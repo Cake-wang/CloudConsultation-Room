@@ -1,0 +1,103 @@
+apply plugin: 'com.android.application'
+apply plugin: 'com.xuexiang.xaop' //引用xaop插件
+
+android {
+    compileSdkVersion rootProject.compileSdkVersion
+    defaultConfig {
+        applicationId "com.aries.template"
+        minSdkVersion rootProject.minSdkVersion
+        targetSdkVersion rootProject.targetSdkVersion
+        versionCode rootProject.versionCode
+        versionName rootProject.versionName
+        multiDexEnabled true
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField "Boolean", "LOG_ENABALE", "true"
+        buildConfigField "String", "BASE_URL", "\"https://api.xxx.com/\""
+    }
+
+    dexOptions {
+        javaMaxHeapSize "Xg"
+        preDexLibraries = false
+    }
+    signingConfigs {
+        release {
+            storeFile file('../fast.jks')
+            storePassword 'fast123#@!'
+            keyAlias 'fast'
+            keyPassword 'fast123#@!'
+        }
+    }
+//    忽略打包资源错误
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
+    }
+    buildTypes {
+        debug {
+            //是否debug模式用于控制是否打印log等
+            debuggable true
+            zipAlignEnabled false //是否支持Zip Align
+            shrinkResources false //是否清理无用资源
+            minifyEnabled false //是否启动混淆
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+        release {
+            debuggable false
+            zipAlignEnabled true //是否支持Zip Align
+            shrinkResources true //是否清理无用资源
+            minifyEnabled true //是否启动混淆
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    gradle.projectsEvaluated {
+        tasks.withType(JavaCompile) {
+            options.compilerArgs << "-Xlint:deprecation" << '-Xlint:-unchecked'
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+//    implementation project(':library')
+    implementation 'me.jessyan:autosize:1.2.1'
+    implementation 'com.github.AriesHoo:FastLib:2.4.0'
+
+    //以下库FastLib里使用compileOnly只是编译,使用时需根据项目选择相应版本
+    implementation 'com.google.android.material:material:'.concat(supportVersion)
+    implementation 'androidx.appcompat:appcompat:'.concat(supportVersion)
+    implementation 'androidx.recyclerview:recyclerview:'.concat(supportVersion)
+    //快速Tab库-继承FastMainActivity使用
+    implementation "com.github.AriesHoo.UIWidget:tab-layout:".concat(widgetVersion)
+    //页面事件交互-androideventbus-停止维护-按需导入
+//    implementation 'org.simple:androideventbus:1.0.5.1'
+    //页面事件交互-eventbus-按需导入
+//    implementation 'org.greenrobot:eventbus:3.1.1'
+    //万能适配器--一般都需要吧
+    implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:'.concat(BRVAHVersion)
+    //webView库 继承FastWebActivity需要,不需要内置WebView可以不implementation
+    implementation 'com.just.agentweb:agentweb:'.concat(agentwebVersion)
+    //webView提供下载功能
+    implementation 'com.download.library:Downloader:'.concat(agentwebVersion)
+    //下拉刷新库注意刷新头SmartRefreshHeader版本最好对应尤其头版本不要低于SmartRefreshLayout版本
+    implementation 'com.scwang.smart:refresh-layout-kernel:'.concat(smartRefreshLayoutVersion)
+    implementation 'com.scwang.smart:refresh-header-material:'.concat(smartRefreshLayoutVersion)
+    //Glide图片加载
+    implementation 'com.github.bumptech.glide:glide:'.concat(glideVersion)
+    implementation files('libs\\dc_mate_202205111943.jar')
+    annotationProcessor 'com.github.bumptech.glide:compiler:'.concat(glideVersion)
+    annotationProcessor 'com.jakewharton:butterknife-compiler:'.concat(butterknifeVersion)
+    //以上库FastLib里使用compileOnly只是编译,使用时需根据项目选择相应版本
+    implementation 'me.yokeyword:fragmentation:1.3.8'
+    implementation 'com.github.xuexiangjys:XUI:1.1.9'
+//    implementation 'com.github.xuexiangjys.XPage:xpage-annotation:3.0.1'
+    // 切片
+    implementation 'com.github.xuexiangjys.XAOP:xaop-runtime:1.1.0'
+
+}

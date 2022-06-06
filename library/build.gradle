@@ -1,0 +1,87 @@
+apply plugin: 'com.android.library'
+apply plugin: 'com.github.dcendents.android-maven'
+
+android {
+    compileSdkVersion rootProject.compileSdkVersion
+
+    defaultConfig {
+        minSdkVersion rootProject.minLibSdkVersion
+        targetSdkVersion rootProject.targetSdkVersion
+        versionCode rootProject.versionCode
+        versionName rootProject.versionName
+        //SVG设置颜色值支持
+//        vectorDrawables.useSupportLibrary = true
+    }
+    buildTypes {
+        release {
+            consumerProguardFiles 'proguard-rules.pro'
+        }
+    }
+    //java 1.8--Interface的虚方法设置默认值default
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    //以下为配置library注释在打包jar后保留
+    // 打包源码jar
+    task sourcesJar(type: Jar) {
+        from android.sourceSets.main.java.srcDirs
+        classifier = 'sources'
+    }
+    task javadoc(type: Javadoc) {
+        failOnError false
+        source = android.sourceSets.main.java.sourceFiles
+        classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+        classpath += configurations.compile
+    }
+    // 打包文档jar
+    task javadocJar(type: Jar, dependsOn: javadoc) {
+        classifier = 'javadoc'
+        from javadoc.destinationDir
+    }
+    artifacts {
+        archives sourcesJar
+        archives javadocJar
+    }
+}
+dependencies {
+    compileOnly "com.google.android.material:material:".concat(supportVersion)
+    compileOnly 'androidx.appcompat:appcompat:'.concat(supportVersion)
+    compileOnly "androidx.recyclerview:recyclerview:".concat(supportVersion)
+    //万能适配器
+    compileOnly 'com.github.CymChad:BaseRecyclerViewAdapterHelper:'.concat(BRVAHVersion)
+    //webView库
+    compileOnly 'com.just.agentweb:agentweb:'.concat(agentwebVersion)
+    //下拉刷新库
+//    compileOnly 'com.scwang.smartrefresh:SmartRefreshLayout:1.1.0-andx-14'
+    compileOnly 'com.scwang.smart:refresh-layout-kernel:'.concat(smartRefreshLayoutVersion)
+    //图片加载
+    compileOnly 'com.github.bumptech.glide:glide:'.concat(glideVersion)
+    //常用UI控件(TitleBarView、RadiusView等)
+    api "com.github.AriesHoo.UIWidget:widget-core:".concat(widgetVersion)
+    //快速Tab库
+    compileOnly "com.github.AriesHoo.UIWidget:tab-layout:".concat(widgetVersion)
+    //日志打印
+    api 'com.orhanobut:logger:2.2.0'
+    //注解
+    api 'com.jakewharton:butterknife:'.concat(butterknifeVersion)
+    //retrofit+rxjava 网络请求及数据解析相关
+    api "io.reactivex.rxjava2:rxjava:2.2.20"
+    api 'io.reactivex.rxjava2:rxandroid:2.1.1'
+    api 'com.squareup.retrofit2:retrofit:2.9.0'
+    api 'com.squareup.retrofit2:converter-gson:2.9.0'
+    api 'com.squareup.retrofit2:adapter-rxjava2:2.9.0'
+    //3.12.x是支持Android 4.4的
+    api 'com.squareup.okhttp3:logging-interceptor:3.12.2'
+    api 'com.google.code.gson:gson:2.8.5'
+    //处理rxjava内存泄漏-生命周期绑定
+    api 'com.trello.rxlifecycle3:rxlifecycle-components:3.1.0'
+    //滑动返回Activity
+    compileOnly 'cn.bingoogolapple:bga-swipebacklayout:2.0.1@aar'
+    //页面事件交互-androideventbus-停止维护
+    compileOnly 'org.simple:androideventbus:1.0.5.1'
+    //页面事件交互-eventbus
+    compileOnly 'org.greenrobot:eventbus:3.1.1'
+    //多状态视图切换
+    api 'com.github.Bakumon:StatusLayoutManager:1.0.4'
+}

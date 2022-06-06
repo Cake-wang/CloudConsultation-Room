@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="com.aries.library.fast">
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <!--8.0开启安装应用权限-->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
+
+    <application android:networkSecurityConfig="@xml/fast_network_security_config">
+        <provider
+            android:name=".FastFileProvider"
+            android:authorities="${applicationId}.FastFileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/fast_file_path"/>
+        </provider>
+        <!--华为使用刘海区域申明-->
+        <meta-data
+            android:name="android.notch_support"
+            android:value="true" />
+        <!--小米使用刘海区域申明-->
+        <meta-data
+            android:name="notch.config"
+            android:value="portrait|landscape" />
+        <!--增加纵横比 全面屏适配-->
+        <meta-data android:name="android.max_aspect"  android:value="2.4"/>
+    </application>
+    <queries>
+        <!--指定微信包名分享-https://open.oppomobile.com/wiki/doc#id=10797-->
+        <package android:name="com.tencent.mm" />
+    </queries>
+</manifest>

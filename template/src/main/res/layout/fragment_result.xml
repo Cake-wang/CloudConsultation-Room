@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/bg_other_yzs"
+    android:orientation="vertical">
+
+    <!--    <include layout="@layout/fast_layout_title_bar" />-->
+
+
+    <!--    <TextView-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:gravity="center"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:text="请插入医保卡" />-->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+
+
+        android:layout_marginTop="130dp"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:layout_marginBottom="80dp"
+        android:background="@drawable/bg_readcard_gray"
+
+        android:paddingTop="10dp"
+        android:paddingRight="40dp"
+        android:paddingLeft="40dp"
+
+        android:orientation="vertical"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+
+            >
+
+            <View
+                android:layout_width="5dp"
+                android:layout_height="25dp"
+                android:background="#24A6A0"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#333"
+                android:layout_weight="1"
+                android:layout_marginLeft="10dp"
+                android:textSize="24dp"
+                android:gravity="left"
+                android:textStyle="bold"
+                android:text="取消成功" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#333"
+                android:drawableLeft="@drawable/icon_countdown_yzs"
+                android:textSize="24dp"
+                android:drawablePadding="10dp"
+
+                android:gravity="center"
+                android:text="119秒" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="400dp"
+
+
+            android:layout_marginTop="10dp"
+
+
+
+            android:background="@drawable/bg_readcard_white"
+
+
+            android:gravity="center"
+            android:orientation="vertical"
+            >
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/bg_suc_yzs"
+                android:layout_marginTop="-10dp"
+                android:layout_marginBottom="15dp"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#38ABA0"
+
+                android:layout_marginTop="-10dp"
+                android:textSize="24dp"
+                android:gravity="left"
+                android:text="取消成功" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#DCA63C"
+
+                android:layout_marginTop="10dp"
+                android:textSize="20dp"
+                android:gravity="left"
+                android:text="您的结算单已取消，如需开药请再次发起问诊" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:paddingTop="10dp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            >
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="返回"
+                android:textColor="#38ABA0"
+                android:gravity="center"
+                android:visibility="gone"
+                android:background="@drawable/btn_back_yzs"
+                />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="首页"
+                android:textColor="#fff"
+                android:gravity="center"
+
+                android:background="@drawable/btn_main_yzs"
+                />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:gravity="center_vertical"
+        android:id="@+id/ll_main"
+        android:background="@color/xui_transparent"
+
+
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#fff"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="机器编号：583958794759" />
+
+
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#333"
+            android:visibility="gone"
+            android:layout_weight="1"
+            android:layout_marginRight="10dp"
+            android:text="服务电话：96225" />
+
+
+
+        <TextClock
+            android:id="@+id/tv_clock"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="2020年5月31日 星期五 20:00:00 1.2.11.13"
+            android:layout_weight="1"
+            android:gravity="left"
+            android:layout_marginTop="8dp"
+            android:format24Hour="H:mm"
+            android:layout_marginRight="20dp"
+            android:format12Hour="h:mm"
+            android:textStyle="normal"
+            android:fontFamily="sans-serif-light"
+            android:textColor="#fff"
+            android:textSize="16dp"
+            android:layout_marginBottom="8dp"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#fff"
+
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="杭州市第一人民医院" />
+    </LinearLayout>
+</RelativeLayout>

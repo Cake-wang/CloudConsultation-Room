@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include layout="@layout/fast_layout_title_bar" />
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:text="请选择一级科室" />
+
+<!--    <TextView-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:gravity="center_vertical"-->
+<!--        android:layout_marginTop="50dp"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="联系方式" />-->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="24dp"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:orientation="vertical"
+            android:layout_height="wrap_content">
+
+
+            <com.xuexiang.xui.widget.alpha.XUIAlphaTextView
+                style="@style/TextStyle.Explain"
+                android:paddingTop="5dp"
+                android:paddingEnd="10dp"
+                android:paddingBottom="5dp"
+                android:text="姓名"
+                android:textColor="@color/xui_config_color_primary_text" />
+
+            <com.xuexiang.xui.widget.alpha.XUIAlphaTextView
+                style="@style/TextStyle.Explain"
+                android:layout_marginTop="32dp"
+                android:paddingTop="5dp"
+                android:paddingEnd="10dp"
+                android:paddingBottom="5dp"
+                android:text="性别"
+                android:textColor="@color/xui_config_color_primary_text" />
+
+            <com.xuexiang.xui.widget.alpha.XUIAlphaTextView
+                style="@style/TextStyle.Explain"
+                android:layout_marginTop="32dp"
+                android:paddingTop="5dp"
+                android:paddingEnd="10dp"
+                android:paddingBottom="5dp"
+                android:text="年龄"
+                android:textColor="@color/xui_config_color_primary_text" />
+
+            <com.xuexiang.xui.widget.alpha.XUIAlphaTextView
+                style="@style/TextStyle.Explain"
+                android:layout_marginTop="32dp"
+                android:paddingTop="5dp"
+                android:paddingEnd="10dp"
+                android:paddingBottom="5dp"
+                android:text="医保卡号"
+                android:textColor="@color/xui_config_color_primary_text" />
+
+            <com.xuexiang.xui.widget.alpha.XUIAlphaTextView
+                style="@style/TextStyle.Explain"
+                android:layout_marginTop="32dp"
+                android:paddingTop="5dp"
+                android:paddingEnd="10dp"
+                android:paddingBottom="5dp"
+                android:text="科室"
+                android:textColor="@color/xui_config_color_primary_text" />
+
+            <com.xuexiang.xui.widget.alpha.XUIAlphaTextView
+                style="@style/TextStyle.Explain"
+                android:layout_marginTop="32dp"
+                android:paddingTop="5dp"
+                android:paddingEnd="10dp"
+                android:paddingBottom="5dp"
+                android:text="医生"
+                android:textColor="@color/xui_config_color_primary_text" />
+
+            <com.xuexiang.xui.widget.alpha.XUIAlphaTextView
+                style="@style/TextStyle.Explain"
+                android:layout_marginTop="32dp"
+                android:paddingTop="5dp"
+                android:paddingEnd="10dp"
+                android:paddingBottom="5dp"
+                android:text="挂号时间"
+                android:textColor="@color/xui_config_color_primary_text" />
+
+            <com.xuexiang.xui.widget.alpha.XUIAlphaTextView
+                style="@style/TextStyle.Explain"
+                android:layout_marginTop="32dp"
+                android:paddingTop="5dp"
+                android:paddingEnd="10dp"
+                android:paddingBottom="5dp"
+                android:text="您已有挂号记录，是否发起问诊"
+                android:textColor="@color/xui_config_color_primary_text" />
+<!--            <TextView-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_gravity="start|center_vertical"-->
+<!--                android:text="验证码" />-->
+
+
+
+        </LinearLayout>
+
+
+
+<!--            <com.xuexiang.xui.widget.textview.supertextview.SuperButton-->
+<!--                android:id="@+id/btn_login"-->
+<!--                style="@style/SuperButton.Primary.Login"-->
+<!--                android:layout_marginTop="16dp"-->
+<!--                android:text="1111" />-->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <com.xuexiang.xui.widget.textview.supertextview.SuperButton
+                android:id="@+id/btn_back"
+                android:layout_height="60dp"
+                style="@style/SuperButton.Primary.Login"
+                android:layout_weight="1"
+                android:text="@string/lab_back" />
+
+            <com.xuexiang.xui.widget.textview.supertextview.SuperButton
+                android:id="@+id/btn_main"
+                android:layout_height="60dp"
+                style="@style/SuperButton.Primary.Login"
+                android:layout_weight="1"
+                android:text="@string/lab_main" />
+
+            <com.xuexiang.xui.widget.textview.supertextview.SuperButton
+                android:id="@+id/btn_cancel"
+                android:layout_height="60dp"
+                style="@style/SuperButton.Primary.Login"
+                android:layout_weight="1"
+                android:text="上一页" />
+
+            <com.xuexiang.xui.widget.textview.supertextview.SuperButton
+                android:id="@+id/btn_inquiry"
+                android:layout_height="60dp"
+                style="@style/SuperButton.Primary.Login"
+                android:layout_weight="1"
+                android:text="下一页" />
+
+        </LinearLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:visibility="gone"
+            android:layout_height="wrap_content">
+
+            <com.xuexiang.xui.widget.alpha.XUIAlphaTextView
+
+                style="@style/TextStyle.Explain"
+                android:layout_gravity="start"
+                android:paddingStart="10dp"
+                android:paddingTop="5dp"
+                android:paddingEnd="10dp"
+                android:paddingBottom="5dp"
+                android:text="其他登录方式"
+                android:textColor="@color/xui_config_color_primary_text" />
+
+            <com.xuexiang.xui.widget.alpha.XUIAlphaTextView
+                android:id="@+id/tv_forget_password"
+                style="@style/TextStyle.Explain"
+                android:layout_gravity="end"
+                android:paddingStart="10dp"
+                android:paddingTop="5dp"
+                android:paddingEnd="10dp"
+                android:paddingBottom="5dp"
+                android:text="忘记密码"
+                android:textColor="@color/xui_config_color_primary_text" />
+
+        </FrameLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

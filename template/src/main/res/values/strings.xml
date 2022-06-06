@@ -1,0 +1,26 @@
+<resources>
+    <string name="app_name">FastTemplate</string>
+    <string name="home">主页</string>
+    <string name="mine">我的</string>
+
+
+    <string name="tip_please_input_phone_number">请输入手机号码</string>
+    <string name="tip_phone_number_error">无效的手机号！</string>
+    <string name="title_phone_number">手机号码</string>
+    <string name="regex_phone_number">^((13[0-9])|(14[5,7])|(15[0-3,5-9])|(16[6])|(17[0,1,3,5-8])|(18[0-9])|(19[8,9]))\\d{8}$</string>
+
+    <string name="hint_please_input_verify_code">请输入验证码</string>
+    <string name="lab_verify_code">验证码</string>
+    <string name="tip_verify_code_error">请输入4位数验证码</string>
+    <string name="regex_verify_code">^\\d{4}$</string>
+
+    <string name="action_get_verify_code">获取验证码</string>
+
+    <string name="lab_back">返回</string>
+    <string name="lab_main">首页</string>
+
+    <string name="tip_cancel_register">取消后问诊需重新挂号</string>
+    <string name="lab_yes">是</string>
+    <string name="lab_no">否</string>
+
+</resources>

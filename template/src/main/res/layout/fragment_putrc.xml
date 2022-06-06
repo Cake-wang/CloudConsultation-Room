@@ -1,0 +1,611 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_other_yzs"
+    android:orientation="vertical">
+
+<!--    <include layout="@layout/fast_layout_title_bar" />-->
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+
+
+        android:layout_marginTop="130dp"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:layout_marginBottom="80dp"
+        android:background="@drawable/bg_readcard_gray"
+
+        android:paddingTop="10dp"
+        android:paddingRight="40dp"
+        android:paddingLeft="40dp"
+
+        android:orientation="vertical"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+
+            >
+
+            <View
+                android:layout_width="5dp"
+                android:layout_height="25dp"
+                android:background="#24A6A0"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#333"
+                android:layout_weight="1"
+                android:layout_marginLeft="10dp"
+                android:textSize="24dp"
+                android:gravity="left"
+                android:textStyle="bold"
+                android:text="请输入手机号" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#333"
+                android:drawableLeft="@drawable/icon_countdown_yzs"
+                android:textSize="24dp"
+                android:drawablePadding="10dp"
+
+                android:gravity="center"
+                android:text="119秒" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="400dp"
+
+
+            android:layout_marginTop="10dp"
+
+
+
+            android:background="@drawable/bg_readcard_white"
+
+
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            >
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="85dp"
+
+                android:layout_marginEnd="24dp"
+                android:orientation="vertical">
+
+
+
+
+                    <com.xuexiang.xui.widget.alpha.XUIAlphaTextView
+                        style="@style/TextStyle.Explain"
+                        android:layout_gravity="start|center_vertical"
+
+                        android:paddingTop="5dp"
+                        android:paddingEnd="10dp"
+                        android:paddingBottom="15dp"
+                        android:text="联系方式:"
+                        android:textSize="18dp"
+                        android:textColor="@color/xui_config_color_primary_text" />
+
+                    <!--            <TextView-->
+                    <!--                android:layout_width="wrap_content"-->
+                    <!--                android:layout_height="wrap_content"-->
+                    <!--                android:layout_gravity="start|center_vertical"-->
+                    <!--                android:text="手机号码" />-->
+
+                    <EditText
+                        android:id="@+id/et_phone_number"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/my_edittext_style"
+
+                        android:hint="@string/tip_please_input_phone_number"
+                        android:inputType="number"
+                      />
+
+<!--                app:met_clearButton="true"-->
+<!--                app:met_errorMessage="@string/tip_phone_number_error"-->
+<!--                app:met_floatingLabel="normal"-->
+<!--                app:met_floatingLabelText="@string/title_phone_number"-->
+<!--                app:met_regexp="@string/regex_phone_number"-->
+
+                <com.xuexiang.xui.widget.alpha.XUIAlphaTextView
+                    style="@style/TextStyle.Explain"
+                    android:layout_gravity="start|center_vertical"
+                    android:layout_marginTop="10dp"
+                    android:paddingTop="5dp"
+                    android:paddingEnd="10dp"
+                    android:paddingBottom="5dp"
+                    android:text="发送验证码"
+                    android:textColor="@color/xui_config_color_primary_text" />
+
+                <FrameLayout
+                    android:id="@+id/fl_verify_code"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp">
+
+
+
+                    <!--            <TextView-->
+                    <!--                android:layout_width="wrap_content"-->
+                    <!--                android:layout_height="wrap_content"-->
+                    <!--                android:layout_gravity="start|center_vertical"-->
+                    <!--                android:text="验证码" />-->
+
+                    <EditText
+                        android:id="@+id/et_verify_code"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/my_edittext_style"
+                        android:hint="@string/hint_please_input_verify_code"
+                        android:inputType="number"
+                         />
+
+<!--                    app:met_clearButton="false"-->
+<!--                    app:met_errorMessage="@string/tip_verify_code_error"-->
+<!--                    app:met_floatingLabel="normal"-->
+<!--                    app:met_floatingLabelText="@string/lab_verify_code"-->
+<!--                    app:met_maxCharacters="4"-->
+<!--                    app:met_regexp="@string/regex_verify_code"-->
+
+                    <com.xuexiang.xui.widget.button.roundbutton.RoundButton
+                        android:id="@+id/btn_get_verify_code"
+                        style="@style/RoundButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="right"
+                        android:paddingStart="10dp"
+                        android:paddingTop="3dp"
+                        android:paddingEnd="10dp"
+                        android:paddingBottom="3dp"
+                        android:text="@string/action_get_verify_code"
+                        android:textColor="@color/selector_round_button_main_theme_color"
+                        android:textSize="13sp"
+                        app:rb_borderColor="@color/selector_round_button_main_theme_color"
+                        app:rb_borderWidth="1.5dp"
+                        app:rb_radius="15dp" />
+
+                </FrameLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="提示：请输入正确的手机号"
+                    android:textColor="#DCA63C"
+                    android:textSize="18dp"
+                    android:layout_marginTop="20dp"
+                    />
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/btn_login"
+                    android:background="@drawable/btn_next_yzs"
+                    android:layout_marginEnd="1dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_gravity="start"
+                    android:text="确认复诊" />
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_marginTop="10dp"
+                    android:layout_height="wrap_content">
+
+                    <androidx.appcompat.widget.AppCompatCheckBox
+                        android:id="@+id/cb_protocol"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="15dp"
+
+
+                        android:button="@drawable/xui_icon_checkbox"
+                        android:scaleX="0.8"
+                        android:scaleY="0.8" />
+
+                    <com.xuexiang.xui.widget.alpha.XUIAlphaTextView
+                        android:id="@+id/tv_other_login"
+                        style="@style/TextStyle.Explain"
+                        android:layout_gravity="start"
+                        android:paddingStart="30dp"
+                        android:paddingTop="5dp"
+                        android:paddingEnd="10dp"
+                        android:paddingBottom="5dp"
+                        android:text="xxxxx协议"
+                        android:textColor="@color/xui_config_color_primary_text" />
+
+
+
+                    <!--            <com.xuexiang.xui.widget.button.roundbutton.RoundButton-->
+                    <!--                android:id="@+id/tv_forget_password"-->
+                    <!--                style="@style/RoundButton"-->
+                    <!--                android:layout_width="wrap_content"-->
+                    <!--                android:layout_height="wrap_content"-->
+                    <!--                android:layout_gravity="end"-->
+                    <!--                android:paddingStart="10dp"-->
+                    <!--                android:paddingTop="3dp"-->
+                    <!--                android:paddingEnd="10dp"-->
+                    <!--                android:paddingBottom="3dp"-->
+                    <!--                android:text="@string/action_get_verify_code"-->
+                    <!--                android:textColor="@color/selector_round_button_main_theme_color"-->
+                    <!--                android:textSize="13sp"-->
+                    <!--                app:rb_borderColor="@color/selector_round_button_main_theme_color"-->
+                    <!--                app:rb_borderWidth="1.5dp"-->
+                    <!--                app:rb_radius="15dp" />-->
+
+                    <!--            <com.xuexiang.xui.widget.alpha.XUIAlphaTextView-->
+                    <!--                android:id="@+id/tv_forget_password"-->
+                    <!--                style="@style/TextStyle.Explain"-->
+                    <!--                android:layout_gravity="end"-->
+                    <!--                android:paddingStart="10dp"-->
+                    <!--                android:paddingTop="5dp"-->
+                    <!--                android:paddingEnd="10dp"-->
+                    <!--                android:paddingBottom="5dp"-->
+                    <!--                android:text="忘记密码"-->
+                    <!--                android:textColor="@color/xui_config_color_primary_text" />-->
+
+                </FrameLayout>
+
+                <!--            <com.xuexiang.xui.widget.textview.supertextview.SuperButton-->
+                <!--                android:id="@+id/btn_login"-->
+                <!--                style="@style/SuperButton.Primary.Login"-->
+                <!--                android:layout_marginTop="16dp"-->
+                <!--                android:text="1111" />-->
+
+
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:visibility="gone"
+                    android:layout_height="wrap_content">
+
+                    <com.xuexiang.xui.widget.alpha.XUIAlphaTextView
+
+                        style="@style/TextStyle.Explain"
+                        android:layout_gravity="start"
+                        android:paddingStart="10dp"
+                        android:paddingTop="5dp"
+                        android:paddingEnd="10dp"
+                        android:paddingBottom="5dp"
+                        android:text="其他登录方式"
+                        android:textColor="@color/xui_config_color_primary_text" />
+
+                    <com.xuexiang.xui.widget.alpha.XUIAlphaTextView
+                        android:id="@+id/tv_forget_password"
+                        style="@style/TextStyle.Explain"
+                        android:layout_gravity="end"
+                        android:paddingStart="10dp"
+                        android:paddingTop="5dp"
+                        android:paddingEnd="10dp"
+                        android:paddingBottom="5dp"
+                        android:text="忘记密码"
+                        android:textColor="@color/xui_config_color_primary_text" />
+
+                </FrameLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+               android:background="@drawable/bg_input_yzs"
+
+                android:padding="10dp"
+                android:layout_marginLeft="100dp"
+                android:orientation="horizontal"
+                >
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+
+                    android:orientation="vertical"
+                    >
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:paddingTop="10dp"
+                        android:paddingRight="10dp"
+                        android:paddingLeft="10dp"
+                        android:paddingBottom="5dp"
+                        android:orientation="horizontal"
+                        >
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="1"
+                            android:textSize="30dp"
+                            android:gravity="center"
+                            android:layout_marginRight="15dp"
+                            android:textColor="@color/white"
+                            android:background="@drawable/bg_num_yzs"
+                            />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="2"
+                            android:textSize="30dp"
+                            android:gravity="center"
+                            android:layout_marginRight="15dp"
+                            android:textColor="@color/white"
+                            android:background="@drawable/bg_num_yzs"
+                            />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="3"
+                            android:textSize="30dp"
+                            android:gravity="center"
+                            android:textColor="@color/white"
+                            android:background="@drawable/bg_num_yzs"
+                            />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:paddingTop="10dp"
+                        android:paddingRight="10dp"
+                        android:paddingLeft="10dp"
+                        android:paddingBottom="5dp"
+                        android:orientation="horizontal"
+                        >
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="4"
+                            android:textSize="30dp"
+                            android:gravity="center"
+                            android:layout_marginRight="15dp"
+                            android:textColor="@color/white"
+                            android:background="@drawable/bg_num_yzs"
+                            />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="5"
+                            android:textSize="30dp"
+                            android:gravity="center"
+                            android:layout_marginRight="15dp"
+                            android:textColor="@color/white"
+                            android:background="@drawable/bg_num_yzs"
+                            />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="6"
+                            android:textSize="30dp"
+                            android:gravity="center"
+                            android:textColor="@color/white"
+                            android:background="@drawable/bg_num_yzs"
+                            />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:paddingTop="10dp"
+                        android:paddingRight="10dp"
+                        android:paddingLeft="10dp"
+                        android:paddingBottom="5dp"
+                        android:orientation="horizontal"
+                        >
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="7"
+                            android:textSize="30dp"
+                            android:gravity="center"
+                            android:layout_marginRight="15dp"
+                            android:textColor="@color/white"
+                            android:background="@drawable/bg_num_yzs"
+                            />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="8"
+                            android:textSize="30dp"
+                            android:gravity="center"
+                            android:layout_marginRight="15dp"
+                            android:textColor="@color/white"
+                            android:background="@drawable/bg_num_yzs"
+                            />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="9"
+                            android:textSize="30dp"
+                            android:gravity="center"
+                            android:textColor="@color/white"
+                            android:background="@drawable/bg_num_yzs"
+                            />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:paddingTop="10dp"
+                        android:paddingRight="10dp"
+                        android:paddingLeft="10dp"
+
+                        android:orientation="horizontal"
+                        >
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textSize="30dp"
+                            android:gravity="center"
+                            android:layout_marginRight="16dp"
+                            android:textColor="@color/white"
+                            android:background="@drawable/bg_zero_yzs"
+                            />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="."
+                            android:textSize="30dp"
+                            android:gravity="center"
+                            android:textColor="@color/white"
+                            android:background="@drawable/bg_num_yzs"
+                            />
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:orientation="vertical"
+                    >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="清\n除"
+                        android:textSize="30dp"
+                        android:gravity="center"
+                       android:layout_marginBottom="16dp"
+                        android:textColor="@color/white"
+                        android:background="@drawable/bg_clear_yzs"
+                        />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="退\n格"
+                        android:textSize="30dp"
+                        android:gravity="center"
+                        android:textColor="@color/white"
+                        android:background="@drawable/bg_clear_yzs"
+                        />
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:paddingTop="10dp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            >
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="返回"
+                android:textColor="#38ABA0"
+                android:gravity="center"
+                android:background="@drawable/btn_back_yzs"
+                />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="首页"
+                android:textColor="#fff"
+                android:gravity="center"
+                android:layout_marginLeft="15dp"
+                android:background="@drawable/btn_main_yzs"
+                />
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:gravity="center_vertical"
+        android:id="@+id/ll_main"
+        android:background="@color/xui_transparent"
+
+
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#fff"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="机器编号：583958794759" />
+
+
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#333"
+            android:visibility="gone"
+            android:layout_weight="1"
+            android:layout_marginRight="10dp"
+            android:text="服务电话：96225" />
+
+
+
+        <TextClock
+            android:id="@+id/tv_clock"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="2020年5月31日 星期五 20:00:00 1.2.11.13"
+            android:layout_weight="1"
+            android:gravity="left"
+            android:layout_marginTop="8dp"
+            android:format24Hour="H:mm"
+            android:layout_marginRight="20dp"
+            android:format12Hour="h:mm"
+            android:textStyle="normal"
+            android:fontFamily="sans-serif-light"
+            android:textColor="#fff"
+            android:textSize="16dp"
+            android:layout_marginBottom="8dp"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#fff"
+
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="杭州市第一人民医院" />
+    </LinearLayout>
+</RelativeLayout>

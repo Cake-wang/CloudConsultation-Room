@@ -1,0 +1,9 @@
+{
+	"versionCode": 248,
+	"versionName": "2.3.6",
+	"url": "https://raw.githubusercontent.com/AriesHoo/FastLib/master/apk/sample.apk",
+	"force": false,
+	"size": "3.04M",
+	"saturation": 1.0,
+	"message": "1、升级部分三方库\n2、新增黑白化效果服务端配置"
+}
