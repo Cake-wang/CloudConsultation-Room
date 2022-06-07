@@ -26,6 +26,7 @@ import androidx.multidex.MultiDexApplication;
 import me.yokeyword.fragmentation.Fragmentation;
 
 /**
+ * 入口
  * @Author: AriesHoo on 2018/7/31 10:43
  * @E-Mail: AriesHoo@126.com
  * Function:基础配置Application
