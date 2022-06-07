@@ -86,7 +86,7 @@ public class DepartmentFragment extends FastTitleFragment implements ISupportFra
 
     @Override
     public int getContentLayout() {
-        return R.layout.fragment_department;
+        return R.layout.fragment_dept;
     }
 
     @Override

@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.widget.CheckBox;
+import android.widget.EditText;
 
 import com.aries.library.fast.module.fragment.FastTitleFragment;
 import com.aries.library.fast.retrofit.FastLoadingObserver;
@@ -26,10 +27,11 @@ import com.xuexiang.xaop.annotation.SingleClick;
 import com.xuexiang.xui.utils.CountDownButtonHelper;
 import com.xuexiang.xui.utils.ViewUtils;
 import com.xuexiang.xui.widget.button.roundbutton.RoundButton;
-import com.xuexiang.xui.widget.edittext.materialedittext.MaterialEditText;
 import com.xuexiang.xui.widget.textview.supertextview.SuperButton;
 
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
@@ -56,9 +58,9 @@ public class PutRecordFragment extends FastTitleFragment implements ISupportFrag
     private  String idCard= "",name= "",smkcard = "";
 
     @BindView(R.id.et_phone_number)
-    MaterialEditText etPhoneNumber;
+    EditText etPhoneNumber;
     @BindView(R.id.et_verify_code)
-    MaterialEditText etVerifyCode;
+    EditText etVerifyCode;
     @BindView(R.id.btn_get_verify_code)
     RoundButton btnGetVerifyCode;
 
@@ -133,14 +135,15 @@ public class PutRecordFragment extends FastTitleFragment implements ISupportFrag
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.btn_get_verify_code:
-                if (etPhoneNumber.validate()) {
-                    getVerifyCode(etPhoneNumber.getEditValue());
+
+                if (isMobileNO(etPhoneNumber.getEditableText().toString().trim())) {
+                    getVerifyCode(etPhoneNumber.getEditableText().toString().trim());
                 }
                 break;
             case R.id.btn_login:
-                if (etPhoneNumber.validate()) {
-                    if (etVerifyCode.validate()) {
-                        loginByVerifyCode(etPhoneNumber.getEditValue(), etVerifyCode.getEditValue());
+                if (isMobileNO(etPhoneNumber.getEditableText().toString().trim())) {
+                    if (isVerifyCode(etVerifyCode.getEditableText().toString().trim())) {
+                        loginByVerifyCode(etPhoneNumber.getEditableText().toString().trim(), etVerifyCode.getEditableText().toString().trim());
                     }
                 }
                 break;
@@ -159,6 +162,22 @@ public class PutRecordFragment extends FastTitleFragment implements ISupportFrag
             default:
                 break;
         }
+    }
+
+    public static boolean isMobileNO(String mobiles) {
+        Pattern p = Pattern
+                .compile("^((13[0-9])|(14[5,7])|(15[0-3,5-9])|(16[6])|(17[0,1,3,5-8])|(18[0-9])|(19[8,9]))\\\\d{8}$");
+        Matcher m = p.matcher(mobiles);
+//        System.out.println(m.matches() + "---");
+        return m.matches();
+    }
+
+    public static boolean isVerifyCode(String verifyCode) {
+        Pattern p = Pattern
+                .compile("^\\\\d{4}$");
+        Matcher m = p.matcher(verifyCode);
+//        System.out.println(m.matches() + "---");
+        return m.matches();
     }
 
     /**
@@ -269,7 +288,7 @@ public class PutRecordFragment extends FastTitleFragment implements ISupportFrag
 //                                checkVersion(entity);
                                 if (entity.isSuccess()){
 
-
+                                    start(DepartmentFragment.newInstance(new Object()));
 
                                 }else {
 

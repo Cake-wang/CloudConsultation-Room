@@ -81,8 +81,8 @@ public class GetConsultsAndRecipesResultEntity {
         public boolean success;
 
         public JsonResponseBean jsonResponseBean;
-        public Consults consults;
-        public Recipes recipes;
+        public List<Consults> consults;
+        public List<Recipes> recipes;
 
         public Integer getStatusCode() {
             return statusCode;
@@ -132,19 +132,19 @@ public class GetConsultsAndRecipesResultEntity {
             this.jsonResponseBean = jsonResponseBean;
         }
 
-        public Consults getConsults() {
+        public List<Consults> getConsults() {
             return consults;
         }
 
-        public void setConsults(Consults consults) {
+        public void setConsults(List<Consults> consults) {
             this.consults = consults;
         }
 
-        public Recipes getRecipes() {
+        public List<Recipes> getRecipes() {
             return recipes;
         }
 
-        public void setRecipes(Recipes recipes) {
+        public void setRecipes(List<Recipes> recipes) {
             this.recipes = recipes;
         }
 

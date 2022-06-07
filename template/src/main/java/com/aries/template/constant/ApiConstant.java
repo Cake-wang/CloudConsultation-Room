@@ -24,16 +24,23 @@ public class ApiConstant {
 
     public static  String BASEURL = "http://10.100.10.45:18033/";
 
+    public static  String BASEURLTest = "https://jsbceshi.hfi-health.com:18188/cloudHospital/";
+
     public static  String DownURL = "http://10.100.10.45:18033/";
 
 //查询激活状态
-    public static final String isRegister  =  "cloudHospital/ngariUserRelation/isRegister";
+    public static final String isRegister  =  "ngariUserRelation/isRegister";
 
-    public static final String register  =  "cloudHospital/ngariUserRelation/register";
+    public static final String findUser  =  "ngariUserRelation/findUser";
+
+    public static final String register  =  "ngariUserRelation/register";
 
     public static final String cancelregister  =  "ngari/revisit/doBaseNgariRequest";
 
     public static final String getConsultsAndRecipes  =  "ngari/revisit/getConsultsAndRecipes";
+
+
+
 
 //    http://XXXXX:port/api/activation/queryActive
 

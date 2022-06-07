@@ -304,49 +304,6 @@
                     android:orientation="vertical"
                     >
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="#666666"
-                        android:layout_marginTop="30dp"
-                        android:layout_marginLeft="40dp"
-                        android:textSize="20dp"
-                        android:gravity="left"
-                        android:layout_marginBottom="15dp"
-                        android:text="处方信息：" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="#333333"
-
-                        android:layout_marginLeft="40dp"
-                        android:textSize="20dp"
-                        android:gravity="left"
-                        android:layout_marginBottom="15dp"
-                        android:text="1、阿莫西林（1天3次，每次2片）" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="#333333"
-
-                        android:layout_marginLeft="40dp"
-                        android:textSize="20dp"
-                        android:gravity="left"
-                        android:layout_marginBottom="15dp"
-                        android:text="2、止咳糖浆（1天3次，每次20毫升）" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="#333333"
-
-                        android:layout_marginLeft="40dp"
-                        android:textSize="20dp"
-                        android:gravity="left"
-
-                        android:text="3、口服液（1天2次，每次1支）" />
 
 
                 </LinearLayout>

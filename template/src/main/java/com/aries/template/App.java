@@ -104,15 +104,19 @@ public class App extends MultiDexApplication {
 //                .putBaseUrl(ApiConstant.API_UPDATE_APP, BuildConfig.BASE__UPDATE_URL);
         FastRetrofit.getInstance()
 //                .addHeader(" Content-Type","application/json")
-                .putBaseUrl(ApiConstant.isRegister, ApiConstant.BASEURL);
+                .putBaseUrl(ApiConstant.isRegister, ApiConstant.BASEURLTest);
 
         FastRetrofit.getInstance()
 //                .addHeader(" Content-Type","application/json")
-                .putBaseUrl(ApiConstant.register, ApiConstant.BASEURL);
+                .putBaseUrl(ApiConstant.register, ApiConstant.BASEURLTest);
 
         FastRetrofit.getInstance()
 //                .addHeader(" Content-Type","application/json")
-                .putBaseUrl(ApiConstant.cancelregister, ApiConstant.BASEURL);
+                .putBaseUrl(ApiConstant.cancelregister, ApiConstant.BASEURLTest);
+
+        FastRetrofit.getInstance()
+//                .addHeader(" Content-Type","application/json")
+                .putBaseUrl(ApiConstant.getConsultsAndRecipes, ApiConstant.BASEURLTest);
 
         //方式二 通过 Service 里添加特定header设置
         //step1

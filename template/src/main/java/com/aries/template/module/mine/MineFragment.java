@@ -14,9 +14,11 @@ import android.view.animation.Animation;
 import com.aries.library.fast.module.fragment.FastTitleFragment;
 import com.aries.library.fast.retrofit.FastLoadingObserver;
 import com.aries.library.fast.retrofit.FastObserver;
+import com.aries.library.fast.util.SPUtil;
 import com.aries.library.fast.util.ToastUtil;
 import com.aries.template.R;
-import com.aries.template.entity.IsRegisterResultEntity;
+import com.aries.template.entity.FindUserResultEntity;
+import com.aries.template.entity.GetConsultsAndRecipesResultEntity;
 import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.ui.view.title.TitleBarView;
 import com.decard.NDKMethod.BasicOper;
@@ -156,12 +158,12 @@ public class MineFragment extends FastTitleFragment implements ISupportFragment 
     }
     public void readCardSuccess(String idCard,String name,String smkcard) {
 
-        ApiRepository.getInstance().isRegister(idCard,mContext)
+        ApiRepository.getInstance().findUser(idCard,mContext)
                 .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
                 .subscribe(true ?
-                        new FastLoadingObserver<IsRegisterResultEntity>("请稍后...") {
+                        new FastLoadingObserver<FindUserResultEntity>("请稍后...") {
                             @Override
-                            public void _onNext(@NonNull IsRegisterResultEntity entity) {
+                            public void _onNext(@NonNull FindUserResultEntity entity) {
                                 if (entity == null) {
                                     ToastUtil.show("请检查网络");
                                     return;
@@ -169,25 +171,32 @@ public class MineFragment extends FastTitleFragment implements ISupportFragment 
 //                                checkVersion(entity);
                                 if (entity.isSuccess()){
 
-                                    if(tag.contains("stjc")){
+                                    if (entity.getData()!=null){
+                                        SPUtil.put(mContext,"tid",entity.getData().getUserId());
+                                        if(tag.contains("stjc")){
 
+                                        }else {
+
+                                            //判断有挂号或处方
+
+                                            getConsultsAndRecipes();
+
+                                        }
                                     }else {
-
-                                        //判断有挂号或处方
-
-                                        findRecordorPrescription();
-
+                                        if(TextUtils.isEmpty(tag)){
+                                            ToastUtil.show("参数缺失");
+                                        }else {
+                                            start(PutRecordFragment.newInstance( idCard, name, smkcard));
+                                        }
                                     }
+
+
 
                                 }else {
 
-                                    if(TextUtils.isEmpty(tag)){
-                                        ToastUtil.show("参数缺失");
-                                    }else {
-                                        start(PutRecordFragment.newInstance( idCard, name, smkcard));
-                                    }
 
-//                                    ToastUtil.show(entity.getRespDesc());
+
+                                    ToastUtil.show(entity.getMessage());
                                 }
                             }
 
@@ -200,9 +209,9 @@ public class MineFragment extends FastTitleFragment implements ISupportFragment 
                                 }
                             }
                         } :
-                        new FastObserver<IsRegisterResultEntity>() {
+                        new FastObserver<FindUserResultEntity>() {
                             @Override
-                            public void _onNext(@NonNull IsRegisterResultEntity entity) {
+                            public void _onNext(@NonNull FindUserResultEntity entity) {
                                 if (entity == null) {
                                     ToastUtil.show("请检查网络");
                                     return;
@@ -222,11 +231,73 @@ public class MineFragment extends FastTitleFragment implements ISupportFragment 
 
     }
 
-    private void findRecordorPrescription() {
+    private void getConsultsAndRecipes() {
 
-        start(OrderFragment.newInstance(new Object()));
 
-        start(DepartmentFragment.newInstance(new Object()));
+        ApiRepository.getInstance().getConsultsAndRecipes("","",0,mContext)
+                .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
+                .subscribe(true ?
+                        new FastLoadingObserver<GetConsultsAndRecipesResultEntity>("请稍后...") {
+                            @Override
+                            public void _onNext(@NonNull GetConsultsAndRecipesResultEntity entity) {
+                                if (entity == null) {
+                                    ToastUtil.show("请检查网络");
+                                    return;
+                                }
+//                                checkVersion(entity);
+                                if (entity.isSuccess()){
+                                    if(entity.getData().isSuccess()){
+                                        if(entity.getData().getConsults().size()>0||entity.getData().getRecipes().size()>0){
+                                            start(OrderFragment.newInstance(entity.getData()));
+                                        }else {
+                                            start(DepartmentFragment.newInstance(new Object()));
+                                        }
+                                    }else {
+                                        ToastUtil.show(entity.getData().getErrorMessage());
+                                    }
+
+
+
+
+
+                                }else {
+
+
+
+                                    ToastUtil.show(entity.getMessage());
+                                }
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+
+//                                ToastUtil.show("请检查网络和ip地址");
+                                if (true) {
+                                    super.onError(e);
+                                }
+                            }
+                        } :
+                        new FastObserver<GetConsultsAndRecipesResultEntity>() {
+                            @Override
+                            public void _onNext(@NonNull GetConsultsAndRecipesResultEntity entity) {
+                                if (entity == null) {
+                                    ToastUtil.show("请检查网络");
+                                    return;
+                                }
+
+
+
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+                                if (false) {
+                                    super.onError(e);
+                                }
+                            }
+                        });
+
+
 
     }
 

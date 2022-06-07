@@ -15,6 +15,7 @@ import com.aries.library.fast.retrofit.FastObserver;
 import com.aries.library.fast.util.ToastUtil;
 import com.aries.template.R;
 import com.aries.template.entity.CancelregisterResultEntity;
+import com.aries.template.entity.GetConsultsAndRecipesResultEntity;
 import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.template.view.ShineButtonDialog;
 import com.aries.ui.view.title.TitleBarView;
@@ -50,7 +51,7 @@ import me.yokeyword.fragmentation.anim.FragmentAnimator;
  * @Description:
  */
 public class OrderFragment extends FastTitleFragment implements ISupportFragment {
-    private  Object obj;
+    private GetConsultsAndRecipesResultEntity.QueryArrearsSummary obj;
     private  String appKey= "",tid= "";
     private Integer consultId ;
 
@@ -65,7 +66,7 @@ public class OrderFragment extends FastTitleFragment implements ISupportFragment
 
 
 
-    public static OrderFragment newInstance(Object obj) {
+    public static OrderFragment newInstance(GetConsultsAndRecipesResultEntity.QueryArrearsSummary obj) {
         Bundle args = new Bundle();
         OrderFragment fragment = new OrderFragment();
         args.putSerializable("obj", (Serializable) obj);
@@ -80,7 +81,7 @@ public class OrderFragment extends FastTitleFragment implements ISupportFragment
         mDelegate.onCreate(savedInstanceState);
         Bundle args = getArguments();
         if (args != null) {
-            obj = args.getSerializable("obj");
+            obj = (GetConsultsAndRecipesResultEntity.QueryArrearsSummary) args.getSerializable("obj");
 
         }
     }
@@ -110,6 +111,11 @@ public class OrderFragment extends FastTitleFragment implements ISupportFragment
 //            }
 //        }, 500);//3秒后执行Runnable中的run方法
 
+        if (obj.getConsults().size()>0){
+
+        }else {
+
+        }
 
     }
 
