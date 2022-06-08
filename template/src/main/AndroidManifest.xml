@@ -24,21 +24,24 @@
         <meta-data
             android:name="design_height_in_dp"
             android:value="768"/>
-        <intent-filter>
-            <action android:name="com.garea.launcher.desktop" />
-        </intent-filter>
+<!--        <intent-filter>-->
+<!--            <action android:name="com.garea.launcher.desktop" />-->
+<!--        </intent-filter>-->
         <activity
             android:name=".SplashActivity"
             android:configChanges="locale|layoutDirection|mcc|mnc"
+            android:screenOrientation="landscape"
             android:theme="@style/NormalSplash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="com.garea.launcher.desktop" />
             </intent-filter>
         </activity>
         <activity
             android:name=".MainActivity"
             android:configChanges="locale|layoutDirection|mcc|mnc|orientation|screenSize"
+            android:screenOrientation="landscape"
             android:launchMode="singleTop" />
         <!-- 应用内浏览器 -->
         <activity
