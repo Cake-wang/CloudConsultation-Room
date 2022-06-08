@@ -82,6 +82,12 @@ public class MineFragment extends FastTitleFragment implements ISupportFragment 
     @Override
     public void initView(Bundle savedInstanceState) {
 
+
+
+    }
+
+    @Override
+    public void loadData() {
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
@@ -92,7 +98,6 @@ public class MineFragment extends FastTitleFragment implements ISupportFragment 
                 openSerialport();
             }
         }, 500);//3秒后执行Runnable中的run方法
-
     }
 
     private void openSerialport() {

@@ -3,24 +3,45 @@ package com.aries.template;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
 
 import com.aries.library.fast.entity.FastTabEntity;
 import com.aries.library.fast.manager.LoggerManager;
 import com.aries.library.fast.module.activity.FastMainActivity;
+import com.aries.library.fast.retrofit.FastLoadingObserver;
+import com.aries.library.fast.retrofit.FastObserver;
+import com.aries.library.fast.util.SPUtil;
+import com.aries.library.fast.util.ToastUtil;
+import com.aries.template.entity.FindUserResultEntity;
+import com.aries.template.entity.GetConsultsAndRecipesResultEntity;
 import com.aries.template.module.main.HomeFragment;
+import com.aries.template.module.mine.DepartmentFragment;
 import com.aries.template.module.mine.MineFragment;
+import com.aries.template.module.mine.OrderFragment;
+import com.aries.template.module.mine.PutRecordFragment;
+import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.ui.view.tab.CommonTabLayout;
+import com.decard.NDKMethod.BasicOper;
+import com.decard.NDKMethod.EGovernment;
+import com.decard.entitys.SSCard;
+import com.trello.rxlifecycle3.android.ActivityEvent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import butterknife.BindView;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import me.yokeyword.fragmentation.ExtraTransaction;
 import me.yokeyword.fragmentation.ISupportActivity;
 import me.yokeyword.fragmentation.ISupportFragment;
@@ -72,6 +93,268 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
     }
 
     @Override
+    public void loadData() {
+
+
+
+        if (getTopFragment() instanceof HomeFragment){
+
+            return;
+
+        }
+
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                /**
+                 *要执行的操作
+                 */
+                openSerialport();
+            }
+        }, 500);//3秒后执行Runnable中的run方法
+
+    }
+
+    private void openSerialport() {
+
+        Log.d("111111MODEL", Build.MODEL);
+
+
+        //打开端口，usb模式，打开之前必须确保已经获取到USB权限，返回值为设备句柄号。
+        int devHandle = BasicOper.dc_open("AUSB",this,"",0);
+        if(devHandle>0){
+            Log.d("open","dc_open success devHandle = "+devHandle);
+            timeLoop();
+        }
+
+    }
+
+    private static final int PERIOD = 3* 1000;
+    private static final int DELAY = 100;
+    private Disposable mDisposable;
+    /**
+     * 定时循环任务
+     */
+    private void timeLoop() {
+
+        mDisposable = Observable.interval(DELAY, PERIOD, TimeUnit.MILLISECONDS)
+                .map((aLong -> aLong + 1))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(aLong -> readCardNew());//getUnreadCount()执行的任务
+
+    }
+
+    private void readCardNew() {
+
+
+        if (getTopFragment() instanceof MineFragment){
+
+            //社保卡上电
+            boolean bCardPowerOn = false;
+            String result = null;
+            String[] resultArr = null;
+            result = EGovernment.EgAPP_SI_CardPowerOn(1);
+            resultArr = result.split("\\|",-1);
+            if(resultArr[0].equals("0000")){
+                bCardPowerOn = true;
+                Log.d("EgAPP_SI_CardPowerOn","success");
+            }else{
+                Log.d("EgAPP_SI_CardPowerOn","error code = "+resultArr[0] +" error msg = "+resultArr[1] );
+            }
+            //读取社保卡基本信息
+            if(bCardPowerOn){
+                SSCard ssCard = EGovernment.EgAPP_SI_ReadSSCardInfo();
+                if(ssCard!=null){
+                    Log.d("EgAPP_SI_ReadSSCardInfo",ssCard.toString());
+
+
+                    readCardSuccess(ssCard.getSSNum(),ssCard.getName(),ssCard.getCardNum());
+
+
+
+                    if (mDisposable != null) {mDisposable.dispose();}
+                }else{
+                    if (mDisposable != null) {mDisposable.dispose();}
+                    Log.d("EgAPP_SI_ReadSSCardInfo","读取社保卡信息失败");
+                }}
+            //社保卡下电
+            if(bCardPowerOn){
+                result = EGovernment.EgAPP_SI_CardPowerOff(1);
+            }
+
+        }else {
+            String result111 = BasicOper.dc_card_status();
+            String[] resultArr111 = result111.split("\\|",-1);
+            if(resultArr111[0].equals("0000")){
+                Log.d("dc_card_status","卡片存在");
+            }
+            else{
+                HomeFragment fragment = findFragment(HomeFragment.class);
+//                Bundle newBundle = new Bundle();
+//
+//                fragment.putNewBundle(newBundle);
+                // 在栈内的HomeFragment以SingleTask模式启动（即在其之上的Fragment会出栈）
+                start(fragment, SupportFragment.SINGLETASK);
+                Log.d("dc_card_status","error code = "+resultArr111[0] +" error msg = "+resultArr111[1] );
+            }
+        }
+
+
+
+
+
+    }
+
+    public void readCardSuccess(String idCard,String name,String smkcard) {
+
+        ApiRepository.getInstance().findUser(idCard,mContext)
+                .compose(this.bindUntilEvent(ActivityEvent.DESTROY))
+                .subscribe(true ?
+                        new FastLoadingObserver<FindUserResultEntity>("请稍后...") {
+                            @Override
+                            public void _onNext(@io.reactivex.annotations.NonNull FindUserResultEntity entity) {
+                                if (entity == null) {
+                                    ToastUtil.show("请检查网络");
+                                    return;
+                                }
+//                                checkVersion(entity);
+                                if (entity.isSuccess()){
+
+                                    String tag = (String) SPUtil.get(mContext,"tag","fzpy");
+
+                                    if (entity.getData()!=null){
+                                        SPUtil.put(mContext,"tid",entity.getData().getUserId());
+                                        if(tag.contains("stjc")){
+
+                                        }else {
+
+                                            //判断有挂号或处方
+
+                                            getConsultsAndRecipes();
+
+                                        }
+                                    }else {
+                                        if(TextUtils.isEmpty(tag)){
+                                            ToastUtil.show("参数缺失");
+                                        }else {
+                                            start(PutRecordFragment.newInstance( idCard, name, smkcard));
+                                        }
+                                    }
+
+
+
+                                }else {
+
+
+
+                                    ToastUtil.show(entity.getMessage());
+                                }
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+
+//                                ToastUtil.show("请检查网络和ip地址");
+                                if (true) {
+                                    super.onError(e);
+                                }
+                            }
+                        } :
+                        new FastObserver<FindUserResultEntity>() {
+                            @Override
+                            public void _onNext(@io.reactivex.annotations.NonNull FindUserResultEntity entity) {
+                                if (entity == null) {
+                                    ToastUtil.show("请检查网络");
+                                    return;
+                                }
+
+
+
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+                                if (false) {
+                                    super.onError(e);
+                                }
+                            }
+                        });
+
+    }
+
+    private void getConsultsAndRecipes() {
+
+
+        ApiRepository.getInstance().getConsultsAndRecipes("","",0,mContext)
+                .compose(this.bindUntilEvent(ActivityEvent.DESTROY))
+                .subscribe(true ?
+                        new FastLoadingObserver<GetConsultsAndRecipesResultEntity>("请稍后...") {
+                            @Override
+                            public void _onNext(@io.reactivex.annotations.NonNull GetConsultsAndRecipesResultEntity entity) {
+                                if (entity == null) {
+                                    ToastUtil.show("请检查网络");
+                                    return;
+                                }
+//                                checkVersion(entity);
+                                if (entity.isSuccess()){
+                                    if(entity.getData().isSuccess()){
+                                        if(entity.getData().getConsults().size()>0||entity.getData().getRecipes().size()>0){
+                                            start(OrderFragment.newInstance(entity.getData()));
+                                        }else {
+                                            start(DepartmentFragment.newInstance(new Object()));
+                                        }
+                                    }else {
+                                        ToastUtil.show(entity.getData().getErrorMessage());
+                                    }
+
+
+
+
+
+                                }else {
+
+
+
+                                    ToastUtil.show(entity.getMessage());
+                                }
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+
+//                                ToastUtil.show("请检查网络和ip地址");
+                                if (true) {
+                                    super.onError(e);
+                                }
+                            }
+                        } :
+                        new FastObserver<GetConsultsAndRecipesResultEntity>() {
+                            @Override
+                            public void _onNext(@io.reactivex.annotations.NonNull GetConsultsAndRecipesResultEntity entity) {
+                                if (entity == null) {
+                                    ToastUtil.show("请检查网络");
+                                    return;
+                                }
+
+
+
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+                                if (false) {
+                                    super.onError(e);
+                                }
+                            }
+                        });
+
+
+
+    }
+
+    @Override
     public void onTabSelect(int position) {
         LoggerManager.d("OnTabSelectListener:onTabSelect:" + position);
     }
@@ -82,6 +365,7 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
     }
 
     //    @Override
+//    @Override
 //    protected void onDestroy() {
 //        super.onDestroy();
 //        LoggerManager.i(TAG, "onDestroy");
@@ -351,3 +635,4 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
     }
 
 }
+

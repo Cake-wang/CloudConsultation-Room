@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextClock;
 
 import com.aries.library.fast.module.fragment.FastTitleFragment;
+import com.aries.library.fast.util.SPUtil;
 import com.aries.template.R;
 import com.aries.template.module.mine.MineFragment;
 import com.aries.ui.view.title.TitleBarView;
@@ -64,6 +65,7 @@ public class HomeFragment extends FastTitleFragment implements ISupportFragment 
             @Override
             public void onClick(View v) {
 
+                SPUtil.put(mContext,"tag","stjc");
                 start(MineFragment.newInstance("stjc"));
 
             }
@@ -73,6 +75,7 @@ public class HomeFragment extends FastTitleFragment implements ISupportFragment 
             @Override
             public void onClick(View v) {
 
+                SPUtil.put(mContext,"tag","fzpy");
                 start(MineFragment.newInstance("fzpy"));
 
             }

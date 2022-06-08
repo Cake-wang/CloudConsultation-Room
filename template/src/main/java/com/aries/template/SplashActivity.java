@@ -31,7 +31,7 @@ public class SplashActivity extends FastTitleActivity {
     /**
      * 闪屏
      */
-    private long mDelayTime = 5000;
+    private long mDelayTime = 500;
 
     @Override
     public void beforeSetContentView() {

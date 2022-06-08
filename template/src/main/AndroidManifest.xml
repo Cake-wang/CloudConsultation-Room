@@ -35,7 +35,10 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
-                <action android:name="com.garea.launcher.desktop" />
+
+            </intent-filter>
+            <intent-filter>
+                 <action android:name="com.garea.launcher.desktop" />
             </intent-filter>
         </activity>
         <activity
