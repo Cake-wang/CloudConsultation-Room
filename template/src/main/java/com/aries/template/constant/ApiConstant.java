@@ -8,10 +8,18 @@ package com.aries.template.constant;
  */
 public class ApiConstant {
 
+    /** 由纳里平台分配的公司标识，固定写死 */
+    public static final String NALI_APPKEY = "app_web";
+
+    /** 由纳里平台分配 第三方平台用户唯一主键 */
+    public static final String NALI_TID = "tid_2";
+
+    /** 纳里的加密私钥 */
+    public static String NALI_PRIVATE_KEY ="MIICXQIBAAKBgQDeppiicqPIfjLjAzW1VKXjP2BsRGBjwh4nYV0C5tD8z+R0NvnLJo7de5icjhhsNnCDn6NFKtLF4WIL97x38nRgKueAD+LYjCPefJ6tZT513tMen9N8BYiUP8+9EyxSKVsVWdBCZnPEWp0GTSpN1sjv6dhk8PYjndfIHalYSY8YXQIDAQABAoGBAJ55p9SgknEnWiL46uaJPJX2SzRkqtL2nS3cgC6LiZ8Yffw2ETAG3tNIoMR1425KhWU6YCTgKSvNk1L/Xzdk7G0easRzCNRQ6EWm3H+c/UBHcDBVfSKq45SwlJvaVlU8A8c8YCmttEBFrKS2YEWln/U8DUSNkrbAs0ni/dCyOGnlAkEA+21tSJYxW2yY939yVHtsrIttCokBR3hp7sZPHEyAcXuslZ/O62k3k3PMZUWEqaXnhiAnIJWr8yrGpcTobwHfwwJBAOKzMYdtoPOswki5temLj7yyTitY9L27hTEgt+Y7y5/oCmB/P3XZlJOtpnFDu+xdJAnEpu1RuCYUUIs00l/kxV8CQGBLTKucOlMViJBh01vf2YNL8vsx9bd1urykXvArrJXKFBNKHWmz5oEmvIWc1m5TCBUqg1HLgQukumgKviqlwRkCQQCCVR9OivqT3Wi9QveQ04nJpIFIbpYWVq7WdccEeLAyuMbuf3nOmU7QMG+WgqiR1WKYsxR9MBQ84EUGI1Ini3DlAkBHyidb8c92GDPKxHG1NS2lMvAKpEOlWhPS18vtEPA1R0oQnRB942l6gekxSRZPUVpNrFXPheVApbZJLpbUaHpS";
+
     public static final String API_MOVIE_IN_THEATERS = "v2/movie/in_theaters";
     public static final String API_MOVIE_COMING_SOON = "v2/movie/coming_soon";
     public static final String API_MOVIE_TOP = "v2/movie/top250";
-
     public static final String API_UPDATE_APP = "update";
     public static final String API_UPDATE_APP_KEY = "update";
 
@@ -35,7 +43,8 @@ public class ApiConstant {
 
     public static final String register  =  "ngariUserRelation/register";
 
-    public static final String cancelregister  =  "ngari/revisit/doBaseNgariRequest";
+    /** 纳里复诊服务接口 */
+    public static final String doBaseNgariRequest =  "ngari/revisit/doBaseNgariRequest";
 
     public static final String getConsultsAndRecipes  =  "ngari/revisit/getConsultsAndRecipes";
 

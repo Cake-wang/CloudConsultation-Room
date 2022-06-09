@@ -113,7 +113,7 @@ public class App extends MultiDexApplication {
 
         FastRetrofit.getInstance()
 //                .addHeader(" Content-Type","application/json")
-                .putBaseUrl(ApiConstant.cancelregister, ApiConstant.BASEURLTest);
+                .putBaseUrl(ApiConstant.doBaseNgariRequest, ApiConstant.BASEURLTest);
 
         FastRetrofit.getInstance()
 //                .addHeader(" Content-Type","application/json")

@@ -9,6 +9,7 @@ import com.aries.template.entity.CancelregisterResultEntity;
 import com.aries.template.entity.CreateOrderResultEntity;
 import com.aries.template.entity.FindUserResultEntity;
 import com.aries.template.entity.FindValidDepartmentForRevisitResultEntity;
+import com.aries.template.entity.FindValidOrganProfessionForRevisitBean;
 import com.aries.template.entity.FindValidOrganProfessionForRevisitResultEntity;
 import com.aries.template.entity.GetConfigurationToThirdForPatientResultEntity;
 import com.aries.template.entity.GetConsultsAndRecipesResultEntity;
@@ -74,35 +75,41 @@ public interface ApiService {
     Observable<RegisterResultEntity> register(@Body RequestBody body);
 
     @Headers("Content-Type: application/json")
-    @POST(ApiConstant.cancelregister)
+    @POST(ApiConstant.doBaseNgariRequest)
     Observable<CancelregisterResultEntity> patientCancelGraphicTextConsult(@Body RequestBody body);
 
+    /**
+     * 复诊按机构查找一级科室
+     */
     @Headers("Content-Type: application/json")
-    @POST(ApiConstant.cancelregister)
-    Observable<FindValidOrganProfessionForRevisitResultEntity> findValidOrganProfessionForRevisit(@Body RequestBody body);
+    @POST(ApiConstant.doBaseNgariRequest)
+    Observable<FindValidOrganProfessionForRevisitBean> findValidOrganProfessionForRevisit(@Body Map body);
 
+    /**
+     * 复诊按机构查找一级科室
+     */
     @Headers("Content-Type: application/json")
-    @POST(ApiConstant.cancelregister)
+    @POST(ApiConstant.doBaseNgariRequest)
     Observable<FindValidDepartmentForRevisitResultEntity> findValidDepartmentForRevisit(@Body RequestBody body);
 
     @Headers("Content-Type: application/json")
-    @POST(ApiConstant.cancelregister)
+    @POST(ApiConstant.doBaseNgariRequest)
     Observable<SearchDoctorListByBusTypeV2ResultEntity> searchDoctorListByBusTypeV2(@Body RequestBody body);
 
     @Headers("Content-Type: application/json")
-    @POST(ApiConstant.cancelregister)
+    @POST(ApiConstant.doBaseNgariRequest)
     Observable<CanRequestOnlineConsultResultEntity> canRequestOnlineConsult(@Body RequestBody body);
 
     @Headers("Content-Type: application/json")
-    @POST(ApiConstant.cancelregister)
+    @POST(ApiConstant.doBaseNgariRequest)
     Observable<CanRequestOnlineConsultResultEntity> requestConsultAndCdrOtherdoc(@Body RequestBody body);
 
     @Headers("Content-Type: application/json")
-    @POST(ApiConstant.cancelregister)
+    @POST(ApiConstant.doBaseNgariRequest)
     Observable<GetConfigurationToThirdForPatientResultEntity> getConfigurationToThirdForPatient(@Body RequestBody body);
 
     @Headers("Content-Type: application/json")
-    @POST(ApiConstant.cancelregister)
+    @POST(ApiConstant.doBaseNgariRequest)
     Observable<CreateOrderResultEntity> createOrder(@Body RequestBody body);
 
     @Headers("Content-Type: application/json")
