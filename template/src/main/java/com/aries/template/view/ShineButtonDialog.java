@@ -19,6 +19,7 @@ package com.aries.template.view;
 
 import android.content.Context;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.aries.template.R;
 import com.xuexiang.xui.widget.alpha.XUIAlphaImageView;
@@ -34,6 +35,8 @@ public class ShineButtonDialog extends CustomMaterialDialog {
    public Button btn_inquiry;
     public Button btn_cancel;
     public XUIAlphaImageView iv_close;
+    public TextView tv_title_tip;
+    public TextView tv_content_tip;
 
 
     /**
@@ -56,6 +59,8 @@ public class ShineButtonDialog extends CustomMaterialDialog {
         btn_inquiry = findViewById(R.id.btn_inquiry);
         btn_cancel = findViewById(R.id.btn_cancel);
         iv_close = findViewById(R.id.iv_close);
+        tv_title_tip = findViewById(R.id.tv_title_tip);
+        tv_content_tip = findViewById(R.id.tv_content_tip);
 
 
         //修复在对话框中的显示问题

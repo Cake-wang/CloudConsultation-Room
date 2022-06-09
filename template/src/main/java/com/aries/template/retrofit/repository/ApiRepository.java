@@ -39,6 +39,10 @@ import com.aries.template.utility.ConvertJavaBean;
 import com.aries.template.utility.RSASignature;
 import com.decard.NDKMethod.BasicOper;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
@@ -79,6 +83,21 @@ public class ApiRepository extends BaseRepository {
     private ApiService getApiService() {
         mApiService = FastRetrofit.getInstance().createService(ApiService.class);
         return mApiService;
+    }
+
+    public static String getDeviceId() {
+        String deviceId = null;
+        BufferedReader reader = null;
+
+        try {
+            reader = new BufferedReader(new InputStreamReader(new FileInputStream("/misc/dn")), 1000);
+            deviceId = reader.readLine();
+            reader.close();
+            return deviceId;
+        } catch (IOException var3) {
+            var3.printStackTrace();
+            return Build.SERIAL;
+        }
     }
 
     /**

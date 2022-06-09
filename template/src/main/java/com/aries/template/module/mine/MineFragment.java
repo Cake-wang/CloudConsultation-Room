@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -88,16 +87,16 @@ public class MineFragment extends FastTitleFragment implements ISupportFragment 
 
     @Override
     public void loadData() {
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                /**
-                 *要执行的操作
-                 */
-                openSerialport();
-            }
-        }, 500);//3秒后执行Runnable中的run方法
+//        Handler handler = new Handler();
+//        handler.postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                /**
+//                 *要执行的操作
+//                 */
+//                openSerialport();
+//            }
+//        }, 500);//3秒后执行Runnable中的run方法
     }
 
     private void openSerialport() {

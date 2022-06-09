@@ -27,6 +27,7 @@ import com.xuexiang.xaop.annotation.SingleClick;
 import com.xuexiang.xui.utils.CountDownButtonHelper;
 import com.xuexiang.xui.utils.ViewUtils;
 import com.xuexiang.xui.widget.button.roundbutton.RoundButton;
+import com.xuexiang.xui.widget.dialog.materialdialog.MaterialDialog;
 import com.xuexiang.xui.widget.textview.supertextview.SuperButton;
 
 import java.util.concurrent.TimeUnit;
@@ -70,6 +71,9 @@ public class PutRecordFragment extends FastTitleFragment implements ISupportFrag
     SuperButton btnLogin;
 
     private CountDownButtonHelper mCountDownHelper;
+    boolean focusFlagnum ;
+
+    boolean focusFlagcode ;
 
     public static PutRecordFragment newInstance(String idCard,String name,String smkcard) {
         Bundle args = new Bundle();
@@ -128,10 +132,35 @@ public class PutRecordFragment extends FastTitleFragment implements ISupportFrag
         ViewUtils.setEnabled(btnLogin, false);
         ViewUtils.setChecked(cbProtocol, false);
 
+        hideSoftInput();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            etPhoneNumber.setShowSoftInputOnFocus(false);//设置获取焦点后，不弹出键盘
+            etVerifyCode.setShowSoftInputOnFocus(false);//设置获取焦点后，不弹出键盘
+        }
+
+        etPhoneNumber.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                focusFlagnum = hasFocus;
+            }
+        });
+
+        etVerifyCode.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                focusFlagcode = hasFocus;
+            }
+        });
+
     }
 
     @SingleClick
-    @OnClick({R.id.btn_get_verify_code, R.id.btn_login, R.id.tv_other_login, R.id.tv_forget_password})
+    @OnClick({R.id.btn_get_verify_code, R.id.btn_login, R.id.tv_other_login, R.id.tv_forget_password,
+            R.id.num_1, R.id.num_2, R.id.num_3, R.id.num_4,
+            R.id.num_5, R.id.num_6, R.id.num_7, R.id.num_8,
+            R.id.num_9, R.id.num_0, R.id.btn_clear, R.id.btn_back_text,
+    })
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.btn_get_verify_code:
@@ -143,9 +172,181 @@ public class PutRecordFragment extends FastTitleFragment implements ISupportFrag
             case R.id.btn_login:
                 if (isMobileNO(etPhoneNumber.getEditableText().toString().trim())) {
                     if (isVerifyCode(etVerifyCode.getEditableText().toString().trim())) {
-                        loginByVerifyCode(etPhoneNumber.getEditableText().toString().trim(), etVerifyCode.getEditableText().toString().trim());
+                        if(cbProtocol.isChecked()){
+
+                            loginByVerifyCode(etPhoneNumber.getEditableText().toString().trim(), etVerifyCode.getEditableText().toString().trim());
+
+                        }else {
+
+                                    new MaterialDialog.Builder(getContext())
+                .content(R.string.tip_next_register)
+                .positiveText(R.string.lab_yes)
+                .negativeText(R.string.lab_no)
+                .onPositive((dialog, which) ->  loginByVerifyCode(etPhoneNumber.getEditableText().toString().trim(), etVerifyCode.getEditableText().toString().trim()))
+                .show();
+
+                        }
                     }
                 }
+                break;
+            case R.id.btn_clear:
+                if (focusFlagnum){
+                    etPhoneNumber.setText(null);
+                }
+                if (focusFlagcode){
+                    etVerifyCode.setText(null);
+                }
+
+                break;
+            case R.id.btn_back_text:
+                if (focusFlagnum){
+                    if(etPhoneNumber.getText().toString().trim().length()>1) {
+                        String str0  = etPhoneNumber.getText().toString().trim().substring(0, etPhoneNumber.getText().toString().trim().length() - 1);
+                        etPhoneNumber.setText(str0);
+                    }else {
+                        etPhoneNumber.setText(null);
+                    }
+                }
+                if (focusFlagcode){
+                    if(etVerifyCode.getText().toString().trim().length()>1) {
+                        String str0   = etVerifyCode.getText().toString().trim().substring(0, etVerifyCode.getText().toString().trim().length() - 1);
+                        etVerifyCode.setText(str0);
+                    }else {
+                        etVerifyCode.setText(null);
+                    }
+                }
+
+
+                break;
+            case R.id.num_0:
+                if (focusFlagnum){
+                    String str0 = etPhoneNumber.getText().toString().trim();
+                    str0 += "0";
+                    etPhoneNumber.setText(str0);
+                }
+                if (focusFlagcode){
+                    String str0 = etVerifyCode.getText().toString().trim();
+                    str0 += "0";
+                    etVerifyCode.setText(str0);
+                }
+
+                break;
+            case R.id.num_1:
+                if (focusFlagnum){
+                    String str1 = etPhoneNumber.getText().toString().trim();
+                    str1 += "1";
+                    etPhoneNumber.setText(str1);
+                }
+                if (focusFlagcode){
+                    String str1 = etVerifyCode.getText().toString().trim();
+                    str1 += "1";
+                    etVerifyCode.setText(str1);
+                }
+
+                break;
+            case R.id.num_2:
+                if (focusFlagnum){
+                    String str2 = etPhoneNumber.getText().toString().trim();
+                    str2 += "2";
+                    etPhoneNumber.setText(str2);
+                }
+                if (focusFlagcode){
+                    String str2 = etVerifyCode.getText().toString().trim();
+                    str2 += "2";
+                    etVerifyCode.setText(str2);
+                }
+
+                break;
+            case R.id.num_3:
+                if (focusFlagnum){
+                    String str3 = etPhoneNumber.getText().toString().trim();
+                    str3 += "3";
+                    etPhoneNumber.setText(str3);
+                }
+                if (focusFlagcode){
+                    String str3 = etVerifyCode.getText().toString().trim();
+                    str3 += "3";
+                    etVerifyCode.setText(str3);
+                }
+
+                break;
+            case R.id.num_4:
+                if (focusFlagnum){
+                    String str4 = etPhoneNumber.getText().toString().trim();
+                    str4 += "4";
+                    etPhoneNumber.setText(str4);
+                }
+                if (focusFlagcode){
+                    String str4 = etVerifyCode.getText().toString().trim();
+                    str4 += "4";
+                    etVerifyCode.setText(str4);
+                }
+
+                break;
+            case R.id.num_5:
+                if (focusFlagnum){
+                    String str5 = etPhoneNumber.getText().toString().trim();
+                    str5 += "5";
+                    etPhoneNumber.setText(str5);
+                }
+                if (focusFlagcode){
+                    String str5 = etVerifyCode.getText().toString().trim();
+                    str5 += "5";
+                    etVerifyCode.setText(str5);
+                }
+
+                break;
+            case R.id.num_6:
+                if (focusFlagnum){
+                    String str6 = etPhoneNumber.getText().toString().trim();
+                    str6 += "6";
+                    etPhoneNumber.setText(str6);
+                }
+                if (focusFlagcode){
+                    String str6 = etVerifyCode.getText().toString().trim();
+                    str6 += "6";
+                    etVerifyCode.setText(str6);
+                }
+
+                break;
+            case R.id.num_7:
+                if (focusFlagnum){
+                    String str7 = etPhoneNumber.getText().toString().trim();
+                    str7 += "7";
+                    etPhoneNumber.setText(str7);
+                }
+                if (focusFlagcode){
+                    String str7 = etVerifyCode.getText().toString().trim();
+                    str7 += "7";
+                    etVerifyCode.setText(str7);
+                }
+
+                break;
+            case R.id.num_8:
+                if (focusFlagnum){
+                    String str8 = etPhoneNumber.getText().toString().trim();
+                    str8 += "8";
+                    etPhoneNumber.setText(str8);
+                }
+                if (focusFlagcode){
+                    String str8 = etVerifyCode.getText().toString().trim();
+                    str8 += "8";
+                    etVerifyCode.setText(str8);
+                }
+
+                break;
+            case R.id.num_9:
+                if (focusFlagnum){
+                    String str9 = etPhoneNumber.getText().toString().trim();
+                    str9 += "9";
+                    etPhoneNumber.setText(str9);
+                }
+                if (focusFlagcode){
+                    String str9 = etVerifyCode.getText().toString().trim();
+                    str9 += "9";
+                    etVerifyCode.setText(str9);
+                }
+
                 break;
 //            case R.id.tv_other_login:
 //                XToastUtils.info("其他登录方式");

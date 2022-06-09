@@ -20,6 +20,7 @@
     <string name="lab_main">首页</string>
 
     <string name="tip_cancel_register">取消后问诊需重新挂号</string>
+    <string name="tip_next_register">我已经认真阅读并同意以上协议,即将进入下一步，确认复诊</string>
     <string name="lab_yes">是</string>
     <string name="lab_no">否</string>
 

@@ -42,7 +42,7 @@ public class App extends MultiDexApplication {
         super.onCreate();
         mContext = this;
         //初始化Logger日志打印
-        LoggerManager.init(TAG, BuildConfig.LOG_ENABALE,
+        LoggerManager.init(TAG, false,
                 PrettyFormatStrategy.newBuilder()
                         .methodOffset(0)
                         .showThreadInfo(true)
@@ -85,7 +85,7 @@ public class App extends MultiDexApplication {
         //初始化Retrofit配置
         FastRetrofit.getInstance()
                 //配置全局网络请求BaseUrl
-                .setBaseUrl(BuildConfig.BASE_URL)
+                .setBaseUrl(ApiConstant.BASEURLTest)
                 //信任所有证书--也可设置setCertificates(单/双向验证)
                 .setCertificates()
                 //设置统一请求头
@@ -135,7 +135,7 @@ public class App extends MultiDexApplication {
         Fragmentation.builder()
                 // 显示悬浮球 ; 其他Mode:SHAKE: 摇一摇唤出   NONE：隐藏
                 .stackViewMode(Fragmentation.NONE)
-                .debug(BuildConfig.DEBUG)
+                .debug(false)
 
              .install();
 

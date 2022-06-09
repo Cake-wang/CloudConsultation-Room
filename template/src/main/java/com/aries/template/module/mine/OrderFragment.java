@@ -8,6 +8,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.aries.library.fast.module.fragment.FastTitleFragment;
 import com.aries.library.fast.retrofit.FastLoadingObserver;
@@ -24,7 +27,6 @@ import com.decard.NDKMethod.EGovernment;
 import com.decard.entitys.SSCard;
 import com.trello.rxlifecycle3.android.FragmentEvent;
 import com.xuexiang.xaop.annotation.SingleClick;
-import com.xuexiang.xui.widget.textview.supertextview.SuperButton;
 
 import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
@@ -56,14 +58,58 @@ public class OrderFragment extends FastTitleFragment implements ISupportFragment
     private Integer consultId ;
 
     @BindView(R.id.btn_back)
-    SuperButton btn_back;
+    Button btn_back;
     @BindView(R.id.btn_main)
-    SuperButton btn_main;
-    @BindView(R.id.btn_cancel)
-    SuperButton btn_cancel;
-    @BindView(R.id.btn_inquiry)
-    SuperButton btn_inquiry;
+    Button btn_main;
 
+
+    @BindView(R.id.tv_name)
+    TextView tv_name;
+    @BindView(R.id.tv_card)
+    TextView tv_card;
+    @BindView(R.id.tv_age)
+    TextView tv_age;
+    @BindView(R.id.tv_dept_r)
+    TextView tv_dept_r;
+    @BindView(R.id.tv_date_r)
+    TextView tv_date_r;
+
+
+    @BindView(R.id.tv_age_tv)
+    TextView tv_age_tv;
+    @BindView(R.id.tv_age_l)
+    TextView tv_age_l;
+    @BindView(R.id.tv_doc_tv)
+    TextView tv_doc_tv;
+    @BindView(R.id.tv_doc)
+    TextView tv_doc;
+    @BindView(R.id.tv_dept_tv)
+    TextView tv_dept_tv;
+    @BindView(R.id.tv_dept)
+    TextView tv_dept;
+    @BindView(R.id.tv_result_tv)
+    TextView tv_result_tv;
+    @BindView(R.id.tv_result)
+    TextView tv_result;
+    @BindView(R.id.tv_date_tv)
+    TextView tv_date_tv;
+    @BindView(R.id.tv_date)
+    TextView tv_date;
+
+    @BindView(R.id.ll_order_text_r)
+    LinearLayout ll_order_text_r;
+    @BindView(R.id.ll_order_r)
+    LinearLayout ll_order_r;
+    @BindView(R.id.ll_prescription)
+    LinearLayout ll_prescription;
+
+
+    @BindView(R.id.tv_tip_message)
+    TextView tv_tip_message;
+    @BindView(R.id.btn_cancel)
+    Button btn_cancel;
+    @BindView(R.id.btn_inquiry)
+    Button btn_inquiry;
 
 
     public static OrderFragment newInstance(GetConsultsAndRecipesResultEntity.QueryArrearsSummary obj) {
@@ -113,8 +159,56 @@ public class OrderFragment extends FastTitleFragment implements ISupportFragment
 
         if (obj.getConsults().size()>0){
 
-        }else {
+             tv_age_tv.setVisibility(View.GONE);
+            tv_age_l.setVisibility(View.GONE);
+           tv_doc_tv.setVisibility(View.VISIBLE);
+             tv_doc.setVisibility(View.VISIBLE);
+             tv_dept_tv.setVisibility(View.GONE);
+             tv_dept.setVisibility(View.GONE);
+            tv_result_tv.setVisibility(View.GONE);
+             tv_result.setVisibility(View.GONE);
+             tv_date_tv.setVisibility(View.GONE);
+            tv_date.setVisibility(View.GONE);
 
+             ll_order_text_r.setVisibility(View.VISIBLE);
+             ll_order_r.setVisibility(View.VISIBLE);
+            ll_prescription.setVisibility(View.GONE);
+
+            tv_tip_message.setText("您已有挂号记录，是否发起问诊");
+            btn_cancel.setText("取消挂号");
+            btn_inquiry.setText("去问诊");
+
+
+            tv_name.setText("");
+          tv_card.setText("");
+           tv_age.setText("");
+            tv_doc.setText("");
+          tv_dept_r.setText("");
+          tv_date_r.setText("");
+
+        }else {
+            tv_age_tv.setVisibility(View.VISIBLE);
+            tv_age_l.setVisibility(View.VISIBLE);
+            tv_doc_tv.setVisibility(View.GONE);
+            tv_doc.setVisibility(View.GONE);
+            tv_dept_tv.setVisibility(View.VISIBLE);
+            tv_dept.setVisibility(View.VISIBLE);
+            tv_result_tv.setVisibility(View.VISIBLE);
+            tv_result.setVisibility(View.VISIBLE);
+            tv_date_tv.setVisibility(View.VISIBLE);
+            tv_date.setVisibility(View.VISIBLE);
+
+            ll_order_text_r.setVisibility(View.GONE);
+            ll_order_r.setVisibility(View.GONE);
+            ll_prescription.setVisibility(View.VISIBLE);
+
+            tv_tip_message.setText("您已有处方记录，是否需要支付");
+            btn_cancel.setText("取消支付");
+            btn_inquiry.setText("去支付");
+
+
+            tv_name.setText("");
+            tv_card.setText("");
         }
 
     }
@@ -130,11 +224,27 @@ public class OrderFragment extends FastTitleFragment implements ISupportFragment
 
                 break;
             case R.id.btn_cancel:
+                if (obj.getConsults().size()>0){
+                    showSimpleConfirmDialog("consults");
+                }else {
+                    showSimpleConfirmDialog("recipes");
+                }
 
-                showSimpleConfirmDialog();
 
                 break;
             case R.id.btn_inquiry:
+
+                if (obj.getConsults().size()>0){
+
+                    //跳视频问诊
+
+
+                }else {
+
+                    //先查库存，再跳转支付页
+
+
+                }
 
                 break;
             default:
@@ -142,7 +252,7 @@ public class OrderFragment extends FastTitleFragment implements ISupportFragment
         }
     }
 
-    private void showSimpleConfirmDialog() {
+    private void showSimpleConfirmDialog(String opflag) {
 //        new MaterialDialog.Builder(getContext())
 //                .content(R.string.tip_cancel_register)
 //                .positiveText(R.string.lab_yes)
@@ -153,11 +263,32 @@ public class OrderFragment extends FastTitleFragment implements ISupportFragment
 
         ShineButtonDialog dialog = new ShineButtonDialog(this.mContext);
 
+        if (opflag.contains("consults")){
+
+            dialog.tv_title_tip.setText("取消挂号订单");
+            dialog.tv_content_tip.setText("取消后问诊需重新挂号，是否确认取消");
+
+        }else {
+
+            dialog.tv_title_tip.setText("取消支付订单");
+            dialog.tv_content_tip.setText("取消后将无法再次支付，是否确认取消");
+
+        }
+
         dialog.btn_inquiry.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 dialog.dismiss();
-                cancelregister(appKey,tid,consultId);
+                if (opflag.contains("consults")){
+
+                    cancelregister(appKey,tid,consultId);
+
+                }else {
+
+
+
+                }
+
             }
         });
         dialog.btn_cancel.setOnClickListener(new View.OnClickListener() {

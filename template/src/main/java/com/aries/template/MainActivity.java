@@ -1,5 +1,7 @@
 package com.aries.template;
 
+import android.content.ComponentName;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -227,6 +229,14 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                                     if (entity.getData()!=null){
                                         SPUtil.put(mContext,"tid",entity.getData().getUserId());
                                         if(tag.contains("stjc")){
+
+                                            Intent intent = new Intent(Intent.ACTION_MAIN);
+                                            /**知道要跳转应用的包命与目标Activity*/
+                                            ComponentName componentName = new ComponentName("com.garea.launcher", "com.garea.launcher.login.LauncherLogin");
+                                            intent.setComponent(componentName);
+                                            intent.putExtra("userName", name);//这里Intent传值
+                                            intent.putExtra("idCard", idCard);
+                                            startActivity(intent);
 
                                         }else {
 
