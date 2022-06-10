@@ -12,16 +12,20 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.aries.library.fast.module.fragment.FastTitleFragment;
+import com.aries.library.fast.module.fragment.FastTitleRefreshLoadFragment;
 import com.aries.library.fast.retrofit.FastLoadingObserver;
 import com.aries.library.fast.retrofit.FastObserver;
+import com.aries.library.fast.util.SPUtil;
 import com.aries.library.fast.util.ToastUtil;
 import com.aries.template.R;
+import com.aries.template.adapter.RecipesAdapter;
 import com.aries.template.entity.CancelregisterResultEntity;
 import com.aries.template.entity.GetConsultsAndRecipesResultEntity;
 import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.template.view.ShineButtonDialog;
 import com.aries.ui.view.title.TitleBarView;
+import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.decard.NDKMethod.BasicOper;
 import com.decard.NDKMethod.EGovernment;
 import com.decard.entitys.SSCard;
@@ -33,6 +37,7 @@ import java.util.concurrent.TimeUnit;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
+import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.OnClick;
 import io.reactivex.Observable;
@@ -52,7 +57,7 @@ import me.yokeyword.fragmentation.anim.FragmentAnimator;
  * @Function: 我的
  * @Description:
  */
-public class OrderFragment extends FastTitleFragment implements ISupportFragment {
+public class OrderFragment extends FastTitleRefreshLoadFragment<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes.RecipeDetail> implements ISupportFragment {
     private GetConsultsAndRecipesResultEntity.QueryArrearsSummary obj;
     private  String appKey= "",tid= "";
     private Integer consultId ;
@@ -111,6 +116,12 @@ public class OrderFragment extends FastTitleFragment implements ISupportFragment
     @BindView(R.id.btn_inquiry)
     Button btn_inquiry;
 
+    private BaseQuickAdapter mAdapter;
+
+
+    @BindView(R.id.rv_contentFastLib)
+    RecyclerView rv_contentFastLib;
+
 
     public static OrderFragment newInstance(GetConsultsAndRecipesResultEntity.QueryArrearsSummary obj) {
         Bundle args = new Bundle();
@@ -135,6 +146,41 @@ public class OrderFragment extends FastTitleFragment implements ISupportFragment
     @Override
     public int getContentLayout() {
         return R.layout.fragment_order;
+    }
+
+    @Override
+    public boolean isLoadMoreEnable() {
+        return false;
+    }
+
+    @Override
+    public boolean isRefreshEnable() {
+        return false;
+    }
+
+
+    @Override
+    public BaseQuickAdapter<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes.RecipeDetail, BaseViewHolder> getAdapter() {
+        mAdapter = new RecipesAdapter();
+
+//        mAdapter.setEmptyView();
+        return mAdapter;
+    }
+
+    @Override
+    public void loadData(int page) {
+
+    }
+
+    @Override
+    public void onItemClicked(BaseQuickAdapter<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes.RecipeDetail, BaseViewHolder> adapter, View view, int position) {
+        super.onItemClicked(adapter, view, position);
+//        WidgetEntity entity = adapter.getItem(position);
+//        if (position == 1) {
+//            SwipeBackActivity.start(mContext, entity.title);
+//        } else {
+//            FastUtil.startActivity(mContext, entity.activity);
+//        }
     }
 
     @Override
@@ -179,12 +225,17 @@ public class OrderFragment extends FastTitleFragment implements ISupportFragment
             btn_inquiry.setText("去问诊");
 
 
-            tv_name.setText("");
-          tv_card.setText("");
-           tv_age.setText("");
-            tv_doc.setText("");
-          tv_dept_r.setText("");
-          tv_date_r.setText("");
+            for (int i = 0; i < obj.getConsults().size(); i++) {
+                if (obj.getConsults().get(i).getConsults().getPayflag() == 1){
+                    tv_name.setText(obj.getConsults().get(i).getConsults().getMpiName()+SPUtil.get(mContext,"sex",""));
+                    tv_card.setText(SPUtil.get(mContext,"smkCard","")+"");
+                    tv_age.setText(SPUtil.get(mContext,"age","")+"");
+                    tv_doc.setText(obj.getConsults().get(i).getConsults().getConsultDoctorText());
+                    tv_dept_r.setText(obj.getConsults().get(i).getConsults().getConsultDepartText());
+                    tv_date_r.setText(obj.getConsults().get(i).getConsults().getTime());
+                }
+            }
+
 
         }else {
             tv_age_tv.setVisibility(View.VISIBLE);
@@ -207,8 +258,12 @@ public class OrderFragment extends FastTitleFragment implements ISupportFragment
             btn_inquiry.setText("去支付");
 
 
-            tv_name.setText("");
-            tv_card.setText("");
+            tv_name.setText(SPUtil.get(mContext,"userName","")+""+SPUtil.get(mContext,"sex",""));
+            tv_card.setText(SPUtil.get(mContext,"smkCard","")+"");
+            tv_age_l.setText(SPUtil.get(mContext,"age","")+"");
+//            tv_dept.setText("");
+            tv_result.setText(obj.getRecipes().get(0).getOrganDiseaseName());
+            tv_date.setText(obj.getRecipes().get(0).getSignDate()+"");
         }
 
     }
@@ -217,12 +272,12 @@ public class OrderFragment extends FastTitleFragment implements ISupportFragment
     @OnClick({R.id.btn_back, R.id.btn_main, R.id.btn_cancel, R.id.btn_inquiry})
     public void onViewClicked(View view) {
         switch (view.getId()) {
-            case R.id.btn_back:
-
-                break;
-            case R.id.btn_main:
-
-                break;
+//            case R.id.btn_back:
+//
+//                break;
+//            case R.id.btn_main:
+//
+//                break;
             case R.id.btn_cancel:
                 if (obj.getConsults().size()>0){
                     showSimpleConfirmDialog("consults");
@@ -237,12 +292,13 @@ public class OrderFragment extends FastTitleFragment implements ISupportFragment
                 if (obj.getConsults().size()>0){
 
                     //跳视频问诊
+                    start(VideoConsultFragment.newInstance(new Object()));
 
 
                 }else {
 
                     //先查库存，再跳转支付页
-
+                    queryInventory();
 
                 }
 
@@ -250,6 +306,12 @@ public class OrderFragment extends FastTitleFragment implements ISupportFragment
             default:
                 break;
         }
+    }
+
+    private void queryInventory() {
+
+        start(PayCodeFragment.newInstance(new Object()));
+
     }
 
     private void showSimpleConfirmDialog(String opflag) {

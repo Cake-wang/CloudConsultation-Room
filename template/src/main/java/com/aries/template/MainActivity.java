@@ -34,6 +34,7 @@ import com.decard.entitys.SSCard;
 import com.trello.rxlifecycle3.android.ActivityEvent;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -171,6 +172,10 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                 if(ssCard!=null){
                     Log.d("EgAPP_SI_ReadSSCardInfo",ssCard.toString());
 
+                    SPUtil.put(mContext,"smkCard",ssCard.getCardNum());
+                    SPUtil.put(mContext,"age",getAge(Long.parseLong(ssCard.getBirthday())));
+                    SPUtil.put(mContext,"userName",ssCard.getName());
+                    SPUtil.put(mContext,"sex",ssCard.getSex());
 
                     readCardSuccess(ssCard.getSSNum(),ssCard.getName(),ssCard.getCardNum());
 
@@ -207,6 +212,21 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
 
 
 
+    }
+
+
+    public static int getAge(long birthday) {
+        Calendar currentCalendar = Calendar.getInstance();//实例化calendar
+        currentCalendar.setTimeInMillis(System.currentTimeMillis());//调用setTimeInMillis方法和System.currentTimeMillis()获取当前时间
+
+        Calendar targetCalendar = Calendar.getInstance();
+        targetCalendar.setTimeInMillis(birthday);//这个解析传进来的时间戳
+
+        if (currentCalendar.get(Calendar.MONTH) >= targetCalendar.get(Calendar.MONTH)) {//如果现在的月份大于生日的月份
+            return currentCalendar.get(Calendar.YEAR) - targetCalendar.get(Calendar.YEAR);//那就直接减,因为现在的年月都大于生日的年月
+        } else {
+            return currentCalendar.get(Calendar.YEAR) - targetCalendar.get(Calendar.YEAR) - 1;//否则,减掉一年
+        }
     }
 
     public void readCardSuccess(String idCard,String name,String smkcard) {
@@ -309,15 +329,13 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                                 }
 //                                checkVersion(entity);
                                 if (entity.isSuccess()){
-                                    if(entity.getData().isSuccess()){
+
                                         if(entity.getData().getConsults().size()>0||entity.getData().getRecipes().size()>0){
                                             start(OrderFragment.newInstance(entity.getData()));
                                         }else {
                                             start(DepartmentFragment.newInstance(new Object()));
                                         }
-                                    }else {
-                                        ToastUtil.show(entity.getData().getErrorMessage());
-                                    }
+
 
 
 

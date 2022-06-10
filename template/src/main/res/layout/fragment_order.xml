@@ -330,6 +330,18 @@
                         android:layout_marginBottom="15dp"
                         android:text="处方信息：" />
 
+
+                    <include
+
+                        layout="@layout/fast_layout_refresh_recycler"
+                        android:layout_width="350dp"
+                        android:layout_height="160dp"
+
+
+                        android:layout_marginLeft="10dp"
+
+                        />
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -338,7 +350,7 @@
                         android:layout_marginLeft="10dp"
                         android:textSize="22dp"
                         android:gravity="left"
-
+                        android:visibility="gone"
                         android:layout_marginBottom="15dp"
                         android:text="1、阿莫西林（1天3次，每次2片）" />
 
@@ -350,6 +362,7 @@
                         android:layout_marginLeft="10dp"
                         android:textSize="22dp"
                         android:gravity="left"
+                        android:visibility="gone"
                         android:layout_marginBottom="15dp"
                         android:text="2、止咳糖浆（1天3次，每次20毫升）" />
 
@@ -361,7 +374,7 @@
                         android:layout_marginLeft="10dp"
                         android:textSize="22dp"
                         android:gravity="left"
-
+                        android:visibility="gone"
                         android:text="3、口服液（1天2次，每次1支）" />
 
 

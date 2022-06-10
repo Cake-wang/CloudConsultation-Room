@@ -250,15 +250,13 @@ public class MineFragment extends FastTitleFragment implements ISupportFragment 
                                 }
 //                                checkVersion(entity);
                                 if (entity.isSuccess()){
-                                    if(entity.getData().isSuccess()){
+
                                         if(entity.getData().getConsults().size()>0||entity.getData().getRecipes().size()>0){
                                             start(OrderFragment.newInstance(entity.getData()));
                                         }else {
                                             start(DepartmentFragment.newInstance(new Object()));
                                         }
-                                    }else {
-                                        ToastUtil.show(entity.getData().getErrorMessage());
-                                    }
+
 
 
 
