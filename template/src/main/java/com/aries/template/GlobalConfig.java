@@ -13,6 +13,13 @@ public class GlobalConfig {
      */
     public static String token = "";
 
+
+    /**
+     * 组织代码
+     * 用于确定医院组织的代码。1 浙大附属邵逸夫医院
+     */
+    public static int organId = 1;
+
     /**
      * 用户个人信息
      * 姓名

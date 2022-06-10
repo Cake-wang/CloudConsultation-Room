@@ -9,7 +9,6 @@ import com.aries.template.entity.CancelregisterResultEntity;
 import com.aries.template.entity.CreateOrderResultEntity;
 import com.aries.template.entity.FindUserResultEntity;
 import com.aries.template.entity.FindValidDepartmentForRevisitResultEntity;
-import com.aries.template.entity.FindValidOrganProfessionForRevisitBean;
 import com.aries.template.entity.FindValidOrganProfessionForRevisitResultEntity;
 import com.aries.template.entity.GetConfigurationToThirdForPatientResultEntity;
 import com.aries.template.entity.GetConsultsAndRecipesResultEntity;
@@ -83,7 +82,7 @@ public interface ApiService {
      */
     @Headers("Content-Type: application/json")
     @POST(ApiConstant.doBaseNgariRequest)
-    Observable<FindValidOrganProfessionForRevisitBean> findValidOrganProfessionForRevisit(@Body Map body);
+    Observable<FindValidOrganProfessionForRevisitResultEntity> findValidOrganProfessionForRevisit(@Body RequestBody body);
 
     /**
      * 复诊按机构查找一级科室

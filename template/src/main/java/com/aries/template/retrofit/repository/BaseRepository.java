@@ -5,10 +5,21 @@ import android.accounts.NetworkErrorException;
 import com.aries.library.fast.retrofit.FastNullException;
 import com.aries.library.fast.retrofit.FastRetryWhen;
 import com.aries.library.fast.retrofit.FastTransformer;
+import com.aries.library.fast.util.SPUtil;
+import com.aries.template.constant.ApiConstant;
+import com.aries.template.utility.ConvertJavaBean;
+import com.aries.template.utility.RSASignature;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.functions.Function;
+import okhttp3.RequestBody;
 
 /**
  * @Author: AriesHoo on 2018/10/10 17:24
@@ -38,5 +49,47 @@ public abstract class BaseRepository {
                                 }
                             }
                         }));
+    }
+
+
+    /**
+     * 输入到通信的body创造工程
+     * 由于是一个统一的网络请求，通过methodcode来调用不同的方法，所以需要输入methodCode
+     * @param map 输入进body的数据
+     * @param methodCode 调用目标方法的code
+     */
+    protected RequestBody BodyCreate(Map map,String methodCode ){
+        Map<String,String> bizContent = new HashMap<>();
+        bizContent.put("appKey", ApiConstant.NALI_APPKEY);
+        bizContent.put("tid",ApiConstant.NALI_TID);
+        bizContent.putAll(map);
+        ArrayList<Map> maps = new ArrayList<>();
+        maps.add(bizContent);
+
+        // 签名加密
+//        final String timeStamp = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());//时间戳
+//        final String signSource = "bizContent=idCard"+""+"&hosiptalNo="+ SPUtil.get(mContext,"hosiptalNo","")+"&mchntId="+SPUtil.get(mContext,"mchntId","")+"&posId="+SPUtil.get(mContext,"posId","")+"&terminal="+SPUtil.get(mContext,"termial","")+"&timestamp="+timeStamp+"";
+//        String signTarget = null;
+//        try {
+//            signTarget = RSASignature.sign(signSource, ApiConstant.NALI_PRIVATE_KEY);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+
+        // 数据加密
+
+        // 创建body
+        ApiRepository.common.getInstance().machineId = "SY0001";
+        ApiRepository.common.getInstance().userId = "2fcd34d6dde742098737b10ff0fddd9a";
+        final String  logTraceId = "eebcbbcf2c664c28a671e980265c6c76";//getUUID();
+
+        final Map<String, Object> params = new HashMap<>(4);
+        params.put("logTraceId", logTraceId);
+        params.put("methodCode",methodCode);
+        params.put("common", ApiRepository.common.getInstance());
+        params.put("bizContent", maps);
+        String strEntity = ConvertJavaBean.converJavaBeanToJsonNew(params);
+        RequestBody body = RequestBody.create(okhttp3.MediaType.parse("Content-Type:application/json;charset=UTF-8"),strEntity);
+        return body;
     }
 }
