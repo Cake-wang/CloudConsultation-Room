@@ -98,13 +98,9 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
     @Override
     public void loadData() {
 
+        Log.d("111111MODEL", "111111MODEL");
 
 
-        if (getTopFragment() instanceof HomeFragment){
-
-            return;
-
-        }
 
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
@@ -123,9 +119,13 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
 
         Log.d("111111MODEL", Build.MODEL);
 
+        Log.d("111111MODEL", getTopFragment()+"");
+
 
         //打开端口，usb模式，打开之前必须确保已经获取到USB权限，返回值为设备句柄号。
         int devHandle = BasicOper.dc_open("AUSB",this,"",0);
+//        int devHandle = BasicOper.dc_open("COM",null,"/dev/ttyS0",115200);
+        Log.d("111111MODEL", devHandle+"");
         if(devHandle>0){
             Log.d("open","dc_open success devHandle = "+devHandle);
             timeLoop();
@@ -150,7 +150,11 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
     }
 
     private void readCardNew() {
+        if (getTopFragment() instanceof HomeFragment){
 
+            return;
+
+        }
 
         if (getTopFragment() instanceof MineFragment){
 
@@ -254,8 +258,9 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                                             /**知道要跳转应用的包命与目标Activity*/
                                             ComponentName componentName = new ComponentName("com.garea.launcher", "com.garea.launcher.login.LauncherLogin");
                                             intent.setComponent(componentName);
-                                            intent.putExtra("userName", name);//这里Intent传值
-                                            intent.putExtra("idCard", idCard);
+                                            intent.putExtra("userName", entity.getData().getName());//这里Intent传值
+                                            intent.putExtra("idCard", entity.getData().getIdcard());
+                                            intent.putExtra("mobile", entity.getData().getMobile());
                                             startActivity(intent);
 
                                         }else {

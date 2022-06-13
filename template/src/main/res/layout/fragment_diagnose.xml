@@ -200,7 +200,7 @@
 
                     <TextView
                         android:layout_marginTop="20dp"
-
+                        android:id="@+id/tv_name"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="#333333"
@@ -215,6 +215,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="#333333"
+                        android:id="@+id/tv_date"
 
                         android:layout_marginLeft="10dp"
                         android:textSize="22dp"
@@ -415,7 +416,7 @@
                         android:layout_height="wrap_content"
 
 
-
+                        android:checked="true"
 
                         android:button="@drawable/bg_cb_n_yzs"
                         android:scaleX="0.8"

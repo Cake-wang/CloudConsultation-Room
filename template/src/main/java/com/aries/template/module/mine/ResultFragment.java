@@ -8,7 +8,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
-import android.widget.CheckBox;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.aries.library.fast.module.fragment.FastTitleFragment;
 import com.aries.library.fast.retrofit.FastLoadingObserver;
@@ -24,10 +25,6 @@ import com.decard.entitys.SSCard;
 import com.trello.rxlifecycle3.android.FragmentEvent;
 import com.xuexiang.xaop.annotation.SingleClick;
 import com.xuexiang.xui.utils.CountDownButtonHelper;
-import com.xuexiang.xui.utils.ViewUtils;
-import com.xuexiang.xui.widget.button.roundbutton.RoundButton;
-import com.xuexiang.xui.widget.edittext.materialedittext.MaterialEditText;
-import com.xuexiang.xui.widget.textview.supertextview.SuperButton;
 
 import java.util.concurrent.TimeUnit;
 
@@ -55,17 +52,28 @@ import me.yokeyword.fragmentation.anim.FragmentAnimator;
 public class ResultFragment extends FastTitleFragment implements ISupportFragment {
     private  String result= "";
 
-    @BindView(R.id.et_phone_number)
-    MaterialEditText etPhoneNumber;
-    @BindView(R.id.et_verify_code)
-    MaterialEditText etVerifyCode;
-    @BindView(R.id.btn_get_verify_code)
-    RoundButton btnGetVerifyCode;
+//    @BindView(R.id.et_phone_number)
+//    MaterialEditText etPhoneNumber;
+//    @BindView(R.id.et_verify_code)
+//    MaterialEditText etVerifyCode;
+//    @BindView(R.id.btn_get_verify_code)
+//    RoundButton btnGetVerifyCode;
+//
+//    @BindView(R.id.cb_protocol)
+//    CheckBox cbProtocol;
+//    @BindView(R.id.btn_login)
+//    SuperButton btnLogin;
+    @BindView(R.id.tv_result_title)
+    TextView tv_result_title;
+    @BindView(R.id.tv_result_bg)
+    ImageView tv_result_bg;
+    @BindView(R.id.tv_result_tip)
+    TextView tv_result_tip;
+    @BindView(R.id.tv_result_contet)
+    TextView tv_result_contet;
+    @BindView(R.id.tv_result_code)
+    TextView tv_result_code;
 
-    @BindView(R.id.cb_protocol)
-    CheckBox cbProtocol;
-    @BindView(R.id.btn_login)
-    SuperButton btnLogin;
 
     private CountDownButtonHelper mCountDownHelper;
 
@@ -103,6 +111,26 @@ public class ResultFragment extends FastTitleFragment implements ISupportFragmen
     @Override
     public void initView(Bundle savedInstanceState) {
 
+        if (result.contains("cancelConsult")){
+             tv_result_title.setText("取消成功");
+            tv_result_bg.setBackgroundResource(R.drawable.bg_suc_yzs);
+             tv_result_tip.setText("取消成功");
+             tv_result_contet.setText("您的结算单已取消，如需开药请再次发起问诊");
+            tv_result_code.setVisibility(View.GONE);
+        }else  if (result.contains("paySuc")){
+            tv_result_title.setText("支付成功");
+            tv_result_bg.setBackgroundResource(R.drawable.bg_pay_suc_yzs);
+            tv_result_tip.setText("支付成功");
+            tv_result_contet.setText("请取走凭条，凭取药码至药柜取药");
+            tv_result_code.setVisibility(View.VISIBLE);
+        }else {
+            tv_result_title.setText("支付失败");
+            tv_result_bg.setBackgroundResource(R.drawable.bg_fail_yzs);
+            tv_result_tip.setText("支付失败");
+            tv_result_contet.setText("当前药品库存不足");
+            tv_result_code.setVisibility(View.GONE);
+        }
+
 //        Handler handler = new Handler();
 //        handler.postDelayed(new Runnable() {
 //            @Override
@@ -113,16 +141,16 @@ public class ResultFragment extends FastTitleFragment implements ISupportFragmen
 //                openSerialport();
 //            }
 //        }, 500);//3秒后执行Runnable中的run方法
-        mCountDownHelper = new CountDownButtonHelper(btnGetVerifyCode, 60);
-
-//        SettingSPUtils spUtils = SettingSPUtils.getInstance();
-
-        cbProtocol.setOnCheckedChangeListener((buttonView, isChecked) -> {
-//            spUtils.setIsAgreePrivacy(isChecked);
-            ViewUtils.setEnabled(btnLogin, isChecked);
-        });
-        ViewUtils.setEnabled(btnLogin, false);
-        ViewUtils.setChecked(cbProtocol, false);
+//        mCountDownHelper = new CountDownButtonHelper(btnGetVerifyCode, 60);
+//
+////        SettingSPUtils spUtils = SettingSPUtils.getInstance();
+//
+//        cbProtocol.setOnCheckedChangeListener((buttonView, isChecked) -> {
+////            spUtils.setIsAgreePrivacy(isChecked);
+//            ViewUtils.setEnabled(btnLogin, isChecked);
+//        });
+//        ViewUtils.setEnabled(btnLogin, false);
+//        ViewUtils.setChecked(cbProtocol, false);
 
     }
 
@@ -130,18 +158,18 @@ public class ResultFragment extends FastTitleFragment implements ISupportFragmen
     @OnClick({R.id.btn_get_verify_code, R.id.btn_login, R.id.tv_other_login, R.id.tv_forget_password})
     public void onViewClicked(View view) {
         switch (view.getId()) {
-            case R.id.btn_get_verify_code:
-                if (etPhoneNumber.validate()) {
-                    getVerifyCode(etPhoneNumber.getEditValue());
-                }
-                break;
-            case R.id.btn_login:
-                if (etPhoneNumber.validate()) {
-                    if (etVerifyCode.validate()) {
-                        loginByVerifyCode(etPhoneNumber.getEditValue(), etVerifyCode.getEditValue());
-                    }
-                }
-                break;
+//            case R.id.btn_get_verify_code:
+//                if (etPhoneNumber.validate()) {
+//                    getVerifyCode(etPhoneNumber.getEditValue());
+//                }
+//                break;
+//            case R.id.btn_login:
+//                if (etPhoneNumber.validate()) {
+//                    if (etVerifyCode.validate()) {
+//                        loginByVerifyCode(etPhoneNumber.getEditValue(), etVerifyCode.getEditValue());
+//                    }
+//                }
+//                break;
 //            case R.id.tv_other_login:
 //                XToastUtils.info("其他登录方式");
 //                break;

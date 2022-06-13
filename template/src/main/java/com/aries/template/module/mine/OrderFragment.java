@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.aries.library.fast.FastManager;
 import com.aries.library.fast.module.fragment.FastTitleRefreshLoadFragment;
 import com.aries.library.fast.retrofit.FastLoadingObserver;
 import com.aries.library.fast.retrofit.FastObserver;
@@ -21,6 +22,7 @@ import com.aries.template.R;
 import com.aries.template.adapter.RecipesAdapter;
 import com.aries.template.entity.CancelregisterResultEntity;
 import com.aries.template.entity.GetConsultsAndRecipesResultEntity;
+import com.aries.template.module.main.HomeFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.template.view.ShineButtonDialog;
 import com.aries.ui.view.title.TitleBarView;
@@ -33,6 +35,7 @@ import com.trello.rxlifecycle3.android.FragmentEvent;
 import com.xuexiang.xaop.annotation.SingleClick;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 import androidx.annotation.Nullable;
@@ -47,6 +50,7 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import me.yokeyword.fragmentation.ExtraTransaction;
 import me.yokeyword.fragmentation.ISupportFragment;
+import me.yokeyword.fragmentation.SupportFragment;
 import me.yokeyword.fragmentation.SupportFragmentDelegate;
 import me.yokeyword.fragmentation.SupportHelper;
 import me.yokeyword.fragmentation.anim.FragmentAnimator;
@@ -169,6 +173,11 @@ public class OrderFragment extends FastTitleRefreshLoadFragment<GetConsultsAndRe
 
     @Override
     public void loadData(int page) {
+        if (obj.getRecipes().size()>0){
+
+            FastManager.getInstance().getHttpRequestControl().httpRequestSuccess(getIHttpRequestControl(), obj.getRecipes().size()>0  ? new ArrayList<>() :obj.getRecipes().get(0).getRecipeDetail(), null);
+
+        }
 
     }
 
@@ -232,12 +241,13 @@ public class OrderFragment extends FastTitleRefreshLoadFragment<GetConsultsAndRe
                     tv_age.setText(SPUtil.get(mContext,"age","")+"");
                     tv_doc.setText(obj.getConsults().get(i).getConsults().getConsultDoctorText());
                     tv_dept_r.setText(obj.getConsults().get(i).getConsults().getConsultDepartText());
-                    tv_date_r.setText(obj.getConsults().get(i).getConsults().getTime());
+                    tv_date_r.setText(obj.getConsults().get(i).getConsults().getRequestTime());
+                    consultId = obj.getConsults().get(i).getConsults().getConsultId();
                 }
             }
 
 
-        }else {
+        }else  if (obj.getRecipes().size()>0){
             tv_age_tv.setVisibility(View.VISIBLE);
             tv_age_l.setVisibility(View.VISIBLE);
             tv_doc_tv.setVisibility(View.GONE);
@@ -264,6 +274,32 @@ public class OrderFragment extends FastTitleRefreshLoadFragment<GetConsultsAndRe
 //            tv_dept.setText("");
             tv_result.setText(obj.getRecipes().get(0).getOrganDiseaseName());
             tv_date.setText(obj.getRecipes().get(0).getSignDate()+"");
+        }else {
+
+            tv_age_tv.setVisibility(View.VISIBLE);
+            tv_age_l.setVisibility(View.VISIBLE);
+            tv_doc_tv.setVisibility(View.GONE);
+            tv_doc.setVisibility(View.GONE);
+            tv_dept_tv.setVisibility(View.VISIBLE);
+            tv_dept.setVisibility(View.VISIBLE);
+            tv_result_tv.setVisibility(View.VISIBLE);
+            tv_result.setVisibility(View.VISIBLE);
+            tv_date_tv.setVisibility(View.VISIBLE);
+            tv_date.setVisibility(View.VISIBLE);
+
+            ll_order_text_r.setVisibility(View.GONE);
+            ll_order_r.setVisibility(View.GONE);
+            ll_prescription.setVisibility(View.VISIBLE);
+
+            tv_tip_message.setVisibility(View.GONE);
+            btn_cancel.setText("取消");
+            btn_inquiry.setText("确认结算");
+
+
+            tv_name.setText(SPUtil.get(mContext,"userName","")+""+SPUtil.get(mContext,"sex",""));
+            tv_card.setText(SPUtil.get(mContext,"smkCard","")+"");
+            tv_age_l.setText(SPUtil.get(mContext,"age","")+"");
+
         }
 
     }
@@ -281,8 +317,10 @@ public class OrderFragment extends FastTitleRefreshLoadFragment<GetConsultsAndRe
             case R.id.btn_cancel:
                 if (obj.getConsults().size()>0){
                     showSimpleConfirmDialog("consults");
-                }else {
+                }else if (obj.getRecipes().size()>0){
                     showSimpleConfirmDialog("recipes");
+                }else {
+                    showSimpleConfirmDialog("backMain");
                 }
 
 
@@ -295,10 +333,14 @@ public class OrderFragment extends FastTitleRefreshLoadFragment<GetConsultsAndRe
                     start(VideoConsultFragment.newInstance(new Object()));
 
 
-                }else {
+                }else if (obj.getRecipes().size()>0){
 
                     //先查库存，再跳转支付页
                     queryInventory();
+
+                }else {
+
+                    start(PayCodeFragment.newInstance(new Object()));
 
                 }
 
@@ -330,11 +372,14 @@ public class OrderFragment extends FastTitleRefreshLoadFragment<GetConsultsAndRe
             dialog.tv_title_tip.setText("取消挂号订单");
             dialog.tv_content_tip.setText("取消后问诊需重新挂号，是否确认取消");
 
-        }else {
+        }else if (opflag.contains("recipes")){
 
             dialog.tv_title_tip.setText("取消支付订单");
             dialog.tv_content_tip.setText("取消后将无法再次支付，是否确认取消");
 
+        }else {
+            dialog.tv_title_tip.setText("取消结算");
+            dialog.tv_content_tip.setText("取消后将无法再次支付，是否确认取消");
         }
 
         dialog.btn_inquiry.setOnClickListener(new View.OnClickListener() {
@@ -342,12 +387,21 @@ public class OrderFragment extends FastTitleRefreshLoadFragment<GetConsultsAndRe
             public void onClick(View v) {
                 dialog.dismiss();
                 if (opflag.contains("consults")){
-
+                    tid = (String) SPUtil.get(mContext,"tid","");
                     cancelregister(appKey,tid,consultId);
+
+                }else if (opflag.contains("recipes")){
+
+
 
                 }else {
 
-
+//                    HomeFragment fragment = findFragment(HomeFragment.class);
+//                Bundle newBundle = new Bundle();
+//
+//                fragment.putNewBundle(newBundle);
+                    // 在栈内的HomeFragment以SingleTask模式启动（即在其之上的Fragment会出栈）
+                    start(HomeFragment.newInstance(), SupportFragment.SINGLETASK);
 
                 }
 
@@ -477,7 +531,10 @@ public class OrderFragment extends FastTitleRefreshLoadFragment<GetConsultsAndRe
 //                                checkVersion(entity);
                                 if (entity.isSuccess()){
 
-                                    start(ResultFragment.newInstance("cancel"));
+                                    if (entity.getData().isSuccess()){
+                                        start(ResultFragment.newInstance("cancelConsult"));
+                                    }
+
 
                                 }else {
 

@@ -1,6 +1,7 @@
 package com.aries.template.module.mine;
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
@@ -14,6 +15,7 @@ import android.widget.EditText;
 import com.aries.library.fast.module.fragment.FastTitleFragment;
 import com.aries.library.fast.retrofit.FastLoadingObserver;
 import com.aries.library.fast.retrofit.FastObserver;
+import com.aries.library.fast.util.SPUtil;
 import com.aries.library.fast.util.ToastUtil;
 import com.aries.template.R;
 import com.aries.template.entity.RegisterResultEntity;
@@ -489,7 +491,30 @@ public class PutRecordFragment extends FastTitleFragment implements ISupportFrag
 //                                checkVersion(entity);
                                 if (entity.isSuccess()){
 
-                                    start(DepartmentFragment.newInstance(new Object()));
+
+                                    String tag = (String) SPUtil.get(mContext,"tag","fzpy");
+
+
+                                        if(tag.contains("stjc")){
+
+                                            Intent intent = new Intent(Intent.ACTION_MAIN);
+                                            /**知道要跳转应用的包命与目标Activity*/
+                                            ComponentName componentName = new ComponentName("com.garea.launcher", "com.garea.launcher.login.LauncherLogin");
+                                            intent.setComponent(componentName);
+                                            intent.putExtra("userName", name);//这里Intent传值
+                                            intent.putExtra("idCard", idCard);
+                                            intent.putExtra("mobile",phoneNumber);
+                                            startActivity(intent);
+
+                                        }else {
+
+                                            //判断有挂号或处方
+
+                                            start(DepartmentFragment.newInstance(new Object()));
+
+                                        }
+
+
 
                                 }else {
 

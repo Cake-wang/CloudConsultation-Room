@@ -9,7 +9,7 @@ import android.widget.TextView;
 import com.aries.library.fast.retrofit.FastLoadingObserver;
 import com.aries.library.fast.util.ToastUtil;
 import com.aries.template.R;
-import com.aries.template.entity.FindValidOrganProfessionForRevisitBean;
+import com.aries.template.entity.FindValidOrganProfessionForRevisitResultEntity;
 import com.aries.template.module.base.BaseEventFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.ui.view.title.TitleBarView;
@@ -75,9 +75,9 @@ public class PayCodeFragment extends BaseEventFragment {
         int organid = 1;//浙大附属邵逸夫医院
         ApiRepository.getInstance().findValidOrganProfessionForRevisit(organid, getContext())
                 .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
-                .subscribe(new FastLoadingObserver<FindValidOrganProfessionForRevisitBean>() {
+                .subscribe(new FastLoadingObserver<FindValidOrganProfessionForRevisitResultEntity>() {
                     @Override
-                    public void _onNext(FindValidOrganProfessionForRevisitBean entity) {
+                    public void _onNext(FindValidOrganProfessionForRevisitResultEntity entity) {
                         if (entity == null) {
                             ToastUtil.show("请检查网络");
                             return;

@@ -51,6 +51,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#333"
+                android:id="@+id/tv_result_title"
                 android:layout_weight="1"
                 android:layout_marginLeft="10dp"
                 android:textSize="24dp"
@@ -91,6 +92,7 @@
                 android:layout_height="wrap_content"
                 android:src="@drawable/bg_suc_yzs"
                 android:layout_marginTop="-10dp"
+                android:id="@+id/tv_result_bg"
                 android:layout_marginBottom="15dp"
                 />
 
@@ -98,7 +100,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#38ABA0"
-
+                android:id="@+id/tv_result_tip"
                 android:layout_marginTop="-10dp"
                 android:textSize="24dp"
                 android:gravity="left"
@@ -108,11 +110,20 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#DCA63C"
-
+                android:id="@+id/tv_result_contet"
                 android:layout_marginTop="10dp"
                 android:textSize="20dp"
                 android:gravity="left"
                 android:text="您的结算单已取消，如需开药请再次发起问诊" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#38ABA0"
+                android:id="@+id/tv_result_code"
+                android:layout_marginTop="10dp"
+                android:textSize="26dp"
+                android:gravity="left"
+                android:text="取药码：888888" />
         </LinearLayout>
 
         <LinearLayout
