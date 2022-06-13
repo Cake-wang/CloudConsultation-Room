@@ -105,14 +105,11 @@ public class DepartmentFragment extends BaseEventFragment {
 
     /**
      * 通过数据刷新列表
-     * 一级和二级共用一个列表
      * @param data 列表数据
      */
     public void reFlashRV(ArrayList<Map> data){
         // 刷新时间
         timeCount = 120;
-//        if (recyclerView.getChildCount()>0)
-//            recyclerView.removeAllViews();
         AutoAdaptor adaptor =  new AutoAdaptor(recyclerView,R.layout.item_dept,3,data,getContext());
         adaptor.setListener(new AutoAdaptor.IItemListener() {
             @Override
@@ -272,7 +269,8 @@ public class DepartmentFragment extends BaseEventFragment {
     @Override
     protected void timeProcess() {
         super.timeProcess();
-        timerTV.setText(--timeCount+"秒");
+        if (timerTV!=null)
+            timerTV.setText(--timeCount+"秒");
         if (timeCount==0){
             gotoMain();
         }

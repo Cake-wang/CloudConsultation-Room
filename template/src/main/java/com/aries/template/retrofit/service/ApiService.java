@@ -91,6 +91,9 @@ public interface ApiService {
     @POST(ApiConstant.doBaseNgariRequest)
     Observable<FindValidDepartmentForRevisitResultEntity> findValidDepartmentForRevisit(@Body RequestBody body);
 
+    /**
+     * 查找医生列表
+     */
     @Headers("Content-Type: application/json")
     @POST(ApiConstant.doBaseNgariRequest)
     Observable<SearchDoctorListByBusTypeV2ResultEntity> searchDoctorListByBusTypeV2(@Body RequestBody body);

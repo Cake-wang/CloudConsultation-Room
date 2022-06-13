@@ -10,6 +10,7 @@ import com.aries.template.constant.ApiConstant;
 import com.aries.template.impl.ActivityControlImpl;
 import com.aries.template.impl.AppImpl;
 import com.aries.template.impl.HttpRequestControlImpl;
+import com.aries.template.widget.mgson.MGsonFactory;
 import com.decard.NDKMethod.BasicOper;
 import com.orhanobut.logger.PrettyFormatStrategy;
 import com.xuexiang.xaop.XAOP;
@@ -97,6 +98,9 @@ public class App extends MultiDexApplication {
                 //设置统一超时--也可单独调用read/write/connect超时(可以设置时间单位TimeUnit)
                 //默认20 s
                 .setTimeout(30);
+
+        FastRetrofit.getRetrofitBuilder()
+                        .addConverterFactory(MGsonFactory.create());
 
         //注意设置baseUrl要以/ 结尾 service 里的方法不要以/打头不然拦截到的url会有问题
         //以下为配置多BaseUrl--默认方式一优先级高 可通过FastRetrofit.getInstance().setHeaderPriorityEnable(true);设置方式二优先级

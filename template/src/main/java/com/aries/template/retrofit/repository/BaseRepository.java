@@ -59,6 +59,7 @@ public abstract class BaseRepository {
      * @param methodCode 调用目标方法的code
      */
     protected RequestBody BodyCreate(Map map,String methodCode ){
+        // bizContent 结构数据信息补全
         Map<String,String> bizContent = new HashMap<>();
         bizContent.put("appKey", ApiConstant.NALI_APPKEY);
         bizContent.put("tid",ApiConstant.NALI_TID);

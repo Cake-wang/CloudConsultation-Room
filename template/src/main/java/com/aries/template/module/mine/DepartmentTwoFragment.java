@@ -36,11 +36,9 @@ import butterknife.BindView;
  * @Function: 我的
  */
 public class DepartmentTwoFragment extends BaseEventFragment {
-    /** 网格数据数据源 key  */
-    public static final String KEY_ITEM_VALUE = "key_item_value";
-    /** 网格数据一级科室组织ID */
-    public static final String KEY_ITEM_ORGANPROFESSIONID = "key_item_organprofessionid";
-    /** 获取传参 */
+    /** 网格数据数据源 key  内部输出数据*/
+    public static final String KEY_ITEM_OBJECT = "key_item_object";
+    /** 获取传参 一级科室组织ID 外部输入数据*/
     public static final String KEK_BUNDLE_ORGANPROFESSIONID = "key_item_organprofessionid";
     /**  网格数据显示的最大个数 */
     public static final int PARAM_MAX_RV_NUMBER = 9;
@@ -112,26 +110,55 @@ public class DepartmentTwoFragment extends BaseEventFragment {
     }
 
     /**
+     * 请求二级科室数据
+     */
+    public void requestLevelTwo(String organProfessionId){
+        int organid = GlobalConfig.organId;//浙大附属邵逸夫医院
+        ApiRepository.getInstance().findValidDepartmentForRevisit(organid, organProfessionId, getContext())
+                .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
+                .subscribe(new FastLoadingObserver<FindValidDepartmentForRevisitResultEntity>() {
+                    @Override
+                    public void _onNext(FindValidDepartmentForRevisitResultEntity entity) {
+                        if (entity == null) {
+                            ToastUtil.show("请检查网络");
+                            return;
+                        }
+                        totalDatas = new ArrayList<>();
+                        for (FindValidDepartmentForRevisitResultEntity.QueryArrearsSummary.JsonResponseBean.OrganProfessionDTO item :
+                                entity.data.jsonResponseBean.body) {
+                            Map<String,Object> data = new HashMap<>();
+                            data.put(KEY_ITEM_OBJECT,item);
+                            totalDatas.add(data);
+                        }
+                        if (totalDatas.size()>0)
+                            beginReFlashRv();
+                    }
+                });
+    }
+
+    /**
      * 通过数据刷新列表
-     * 一级和二级共用一个列表
      * @param data 列表数据
      */
     public void reFlashRV(ArrayList<Map> data){
         // 刷新时间
         timeCount = 120;
-//        if (recyclerView.getChildCount()>0)
-//            recyclerView.removeAllViews();
         AutoAdaptor adaptor =  new AutoAdaptor(recyclerView,R.layout.item_dept,3,data,getContext());
         adaptor.setListener(new AutoAdaptor.IItemListener() {
             @Override
             public void onItemClick(AutoAdaptor.ViewHolder holder, int position, Map itemData) {
-                // todo 进入医生
-//                else if (type==2)
-//                    start();
+                //进入医生
+                if (itemData.get(KEY_ITEM_OBJECT)!=null){
+                    FindValidDepartmentForRevisitResultEntity.QueryArrearsSummary.JsonResponseBean.OrganProfessionDTO data
+                            = ((FindValidDepartmentForRevisitResultEntity.QueryArrearsSummary.JsonResponseBean.OrganProfessionDTO) itemData.get(KEY_ITEM_OBJECT));
+                    start(DoctorListFragment.newInstance(data.getCode(),data.getProfessionCode()));
+                }
             }
             @Override
             public void onItemViewDraw(AutoAdaptor.ViewHolder holder, int position, Map itemData) {
-                ((TextView)holder.itemView.findViewById(R.id.jtjk_fz_item_tv)).setText(itemData.get(KEY_ITEM_VALUE).toString());
+                FindValidDepartmentForRevisitResultEntity.QueryArrearsSummary.JsonResponseBean.OrganProfessionDTO data
+                        = ((FindValidDepartmentForRevisitResultEntity.QueryArrearsSummary.JsonResponseBean.OrganProfessionDTO) itemData.get(KEY_ITEM_OBJECT));
+                ((TextView)holder.itemView.findViewById(R.id.jtjk_fz_item_tv)).setText(data.getName());
             }
         });
         adaptor.notifyDataSetChanged();
@@ -244,42 +271,14 @@ public class DepartmentTwoFragment extends BaseEventFragment {
     }
 
     /**
-     * 请求二级科室数据
-     */
-    public void requestLevelTwo(String organProfessionId){
-        int organid = GlobalConfig.organId;//浙大附属邵逸夫医院
-        ApiRepository.getInstance().findValidDepartmentForRevisit(organid, organProfessionId, getContext())
-                .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
-                .subscribe(new FastLoadingObserver<FindValidDepartmentForRevisitResultEntity>() {
-                    @Override
-                    public void _onNext(FindValidDepartmentForRevisitResultEntity entity) {
-                        if (entity == null) {
-                            ToastUtil.show("请检查网络");
-                            return;
-                        }
-                        totalDatas = new ArrayList<>();
-                        for (FindValidDepartmentForRevisitResultEntity.QueryArrearsSummary.JsonResponseBean.OrganProfessionDTO item :
-                                entity.data.jsonResponseBean.body) {
-                            Map<String,String> data = new HashMap<>();
-                            data.put(KEY_ITEM_VALUE,item.getName());
-                            data.put(KEY_ITEM_ORGANPROFESSIONID,item.getProfessionCode());
-                            totalDatas.add(data);
-                        }
-
-                        if (totalDatas.size()>0)
-                            beginReFlashRv();
-                    }
-                });
-    }
-
-    /**
      * 计时器任务处理
      */
     @SuppressLint("SetTextI18n")
     @Override
     protected void timeProcess() {
         super.timeProcess();
-        timerTV.setText(--timeCount+"秒");
+        if (timerTV!=null)
+            timerTV.setText(--timeCount+"秒");
         if (timeCount==0){
             gotoMain();
         }

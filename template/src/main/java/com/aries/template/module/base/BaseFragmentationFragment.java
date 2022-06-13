@@ -105,7 +105,11 @@ public abstract class BaseFragmentationFragment extends FastTitleFragment implem
     @Override
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
-        mDelegate.onHiddenChanged(hidden);
+        try {
+            mDelegate.onHiddenChanged(hidden);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     @Override

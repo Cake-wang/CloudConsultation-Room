@@ -17,6 +17,7 @@
         >
 
         <TextView
+            android:id="@+id/jtjk_doc_item_name_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="#333"
@@ -28,6 +29,7 @@
             android:text="张三三" />
 
         <TextView
+            android:id="@+id/jtjk_doc_item_introduce_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="#666"
