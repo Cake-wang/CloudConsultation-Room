@@ -94,6 +94,7 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/jtjk_fz_fragment_rv"
                 android:layout_width="match_parent"
+                android:minHeight="300dp"
                 android:layout_height="wrap_content"/>
 s
             <LinearLayout

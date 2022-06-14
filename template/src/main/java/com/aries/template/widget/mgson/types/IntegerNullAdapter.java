@@ -2,6 +2,7 @@ package com.aries.template.widget.mgson.types;
 
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 
 import java.io.IOException;
@@ -27,12 +28,21 @@ public class IntegerNullAdapter extends TypeAdapter<Integer> {
      */
     @Override
     public Integer read(JsonReader in) throws IOException {
-        if (in.peek()==null){
-            in.skipValue();
-            return -1;
+        if (in.peek()== JsonToken.NULL){
+            in.nextNull();
+            return 0;
         }
-        BigDecimal bigDecimal = new BigDecimal(in.nextString());
-        return bigDecimal.intValue();
+        try{
+            BigDecimal bigDecimal = new BigDecimal(in.nextString());
+            return bigDecimal.intValue();
+        }catch (Exception e){
+            try {
+                Double doubleValue = in.nextDouble();
+                return doubleValue.intValue();
+            }catch (Exception e2){
+                in.nextString();
+                return 0;
+            }
+        }
     }
-
 }

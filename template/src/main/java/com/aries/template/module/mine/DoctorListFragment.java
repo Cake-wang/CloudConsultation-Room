@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
@@ -13,12 +14,15 @@ import com.aries.library.fast.retrofit.FastLoadingObserver;
 import com.aries.library.fast.util.ToastUtil;
 import com.aries.template.GlobalConfig;
 import com.aries.template.R;
+import com.aries.template.entity.CanRequestOnlineConsultResultEntity;
 import com.aries.template.entity.SearchDoctorListByBusTypeV2ResultEntity;
 import com.aries.template.module.base.BaseEventFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.template.widget.autoadopter.AutoAdaptor;
 import com.aries.ui.view.title.TitleBarView;
 import com.trello.rxlifecycle3.android.FragmentEvent;
+
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -130,14 +134,14 @@ public class DoctorListFragment extends BaseEventFragment {
             public void onItemClick(AutoAdaptor.ViewHolder holder, int position, Map itemData) {
                 //进入复诊单
                 // todo 存储当前最终选择的医生信息，可以重复刷新，结束后清空
-//                if (itemData.get(KEY_ITEM_ORGANPROFESSIONID)!=null)
-//                    start(DepartmentTwoFragment.newInstance(itemData.get(KEY_ITEM_ORGANPROFESSIONID).toString()));
+                SearchDoctorListByBusTypeV2ResultEntity.QueryArrearsSummary.JsonResponseBean.OrganProfessionDTO.DocList.Doctor doc = ((SearchDoctorListByBusTypeV2ResultEntity.QueryArrearsSummary.JsonResponseBean.OrganProfessionDTO.DocList.Doctor) itemData.get(KEY_ITEM_CURRENT_DOC));
+                requestCanRequestOnlineConsult(doc.getDoctorId(),doc);
             }
             @Override
             public void onItemViewDraw(AutoAdaptor.ViewHolder holder, int position, Map itemData) {
                 SearchDoctorListByBusTypeV2ResultEntity.QueryArrearsSummary.JsonResponseBean.OrganProfessionDTO.DocList.Doctor doc = ((SearchDoctorListByBusTypeV2ResultEntity.QueryArrearsSummary.JsonResponseBean.OrganProfessionDTO.DocList.Doctor) itemData.get(KEY_ITEM_CURRENT_DOC));
-                ((TextView)holder.itemView.findViewById(R.id.jtjk_doc_item_name_tv)).setText(itemData.get(doc.getName()).toString());
-//                ((TextView)holder.itemView.findViewById(R.id.jtjk_doc_item_introduce_tv)).setText(itemData.get(doc.getIntroduce()).toString());
+                ((TextView)holder.itemView.findViewById(R.id.jtjk_doc_item_name_tv)).setText(doc.getName());
+                ((TextView)holder.itemView.findViewById(R.id.jtjk_doc_item_introduce_tv)).setText(doc.getIntroduce());
             }
         });
         adaptor.notifyDataSetChanged();
@@ -161,14 +165,11 @@ public class DoctorListFragment extends BaseEventFragment {
                             return;
                         //将返回的数据显示出来
                         totalDatas = new ArrayList<>();
-                        for (SearchDoctorListByBusTypeV2ResultEntity.QueryArrearsSummary.JsonResponseBean.OrganProfessionDTO item : entity.data.jsonResponseBean.body) {
-                            for (SearchDoctorListByBusTypeV2ResultEntity.QueryArrearsSummary.JsonResponseBean.OrganProfessionDTO.DocList doc : item.getDocList()) {
-                                doc.getDoctor().getName();
-                                Map<String,Object> data = new HashMap<>();
-                                data.put(KEY_ITEM_CURRENT_DOC,doc.getDoctor());
-                                totalDatas.add(data);
-                            }
-
+                        for (SearchDoctorListByBusTypeV2ResultEntity.QueryArrearsSummary.JsonResponseBean.OrganProfessionDTO.DocList doc : entity.data.jsonResponseBean.body.getDocList()) {
+                            doc.getDoctor().getName();
+                            Map<String,Object> data = new HashMap<>();
+                            data.put(KEY_ITEM_CURRENT_DOC,doc.getDoctor());
+                            totalDatas.add(data);
                         }
                         if (totalDatas.size()>0)
                             beginReFlashRv();
@@ -177,9 +178,37 @@ public class DoctorListFragment extends BaseEventFragment {
     }
 
     /**
+     * 请求医生当前是否能够复诊
+     */
+    public void requestCanRequestOnlineConsult(Long doctorID, SearchDoctorListByBusTypeV2ResultEntity.QueryArrearsSummary.JsonResponseBean.OrganProfessionDTO.DocList.Doctor doc){
+        ApiRepository.getInstance().canRequestOnlineConsult(doctorID)
+                .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
+                .subscribe(new FastLoadingObserver<CanRequestOnlineConsultResultEntity>() {
+                    @Override
+                    public void _onNext(CanRequestOnlineConsultResultEntity entity) {
+                        if (entity == null) {
+                            ToastUtil.show("请检查网络");
+                            return;
+                        }
+                        if (entity.success){
+                            // 将医生信息设置为全局复诊医生信息
+                            GlobalConfig.doc = doc;
+                            // 医生可以进行复诊 跳转确认
+                            start(ConfirmConsultFragment.newInstance("ok"));
+                        }else{
+                            // 医生不可以进行复诊
+                            Toast.makeText(mContext, "医生当前不能进行复诊", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+    }
+
+    /**
      * 上一页数据显示
      */
     public void preReFlashRV(){
+        if (totalDatas==null)
+            return;
         int startIndex = (currentPageNum -1)*PARAM_MAX_RV_NUMBER;
         if (startIndex<=0){
             startIndex = 0;

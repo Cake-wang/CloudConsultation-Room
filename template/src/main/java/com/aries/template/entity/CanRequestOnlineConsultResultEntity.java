@@ -131,7 +131,7 @@ public class CanRequestOnlineConsultResultEntity {
 
             public Integer code;
 
-            public Msg msg;
+            public String msg;
             public String properties;
 
             public boolean body;
@@ -144,11 +144,11 @@ public class CanRequestOnlineConsultResultEntity {
                 this.code = code;
             }
 
-            public Msg getMsg() {
+            public String getMsg() {
                 return msg;
             }
 
-            public void setMsg(Msg msg) {
+            public void setMsg(String msg) {
                 this.msg = msg;
             }
 

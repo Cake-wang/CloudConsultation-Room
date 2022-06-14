@@ -9,13 +9,16 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.aries.library.fast.retrofit.FastLoadingObserver;
 import com.aries.library.fast.retrofit.FastObserver;
 import com.aries.library.fast.util.SPUtil;
 import com.aries.library.fast.util.ToastUtil;
+import com.aries.template.GlobalConfig;
 import com.aries.template.R;
 import com.aries.template.adapter.FlowTagAdapter;
+import com.aries.template.entity.CanRequestOnlineConsultResultEntity;
 import com.aries.template.entity.RequestConsultAndCdrOtherdocResultEntity;
 import com.aries.template.module.base.BaseEventFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
@@ -115,6 +118,10 @@ public class ConfirmConsultFragment extends BaseEventFragment implements Compoun
 
         initSingleFlowTagLayouto();
         initSingleFlowTagLayoutt();
+
+        cb_protocol_o.setOnCheckedChangeListener(this);
+        cb_protocol_tw.setOnCheckedChangeListener(this);
+        cb_protocol_tr.setOnCheckedChangeListener(this);
 //        int organid = 1;//浙大附属邵逸夫医院
 //        ApiRepository.getInstance().findValidOrganProfessionForRevisit(organid, getContext())
 //                .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
@@ -148,7 +155,6 @@ public class ConfirmConsultFragment extends BaseEventFragment implements Compoun
         flowlayout_single_select_t.setOnTagSelectListener((parent, position, selectedList) ->  haveReaction =position);
         tagAdapter.addTags(ResUtils.getStringArray(R.array.tags_values));
         tagAdapter.setSelectedPositions(0);
-
     }
 
     @Override
@@ -176,98 +182,39 @@ public class ConfirmConsultFragment extends BaseEventFragment implements Compoun
                     returnVisitStatus = 2;
                 }
                 break;
-
             default:
                 break;
         }
     }
 
 
+    /**
+     * 按钮 行为 集合
+     */
     @Override
     @SingleClick
-    @OnClick({R.id.btn_back, R.id.btn_main, R.id.btn_cancel, R.id.btn_inquiry})
+    @OnClick({R.id.btn_back, R.id.btn_main, R.id.btn_cancel, R.id.btn_inquiry, R.id.tv_date})
     public void onViewClicked(View view) {
         switch (view.getId()) {
 //            case R.id.btn_back:
-//
 //                break;
 //            case R.id.btn_main:
-//
 //                break;
             case R.id.tv_date:
-
                 showDatePickerDialog(getContext(), DatePickerDialog.THEME_DEVICE_DEFAULT_LIGHT, tv_date, Calendar.getInstance());
-
-
                 break;
             case R.id.btn_inquiry:
-
-                ApiRepository.getInstance().requestConsultAndCdrOtherdoc("","","",mContext)
-                        .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
-                        .subscribe(true ?
-                                new FastLoadingObserver<RequestConsultAndCdrOtherdocResultEntity>("请稍后...") {
-                                    @Override
-                                    public void _onNext(@NonNull RequestConsultAndCdrOtherdocResultEntity entity) {
-                                        if (entity == null) {
-                                            ToastUtil.show("请检查网络");
-                                            return;
-                                        }
-//                                checkVersion(entity);
-                                        if (entity.isSuccess()){
-
-                                            if (entity.getData().isSuccess()){
-                                                start(PayCodeFragment.newInstance(new Object()));
-                                            }
-
-
-                                        }else {
-
-//                                    if(TextUtils.isEmpty(tag)){
-//                                        ToastUtil.show("参数缺失");
-//                                    }else {
-//                                        start(PutRecordFragment.newInstance( idCard, name, smkcard));
-//                                    }
-
-//                                    ToastUtil.show(entity.getRespDesc());
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onError(Throwable e) {
-
-//                                ToastUtil.show("请检查网络和ip地址");
-                                        if (true) {
-                                            super.onError(e);
-                                        }
-                                    }
-                                } :
-                                new FastObserver<RequestConsultAndCdrOtherdocResultEntity>() {
-                                    @Override
-                                    public void _onNext(@NonNull RequestConsultAndCdrOtherdocResultEntity entity) {
-                                        if (entity == null) {
-                                            ToastUtil.show("请检查网络");
-                                            return;
-                                        }
-
-
-
-                                    }
-
-                                    @Override
-                                    public void onError(Throwable e) {
-                                        if (false) {
-                                            super.onError(e);
-                                        }
-                                    }
-                                });
-
-
+                // 确认，发起复诊请求
+                requestConsultAndCdrOtherdoc();
                 break;
             default:
                 break;
         }
     }
 
+    /**
+     * 日期选择框 显示
+     */
     public void showDatePickerDialog(Context context, int themeResId, final TextView tv, Calendar calendar) {
         new DatePickerDialog(context
                 , themeResId
@@ -277,6 +224,23 @@ public class ConfirmConsultFragment extends BaseEventFragment implements Compoun
                 , calendar.get(Calendar.MONTH)
                 , calendar.get(Calendar.DAY_OF_MONTH))
                 .show();
+    }
+
+    /**
+     * 执行复诊确认
+     */
+    public void requestConsultAndCdrOtherdoc(){
+        ApiRepository.getInstance().requestConsultAndCdrOtherdoc(GlobalConfig.doc.getDoctorId())
+                .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
+                .subscribe(new FastLoadingObserver<RequestConsultAndCdrOtherdocResultEntity>() {
+                    @Override
+                    public void _onNext(RequestConsultAndCdrOtherdocResultEntity entity) {
+                        if (entity == null) {
+                            ToastUtil.show("请检查网络");
+                            return;
+                        }
+                    }
+                });
     }
 
     /**

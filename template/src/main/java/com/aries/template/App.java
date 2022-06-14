@@ -10,6 +10,7 @@ import com.aries.template.constant.ApiConstant;
 import com.aries.template.impl.ActivityControlImpl;
 import com.aries.template.impl.AppImpl;
 import com.aries.template.impl.HttpRequestControlImpl;
+import com.aries.template.widget.mgson.MFastRetrofit;
 import com.aries.template.widget.mgson.MGsonFactory;
 import com.decard.NDKMethod.BasicOper;
 import com.orhanobut.logger.PrettyFormatStrategy;
@@ -84,7 +85,8 @@ public class App extends MultiDexApplication {
                 .setToastControl(impl);
 
         //初始化Retrofit配置
-        FastRetrofit.getInstance()
+//        FastRetrofit.getInstance()
+        MFastRetrofit.getInstance()
                 //配置全局网络请求BaseUrl
                 .setBaseUrl(ApiConstant.BASEURLTest)
                 //信任所有证书--也可设置setCertificates(单/双向验证)
@@ -99,27 +101,24 @@ public class App extends MultiDexApplication {
                 //默认20 s
                 .setTimeout(30);
 
-        FastRetrofit.getRetrofitBuilder()
-                        .addConverterFactory(MGsonFactory.create());
-
         //注意设置baseUrl要以/ 结尾 service 里的方法不要以/打头不然拦截到的url会有问题
         //以下为配置多BaseUrl--默认方式一优先级高 可通过FastRetrofit.getInstance().setHeaderPriorityEnable(true);设置方式二优先级
         //方式一 通过Service 里的method-(如:) 设置 推荐 使用该方式不需设置如方式二的额外Header
 //        FastRetrofit.getInstance()
 //                .putBaseUrl(ApiConstant.API_UPDATE_APP, BuildConfig.BASE__UPDATE_URL);
-        FastRetrofit.getInstance()
+        MFastRetrofit.getInstance()
 //                .addHeader(" Content-Type","application/json")
                 .putBaseUrl(ApiConstant.isRegister, ApiConstant.BASEURLTest);
 
-        FastRetrofit.getInstance()
+        MFastRetrofit.getInstance()
 //                .addHeader(" Content-Type","application/json")
                 .putBaseUrl(ApiConstant.register, ApiConstant.BASEURLTest);
 
-        FastRetrofit.getInstance()
+        MFastRetrofit.getInstance()
 //                .addHeader(" Content-Type","application/json")
                 .putBaseUrl(ApiConstant.doBaseNgariRequest, ApiConstant.BASEURLTest);
 
-        FastRetrofit.getInstance()
+        MFastRetrofit.getInstance()
 //                .addHeader(" Content-Type","application/json")
                 .putBaseUrl(ApiConstant.getConsultsAndRecipes, ApiConstant.BASEURLTest);
 

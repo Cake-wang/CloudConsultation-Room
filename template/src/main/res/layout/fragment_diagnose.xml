@@ -59,6 +59,7 @@
                 android:text="请确认您的订单" />
 
             <TextView
+                android:id="@+id/jtjk_fz_fragment_timer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#333"
@@ -388,25 +389,18 @@
                         android:id="@+id/cb_protocol_o"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-
-
-
                         android:layout_marginBottom="25dp"
-                        android:button="@drawable/bg_cb_y_yzs"
+                        android:button="@drawable/checkbox_theme"
+                        android:checked="true"
                         android:scaleX="0.8"
                         android:scaleY="0.8" />
-
-
 
                     <androidx.appcompat.widget.AppCompatCheckBox
                         android:id="@+id/cb_protocol_tw"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-
-
-
                         android:layout_marginBottom="25dp"
-                        android:button="@drawable/bg_cb_n_yzs"
+                        android:button="@drawable/checkbox_theme"
                         android:scaleX="0.8"
                         android:scaleY="0.8" />
 
@@ -414,11 +408,7 @@
                         android:id="@+id/cb_protocol_tr"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-
-
-                        android:checked="true"
-
-                        android:button="@drawable/bg_cb_n_yzs"
+                        android:button="@drawable/checkbox_theme"
                         android:scaleX="0.8"
                         android:scaleY="0.8" />
 

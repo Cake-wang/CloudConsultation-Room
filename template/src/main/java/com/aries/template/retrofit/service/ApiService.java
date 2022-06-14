@@ -17,6 +17,7 @@ import com.aries.template.entity.RegisterResultEntity;
 import com.aries.template.entity.RequestConsultAndCdrOtherdocResultEntity;
 import com.aries.template.entity.SearchDoctorListByBusTypeV2ResultEntity;
 import com.aries.template.entity.UpdateEntity;
+import com.aries.template.widget.mgson.MFastRetrofit;
 
 import java.util.Map;
 
@@ -55,7 +56,7 @@ public interface ApiService {
      * @return
      */
     @GET(ApiConstant.API_UPDATE_APP)
-    @Headers({FastRetrofit.BASE_URL_NAME_HEADER + ApiConstant.API_UPDATE_APP_KEY})
+    @Headers({MFastRetrofit.BASE_URL_NAME_HEADER + ApiConstant.API_UPDATE_APP_KEY})
     Observable<UpdateEntity> updateApp();
 
 //    @Headers("Content-Type: application/json")

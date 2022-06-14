@@ -136,7 +136,7 @@ public class SearchDoctorListByBusTypeV2ResultEntity {
             public String msg;
             public String properties;
 
-            public List<OrganProfessionDTO> body;
+            public OrganProfessionDTO body;
 
             public Integer getCode() {
                 return code;
@@ -162,11 +162,11 @@ public class SearchDoctorListByBusTypeV2ResultEntity {
                 this.properties = properties;
             }
 
-            public List<OrganProfessionDTO> getBody() {
+            public OrganProfessionDTO getBody() {
                 return body;
             }
 
-            public void setBody(List<OrganProfessionDTO> body) {
+            public void setBody(OrganProfessionDTO body) {
                 this.body = body;
             }
 
@@ -184,12 +184,12 @@ public class SearchDoctorListByBusTypeV2ResultEntity {
                  * @website http://www.bejson.com/java2pojo/
                  */
 
-                private int start;
+                private Integer start;
                 private List<DocList> docList;
-                public void setStart(int start) {
+                public void setStart(Integer start) {
                     this.start = start;
                 }
-                public int getStart() {
+                public Integer getStart() {
                     return start;
                 }
 
@@ -236,6 +236,7 @@ public class SearchDoctorListByBusTypeV2ResultEntity {
                         private String loginId;
                         private long doctorId;
                         private String name;
+                        private String introduce;
                         private String gender;
                         private String profession;
                         private long organProfession;
@@ -275,6 +276,14 @@ public class SearchDoctorListByBusTypeV2ResultEntity {
                         private String groupModeText;
                         private String userTypeText;
                         private String statusText;
+
+                        public String getIntroduce() {
+                            return introduce;
+                        }
+
+                        public void setIntroduce(String introduce) {
+                            this.introduce = introduce;
+                        }
 
                         public void setLoginId(String loginId) {
                             this.loginId = loginId;

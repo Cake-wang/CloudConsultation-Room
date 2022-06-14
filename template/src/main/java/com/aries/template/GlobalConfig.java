@@ -1,5 +1,7 @@
 package com.aries.template;
 
+import com.aries.template.entity.SearchDoctorListByBusTypeV2ResultEntity;
+
 /******
  * 全世界存储对象
  * @author  ::: louis luo
@@ -13,7 +15,6 @@ public class GlobalConfig {
      */
     public static String token = "";
 
-
     /**
      * 组织代码
      * 用于确定医院组织的代码。1 浙大附属邵逸夫医院
@@ -23,8 +24,14 @@ public class GlobalConfig {
     /**
      * 用户个人信息
      * 姓名
+     * todo 是否要使用个人信息数据bean？
      */
     public static  String name = "";
+
+    /**
+     * 全局复诊医生信息
+     */
+    public static SearchDoctorListByBusTypeV2ResultEntity.QueryArrearsSummary.JsonResponseBean.OrganProfessionDTO.DocList.Doctor doc;
 
     /**
      * 清空所有缓存数据
@@ -33,6 +40,7 @@ public class GlobalConfig {
     public static void clear(){
         token="";
         name="";
+        doc=null;
     }
 
 }

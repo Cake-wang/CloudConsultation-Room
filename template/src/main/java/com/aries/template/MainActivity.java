@@ -424,13 +424,17 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ActivityUtils.fullScreen(getWindow(),false);
-        ActivityUtils.lightOnScreen(getWindow());
         mDelegate.onCreate(savedInstanceState);
-
         if (findFragment(HomeFragment.class) == null) {
             loadRootFragment(R.id.fLayout_containerFastMain, HomeFragment.newInstance());  // 加载根Fragment
         }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        ActivityUtils.fullScreen(getWindow(),false);
+        ActivityUtils.lightOnScreen(getWindow());
     }
 
     @Override
