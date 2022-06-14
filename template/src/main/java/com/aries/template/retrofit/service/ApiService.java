@@ -14,6 +14,7 @@ import com.aries.template.entity.GetConfigurationToThirdForPatientResultEntity;
 import com.aries.template.entity.GetConsultsAndRecipesResultEntity;
 import com.aries.template.entity.IsRegisterResultEntity;
 import com.aries.template.entity.RegisterResultEntity;
+import com.aries.template.entity.RequestConsultAndCdrOtherdocResultEntity;
 import com.aries.template.entity.SearchDoctorListByBusTypeV2ResultEntity;
 import com.aries.template.entity.UpdateEntity;
 
@@ -104,7 +105,7 @@ public interface ApiService {
 
     @Headers("Content-Type: application/json")
     @POST(ApiConstant.doBaseNgariRequest)
-    Observable<CanRequestOnlineConsultResultEntity> requestConsultAndCdrOtherdoc(@Body RequestBody body);
+    Observable<RequestConsultAndCdrOtherdocResultEntity> requestConsultAndCdrOtherdoc(@Body RequestBody body);
 
     @Headers("Content-Type: application/json")
     @POST(ApiConstant.doBaseNgariRequest)
@@ -117,4 +118,5 @@ public interface ApiService {
     @Headers("Content-Type: application/json")
     @POST(ApiConstant.getConsultsAndRecipes)
     Observable<GetConsultsAndRecipesResultEntity> getConsultsAndRecipes(@Body RequestBody body);
+
 }
