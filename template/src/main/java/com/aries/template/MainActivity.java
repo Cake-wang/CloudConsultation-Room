@@ -2,7 +2,6 @@ package com.aries.template;
 
 import android.content.ComponentName;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -10,7 +9,6 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.WindowManager;
 
 import com.aries.library.fast.entity.FastTabEntity;
 import com.aries.library.fast.manager.LoggerManager;
@@ -181,6 +179,7 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                     SPUtil.put(mContext,"age",getAge(Long.parseLong(ssCard.getBirthday())));
                     SPUtil.put(mContext,"userName",ssCard.getName());
                     SPUtil.put(mContext,"sex",ssCard.getSex());
+                    SPUtil.put(mContext,"idCard",ssCard.getSSNum());
 
                     readCardSuccess(ssCard.getSSNum(),ssCard.getName(),ssCard.getCardNum());
 
@@ -253,6 +252,7 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
 
                                     if (entity.getData()!=null){
                                         SPUtil.put(mContext,"tid",entity.getData().getUserId());
+                                        SPUtil.put(mContext,"mobile",entity.getData().getMobile());
                                         if(tag.contains("stjc")){
 
                                             Intent intent = new Intent(Intent.ACTION_MAIN);

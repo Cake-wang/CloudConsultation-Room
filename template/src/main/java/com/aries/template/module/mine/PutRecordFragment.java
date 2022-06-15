@@ -494,6 +494,7 @@ public class PutRecordFragment extends FastTitleFragment implements ISupportFrag
 
                                     String tag = (String) SPUtil.get(mContext,"tag","fzpy");
 
+                                    SPUtil.put(mContext,"mobile",phoneNumber);
 
                                         if(tag.contains("stjc")){
 

@@ -99,5 +99,7 @@ dependencies {
 //    implementation 'com.github.xuexiangjys.XPage:xpage-annotation:3.0.1'
     // 切片
     implementation 'com.github.xuexiangjys.XAOP:xaop-runtime:1.1.0'
+// XQRCode二维码扫描
+    implementation 'com.github.xuexiangjys:XQRCode:1.1.0'
 
 }

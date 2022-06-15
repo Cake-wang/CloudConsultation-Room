@@ -194,7 +194,7 @@
 
                     <TextView
                         android:layout_marginTop="10dp"
-
+                        android:id="@+id/tv_name"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="#333333"
@@ -213,6 +213,7 @@
                         android:layout_marginLeft="10dp"
                         android:textSize="22dp"
                         android:gravity="left"
+                        android:id="@+id/tv_fee_type"
                         android:layout_marginBottom="20dp"
                         android:text="挂号费" />
 
@@ -225,7 +226,7 @@
                         android:textSize="22dp"
                         android:gravity="left"
                         android:layout_marginBottom="20dp"
-
+                        android:id="@+id/tv_fee_all"
                         android:text="100 元" />
 
                     <TextView
@@ -236,7 +237,7 @@
                         android:layout_marginLeft="10dp"
                         android:textSize="22dp"
                         android:gravity="left"
-
+                        android:id="@+id/tv_fee_yb"
                         android:layout_marginBottom="20dp"
                         android:text="80 元" />
 
@@ -248,7 +249,7 @@
                         android:layout_marginLeft="10dp"
                         android:textSize="22dp"
                         android:gravity="left"
-
+                        android:id="@+id/tv_fee_zf"
 
                         android:text="20 元" />
 
@@ -443,8 +444,18 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:src="@drawable/bg_pay_w_yzs"
-
+                        android:visibility="gone"
                         />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/iv_qrcode"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+
+                        android:background="@drawable/bg_pay_w_yzs"
+                        android:minWidth="200dp"
+                        android:minHeight="200dp"
+                        android:scaleType="fitXY" />
 
                 </LinearLayout>
             </LinearLayout>

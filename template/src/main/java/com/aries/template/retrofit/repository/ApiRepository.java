@@ -594,6 +594,44 @@ public class ApiRepository extends BaseRepository {
         return FastTransformer.switchSchedulers(getApiService().requestConsultAndCdrOtherdoc(body).retryWhen(new FastRetryWhen()));
     }
 
+    public Observable<RequestConsultAndCdrOtherdocResultEntity> presettlement(String appKey, String tid, String appClientType, Context mContext) {
+
+//        idCard = "33052219861229693X";
+//        SPUtil.put(mContext, "termial","YTJ1001");
+//        SPUtil.put(mContext,"hosiptalNo", "A0005");
+//        SPUtil.put(mContext, "mchntId", "330160400279");
+//
+//        SPUtil.put(mContext, "posId","1001");
+
+//        CanRequestOnlineConsultRequestEntity checkActivationStateReferenceEntity = new CanRequestOnlineConsultRequestEntity();
+//        checkActivationStateReferenceEntity.setAppKey(appKey);
+//        checkActivationStateReferenceEntity.setDoctorId(doctorId);
+//        checkActivationStateReferenceEntity.setTid(tid);
+        Map<String,String> bizContent = new HashMap<>();
+        bizContent.put("appClientType",appClientType);
+        RequestBody body = BodyCreate(bizContent,"requestConsultAndCdrOtherdoc");
+        return FastTransformer.switchSchedulers(getApiService().presettlement(body).retryWhen(new FastRetryWhen()));
+    }
+
+    public Observable<RequestConsultAndCdrOtherdocResultEntity> paySuccess(String appKey, String tid, String appClientType, Context mContext) {
+
+//        idCard = "33052219861229693X";
+//        SPUtil.put(mContext, "termial","YTJ1001");
+//        SPUtil.put(mContext,"hosiptalNo", "A0005");
+//        SPUtil.put(mContext, "mchntId", "330160400279");
+//
+//        SPUtil.put(mContext, "posId","1001");
+
+//        CanRequestOnlineConsultRequestEntity checkActivationStateReferenceEntity = new CanRequestOnlineConsultRequestEntity();
+//        checkActivationStateReferenceEntity.setAppKey(appKey);
+//        checkActivationStateReferenceEntity.setDoctorId(doctorId);
+//        checkActivationStateReferenceEntity.setTid(tid);
+        Map<String,String> bizContent = new HashMap<>();
+        bizContent.put("appClientType",appClientType);
+        RequestBody body = BodyCreate(bizContent,"requestConsultAndCdrOtherdoc");
+        return FastTransformer.switchSchedulers(getApiService().paySuccess(body).retryWhen(new FastRetryWhen()));
+    }
+
     public Observable<GetConfigurationToThirdForPatientResultEntity> getConfigurationToThirdForPatient(String thirdParty, String tid, Context mContext) {
 
 //        idCard = "33052219861229693X";

@@ -120,4 +120,12 @@ public interface ApiService {
     @POST(ApiConstant.getConsultsAndRecipes)
     Observable<GetConsultsAndRecipesResultEntity> getConsultsAndRecipes(@Body RequestBody body);
 
+    @Headers("Content-Type: application/json")
+    @POST(ApiConstant.doBaseNgariRequest)
+    Observable<RequestConsultAndCdrOtherdocResultEntity> presettlement(@Body RequestBody body);
+
+    @Headers("Content-Type: application/json")
+    @POST(ApiConstant.doBaseNgariRequest)
+    Observable<RequestConsultAndCdrOtherdocResultEntity> paySuccess(@Body RequestBody body);
+
 }
