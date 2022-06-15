@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.aries.library.fast.retrofit.FastLoadingObserver;
 import com.aries.library.fast.util.SPUtil;
@@ -31,6 +32,9 @@ import java.util.Date;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatCheckBox;
+
+import org.json.JSONObject;
+
 import butterknife.BindView;
 import butterknife.OnClick;
 
@@ -191,6 +195,7 @@ public class ConfirmConsultFragment extends BaseEventFragment implements Compoun
     @SingleClick
     @OnClick({R.id.btn_back, R.id.btn_main, R.id.btn_cancel, R.id.btn_inquiry, R.id.tv_date})
     public void onViewClicked(View view) {
+        super.onViewClicked(view);
         switch (view.getId()) {
 //            case R.id.btn_back:
 //                break;
@@ -235,8 +240,49 @@ public class ConfirmConsultFragment extends BaseEventFragment implements Compoun
                             ToastUtil.show("请检查网络");
                             return;
                         }
+                        if (entity.data.isSuccess()){
+                            // 医生 确认复诊，并进入复诊阶段
+                            start(ConfirmConsultFragment.newInstance("ok"));
+                        }else{
+                            // 如果不能复诊，则检查异常原因
+                            errorCheck(entity.data.jsonResponseBean.msg,entity.data.jsonResponseBean.code);
+                        }
                     }
                 });
+    }
+
+    /**
+     * 复诊 异常情况处理
+     */
+    public void errorCheck(String msg, int code) {
+        String toastTip = "复诊单异常"; //默认提示
+        String cid = "0";// 默认是0
+        try {
+            switch (code){
+                case 611:
+                    JSONObject json611 = new JSONObject(msg);
+                    cid = json611.get("consultId").toString();
+                    toastTip = json611.get("title").toString();
+                    break;
+                case 613:
+//                    JSONObject json613 = new JSONObject(msg);
+//                    cid = json613.get("cid").toString();
+                    toastTip ="有一条未结束的非团队复诊单";
+                    break;
+                case 614:
+                    JSONObject json614 = new JSONObject(msg);
+                    cid = json614.get("cid").toString();
+                    toastTip ="有一条未结束的团队复诊单";
+                    break;
+                case 608:
+                    cid = "0";
+                    toastTip =msg;
+                    break;
+            }
+            Toast.makeText(mContext, toastTip, Toast.LENGTH_LONG).show();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     /**

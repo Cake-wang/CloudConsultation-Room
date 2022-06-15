@@ -19,9 +19,13 @@ import com.aries.template.entity.SearchDoctorListByBusTypeV2ResultEntity;
 import com.aries.template.module.base.BaseEventFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.template.widget.autoadopter.AutoAdaptor;
+import com.aries.template.widget.updownbtn.UpDownProxy;
 import com.aries.ui.view.title.TitleBarView;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.trello.rxlifecycle3.android.FragmentEvent;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -68,6 +72,8 @@ public class DoctorListFragment extends BaseEventFragment {
     private int currentPageNum = 0;
     /** 网络获取的全一级科室数据 */
     private ArrayList<Map> totalDatas;
+    /** 上一页，下一页管理器 */
+    private UpDownProxy<Map> upDownProxy;
 
     @BindView(R.id.jtjk_fz_fragment_timer)
     TextView timerTV; //时间计时器显示对象
@@ -104,6 +110,49 @@ public class DoctorListFragment extends BaseEventFragment {
         // 获取传参数
         departmentId = getArguments().getString(KEK_BUNDLE_DEPARTMENTID);
         profession = getArguments().getString(KEK_BUNDLE_PROFESSION);
+        // 创建 上一页，下一页管理器
+        upDownProxy = new UpDownProxy<>();
+        upDownProxy.setOnEventListener(new UpDownProxy.EventListener<Map>() {
+            @Override
+            public void reFlashRV(ArrayList<Map> newDatas) {
+                // 刷新时间
+                timeCount = 120;
+                AutoAdaptor adaptor =  new AutoAdaptor(recyclerView,R.layout.item_doctor,2,newDatas,getContext());
+                adaptor.setListener(new AutoAdaptor.IItemListener() {
+                    @Override
+                    public void onItemClick(AutoAdaptor.ViewHolder holder, int position, Map itemData) {
+                        //进入复诊单
+                        // todo 存储当前最终选择的医生信息，可以重复刷新，结束后清空
+                        SearchDoctorListByBusTypeV2ResultEntity.QueryArrearsSummary.JsonResponseBean.OrganProfessionDTO.DocList.Doctor doc = ((SearchDoctorListByBusTypeV2ResultEntity.QueryArrearsSummary.JsonResponseBean.OrganProfessionDTO.DocList.Doctor) itemData.get(KEY_ITEM_CURRENT_DOC));
+                        requestCanRequestOnlineConsult(doc.getDoctorId(),doc);
+                    }
+                    @Override
+                    public void onItemViewDraw(AutoAdaptor.ViewHolder holder, int position, Map itemData) {
+                        SearchDoctorListByBusTypeV2ResultEntity.QueryArrearsSummary.JsonResponseBean.OrganProfessionDTO.DocList.Doctor doc = ((SearchDoctorListByBusTypeV2ResultEntity.QueryArrearsSummary.JsonResponseBean.OrganProfessionDTO.DocList.Doctor) itemData.get(KEY_ITEM_CURRENT_DOC));
+                        ((TextView)holder.itemView.findViewById(R.id.jtjk_doc_item_name_tv)).setText(doc.getName());
+                        ((TextView)holder.itemView.findViewById(R.id.jtjk_doc_item_introduce_tv)).setText(doc.getIntroduce());
+                    }
+                });
+                adaptor.notifyDataSetChanged();
+            }
+
+            @Override
+            public void setBtnEnable(int nowCase, boolean b) {
+                Button button = new Button(getContext());
+                if (nowCase==UpDownProxy.CASE_RV_UP)
+                    button = btn_cancel;
+                if (nowCase==UpDownProxy.CASE_RV_DOWN)
+                    button = btn_inquiry;
+                button.setEnabled(b);
+                if (b){
+                    button.setTextColor(Color.parseColor("#ffffff"));
+                    button.setBackgroundResource(R.drawable.btn_next_yzs);
+                }else {
+                    button.setTextColor(Color.parseColor("#999999"));
+                    button.setBackgroundResource(R.drawable.btn_ago_yzs);
+                }
+            }
+        });
         // 启动计时器
         timeStart();
     }
@@ -114,37 +163,11 @@ public class DoctorListFragment extends BaseEventFragment {
     @Override
     public void initView(Bundle savedInstanceState) {
         // 事件
-        btn_inquiry.setOnClickListener(v -> {nextReFlashRv();});
-        btn_cancel.setOnClickListener(v -> {preReFlashRV();});
+        btn_inquiry.setOnClickListener(v -> {upDownProxy.doNextReFlash();});
+        btn_cancel.setOnClickListener(v -> {upDownProxy.doProReFlash();});
         title.setText("请选择就诊医生");
         // 请求一级科室
         requestDoctorInfo();
-    }
-
-    /**
-     * 通过数据刷新列表
-     * @param data 列表数据
-     */
-    public void reFlashRV(ArrayList<Map> data){
-        // 刷新时间
-        timeCount = 120;
-        AutoAdaptor adaptor =  new AutoAdaptor(recyclerView,R.layout.item_doctor,2,data,getContext());
-        adaptor.setListener(new AutoAdaptor.IItemListener() {
-            @Override
-            public void onItemClick(AutoAdaptor.ViewHolder holder, int position, Map itemData) {
-                //进入复诊单
-                // todo 存储当前最终选择的医生信息，可以重复刷新，结束后清空
-                SearchDoctorListByBusTypeV2ResultEntity.QueryArrearsSummary.JsonResponseBean.OrganProfessionDTO.DocList.Doctor doc = ((SearchDoctorListByBusTypeV2ResultEntity.QueryArrearsSummary.JsonResponseBean.OrganProfessionDTO.DocList.Doctor) itemData.get(KEY_ITEM_CURRENT_DOC));
-                requestCanRequestOnlineConsult(doc.getDoctorId(),doc);
-            }
-            @Override
-            public void onItemViewDraw(AutoAdaptor.ViewHolder holder, int position, Map itemData) {
-                SearchDoctorListByBusTypeV2ResultEntity.QueryArrearsSummary.JsonResponseBean.OrganProfessionDTO.DocList.Doctor doc = ((SearchDoctorListByBusTypeV2ResultEntity.QueryArrearsSummary.JsonResponseBean.OrganProfessionDTO.DocList.Doctor) itemData.get(KEY_ITEM_CURRENT_DOC));
-                ((TextView)holder.itemView.findViewById(R.id.jtjk_doc_item_name_tv)).setText(doc.getName());
-                ((TextView)holder.itemView.findViewById(R.id.jtjk_doc_item_introduce_tv)).setText(doc.getIntroduce());
-            }
-        });
-        adaptor.notifyDataSetChanged();
     }
 
     /**
@@ -171,8 +194,11 @@ public class DoctorListFragment extends BaseEventFragment {
                             data.put(KEY_ITEM_CURRENT_DOC,doc.getDoctor());
                             totalDatas.add(data);
                         }
-                        if (totalDatas.size()>0)
-                            beginReFlashRv();
+                        if (totalDatas.size()>0){
+                            upDownProxy.setParamMaxNumber(9);
+                            upDownProxy.setTotalDatas(totalDatas);
+                            upDownProxy.doStartReFlash();
+                        }
                     }
                 });
     }
@@ -190,124 +216,52 @@ public class DoctorListFragment extends BaseEventFragment {
                             ToastUtil.show("请检查网络");
                             return;
                         }
-                        if (entity.success){
+                        if (entity.data.isSuccess()){
                             // 将医生信息设置为全局复诊医生信息
                             GlobalConfig.doc = doc;
                             // 医生可以进行复诊 跳转确认
                             start(ConfirmConsultFragment.newInstance("ok"));
                         }else{
                             // 医生不可以进行复诊
-                            Toast.makeText(mContext, "医生当前不能进行复诊", Toast.LENGTH_LONG).show();
+
+                            // 如果不能复诊，则检查异常原因
+                            errorCheck(entity.data.jsonResponseBean.msg,entity.data.jsonResponseBean.code);
                         }
                     }
                 });
     }
 
     /**
-     * 上一页数据显示
+     * 复诊 异常情况处理
      */
-    public void preReFlashRV(){
-        if (totalDatas==null)
-            return;
-        int startIndex = (currentPageNum -1)*PARAM_MAX_RV_NUMBER;
-        if (startIndex<=0){
-            startIndex = 0;
-            // 上一页 背景设置，可点击设置
-            setBtnEnable(btn_cancel,false);
-        }
-        ArrayList<Map> newDatas = new ArrayList<>();
-        for (int i = 0; i < PARAM_MAX_RV_NUMBER; i++) {
-            if (startIndex+i>totalDatas.size()){
-                // 下一页 不可用
-                setBtnEnable(btn_inquiry,false);
-                break; // out of boundary
+    public void errorCheck(String msg, int code) {
+        String toastTip = "复诊单异常"; //默认提示
+        String cid = "0";// 默认是0
+        try {
+            switch (code){
+                case 611:
+                    JSONObject json611 = new JSONObject(msg);
+                    cid = json611.get("consultId").toString();
+                    toastTip = json611.get("title").toString();
+                    break;
+                case 613:
+                    JSONObject json613 = new JSONObject(msg);
+                    cid = json613.get("cid").toString();
+                    toastTip ="有一条未结束的非团队复诊单";
+                    break;
+                case 614:
+                    JSONObject json614 = new JSONObject(msg);
+                    cid = json614.get("cid").toString();
+                    toastTip ="有一条未结束的团队复诊单";
+                    break;
+                case 608:
+                    cid = "0";
+                    toastTip =msg;
+                    break;
             }
-            newDatas.add(totalDatas.get(startIndex+i));
-        }
-        reFlashRV(newDatas);
-        currentPageNum--;
-        // 如果是上一页功能就设置下一页按钮
-        if (!btn_inquiry.isEnabled()){
-            if (startIndex+PARAM_MAX_RV_NUMBER<=totalDatas.size()){
-                setBtnEnable(btn_inquiry,true);
-            }
-        }else{
-            if (startIndex+PARAM_MAX_RV_NUMBER>totalDatas.size()){
-                setBtnEnable(btn_inquiry,false);
-            }
-        }
-    }
-
-    /**
-     * 下一页数据显示
-     */
-    public void nextReFlashRv(){
-        int startIndex = (currentPageNum+1)*PARAM_MAX_RV_NUMBER;
-        if (startIndex<=0){
-            startIndex = 0;
-            // 上一页 背景设置，可点击设置
-            setBtnEnable(btn_cancel,false);
-        }
-        ArrayList<Map> newDatas = new ArrayList<>();
-        for (int i = 0; i < PARAM_MAX_RV_NUMBER; i++) {
-            if (startIndex+i>=totalDatas.size()){
-                // 下一页 不可用
-                setBtnEnable(btn_inquiry,false);
-                break; // out of boundary
-            }
-            newDatas.add(totalDatas.get(startIndex+i));
-        }
-        reFlashRV(newDatas);
-        currentPageNum++;
-        // 如果是下一页功能则设置上一页按钮
-        if (!btn_cancel.isEnabled()){
-            if (startIndex-PARAM_MAX_RV_NUMBER>=0){
-                setBtnEnable(btn_cancel,true);
-            }
-        }else{
-            if (startIndex-PARAM_MAX_RV_NUMBER<0){
-                setBtnEnable(btn_cancel,false);
-            }
-        }
-    }
-
-    /**
-     * 从0开始显示
-     * 重置数据，重置上一页下一页按钮
-     */
-    public void beginReFlashRv(){
-        //todo 修改一下样式，修改一下按钮不可用,包括上一页和下一页
-        int startIndex = 0;
-        ArrayList<Map> newDatas = new ArrayList<>();
-        for (int i = 0; i < PARAM_MAX_RV_NUMBER; i++) {
-            if (startIndex+i>=totalDatas.size()){
-                break; // out of boundary
-            }
-            newDatas.add(totalDatas.get(startIndex+i));
-        }
-        reFlashRV(newDatas);
-        currentPageNum =0;
-
-        // 上一页肯定不能用
-        setBtnEnable(btn_cancel,false);
-
-        // 下一页未必不能用
-        if (startIndex+PARAM_MAX_RV_NUMBER<totalDatas.size()){
-            setBtnEnable(btn_inquiry,true);
-        }
-    }
-
-    /**
-     * 将一个button设置可用和不可用,并调整样式
-     */
-    public void setBtnEnable(Button button, boolean b){
-        button.setEnabled(b);
-        if (b){
-            button.setTextColor(Color.parseColor("#ffffff"));
-            button.setBackgroundResource(R.drawable.btn_next_yzs);
-        }else {
-            button.setTextColor(Color.parseColor("#999999"));
-            button.setBackgroundResource(R.drawable.btn_ago_yzs);
+            Toast.makeText(mContext, toastTip, Toast.LENGTH_LONG).show();
+        }catch (Exception e){
+            e.printStackTrace();
         }
     }
 
