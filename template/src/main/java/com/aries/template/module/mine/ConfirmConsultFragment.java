@@ -39,8 +39,8 @@ import butterknife.BindView;
 import butterknife.OnClick;
 
 /**
- * 科室展示页面
- * 用于显示一级部门，二级部门
+ * 确认复诊页面
+ * 用于输入确认复诊的详细数据
  * @author louisluo
  * @Author: AriesHoo on 2018/7/13 17:09
  * @E-Mail: AriesHoo@126.com
@@ -240,9 +240,9 @@ public class ConfirmConsultFragment extends BaseEventFragment implements Compoun
                             ToastUtil.show("请检查网络");
                             return;
                         }
-                        if (entity.data.isSuccess()){
+                        if (entity.data.success){
                             // 医生 确认复诊，并进入复诊阶段
-                            start(ConfirmConsultFragment.newInstance("ok"));
+                            start(PayCodeFragment.newInstance(new Object()));
                         }else{
                             // 如果不能复诊，则检查异常原因
                             errorCheck(entity.data.jsonResponseBean.msg,entity.data.jsonResponseBean.code);

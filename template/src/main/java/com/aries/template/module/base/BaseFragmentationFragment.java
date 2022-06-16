@@ -27,7 +27,7 @@ import me.yokeyword.fragmentation.anim.FragmentAnimator;
  */
 public abstract class BaseFragmentationFragment extends FastTitleFragment implements ISupportFragment {
     /** 实现 Fragmentation 事务机制的代理器，需要控制Fragment的所有生命周期 */
-    protected final SupportFragmentDelegate mDelegate = new SupportFragmentDelegate(this);
+    private final SupportFragmentDelegate mDelegate = new SupportFragmentDelegate(this);
     protected FragmentActivity _mActivity;
 
     //=====================

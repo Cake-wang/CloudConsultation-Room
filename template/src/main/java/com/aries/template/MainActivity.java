@@ -23,6 +23,7 @@ import com.aries.template.module.main.HomeFragment;
 import com.aries.template.module.mine.DepartmentFragment;
 import com.aries.template.module.mine.MineFragment;
 import com.aries.template.module.mine.OrderFragment;
+import com.aries.template.module.mine.OrderConsultFragment;
 import com.aries.template.module.mine.PutRecordFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.template.utils.ActivityUtils;
@@ -320,72 +321,39 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
 
     }
 
-    private void getConsultsAndRecipes() {
-
-
-        ApiRepository.getInstance().getConsultsAndRecipes("","",0,mContext)
+    public void getConsultsAndRecipes() {
+        ApiRepository.getInstance().getConsultsAndRecipes()
                 .compose(this.bindUntilEvent(ActivityEvent.DESTROY))
-                .subscribe(true ?
-                        new FastLoadingObserver<GetConsultsAndRecipesResultEntity>("请稍后...") {
-                            @Override
-                            public void _onNext(@io.reactivex.annotations.NonNull GetConsultsAndRecipesResultEntity entity) {
-                                if (entity == null) {
-                                    ToastUtil.show("请检查网络");
-                                    return;
-                                }
+                .subscribe(new FastLoadingObserver<GetConsultsAndRecipesResultEntity>("请稍后...") {
+                    @Override
+                    public void _onNext(@io.reactivex.annotations.NonNull GetConsultsAndRecipesResultEntity entity) {
+                        if (entity == null) {
+                            ToastUtil.show("请检查网络");
+                            return;
+                        }
 //                                checkVersion(entity);
-                                if (entity.isSuccess()){
-
-                                        if(entity.getData().getConsults().size()>0||entity.getData().getRecipes().size()>0){
-                                            start(OrderFragment.newInstance(entity.getData()));
-                                        }else {
-                                            start(DepartmentFragment.newInstance(new Object()));
-                                        }
-
-
-
-
-
-
-                                }else {
-
-
-
-                                    ToastUtil.show(entity.getMessage());
+                        if (entity.isSuccess()){
+                            // 查看处方单是否多余1条
+                            if(entity.getData().getConsults().size()>0){
+                                for (GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Consults item : entity.getData().getConsults()) {
+                                    int status = item.getConsults().getStatus();
+                                   if ( item.getConsults().getPayflag()==1 &&
+                                           (status==1 || status ==2 || status == 3)){
+                                       // 挂号
+                                       start(OrderConsultFragment.newInstance(item));
+                                   }
                                 }
+                            }else if (entity.getData().getRecipes().size()>0){
+                                // 处方
+                                start(OrderFragment.newInstance(entity.getData()));
+                            } else {
+                                start(DepartmentFragment.newInstance(new Object()));
                             }
-
-                            @Override
-                            public void onError(Throwable e) {
-
-//                                ToastUtil.show("请检查网络和ip地址");
-                                if (true) {
-                                    super.onError(e);
-                                }
-                            }
-                        } :
-                        new FastObserver<GetConsultsAndRecipesResultEntity>() {
-                            @Override
-                            public void _onNext(@io.reactivex.annotations.NonNull GetConsultsAndRecipesResultEntity entity) {
-                                if (entity == null) {
-                                    ToastUtil.show("请检查网络");
-                                    return;
-                                }
-
-
-
-                            }
-
-                            @Override
-                            public void onError(Throwable e) {
-                                if (false) {
-                                    super.onError(e);
-                                }
-                            }
-                        });
-
-
-
+                        }else {
+                            ToastUtil.show(entity.getMessage());
+                        }
+                    }
+                });
     }
 
     @Override

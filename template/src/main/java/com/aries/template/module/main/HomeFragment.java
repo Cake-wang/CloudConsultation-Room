@@ -10,8 +10,8 @@ import android.widget.TextClock;
 
 import com.aries.library.fast.module.fragment.FastTitleFragment;
 import com.aries.library.fast.util.SPUtil;
+import com.aries.template.MainActivity;
 import com.aries.template.R;
-import com.aries.template.module.mine.DepartmentFragment;
 import com.aries.template.module.mine.MineFragment;
 import com.aries.ui.view.title.TitleBarView;
 
@@ -65,11 +65,11 @@ public class HomeFragment extends FastTitleFragment implements ISupportFragment 
         iv_stjc.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 SPUtil.put(mContext,"tag","stjc");
 //                start(MineFragment.newInstance("stjc"));
-                start(DepartmentFragment.newInstance("stjc"));// todo cc
-
+//                start(DepartmentFragment.newInstance("stjc"));// todo cc
+//                start(PutRecordFragment.newInstance("idcard","name","smkcard"));// todo cc
+                ((MainActivity) getActivity()).getConsultsAndRecipes();//todo cc
             }
         });
 

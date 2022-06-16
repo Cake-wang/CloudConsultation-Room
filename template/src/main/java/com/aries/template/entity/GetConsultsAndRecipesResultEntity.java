@@ -1,5 +1,6 @@
 package com.aries.template.entity;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -71,7 +72,7 @@ public class GetConsultsAndRecipesResultEntity {
         this.data = data;
     }
 
-    public class QueryArrearsSummary {
+    public class QueryArrearsSummary{
 
 //        public Integer statusCode;
 //        public String requestId;
@@ -214,7 +215,7 @@ public class GetConsultsAndRecipesResultEntity {
 
         }
 
-        public class Consults
+        public class Consults implements Serializable
         {
             private Consultss consults;
 

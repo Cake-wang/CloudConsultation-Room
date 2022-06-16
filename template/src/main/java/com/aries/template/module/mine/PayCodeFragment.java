@@ -21,7 +21,6 @@ import com.trello.rxlifecycle3.android.FragmentEvent;
 import com.xuexiang.xaop.annotation.IOThread;
 import com.xuexiang.xaop.annotation.MainThread;
 import com.xuexiang.xaop.enums.ThreadType;
-import com.xuexiang.xqrcode.XQRCode;
 
 import java.util.concurrent.TimeUnit;
 
@@ -127,142 +126,141 @@ public class PayCodeFragment extends BaseEventFragment {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(aLong -> paySuccess());//getUnreadCount()执行的任务
-
     }
 
     private void paySuccess() {
-
-
-        ApiRepository.getInstance().paySuccess("","","",mContext)
-                .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
-                .subscribe(true ?
-                        new FastLoadingObserver<RequestConsultAndCdrOtherdocResultEntity>("请稍后...") {
-                            @Override
-                            public void _onNext(@NonNull RequestConsultAndCdrOtherdocResultEntity entity) {
-                                if (entity == null) {
-                                    ToastUtil.show("请检查网络");
-                                    return;
-                                }
-//                                checkVersion(entity);
-                                if (entity.isSuccess()){
-
-                                    if (entity.getData().isSuccess()){
-
-                                        //跳视频问诊
-                                        start(VideoConsultFragment.newInstance(new Object()));
-
-                                    }
-
-
-                                }else {
-
-//                                    ToastUtil.show(entity.getRespDesc());
-                                }
-                            }
-
-                            @Override
-                            public void onError(Throwable e) {
-
-//                                ToastUtil.show("请检查网络和ip地址");
-                                if (true) {
-                                    super.onError(e);
-                                }
-                            }
-                        } :
-                        new FastObserver<RequestConsultAndCdrOtherdocResultEntity>() {
-                            @Override
-                            public void _onNext(@NonNull RequestConsultAndCdrOtherdocResultEntity entity) {
-                                if (entity == null) {
-                                    ToastUtil.show("请检查网络");
-                                    return;
-                                }
-
-
-
-                            }
-
-                            @Override
-                            public void onError(Throwable e) {
-                                if (false) {
-                                    super.onError(e);
-                                }
-                            }
-                        });
-
-
+//
+//
+//        ApiRepository.getInstance().paySuccess("","","",mContext)
+//                .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
+//                .subscribe(true ?
+//                        new FastLoadingObserver<RequestConsultAndCdrOtherdocResultEntity>("请稍后...") {
+//                            @Override
+//                            public void _onNext(@NonNull RequestConsultAndCdrOtherdocResultEntity entity) {
+//                                if (entity == null) {
+//                                    ToastUtil.show("请检查网络");
+//                                    return;
+//                                }
+////                                checkVersion(entity);
+//                                if (entity.isSuccess()){
+//
+//                                    if (entity.getData().isSuccess()){
+//
+//                                        //跳视频问诊
+//                                        start(VideoConsultFragment.newInstance(new Object()));
+//
+//                                    }
+//
+//
+//                                }else {
+//
+////                                    ToastUtil.show(entity.getRespDesc());
+//                                }
+//                            }
+//
+//                            @Override
+//                            public void onError(Throwable e) {
+//
+////                                ToastUtil.show("请检查网络和ip地址");
+//                                if (true) {
+//                                    super.onError(e);
+//                                }
+//                            }
+//                        } :
+//                        new FastObserver<RequestConsultAndCdrOtherdocResultEntity>() {
+//                            @Override
+//                            public void _onNext(@NonNull RequestConsultAndCdrOtherdocResultEntity entity) {
+//                                if (entity == null) {
+//                                    ToastUtil.show("请检查网络");
+//                                    return;
+//                                }
+//
+//
+//
+//                            }
+//
+//                            @Override
+//                            public void onError(Throwable e) {
+//                                if (false) {
+//                                    super.onError(e);
+//                                }
+//                            }
+//                        });
+//
+//
     }
 
     @Override
     public void loadData() {
-        ApiRepository.getInstance().presettlement("","","",mContext)
-                .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
-                .subscribe(true ?
-                        new FastLoadingObserver<RequestConsultAndCdrOtherdocResultEntity>("请稍后...") {
-                            @Override
-                            public void _onNext(@NonNull RequestConsultAndCdrOtherdocResultEntity entity) {
-                                if (entity == null) {
-                                    ToastUtil.show("请检查网络");
-                                    return;
-                                }
-//                                checkVersion(entity);
-                                if (entity.isSuccess()){
-
-                                    if (entity.getData().isSuccess()){
-
-                                      tv_name.setText(""); //时间计时器显示对象
-                                      tv_fee_type.setText(""); //时间计时器显示对象
-                                      tv_fee_all.setText(""); //时间计时器显示对象
-                                      tv_fee_yb.setText(""); //时间计时器显示对象
-                                      tv_fee_zf.setText("");
-
-
-                                        BitmapFactory.Options bfoOptions =new BitmapFactory.Options();
-
-                                        bfoOptions.inScaled =false;
-
-                                        Bitmap img1 = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher, bfoOptions);
-
-                                        createQRCodeWithLogo(img1);
-
-                                        timeLoop();
-
-                                    }
-
-
-                                }else {
-
-//                                    ToastUtil.show(entity.getRespDesc());
-                                }
-                            }
-
-                            @Override
-                            public void onError(Throwable e) {
-
-//                                ToastUtil.show("请检查网络和ip地址");
-                                if (true) {
-                                    super.onError(e);
-                                }
-                            }
-                        } :
-                        new FastObserver<RequestConsultAndCdrOtherdocResultEntity>() {
-                            @Override
-                            public void _onNext(@NonNull RequestConsultAndCdrOtherdocResultEntity entity) {
-                                if (entity == null) {
-                                    ToastUtil.show("请检查网络");
-                                    return;
-                                }
-
-
-
-                            }
-
-                            @Override
-                            public void onError(Throwable e) {
-                                if (false) {
-                                    super.onError(e);
-                                }
-                            }
-                        });
+//        ApiRepository.getInstance().presettlement("","","",mContext)
+//                .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
+//                .subscribe(true ?
+//                        new FastLoadingObserver<RequestConsultAndCdrOtherdocResultEntity>("请稍后...") {
+//                            @Override
+//                            public void _onNext(@NonNull RequestConsultAndCdrOtherdocResultEntity entity) {
+//                                if (entity == null) {
+//                                    ToastUtil.show("请检查网络");
+//                                    return;
+//                                }
+////                                checkVersion(entity);
+//                                if (entity.isSuccess()){
+//
+//                                    if (entity.getData().isSuccess()){
+//
+//                                      tv_name.setText(""); //时间计时器显示对象
+//                                      tv_fee_type.setText(""); //时间计时器显示对象
+//                                      tv_fee_all.setText(""); //时间计时器显示对象
+//                                      tv_fee_yb.setText(""); //时间计时器显示对象
+//                                      tv_fee_zf.setText("");
+//
+//
+//                                        BitmapFactory.Options bfoOptions =new BitmapFactory.Options();
+//
+//                                        bfoOptions.inScaled =false;
+//
+//                                        Bitmap img1 = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher, bfoOptions);
+//
+//                                        createQRCodeWithLogo(img1);
+//
+//                                        timeLoop();
+//
+//                                    }
+//
+//
+//                                }else {
+//
+////                                    ToastUtil.show(entity.getRespDesc());
+//                                }
+//                            }
+//
+//                            @Override
+//                            public void onError(Throwable e) {
+//
+////                                ToastUtil.show("请检查网络和ip地址");
+//                                if (true) {
+//                                    super.onError(e);
+//                                }
+//                            }
+//                        } :
+//                        new FastObserver<RequestConsultAndCdrOtherdocResultEntity>() {
+//                            @Override
+//                            public void _onNext(@NonNull RequestConsultAndCdrOtherdocResultEntity entity) {
+//                                if (entity == null) {
+//                                    ToastUtil.show("请检查网络");
+//                                    return;
+//                                }
+//
+//
+//
+//                            }
+//
+//                            @Override
+//                            public void onError(Throwable e) {
+//                                if (false) {
+//                                    super.onError(e);
+//                                }
+//                            }
+//                        });
     }
 
     /**
@@ -271,7 +269,7 @@ public class PayCodeFragment extends BaseEventFragment {
      */
     @IOThread(ThreadType.Single)
     private void createQRCodeWithLogo(Bitmap logo) {
-        showQRCode(XQRCode.createQRCodeWithLogo("00000000", 400, 400, logo));
+//        showQRCode(XQRCode.createQRCodeWithLogo("00000000", 400, 400, logo));
 //        isQRCodeCreated = true;
     }
 

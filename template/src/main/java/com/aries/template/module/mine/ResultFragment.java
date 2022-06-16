@@ -151,40 +151,6 @@ public class ResultFragment extends FastTitleFragment implements ISupportFragmen
 //        });
 //        ViewUtils.setEnabled(btnLogin, false);
 //        ViewUtils.setChecked(cbProtocol, false);
-
-    }
-
-    @SingleClick
-    @OnClick({R.id.btn_get_verify_code, R.id.btn_login, R.id.tv_other_login, R.id.tv_forget_password})
-    public void onViewClicked(View view) {
-        switch (view.getId()) {
-//            case R.id.btn_get_verify_code:
-//                if (etPhoneNumber.validate()) {
-//                    getVerifyCode(etPhoneNumber.getEditValue());
-//                }
-//                break;
-//            case R.id.btn_login:
-//                if (etPhoneNumber.validate()) {
-//                    if (etVerifyCode.validate()) {
-//                        loginByVerifyCode(etPhoneNumber.getEditValue(), etVerifyCode.getEditValue());
-//                    }
-//                }
-//                break;
-//            case R.id.tv_other_login:
-//                XToastUtils.info("其他登录方式");
-//                break;
-//            case R.id.tv_forget_password:
-//                XToastUtils.info("忘记密码");
-//                break;
-//            case R.id.tv_user_protocol:
-//                openPage(ServiceProtocolFragment.class, KEY_PROTOCOL_TITLE, ResUtils.getString(R.string.title_user_protocol));
-//                break;
-//            case R.id.tv_privacy_protocol:
-//                openPage(ServiceProtocolFragment.class, KEY_PROTOCOL_TITLE, ResUtils.getString(R.string.title_privacy_protocol));
-//                break;
-            default:
-                break;
-        }
     }
 
     /**
@@ -281,62 +247,62 @@ public class ResultFragment extends FastTitleFragment implements ISupportFragmen
     }
 
     public void register(String idCard,String name,String phoneNumber) {
-
-        ApiRepository.getInstance().register(idCard,name, phoneNumber,mContext)
-                .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
-                .subscribe(true ?
-                        new FastLoadingObserver<RegisterResultEntity>("请稍后...") {
-                            @Override
-                            public void _onNext(@NonNull RegisterResultEntity entity) {
-                                if (entity == null) {
-                                    ToastUtil.show("请检查网络");
-                                    return;
-                                }
-//                                checkVersion(entity);
-                                if (entity.isSuccess()){
-
-
-
-                                }else {
-
-//                                    if(TextUtils.isEmpty(tag)){
-//                                        ToastUtil.show("参数缺失");
-//                                    }else {
-//                                        start(PutRecordFragment.newInstance( idCard, name, smkcard));
-//                                    }
-
-//                                    ToastUtil.show(entity.getRespDesc());
-                                }
-                            }
-
-                            @Override
-                            public void onError(Throwable e) {
-
-//                                ToastUtil.show("请检查网络和ip地址");
-                                if (true) {
-                                    super.onError(e);
-                                }
-                            }
-                        } :
-                        new FastObserver<RegisterResultEntity>() {
-                            @Override
-                            public void _onNext(@NonNull RegisterResultEntity entity) {
-                                if (entity == null) {
-                                    ToastUtil.show("请检查网络");
-                                    return;
-                                }
-
-
-
-                            }
-
-                            @Override
-                            public void onError(Throwable e) {
-                                if (false) {
-                                    super.onError(e);
-                                }
-                            }
-                        });
+//
+//        ApiRepository.getInstance().register(idCard,name, phoneNumber)
+//                .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
+//                .subscribe(true ?
+//                        new FastLoadingObserver<RegisterResultEntity>("请稍后...") {
+//                            @Override
+//                            public void _onNext(@NonNull RegisterResultEntity entity) {
+//                                if (entity == null) {
+//                                    ToastUtil.show("请检查网络");
+//                                    return;
+//                                }
+////                                checkVersion(entity);
+//                                if (entity.isSuccess()){
+//
+//
+//
+//                                }else {
+//
+////                                    if(TextUtils.isEmpty(tag)){
+////                                        ToastUtil.show("参数缺失");
+////                                    }else {
+////                                        start(PutRecordFragment.newInstance( idCard, name, smkcard));
+////                                    }
+//
+////                                    ToastUtil.show(entity.getRespDesc());
+//                                }
+//                            }
+//
+//                            @Override
+//                            public void onError(Throwable e) {
+//
+////                                ToastUtil.show("请检查网络和ip地址");
+//                                if (true) {
+//                                    super.onError(e);
+//                                }
+//                            }
+//                        } :
+//                        new FastObserver<RegisterResultEntity>() {
+//                            @Override
+//                            public void _onNext(@NonNull RegisterResultEntity entity) {
+//                                if (entity == null) {
+//                                    ToastUtil.show("请检查网络");
+//                                    return;
+//                                }
+//
+//
+//
+//                            }
+//
+//                            @Override
+//                            public void onError(Throwable e) {
+//                                if (false) {
+//                                    super.onError(e);
+//                                }
+//                            }
+//                        });
 
     }
 

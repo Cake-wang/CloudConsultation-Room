@@ -56,6 +56,9 @@ import me.yokeyword.fragmentation.SupportHelper;
 import me.yokeyword.fragmentation.anim.FragmentAnimator;
 
 /**
+ * 已挂号页面
+ *
+ * @author louisluo
  * @Author: AriesHoo on 2018/7/13 17:09
  * @E-Mail: AriesHoo@126.com
  * @Function: 我的
@@ -127,6 +130,11 @@ public class OrderFragment extends FastTitleRefreshLoadFragment<GetConsultsAndRe
     RecyclerView rv_contentFastLib;
 
 
+    /**
+     * 获取数据
+     * @param obj 传入的数据，注意这个对象必须实现序列化
+     * @return
+     */
     public static OrderFragment newInstance(GetConsultsAndRecipesResultEntity.QueryArrearsSummary obj) {
         Bundle args = new Bundle();
         OrderFragment fragment = new OrderFragment();
@@ -389,22 +397,14 @@ public class OrderFragment extends FastTitleRefreshLoadFragment<GetConsultsAndRe
                 if (opflag.contains("consults")){
                     tid = (String) SPUtil.get(mContext,"tid","");
                     cancelregister(appKey,tid,consultId);
-
                 }else if (opflag.contains("recipes")){
-
-
-
                 }else {
-
 //                    HomeFragment fragment = findFragment(HomeFragment.class);
 //                Bundle newBundle = new Bundle();
-//
 //                fragment.putNewBundle(newBundle);
                     // 在栈内的HomeFragment以SingleTask模式启动（即在其之上的Fragment会出栈）
                     start(HomeFragment.newInstance(), SupportFragment.SINGLETASK);
-
                 }
-
             }
         });
         dialog.btn_cancel.setOnClickListener(new View.OnClickListener() {
@@ -419,7 +419,6 @@ public class OrderFragment extends FastTitleRefreshLoadFragment<GetConsultsAndRe
                 dialog.dismiss();
             }
         });
-
         dialog.show();
     }
 
@@ -518,7 +517,7 @@ public class OrderFragment extends FastTitleRefreshLoadFragment<GetConsultsAndRe
 
     public void cancelregister(String appKey,String tid,Integer consultId) {
 
-        ApiRepository.getInstance().patientCancelGraphicTextConsult(appKey,tid,consultId,mContext)
+        ApiRepository.getInstance().patientCancelGraphicTextConsult(consultId)
                 .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
                 .subscribe(true ?
                         new FastLoadingObserver<CancelregisterResultEntity>("请稍后...") {

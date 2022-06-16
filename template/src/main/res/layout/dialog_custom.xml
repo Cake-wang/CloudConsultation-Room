@@ -48,18 +48,18 @@
         >
 
         <Button
+            android:id="@+id/btn_inquiry"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="是"
             android:textColor="#fff"
             android:gravity="center"
-            android:id="@+id/btn_inquiry"
             android:layout_marginLeft="50dp"
             android:background="@drawable/btn_next_yzs"
             />
 
         <Button
-
+            android:id="@+id/btn_cancel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="否"

@@ -238,7 +238,7 @@ public class MineFragment extends FastTitleFragment implements ISupportFragment 
     private void getConsultsAndRecipes() {
 
 
-        ApiRepository.getInstance().getConsultsAndRecipes("","",0,mContext)
+        ApiRepository.getInstance().getConsultsAndRecipes()
                 .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
                 .subscribe(true ?
                         new FastLoadingObserver<GetConsultsAndRecipesResultEntity>("请稍后...") {
