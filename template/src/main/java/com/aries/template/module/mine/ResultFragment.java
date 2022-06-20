@@ -12,29 +12,21 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.aries.library.fast.module.fragment.FastTitleFragment;
-import com.aries.library.fast.retrofit.FastLoadingObserver;
-import com.aries.library.fast.retrofit.FastObserver;
-import com.aries.library.fast.util.ToastUtil;
 import com.aries.template.R;
-import com.aries.template.entity.RegisterResultEntity;
-import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.ui.view.title.TitleBarView;
 import com.decard.NDKMethod.BasicOper;
 import com.decard.NDKMethod.EGovernment;
 import com.decard.entitys.SSCard;
-import com.trello.rxlifecycle3.android.FragmentEvent;
-import com.xuexiang.xaop.annotation.SingleClick;
 import com.xuexiang.xui.utils.CountDownButtonHelper;
 
+import java.io.UnsupportedEncodingException;
 import java.util.concurrent.TimeUnit;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
 import butterknife.BindView;
-import butterknife.OnClick;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import me.yokeyword.fragmentation.ExtraTransaction;
@@ -151,6 +143,31 @@ public class ResultFragment extends FastTitleFragment implements ISupportFragmen
 //        });
 //        ViewUtils.setEnabled(btnLogin, false);
 //        ViewUtils.setChecked(cbProtocol, false);
+    }
+
+    @Override
+    public void loadData() {
+
+        if (result.contains("paySuc")){
+            //打印机参数设置
+             String setPrint = BasicOper.dc_setprint(0x02, 0x01, 0, 0, 10, 0x00);
+             Log.d("print", "BasicOper.dc_setprint:" + setPrint);
+            // 打印机进纸设置
+             String enter = BasicOper.dc_printenter(50);
+             Log.d("print", "BasicOper.dc_printenter:" + enter);
+
+            String printString = "取药码：888888";
+            try {
+                byte[] strByte = printString.getBytes("GBK");
+                //打印字符
+                 String print_char = BasicOper.dc_printcharacter(strByte);
+                 Log.d("print", "BasicOper.dc_printcharacter:" + print_char);
+            }
+            catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+        }
+
     }
 
     /**

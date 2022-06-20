@@ -1,17 +1,20 @@
 package com.aries.template;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
+import android.os.PowerManager;
+import android.provider.Settings;
 import android.util.Log;
 
 import com.aries.library.fast.FastManager;
 import com.aries.library.fast.manager.LoggerManager;
-import com.aries.library.fast.retrofit.FastRetrofit;
 import com.aries.template.constant.ApiConstant;
 import com.aries.template.impl.ActivityControlImpl;
 import com.aries.template.impl.AppImpl;
 import com.aries.template.impl.HttpRequestControlImpl;
 import com.aries.template.widget.mgson.MFastRetrofit;
-import com.aries.template.widget.mgson.MGsonFactory;
 import com.decard.NDKMethod.BasicOper;
 import com.orhanobut.logger.PrettyFormatStrategy;
 import com.xuexiang.xaop.XAOP;
@@ -24,6 +27,7 @@ import org.aspectj.lang.JoinPoint;
 
 import java.util.List;
 
+import androidx.annotation.RequiresApi;
 import androidx.multidex.MultiDexApplication;
 import me.yokeyword.fragmentation.Fragmentation;
 
@@ -39,6 +43,7 @@ public class App extends MultiDexApplication {
     private static Context mContext;
     private static String TAG = "FastTemplate";
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void onCreate() {
         super.onCreate();
@@ -189,6 +194,34 @@ public class App extends MultiDexApplication {
                 return null;
             }
         });
+
+        if(!isIgnoringBatteryOptimizations()){
+
+            requestIgnoreBatteryOptimizations();
+
+        }
+
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    private boolean isIgnoringBatteryOptimizations() {
+        boolean isIgnoring = false;
+        PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        if (powerManager != null) {
+            isIgnoring = powerManager.isIgnoringBatteryOptimizations(getPackageName());
+        }
+        return isIgnoring;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    public void requestIgnoreBatteryOptimizations() {
+        try {
+            Intent intent = new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+            intent.setData(Uri.parse("package:" + getPackageName()));
+            startActivity(intent);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static Context getContext() {

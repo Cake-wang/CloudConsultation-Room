@@ -6,13 +6,11 @@ import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.aries.library.fast.retrofit.FastRetrofit;
 import com.aries.library.fast.retrofit.FastRetryWhen;
 import com.aries.library.fast.retrofit.FastTransformer;
 import com.aries.library.fast.util.SPUtil;
 import com.aries.library.fast.util.ToastUtil;
 import com.aries.template.entity.BaseMovieEntity;
-import com.aries.template.entity.CanRequestOnlineConsultRequestEntity;
 import com.aries.template.entity.CanRequestOnlineConsultResultEntity;
 import com.aries.template.entity.CancelregisterResultEntity;
 import com.aries.template.entity.CreateOrderRequestEntity;
@@ -22,11 +20,9 @@ import com.aries.template.entity.FindValidDepartmentForRevisitResultEntity;
 import com.aries.template.entity.FindValidOrganProfessionForRevisitResultEntity;
 import com.aries.template.entity.GetConfigurationToThirdForPatientRequestEntity;
 import com.aries.template.entity.GetConfigurationToThirdForPatientResultEntity;
-import com.aries.template.entity.GetConsultsAndRecipesRequestEntity;
 import com.aries.template.entity.GetConsultsAndRecipesResultEntity;
 import com.aries.template.entity.IsRegisterRequestEntity;
 import com.aries.template.entity.IsRegisterResultEntity;
-import com.aries.template.entity.RegisterRequestEntity;
 import com.aries.template.entity.RegisterResultEntity;
 import com.aries.template.entity.RequestConsultAndCdrOtherdocResultEntity;
 import com.aries.template.entity.SearchDoctorListByBusTypeV2ResultEntity;
@@ -411,6 +407,14 @@ public class ApiRepository extends BaseRepository {
      * @param consultId
      */
     public Observable<CancelregisterResultEntity> patientCancelGraphicTextConsult(Integer consultId) {
+        Map<String,String> bizContent = new HashMap<>();
+//        bizContent.put("consultId",String.valueOf(consultId));
+        bizContent.put("consultId","815423835");
+        RequestBody body = BodyCreate(bizContent,"patientCancelGraphicTextConsult");
+        return FastTransformer.switchSchedulers(getApiService().patientCancelGraphicTextConsult(body).retryWhen(new FastRetryWhen()));
+    }
+
+    public Observable<CancelregisterResultEntity> patientFinishGraphicTextConsult(Integer consultId) {
         Map<String,String> bizContent = new HashMap<>();
 //        bizContent.put("consultId",String.valueOf(consultId));
         bizContent.put("consultId","815423835");

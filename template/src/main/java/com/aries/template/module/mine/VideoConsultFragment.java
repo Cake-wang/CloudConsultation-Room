@@ -9,11 +9,16 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.aries.library.fast.retrofit.FastLoadingObserver;
 import com.aries.library.fast.util.SPUtil;
+import com.aries.library.fast.util.ToastUtil;
 import com.aries.template.R;
+import com.aries.template.entity.CancelregisterResultEntity;
 import com.aries.template.module.base.BaseEventFragment;
+import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.template.view.ShineButtonDialog;
 import com.aries.ui.view.title.TitleBarView;
+import com.trello.rxlifecycle3.android.FragmentEvent;
 import com.xuexiang.xaop.annotation.SingleClick;
 
 import androidx.annotation.Nullable;
@@ -141,7 +146,8 @@ public class VideoConsultFragment extends BaseEventFragment {
 //
 //                fragment.putNewBundle(newBundle);
                     // 在栈内的HomeFragment以SingleTask模式启动（即在其之上的Fragment会出栈）
-                start(OrderFragment.newInstance(null));
+                patientFinishGraphicTextConsult(0);
+
 
 
 
@@ -161,6 +167,28 @@ public class VideoConsultFragment extends BaseEventFragment {
         });
 
         dialog.show();
+    }
+
+    private void patientFinishGraphicTextConsult(Integer consultId) {
+
+        ApiRepository.getInstance().patientFinishGraphicTextConsult(consultId)
+                .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
+                .subscribe(new FastLoadingObserver<CancelregisterResultEntity>("请稍后...") {
+                    @Override
+                    public void _onNext(CancelregisterResultEntity entity) {
+                        if (entity == null) {
+                            ToastUtil.show("请检查网络");
+                            return;
+                        }
+                        if (entity.isSuccess()){
+                            if (entity.getData().isSuccess()){
+                                start(OrderFragment.newInstance(null));
+                            }
+                        }
+                    }
+                });
+
+
     }
 
 
