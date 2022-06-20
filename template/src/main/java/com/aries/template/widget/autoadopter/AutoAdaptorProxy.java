@@ -1,16 +1,13 @@
 package com.aries.template.widget.autoadopter;
 
 import android.content.Context;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 
 import androidx.annotation.LayoutRes;
-import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /******
@@ -30,21 +27,20 @@ import java.util.Map;
  *       ((TextView)holder.itemView.findViewById(R.id.jtjk_doc_item_introduce_tv)).setText(item.getIntroduce());
  * }
  *
- *  因为这个类的数据处理太复杂，所以启用新的高级处理范型 AutoAdaptorProxy 来处理自动RV代理
- *
  * @author  ::: louis luo
  * Date ::: 2022/6/10 11:04 AM
  *
  */
-@Deprecated
-public class AutoAdaptor extends RecyclerView.Adapter<AutoAdaptor.ViewHolder>{
+public class AutoAdaptorProxy<T>{
 
-    /** 创建一个OBJECT太麻烦了，直接用 MAP 吧 */
-    public ArrayList<Map> data;
-    /** 资源 layout id */
-    public int res;
+    /** RV 数据代理对象, 这里不需要管理数据，数据统一由 adaptor管理，这里只规定输入数据的类型 */
+    private AutoObjectAdaptor adaptor;
     /** item 监听对象 */
-    private IItemListener listener;
+    private IItemListener<T> listener;
+
+    public AutoAdaptorProxy(RecyclerView recyclerView, @LayoutRes int res, int spanCount , List<T> data, Context context){
+        this(recyclerView,res,spanCount,new ArrayList<>(data),context);
+    }
 
     /**
      * 将 adaptor 和 RV 链接在一起
@@ -54,7 +50,7 @@ public class AutoAdaptor extends RecyclerView.Adapter<AutoAdaptor.ViewHolder>{
      * @param data 显示注入的数据
      * @param context recyclerView显示中的上下文数据
      */
-    public AutoAdaptor(RecyclerView recyclerView, @LayoutRes int res,int spanCount , ArrayList<Map> data, Context context) {
+    public AutoAdaptorProxy(RecyclerView recyclerView, @LayoutRes int res, int spanCount , ArrayList<T> data, Context context) {
         if (spanCount<=0)
             return;
         if (context ==null)
@@ -63,66 +59,42 @@ public class AutoAdaptor extends RecyclerView.Adapter<AutoAdaptor.ViewHolder>{
             return;
         if (data==null)
             return;
+        this.adaptor = new AutoObjectAdaptor(recyclerView,res,spanCount, (ArrayList<Object>) data,context);
+        recyclerView.setAdapter(adaptor);
 
-        this.res = res;
-        this.data = data;
-
-        GridLayoutManager manager = new GridLayoutManager(context,spanCount){
+        adaptor.setListener(new AutoObjectAdaptor.IItemListener() {
             @Override
-            public boolean canScrollVertically() {
-                return false;
+            public void onItemClick(AutoObjectAdaptor.ViewHolder holder, int position, Object itemData) {
+                listener.onItemClick(holder,position, ((T) itemData));
             }
-        };
-        recyclerView.setLayoutManager(manager);
-        recyclerView.setAdapter(this);
+
+            @Override
+            public void onItemViewDraw(AutoObjectAdaptor.ViewHolder holder, int position, Object itemData) {
+                listener.onItemViewDraw(holder,position, ((T) itemData));
+            }
+        });
+    }
+
+    // setter && getter
+    public void setListener(IItemListener<T> listener) {
+        this.listener = listener;
     }
 
     /**
-     * viewHolder 构造器
+     * 强制刷新RV的界面
      */
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        public ViewHolder(@NonNull View itemView) {
-            super(itemView);
-            setIsRecyclable(false);
-        }
+    public void notifyDataSetChanged() {
+        adaptor.notifyDataSetChanged();
     }
 
     /**
      * 对外监听类
      */
-    public interface IItemListener{
+    public interface IItemListener<T>{
         // 当单个对象被点击时
-        void onItemClick(ViewHolder holder, int position, Map  itemData);
+        void onItemClick(AutoObjectAdaptor.ViewHolder holder, int position, T  itemData);
         // 当单个对象开始绘制时
-        void onItemViewDraw(ViewHolder holder, int position, Map  itemData);
-    }
-
-    @NonNull
-    @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(res,parent,false);
-        return new ViewHolder(view);
-    }
-
-    @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        listener.onItemViewDraw(holder,position,data.get(position));
-        holder.itemView.setOnClickListener(v->listener.onItemClick(holder,position,data.get(position)));
-    }
-
-
-    /**
-     * 返回数据
-     */
-    @Override
-    public int getItemCount() {
-        return data.size();
-    }
-
-
-    // setter && getter
-    public void setListener(IItemListener listener) {
-        this.listener = listener;
+        void onItemViewDraw(AutoObjectAdaptor.ViewHolder holder, int position, T  itemData);
     }
 
 

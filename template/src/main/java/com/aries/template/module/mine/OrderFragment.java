@@ -183,7 +183,7 @@ public class OrderFragment extends FastTitleRefreshLoadFragment<GetConsultsAndRe
     public void loadData(int page) {
         if (obj.getRecipes().size()>0){
 
-            FastManager.getInstance().getHttpRequestControl().httpRequestSuccess(getIHttpRequestControl(), obj.getRecipes().size()>0  ? new ArrayList<>() :obj.getRecipes().get(0).getRecipeDetail(), null);
+            FastManager.getInstance().getHttpRequestControl().httpRequestSuccess(getIHttpRequestControl(), obj.getRecipes().size()>0  ? new ArrayList<>() :obj.getRecipes().get(0).getRecipeDetailBeans(), null);
 
         }
 

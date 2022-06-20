@@ -13,6 +13,7 @@ import com.aries.library.fast.util.SPUtil;
 import com.aries.template.MainActivity;
 import com.aries.template.R;
 import com.aries.template.module.mine.MineFragment;
+import com.aries.template.module.mine.ResultFragment;
 import com.aries.ui.view.title.TitleBarView;
 
 import androidx.annotation.Nullable;
@@ -69,7 +70,8 @@ public class HomeFragment extends FastTitleFragment implements ISupportFragment 
 //                start(MineFragment.newInstance("stjc"));
 //                start(DepartmentFragment.newInstance("stjc"));// todo cc
 //                start(PutRecordFragment.newInstance("idcard","name","smkcard"));// todo cc
-                ((MainActivity) getActivity()).getConsultsAndRecipes();//todo cc
+//                ((MainActivity) getActivity()).getConsultsAndRecipes();//todo cc
+                start(ResultFragment.newInstance("cancelConsult"));
             }
         });
 

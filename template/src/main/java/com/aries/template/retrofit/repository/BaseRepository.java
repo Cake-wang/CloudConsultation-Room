@@ -72,7 +72,7 @@ public abstract class BaseRepository {
         Map<String,String> bizContent = new HashMap<>();
         bizContent.put("appKey", ApiConstant.NALI_APPKEY);
 //        bizContent.put("tid",ApiConstant.NALI_TID);
-        bizContent.put("tid","5e63e9b0906e42d4a6866175c0e4163e");
+        bizContent.put("tid","tid_eric_1");
         bizContent.putAll(map);
 
         ArrayList<Map> maps = new ArrayList<>();
@@ -93,9 +93,9 @@ public abstract class BaseRepository {
         // 创建body
         ApiRepository.common.getInstance().machineId = "SY0001";
 //        ApiRepository.common.getInstance().userId = "2fcd34d6dde742098737b10ff0fddd9a";
-        ApiRepository.common.getInstance().userId = "5e63e9b0906e42d4a6866175c0e4163e";
+        ApiRepository.common.getInstance().userId = "tid_eric_1";
 //        final String  logTraceId = "eebcbbcf2c664c28a671e980265c6c76";//getUUID();
-        final String  logTraceId = "1653534697397";//getUUID();
+        final String  logTraceId = "eebcbbcf2c664c28a671e980265c6c76";//getUUID();
 
         final Map<String, Object> params = new HashMap<>(4);
         params.put("logTraceId", logTraceId);

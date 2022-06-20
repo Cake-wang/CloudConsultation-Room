@@ -60,13 +60,13 @@
                 android:text="取消成功" />
 
             <TextView
+                android:id="@+id/jtjk_fz_fragment_timer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#333"
                 android:drawableLeft="@drawable/icon_countdown_yzs"
                 android:textSize="24dp"
                 android:drawablePadding="10dp"
-
                 android:gravity="center"
                 android:text="119秒" />
         </LinearLayout>
@@ -136,6 +136,7 @@
             >
 
             <Button
+                android:id="@+id/btn_back"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="返回"
@@ -146,12 +147,12 @@
                 />
 
             <Button
+                android:id="@+id/btn_main"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="首页"
                 android:textColor="#fff"
                 android:gravity="center"
-
                 android:background="@drawable/btn_main_yzs"
                 />
         </LinearLayout>

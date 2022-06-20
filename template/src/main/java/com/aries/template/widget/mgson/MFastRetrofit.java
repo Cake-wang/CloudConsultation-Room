@@ -36,6 +36,23 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
+ * retrofit 快速搭建插件
+ * 使用方法：
+ *  MFastRetrofit.getInstance()
+ *                 //配置全局网络请求BaseUrl
+ *                 .setBaseUrl(ApiConstant.BASEURLTest)
+ *                 //信任所有证书--也可设置setCertificates(单/双向验证)
+ *                 .setCertificates()
+ *                 //设置统一请求头
+ * //                .addHeader(header)
+ * //                .addHeader(key,value)
+ *                 //设置请求全局log-可设置tag及Level类型
+ *                 .setLogEnable(true)
+ *                 //设置统一超时--也可单独调用read/write/connect超时(可以设置时间单位TimeUnit)
+ *                 //默认20 s
+ *                 .setTimeout(30);
+ *
+ *
  * @Author: AriesHoo on 2018/7/24 13:10
  * @E-Mail: AriesHoo@126.com
  * Function: Retrofit封装

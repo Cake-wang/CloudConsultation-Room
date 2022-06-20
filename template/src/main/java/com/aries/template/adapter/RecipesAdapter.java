@@ -26,7 +26,7 @@ public class RecipesAdapter extends BaseQuickAdapter<GetConsultsAndRecipesResult
 
         helper
 //                .setText(R.id.tv_name, item.getName())
-                .setText(R.id.tv_drugName, item.getDrugName())
+//                .setText(R.id.tv_drugName, item.getDrugName())
                 .setText(R.id.tv_useDose, item.getUseDose()+"")
                ;
 //                .setText(R.id.tv_time, item.getReportTime());

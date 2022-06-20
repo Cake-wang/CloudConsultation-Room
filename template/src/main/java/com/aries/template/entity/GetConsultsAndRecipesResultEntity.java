@@ -1048,31 +1048,24 @@ public class GetConsultsAndRecipesResultEntity {
         }
 
 
-        public class Recipes {
-
-            public String recipeId;
+        public class Recipes implements Serializable{
+            public Integer recipeId;
             public String patientName;
-            public String photo;
             public String patientSex;
             public String organDiseaseName;
-
-            public Date signDate;
+            public String signDate;
             public Double totalMoney;
             public String statusText;
             public Integer statusCode;
             public String recipeSurplusHours;
-
-            public String logisticsCompany;
             public Integer recipeType;
-            public String trackingNumber;
+            public List<RecipeDetail> recipeDetailBeans;
 
-            public List<RecipeDetail> recipeDetail;
-
-            public String getRecipeId() {
+            public Integer getRecipeId() {
                 return recipeId;
             }
 
-            public void setRecipeId(String recipeId) {
+            public void setRecipeId(Integer recipeId) {
                 this.recipeId = recipeId;
             }
 
@@ -1082,14 +1075,6 @@ public class GetConsultsAndRecipesResultEntity {
 
             public void setPatientName(String patientName) {
                 this.patientName = patientName;
-            }
-
-            public String getPhoto() {
-                return photo;
-            }
-
-            public void setPhoto(String photo) {
-                this.photo = photo;
             }
 
             public String getPatientSex() {
@@ -1108,11 +1093,11 @@ public class GetConsultsAndRecipesResultEntity {
                 this.organDiseaseName = organDiseaseName;
             }
 
-            public Date getSignDate() {
+            public String getSignDate() {
                 return signDate;
             }
 
-            public void setSignDate(Date signDate) {
+            public void setSignDate(String signDate) {
                 this.signDate = signDate;
             }
 
@@ -1148,14 +1133,6 @@ public class GetConsultsAndRecipesResultEntity {
                 this.recipeSurplusHours = recipeSurplusHours;
             }
 
-            public String getLogisticsCompany() {
-                return logisticsCompany;
-            }
-
-            public void setLogisticsCompany(String logisticsCompany) {
-                this.logisticsCompany = logisticsCompany;
-            }
-
             public Integer getRecipeType() {
                 return recipeType;
             }
@@ -1164,42 +1141,32 @@ public class GetConsultsAndRecipesResultEntity {
                 this.recipeType = recipeType;
             }
 
-            public String getTrackingNumber() {
-                return trackingNumber;
+            public List<RecipeDetail> getRecipeDetailBeans() {
+                return recipeDetailBeans;
             }
 
-            public void setTrackingNumber(String trackingNumber) {
-                this.trackingNumber = trackingNumber;
-            }
-
-            public List<RecipeDetail> getRecipeDetail() {
-                return recipeDetail;
-            }
-
-            public void setRecipeDetail(List<RecipeDetail> recipeDetail) {
-                this.recipeDetail = recipeDetail;
+            public void setRecipeDetailBeans(List<RecipeDetail> recipeDetailBeans) {
+                this.recipeDetailBeans = recipeDetailBeans;
             }
 
             public class RecipeDetail {
-
-                private Integer recipeDetailId;
-                private Integer recipeId;
-                private String drugSpec;
-                private Integer pack;
-                private String drugUnit;
-                private String drugName;
-                private Double useDose;
-                private Double defaultUseDose;
-                private String useDoseUnit;
-                private String dosageUnit;
-                private String usingRate;
-                private String usePathways;
-                private Double useTotalDose;
-                private Double sendNumber;
-                private Integer useDays;
-                private Double drugCost;
-                private String memo;
-                private String organDrugCode;
+                public Integer recipeDetailId;
+                public Integer recipeId;
+                public String drugSpec;
+                public Integer pack;
+                public String drugUnit;
+                public String drugName;
+                public Double useDose;
+                public Double defaultUseDose;
+                public String useDoseUnit;
+                public String dosageUnit;
+                public String usingRate;
+                public String usePathways;
+                public Double useTotalDose;
+                public Double sendNumber;
+                public Integer useDays;
+                public String memo;
+                public String organDrugCode;
 
                 public Integer getRecipeDetailId() {
                     return recipeDetailId;
@@ -1321,14 +1288,6 @@ public class GetConsultsAndRecipesResultEntity {
                     this.useDays = useDays;
                 }
 
-                public Double getDrugCost() {
-                    return drugCost;
-                }
-
-                public void setDrugCost(Double drugCost) {
-                    this.drugCost = drugCost;
-                }
-
                 public String getMemo() {
                     return memo;
                 }
@@ -1345,7 +1304,6 @@ public class GetConsultsAndRecipesResultEntity {
                     this.organDrugCode = organDrugCode;
                 }
             }
-
         }
 
     }

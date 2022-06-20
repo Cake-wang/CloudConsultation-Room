@@ -1,8 +1,9 @@
 package com.aries.template.utils;
 
-import android.app.Activity;
 import android.graphics.Color;
 import android.os.Build;
+import android.text.Html;
+import android.text.Spanned;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -159,4 +160,22 @@ public class ActivityUtils {
         }
         window.setAttributes(winParams);
     }
+
+    /**
+     * 快速转换一串 HTML 放进 textview进行颜色和样式展示
+     * 用法如下
+     * String[] orders = {"#333333",drugName,"#38ABA0",wayToUse};
+     * ActivityUtils.formatTextView(orders);
+     */
+    public static Spanned formatTextView(String[] args) {
+        String returnStr = "";
+        String temp="<font color='%s'>%s</font>";
+        for (int i = 0; i < args.length; i++) {
+            if (i%2==0){
+                returnStr += String.format(temp,args[i],args[i+1]);
+            }
+        }
+        return Html.fromHtml(returnStr);
+    }
+
 }

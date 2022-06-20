@@ -22,8 +22,8 @@ import com.aries.template.entity.GetConsultsAndRecipesResultEntity;
 import com.aries.template.module.main.HomeFragment;
 import com.aries.template.module.mine.DepartmentFragment;
 import com.aries.template.module.mine.MineFragment;
-import com.aries.template.module.mine.OrderFragment;
 import com.aries.template.module.mine.OrderConsultFragment;
+import com.aries.template.module.mine.OrderRecipesFragment;
 import com.aries.template.module.mine.PutRecordFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.template.utils.ActivityUtils;
@@ -321,6 +321,10 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
 
     }
 
+    /**
+     * 获取未支付挂号单
+     * 获取未支付处方
+     */
     public void getConsultsAndRecipes() {
         ApiRepository.getInstance().getConsultsAndRecipes()
                 .compose(this.bindUntilEvent(ActivityEvent.DESTROY))
@@ -333,20 +337,37 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                         }
 //                                checkVersion(entity);
                         if (entity.isSuccess()){
-                            // 查看处方单是否多余1条
+                            // 如果2个都不满足则跳转科室
+                            boolean isDepartTag = true;
+                            // 挂号单和处方单不会同时出现，如果同时出现，则需要调整逻辑
+                            // 查看挂号是否多余1条
                             if(entity.getData().getConsults().size()>0){
                                 for (GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Consults item : entity.getData().getConsults()) {
                                     int status = item.getConsults().getStatus();
                                    if ( item.getConsults().getPayflag()==1 &&
                                            (status==1 || status ==2 || status == 3)){
+                                       isDepartTag = false;
                                        // 挂号
                                        start(OrderConsultFragment.newInstance(item));
                                    }
                                 }
-                            }else if (entity.getData().getRecipes().size()>0){
-                                // 处方
-                                start(OrderFragment.newInstance(entity.getData()));
-                            } else {
+                            }
+                            // 查看处方单是否多余1条处方
+                            if (entity.getData().getRecipes().size()>0){
+                                // 每一个处方单中，都有一个处方信息，这个处方信息是需要合并的
+                                ArrayList<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes> recipes = new ArrayList();
+                                for (GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes item : entity.data.recipes) {
+                                    if (item.statusCode==2){
+                                        recipes.add(item);
+                                    }
+                                }
+                                if (recipes.size()>0){
+                                    isDepartTag = false;
+                                    start(OrderRecipesFragment.newInstance(recipes,OrderRecipesFragment.TYPE_RECIPE_OLD));
+                                }
+                            }
+                            if (isDepartTag){
+                                // 如果2个都不满足则跳转科室
                                 start(DepartmentFragment.newInstance(new Object()));
                             }
                         }else {

@@ -236,70 +236,70 @@ public class MineFragment extends FastTitleFragment implements ISupportFragment 
     }
 
     private void getConsultsAndRecipes() {
-
-
-        ApiRepository.getInstance().getConsultsAndRecipes()
-                .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
-                .subscribe(true ?
-                        new FastLoadingObserver<GetConsultsAndRecipesResultEntity>("请稍后...") {
-                            @Override
-                            public void _onNext(@NonNull GetConsultsAndRecipesResultEntity entity) {
-                                if (entity == null) {
-                                    ToastUtil.show("请检查网络");
-                                    return;
-                                }
-//                                checkVersion(entity);
-                                if (entity.isSuccess()){
-
-                                        if(entity.getData().getConsults().size()>0||entity.getData().getRecipes().size()>0){
-                                            start(OrderFragment.newInstance(entity.getData()));
-                                        }else {
-                                            start(DepartmentFragment.newInstance(new Object()));
-                                        }
-
-
-
-
-
-
-                                }else {
-
-
-
-                                    ToastUtil.show(entity.getMessage());
-                                }
-                            }
-
-                            @Override
-                            public void onError(Throwable e) {
-
-//                                ToastUtil.show("请检查网络和ip地址");
-                                if (true) {
-                                    super.onError(e);
-                                }
-                            }
-                        } :
-                        new FastObserver<GetConsultsAndRecipesResultEntity>() {
-                            @Override
-                            public void _onNext(@NonNull GetConsultsAndRecipesResultEntity entity) {
-                                if (entity == null) {
-                                    ToastUtil.show("请检查网络");
-                                    return;
-                                }
-
-
-
-                            }
-
-                            @Override
-                            public void onError(Throwable e) {
-                                if (false) {
-                                    super.onError(e);
-                                }
-                            }
-                        });
-
-
+//  todo open
+//
+//        ApiRepository.getInstance().getConsultsAndRecipes()
+//                .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
+//                .subscribe(true ?
+//                        new FastLoadingObserver<GetConsultsAndRecipesResultEntity>("请稍后...") {
+//                            @Override
+//                            public void _onNext(@NonNull GetConsultsAndRecipesResultEntity entity) {
+//                                if (entity == null) {
+//                                    ToastUtil.show("请检查网络");
+//                                    return;
+//                                }
+////                                checkVersion(entity);
+//                                if (entity.isSuccess()){
+//
+//                                        if(entity.getData().getConsults().size()>0||entity.getData().getRecipes().size()>0){
+//                                            start(OrderFragment.newInstance(entity.getData()));
+//                                        }else {
+//                                            start(DepartmentFragment.newInstance(new Object()));
+//                                        }
+//
+//
+//
+//
+//
+//
+//                                }else {
+//
+//
+//
+//                                    ToastUtil.show(entity.getMessage());
+//                                }
+//                            }
+//
+//                            @Override
+//                            public void onError(Throwable e) {
+//
+////                                ToastUtil.show("请检查网络和ip地址");
+//                                if (true) {
+//                                    super.onError(e);
+//                                }
+//                            }
+//                        } :
+//                        new FastObserver<GetConsultsAndRecipesResultEntity>() {
+//                            @Override
+//                            public void _onNext(@NonNull GetConsultsAndRecipesResultEntity entity) {
+//                                if (entity == null) {
+//                                    ToastUtil.show("请检查网络");
+//                                    return;
+//                                }
+//
+//
+//
+//                            }
+//
+//                            @Override
+//                            public void onError(Throwable e) {
+//                                if (false) {
+//                                    super.onError(e);
+//                                }
+//                            }
+//                        });
+//
+//
 
     }
 
