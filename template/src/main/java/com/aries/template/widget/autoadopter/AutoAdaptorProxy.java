@@ -12,6 +12,7 @@ import java.util.Map;
 
 /******
  * 快速RV适配器
+ * 这个快速适配器专门只做规定数据类型的任务
  * 用法：
  * AutoAdaptor adaptor =  new AutoAdaptor(recyclerView,R.layout.item_doctor,2,newDatas,getContext());创建代理
  * adaptor.setListener(new AutoAdaptor.IItemListener() 创建对应的事件任务
@@ -27,6 +28,8 @@ import java.util.Map;
  *       ((TextView)holder.itemView.findViewById(R.id.jtjk_doc_item_introduce_tv)).setText(item.getIntroduce());
  * }
  *
+ * T 这个对象既可以是一个存储数据的bean结构，也可以是存储固定key值的MAP。
+ *
  * @author  ::: louis luo
  * Date ::: 2022/6/10 11:04 AM
  *
@@ -34,9 +37,11 @@ import java.util.Map;
 public class AutoAdaptorProxy<T>{
 
     /** RV 数据代理对象, 这里不需要管理数据，数据统一由 adaptor管理，这里只规定输入数据的类型 */
-    private AutoObjectAdaptor adaptor;
+    private AutoThemeAdaptor adaptor;
     /** item 监听对象 */
     private IItemListener<T> listener;
+    /** item 样式监听对象 */
+    public IItemThemeListener<T> themeListener;
 
     public AutoAdaptorProxy(RecyclerView recyclerView, @LayoutRes int res, int spanCount , List<T> data, Context context){
         this(recyclerView,res,spanCount,new ArrayList<>(data),context);
@@ -59,9 +64,10 @@ public class AutoAdaptorProxy<T>{
             return;
         if (data==null)
             return;
-        this.adaptor = new AutoObjectAdaptor(recyclerView,res,spanCount, (ArrayList<Object>) data,context);
+        this.adaptor = new AutoThemeAdaptor(recyclerView,res,spanCount, (ArrayList<Object>) data,context);
         recyclerView.setAdapter(adaptor);
 
+        // 点击事件和对象创建事件触发
         adaptor.setListener(new AutoObjectAdaptor.IItemListener() {
             @Override
             public void onItemClick(AutoObjectAdaptor.ViewHolder holder, int position, Object itemData) {
@@ -73,11 +79,27 @@ public class AutoAdaptorProxy<T>{
                 listener.onItemViewDraw(holder,position, ((T) itemData));
             }
         });
+
+        // 样式事件触发
+        adaptor.setThemeListener(new AutoThemeAdaptor.IItemThemeListener() {
+            @Override
+            public void onClickTheme(AutoObjectAdaptor.ViewHolder holder, int position, Object itemData) {
+                themeListener.onClickTheme(holder,position, ((T) itemData));
+            }
+
+            @Override
+            public void unClickTheme(AutoObjectAdaptor.ViewHolder holder, int position, Object itemData) {
+                themeListener.unClickTheme(holder,position, ((T) itemData));
+            }
+        });
     }
 
     // setter && getter
     public void setListener(IItemListener<T> listener) {
         this.listener = listener;
+    }
+    public void setThemeListener(IItemThemeListener<T> themeListener) {
+        this.themeListener = themeListener;
     }
 
     /**
@@ -95,6 +117,16 @@ public class AutoAdaptorProxy<T>{
         void onItemClick(AutoObjectAdaptor.ViewHolder holder, int position, T  itemData);
         // 当单个对象开始绘制时
         void onItemViewDraw(AutoObjectAdaptor.ViewHolder holder, int position, T  itemData);
+    }
+
+    /**
+     * 样式监听类
+     */
+    public interface IItemThemeListener<T>{
+        // 有点击样式的规定
+        void onClickTheme(AutoObjectAdaptor.ViewHolder holder, int position, T  itemData);
+        // 没有点击的样式规定
+        void unClickTheme(AutoObjectAdaptor.ViewHolder holder, int position, T  itemData);
     }
 
 

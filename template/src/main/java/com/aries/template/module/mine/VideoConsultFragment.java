@@ -44,11 +44,6 @@ public class VideoConsultFragment extends BaseEventFragment {
 
     /** 从外部传入的数据  */
     private  Object inputObj;
-    /** 120  秒倒计时间 */
-    private int timeCount = 120;
-
-    @BindView(R.id.jtjk_fz_fragment_timer)
-    TextView timerTV; //时间计时器显示对象
     @BindView(R.id.btn_stjc)
     Button btn_stjc;// 上一页按钮
     @BindView(R.id.btn_finish)
@@ -70,8 +65,6 @@ public class VideoConsultFragment extends BaseEventFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // 启动计时器
-        timeStart();
     }
 
     /**
@@ -85,7 +78,6 @@ public class VideoConsultFragment extends BaseEventFragment {
     }
 
 
-    @Override
     @SingleClick
     @OnClick({R.id.btn_back, R.id.btn_main, R.id.btn_cancel, R.id.btn_inquiry})
     public void onViewClicked(View view) {
@@ -191,19 +183,6 @@ public class VideoConsultFragment extends BaseEventFragment {
 
     }
 
-
-    /**
-     * 计时器任务处理
-     */
-    @SuppressLint("SetTextI18n")
-    @Override
-    protected void timeProcess() {
-        super.timeProcess();
-        timerTV.setText(--timeCount+"秒");
-        if (timeCount==0){
-            gotoMain();
-        }
-    }
 
     /**
      * 设置title的信息

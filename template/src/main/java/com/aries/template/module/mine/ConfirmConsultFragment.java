@@ -57,11 +57,6 @@ public class ConfirmConsultFragment extends BaseEventFragment implements Compoun
 
     /** 从外部传入的数据  */
     private  Object inputObj;
-    /** 120  秒倒计时间 */
-    private int timeCount = 120;
-
-    @BindView(R.id.jtjk_fz_fragment_timer)
-    TextView timerTV; //时间计时器显示对象
     @BindView(R.id.btn_cancel)
     Button btn_cancel;// 上一页按钮
     @BindView(R.id.btn_inquiry)
@@ -102,8 +97,6 @@ public class ConfirmConsultFragment extends BaseEventFragment implements Compoun
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // 启动计时器
-        timeStart();
     }
 
     /**
@@ -134,7 +127,6 @@ public class ConfirmConsultFragment extends BaseEventFragment implements Compoun
 //                        }
 ////                        entity.data.requestId;
 //                    }
-//                });
     }
 
 
@@ -191,16 +183,10 @@ public class ConfirmConsultFragment extends BaseEventFragment implements Compoun
     /**
      * 按钮 行为 集合
      */
-    @Override
     @SingleClick
     @OnClick({R.id.btn_back, R.id.btn_main, R.id.btn_cancel, R.id.btn_inquiry, R.id.tv_date})
     public void onViewClicked(View view) {
-        super.onViewClicked(view);
         switch (view.getId()) {
-//            case R.id.btn_back:
-//                break;
-//            case R.id.btn_main:
-//                break;
             case R.id.tv_date:
                 showDatePickerDialog(getContext(), DatePickerDialog.THEME_DEVICE_DEFAULT_LIGHT, tv_date, Calendar.getInstance());
                 break;
@@ -282,19 +268,6 @@ public class ConfirmConsultFragment extends BaseEventFragment implements Compoun
             Toast.makeText(mContext, toastTip, Toast.LENGTH_LONG).show();
         }catch (Exception e){
             e.printStackTrace();
-        }
-    }
-
-    /**
-     * 计时器任务处理
-     */
-    @SuppressLint("SetTextI18n")
-    @Override
-    protected void timeProcess() {
-        super.timeProcess();
-        timerTV.setText(--timeCount+"秒");
-        if (timeCount==0){
-            gotoMain();
         }
     }
 

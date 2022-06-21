@@ -60,8 +60,6 @@ public class PutRecordFragment extends BaseEventFragment implements ISupportFrag
     AppCompatCheckBox cbProtocol;
     @BindView(R.id.btn_register)
     View btnLogin;
-    @BindView(R.id.jtjk_fz_fragment_timer)
-    TextView timerTV; //时间计时器显示对象
 
     /** 获取验证码的倒计时插件 */
     private CountDownButtonHelper mCountDownHelper;
@@ -69,8 +67,6 @@ public class PutRecordFragment extends BaseEventFragment implements ISupportFrag
     boolean focusFlagnum ;
     /** 当前验证码输入框的焦点状态 */
     boolean focusFlagcode ;
-    /** 120  秒倒计时间 */
-    private int timeCount = 120;
 
     /**
      * 获取输入数据
@@ -97,8 +93,6 @@ public class PutRecordFragment extends BaseEventFragment implements ISupportFrag
             name = args.getString("name");
             smkcard = args.getString("smkcard");
         }
-        // 启动计时器
-        timeStart();
     }
 
     @Override
@@ -125,7 +119,6 @@ public class PutRecordFragment extends BaseEventFragment implements ISupportFrag
         etVerifyCode.setOnFocusChangeListener((v, hasFocus) -> focusFlagcode = hasFocus);
     }
 
-    @Override
     @SingleClick
     @OnClick({R.id.btn_get_verify_code,R.id.btn_register, R.id.tv_other_login, R.id.tv_forget_password,
             R.id.num_1, R.id.num_2, R.id.num_3, R.id.num_4,
@@ -133,7 +126,6 @@ public class PutRecordFragment extends BaseEventFragment implements ISupportFrag
             R.id.num_9, R.id.num_0, R.id.btn_clear, R.id.btn_back_text,
     })
     public void onViewClicked(View view) {
-        super.onViewClicked(view);
         switch (view.getId()) {
             case R.id.btn_get_verify_code:
                 // 获取验证码
@@ -309,19 +301,6 @@ public class PutRecordFragment extends BaseEventFragment implements ISupportFrag
             mCountDownHelper.recycle();
         }
         super.onDestroyView();
-    }
-
-    /**
-     * 计时器任务处理
-     */
-    @SuppressLint("SetTextI18n")
-    @Override
-    protected void timeProcess() {
-        super.timeProcess();
-        timerTV.setText(--timeCount+"秒");
-        if (timeCount==0){
-            gotoMain();
-        }
     }
 
     @Override

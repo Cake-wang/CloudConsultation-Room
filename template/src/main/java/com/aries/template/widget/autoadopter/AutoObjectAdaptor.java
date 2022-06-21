@@ -1,5 +1,6 @@
 package com.aries.template.widget.autoadopter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,8 +14,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 
 /******
- *
- *
+ * 快速RV搭建器
+ * 这个搭建器简单的只是对数字进行反应和重绘，不对样式进行处理
  * @author  ::: louis luo
  * Date ::: 2022/6/17 11:18 AM
  *
@@ -27,6 +28,8 @@ public class AutoObjectAdaptor extends RecyclerView.Adapter<AutoObjectAdaptor.Vi
     public int res;
     /** item 监听对象 */
     public IItemListener listener;
+    /** 当前点击对象在数据中的位置,初始化不能为0 */
+    public int currentClickPosition=-1;
 
     public AutoObjectAdaptor(RecyclerView recyclerView, @LayoutRes int res, int spanCount , ArrayList<Object> data, Context context) {
         if (spanCount<=0)
@@ -59,9 +62,13 @@ public class AutoObjectAdaptor extends RecyclerView.Adapter<AutoObjectAdaptor.Vi
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         listener.onItemViewDraw(holder,position,data.get(position));
-        holder.itemView.setOnClickListener(v->listener.onItemClick(holder,position,data.get(position)));
+        holder.itemView.setOnClickListener(v -> {
+            listener.onItemClick(holder,position,data.get(position));
+            this.currentClickPosition = position;
+            this.notifyDataSetChanged();// 强制刷新所有按钮的状态。比如样式修改等操作。
+        });
     }
 
     @Override

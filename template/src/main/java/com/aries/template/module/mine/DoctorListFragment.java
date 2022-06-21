@@ -66,8 +66,6 @@ public class DoctorListFragment extends BaseEventFragment {
     private  String profession;
     /** 从外部传入的数据  */
     private  String departmentId;
-    /** 120  秒倒计时间 */
-    private int timeCount = 120;
     /** 当前1级机构的page位置 */
     private int currentPageNum = 0;
     /** 网络获取的全一级科室数据 */
@@ -75,8 +73,6 @@ public class DoctorListFragment extends BaseEventFragment {
     /** 上一页，下一页管理器 */
     private UpDownProxy<Map> upDownProxy;
 
-    @BindView(R.id.jtjk_fz_fragment_timer)
-    TextView timerTV; //时间计时器显示对象
     @BindView(R.id.btn_cancel)
     Button btn_cancel;// 上一页按钮
     @BindView(R.id.btn_inquiry)
@@ -153,8 +149,6 @@ public class DoctorListFragment extends BaseEventFragment {
                 }
             }
         });
-        // 启动计时器
-        timeStart();
     }
 
     /**
@@ -262,20 +256,6 @@ public class DoctorListFragment extends BaseEventFragment {
             Toast.makeText(mContext, toastTip, Toast.LENGTH_LONG).show();
         }catch (Exception e){
             e.printStackTrace();
-        }
-    }
-
-    /**
-     * 计时器任务处理
-     */
-    @SuppressLint("SetTextI18n")
-    @Override
-    protected void timeProcess() {
-        super.timeProcess();
-        if (timerTV!=null)
-            timerTV.setText(--timeCount+"秒");
-        if (timeCount==0){
-            gotoMain();
         }
     }
 

@@ -1,7 +1,7 @@
 package com.aries.template.module.mine;
 
-import android.annotation.SuppressLint;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
@@ -13,12 +13,14 @@ import com.aries.template.R;
 import com.aries.template.entity.FindValidOrganProfessionForRevisitResultEntity;
 import com.aries.template.module.base.BaseEventFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
-import com.aries.template.widget.autoadopter.AutoAdaptor;
+import com.aries.template.widget.autoadopter.AutoAdaptorProxy;
+import com.aries.template.widget.autoadopter.AutoObjectAdaptor;
 import com.aries.template.widget.updownbtn.UpDownProxy;
 import com.aries.ui.view.title.TitleBarView;
 import com.trello.rxlifecycle3.android.FragmentEvent;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
@@ -51,15 +53,11 @@ public class DepartmentFragment extends BaseEventFragment {
 
     /** 从外部传入的数据  */
     private  Object inputObj;
-    /** 120  秒倒计时间 */
-    private int timeCount = 120;
     /** 网络获取的全一级科室数据 */
     private ArrayList<Map> totalDatas;
     /** 上一页，下一页管理器 */
     private UpDownProxy<Map> upDownProxy;
 
-    @BindView(R.id.jtjk_fz_fragment_timer)
-    TextView timerTV; //时间计时器显示对象
     @BindView(R.id.btn_cancel)
     Button btn_cancel;// 上一页按钮
     @BindView(R.id.btn_inquiry)
@@ -91,21 +89,37 @@ public class DepartmentFragment extends BaseEventFragment {
             public void reFlashRV(ArrayList<Map> newDatas) {
                 // 刷新时间
                 timeCount = 120;
-                // 构造RV的显示对象
-                AutoAdaptor adaptor =  new AutoAdaptor(recyclerView,R.layout.item_dept,3,newDatas,getContext());
-                adaptor.setListener(new AutoAdaptor.IItemListener() {
+                AutoAdaptorProxy<Map> proxy = new AutoAdaptorProxy(recyclerView,R.layout.item_dept,3,newDatas,getContext());
+                proxy.setListener(new AutoAdaptorProxy.IItemListener<Map>() {
                     @Override
-                    public void onItemClick(AutoAdaptor.ViewHolder holder, int position, Map itemData) {
+                    public void onItemClick(AutoObjectAdaptor.ViewHolder holder, int position, Map itemData) {
                         //进入二级
                         if (itemData.get(KEY_ITEM_ORGANPROFESSIONID)!=null)
                             start(DepartmentTwoFragment.newInstance(itemData.get(KEY_ITEM_ORGANPROFESSIONID).toString()));
                     }
                     @Override
-                    public void onItemViewDraw(AutoAdaptor.ViewHolder holder, int position, Map itemData) {
+                    public void onItemViewDraw(AutoObjectAdaptor.ViewHolder holder, int position, Map itemData) {
+                        // 添加文字
                         ((TextView)holder.itemView.findViewById(R.id.jtjk_fz_item_tv)).setText(itemData.get(KEY_ITEM_VALUE).toString());
                     }
                 });
-                adaptor.notifyDataSetChanged();
+                proxy.setThemeListener(new AutoAdaptorProxy.IItemThemeListener<Map>() {
+                    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+                    @Override
+                    public void onClickTheme(AutoObjectAdaptor.ViewHolder holder, int position, Map itemData) {
+                        //点击后样式
+                        ((TextView)holder.itemView.findViewById(R.id.jtjk_fz_item_tv)).setBackground(getActivity().getDrawable(R.drawable.btn_register_pressed_yzs));
+                        ((TextView)holder.itemView.findViewById(R.id.jtjk_fz_item_tv)).setTextColor(Color.parseColor("#ffffff"));
+                    }
+
+                    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+                    @Override
+                    public void unClickTheme(AutoObjectAdaptor.ViewHolder holder, int position, Map itemData) {
+                        ((TextView)holder.itemView.findViewById(R.id.jtjk_fz_item_tv)).setBackground(getActivity().getDrawable(R.drawable.btn_register_normal_yzs));
+                        ((TextView)holder.itemView.findViewById(R.id.jtjk_fz_item_tv)).setTextColor(Color.parseColor("#333333"));
+                    }
+                });
+                proxy.notifyDataSetChanged();
             }
 
             @Override
@@ -125,9 +139,6 @@ public class DepartmentFragment extends BaseEventFragment {
                 }
             }
         });
-
-        // 启动计时器
-        timeStart();
     }
 
     /**
@@ -136,7 +147,9 @@ public class DepartmentFragment extends BaseEventFragment {
     @Override
     public void initView(Bundle savedInstanceState) {
         // 事件
+        // 点击上一页
         btn_inquiry.setOnClickListener(v -> {upDownProxy.doNextReFlash();});
+        // 点击下一页
         btn_cancel.setOnClickListener(v -> {upDownProxy.doProReFlash();});
         title.setText("请选择一级科室");
         // 请求一级科室
@@ -177,19 +190,6 @@ public class DepartmentFragment extends BaseEventFragment {
                 });
     }
 
-    /**
-     * 计时器任务处理
-     */
-    @SuppressLint("SetTextI18n")
-    @Override
-    protected void timeProcess() {
-        super.timeProcess();
-        if (timerTV!=null)
-            timerTV.setText(--timeCount+"秒");
-        if (timeCount==0){
-            gotoMain();
-        }
-    }
 
     /**
      * 设置title的信息

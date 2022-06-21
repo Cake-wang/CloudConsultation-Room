@@ -27,11 +27,7 @@ import me.yokeyword.fragmentation.ISupportFragment;
  */
 public class ResultFragment extends BaseEventFragment implements ISupportFragment {
     private  String result= "";
-    /** 120  秒倒计时间 */
-    private int timeCount = 120;
 
-    @BindView(R.id.jtjk_fz_fragment_timer)
-    TextView timerTV; //时间计时器显示对象
     @BindView(R.id.tv_result_title)
     TextView tv_result_title;
     @BindView(R.id.tv_result_bg)
@@ -57,9 +53,6 @@ public class ResultFragment extends BaseEventFragment implements ISupportFragmen
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // 启动时间
-        timeStart();
-
         Bundle args = getArguments();
         if (args != null) {
             result = args.getString("result");
@@ -141,19 +134,6 @@ public class ResultFragment extends BaseEventFragment implements ISupportFragmen
             catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
-        }
-    }
-
-    /**
-     * 计时器任务处理
-     */
-    @SuppressLint("SetTextI18n")
-    @Override
-    protected void timeProcess() {
-        super.timeProcess();
-        timerTV.setText(--timeCount+"秒");
-        if (timeCount==0){
-            gotoMain();
         }
     }
 

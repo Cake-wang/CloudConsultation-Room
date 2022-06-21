@@ -12,6 +12,7 @@ import com.aries.library.fast.module.fragment.FastTitleFragment;
 import com.aries.library.fast.util.SPUtil;
 import com.aries.template.MainActivity;
 import com.aries.template.R;
+import com.aries.template.module.mine.DepartmentFragment;
 import com.aries.template.module.mine.MineFragment;
 import com.aries.template.module.mine.ResultFragment;
 import com.aries.ui.view.title.TitleBarView;
@@ -37,8 +38,6 @@ public class HomeFragment extends FastTitleFragment implements ISupportFragment 
     ImageView iv_stjc;
     @BindView(R.id.iv_fzpy)
     ImageView iv_fzpy;
-    @BindView(R.id.tv_clock)
-    TextClock tv_clock;
 
     public static HomeFragment newInstance() {
         Bundle args = new Bundle();
@@ -68,10 +67,10 @@ public class HomeFragment extends FastTitleFragment implements ISupportFragment 
             public void onClick(View v) {
                 SPUtil.put(mContext,"tag","stjc");
 //                start(MineFragment.newInstance("stjc"));
-//                start(DepartmentFragment.newInstance("stjc"));// todo cc
+                start(DepartmentFragment.newInstance("stjc"));// todo cc
 //                start(PutRecordFragment.newInstance("idcard","name","smkcard"));// todo cc
 //                ((MainActivity) getActivity()).getConsultsAndRecipes();//todo cc
-                start(ResultFragment.newInstance("cancelConsult"));
+//                start(ResultFragment.newInstance("cancelConsult"));
             }
         });
 
@@ -84,12 +83,6 @@ public class HomeFragment extends FastTitleFragment implements ISupportFragment 
 
             }
         });
-
-        if (tv_clock.is24HourModeEnabled()){
-            tv_clock.setFormat24Hour("yyyy/MM/dd hh:mm:ss");
-        }else {
-            tv_clock.setFormat24Hour("yyyy/MM/dd h:mm:ss");
-        }
     }
 
     @Override

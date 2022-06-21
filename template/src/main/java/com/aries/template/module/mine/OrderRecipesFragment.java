@@ -53,11 +53,6 @@ public class OrderRecipesFragment extends BaseEventFragment {
     /** 当前启动状态 TYPE_RECIPE_NEW为新处方单，为TYPE_RECIPE_OLD已有处方单 */
     private String openType;
 
-    /** 120  秒倒计时间 */
-    private int timeCount = 120;
-
-    @BindView(R.id.jtjk_fz_fragment_timer)
-    TextView timerTV; //时间计时器显示对象
     @BindView(R.id.tv_name)
     TextView tv_name;
     @BindView(R.id.tv_card)
@@ -126,8 +121,6 @@ public class OrderRecipesFragment extends BaseEventFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // 启动时间
-        timeStart();
         // 注入数据
         Bundle args = getArguments();
         if (args != null) {
@@ -193,11 +186,9 @@ public class OrderRecipesFragment extends BaseEventFragment {
      * OnClick 必须声明点击对象，否则，点击无效
      * @param view 点击对象
      */
-    @Override
     @SingleClick
     @OnClick({R.id.btn_back, R.id.btn_main, R.id.btn_cancel, R.id.btn_inquiry})
     public void onViewClicked(View view) {
-        super.onViewClicked(view);
         switch (view.getId()) {
 //            case R.id.btn_back:
 //                break;
@@ -279,19 +270,6 @@ public class OrderRecipesFragment extends BaseEventFragment {
        });
         //刷新
         proxy.notifyDataSetChanged();
-    }
-
-    /**
-     * 计时器任务处理
-     */
-    @SuppressLint("SetTextI18n")
-    @Override
-    protected void timeProcess() {
-        super.timeProcess();
-        timerTV.setText(--timeCount+"秒");
-        if (timeCount==0){
-            gotoMain();
-        }
     }
 
     @Override
