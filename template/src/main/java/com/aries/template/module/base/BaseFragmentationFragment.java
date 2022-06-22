@@ -6,16 +6,15 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.animation.Animation;
 
+import com.aries.library.fast.module.fragment.FastTitleFragment;
+
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
-
-import com.aries.library.fast.module.fragment.FastTitleFragment;
-import com.aries.template.entity.GetConsultsAndRecipesResultEntity;
-
 import me.yokeyword.fragmentation.ExtraTransaction;
 import me.yokeyword.fragmentation.ISupportFragment;
 import me.yokeyword.fragmentation.SupportFragmentDelegate;
 import me.yokeyword.fragmentation.SupportHelper;
+import me.yokeyword.fragmentation.anim.DefaultHorizontalAnimator;
 import me.yokeyword.fragmentation.anim.FragmentAnimator;
 
 /******
@@ -200,7 +199,10 @@ public abstract class BaseFragmentationFragment extends FastTitleFragment implem
      */
     @Override
     public FragmentAnimator onCreateFragmentAnimator() {
-        return mDelegate.onCreateFragmentAnimator();
+//        return mDelegate.onCreateFragmentAnimator();
+
+        // 设置横向(和安卓4.x动画相同)
+         return new DefaultHorizontalAnimator();
     }
 
     /**
