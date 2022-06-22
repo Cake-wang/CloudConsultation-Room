@@ -217,7 +217,13 @@ public class ConfirmConsultFragment extends BaseEventFragment implements Compoun
      * 执行复诊确认
      */
     public void requestConsultAndCdrOtherdoc(){
-        ApiRepository.getInstance().requestConsultAndCdrOtherdoc(GlobalConfig.doc.getDoctorId())
+        if (GlobalConfig.doc==null && GlobalConfig.departmentID==null){
+            // todo 添加用户提示
+            return;
+        }
+        ApiRepository.getInstance().requestConsultAndCdrOtherdoc(GlobalConfig.doc.getCurrentOrgan(),
+                        GlobalConfig.departmentID,
+                        GlobalConfig.doc.getDoctorId())
                 .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
                 .subscribe(new FastLoadingObserver<RequestConsultAndCdrOtherdocResultEntity>() {
                     @Override

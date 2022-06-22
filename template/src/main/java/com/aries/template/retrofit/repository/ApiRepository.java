@@ -470,8 +470,8 @@ public class ApiRepository extends BaseRepository {
         bizContent.put("organId",String.valueOf(2000300));
         bizContent.put("sortKey",String.valueOf(1));//排序类型(1:综合排序，2:复诊价格排序，3:复诊量排序，4: 好评排序)
         bizContent.put("recipeConsultSourceFlag",String.valueOf(2));//医生类型(1：平台排班，2：无排班，3：his排班，4：医生自主排班)
-        bizContent.put("start",String.valueOf(0));//是否快速返回，快速返回没有职业点和扩展信息//todo cc
-        bizContent.put("limit",String.valueOf(10));//是否快速返回，快速返回没有职业点和扩展信息//todo cc
+        bizContent.put("start",String.valueOf(0));//开始index点//todo 这个是否需要，还是一次性拿出来？
+        bizContent.put("limit",String.valueOf(10));//结束index点//todo cc
         bizContent.put("packageFlag",String.valueOf(1));//是否快速返回，快速返回没有职业点和扩展信息
         bizContent.put("search","");//是否快速返回，快速返回没有职业点和扩展信息
         // 请求的类型 searchDoctorListByBusTypeV2
@@ -494,41 +494,48 @@ public class ApiRepository extends BaseRepository {
 
     /**
      * 确认并发起复诊
-     * @param appClientType
+     * @param consultOrgan 复诊医生机构
+     * @param consultDepart 复诊医生科室
+     * @param consultDoctor 复诊医生
      */
-    public Observable<RequestConsultAndCdrOtherdocResultEntity> requestConsultAndCdrOtherdoc(Long appClientType) {
-        Map<String,String> questionnaire =new HashMap<>();
-        questionnaire.put("pregnent",String.valueOf(0));
-        questionnaire.put("pregnentMemo","");
-        questionnaire.put("alleric",String.valueOf(0));
-        questionnaire.put("allericMemo","");
-        questionnaire.put("proposedDrugs","鲜铁皮石斛");
-        questionnaire.put("haveReaction",String.valueOf(0));
-        questionnaire.put("haveReactionMemo","");
-        questionnaire.put("disease","");
-        questionnaire.put("confirmedDate","");
-        questionnaire.put("returnVisitStatus",String.valueOf(1));
+    public Observable<RequestConsultAndCdrOtherdocResultEntity> requestConsultAndCdrOtherdoc(Long consultOrgan,
+                                                                                             String consultDepart,
+                                                                                             Long consultDoctor) {
+        Map<String,String> questionnaire =new HashMap<>(); //问卷单对象（详见questionnaire详细描述）
+        questionnaire.put("pregnent",String.valueOf(0)); //是否怀孕 -1：男 0:无 1:有
+//        questionnaire.put("pregnentMemo","");
+        questionnaire.put("alleric",String.valueOf(0));//有无过敏史 0:无 1:有
+//        questionnaire.put("allericMemo","");
+        questionnaire.put("proposedDrugs","鲜铁皮石斛");//既往用药（多个药品用、隔开）
+        questionnaire.put("haveReaction",String.valueOf(0));//服药后不良反应 0:无 1:有
+//        questionnaire.put("haveReactionMemo","");
+        questionnaire.put("disease","");//确诊疾病
+        questionnaire.put("confirmedDate","");//确诊时间，如 2019-04-03
+//        questionnaire.put("returnVisitStatus",String.valueOf(1));
 
-        Map<String,String> cdrOtherdocs =new HashMap<>();
-        cdrOtherdocs.put("docType",String.valueOf(9));
-        cdrOtherdocs.put("docName","20210522135342oz0d.jpg");
-        cdrOtherdocs.put("docFormat",String.valueOf(13));
-        cdrOtherdocs.put("docContent","60a89c66f0f97817f591851c");
+        Map<String,String> cdrOtherdocs =new HashMap<>(); //病历数据
+        cdrOtherdocs.put("docType",String.valueOf(9));//文档类型，默认填9 0门诊病历 1检验报告 2检查报告 10体检报告 3处方 4治疗记录 5住院病历 6医嘱 7医学影像 8病患部位 9其他
+        cdrOtherdocs.put("docName","20210522135342oz0d.jpg");//文件名，包含后缀
+        cdrOtherdocs.put("docFormat",String.valueOf(13));//文档格式 01 CDA； 02 BSXML； 11 HTMLX；12 PDF； 13 JPG
+        cdrOtherdocs.put("docContent","60a89c66f0f97817f591851c");//文件上传或返回的文件id
 
         Map<String,Object> bizContent = new HashMap<>();
 //        bizContent.put("appClientType",String.valueOf(appClientType));
-        bizContent.put("mpiid","2c95818f80b0ab390180b0db16ea0000");
-        bizContent.put("appClientType","APP_WEB");
-        bizContent.put("appType","ngari-health");
-        bizContent.put("requestMode",String.valueOf(4));
-        bizContent.put("consultOrgan",String.valueOf(2000300));
-        bizContent.put("consultDepart",String.valueOf(18804));
-        bizContent.put("consultDoctor",String.valueOf(111733));
-        bizContent.put("consultCost",String.valueOf(0));
-        bizContent.put("consultPrice",String.valueOf(0));
-        bizContent.put("leaveMess","");
-        bizContent.put("questionnaire",questionnaire);
-        bizContent.put("cdrOtherdocs",cdrOtherdocs);
+        bizContent.put("mpiid","2c95818f80b0ab390180b0db16ea0000");//就诊人索引
+        bizContent.put("appClientType","APP_WEB");//由纳里平台分配的公司标识，固定写死
+        bizContent.put("appType","ngari-health");//由纳里平台分配的公司标识，固定写死
+        bizContent.put("requestMode",String.valueOf(4));//类型，复诊固定为4
+        bizContent.put("consultOrgan",String.valueOf(2000300));//复诊医生机构
+//        bizContent.put("consultOrgan",String.valueOf(consultOrgan));//复诊医生机构
+        bizContent.put("consultDepart",String.valueOf(18804));//复诊医生科室
+//        bizContent.put("consultDepart",String.valueOf(consultDepart));//复诊医生科室
+        bizContent.put("consultDoctor",String.valueOf(111733));//复诊医生
+//        bizContent.put("consultDoctor",String.valueOf(consultDoctor));//复诊医生
+//        bizContent.put("consultCost",String.valueOf(0));
+//        bizContent.put("consultPrice",String.valueOf(0));
+//        bizContent.put("leaveMess","");
+//        bizContent.put("questionnaire",questionnaire);
+//        bizContent.put("cdrOtherdocs",cdrOtherdocs);
 
         RequestBody body = BodyCreate(bizContent,"requestConsultAndCdrOtherdoc");
         return FastTransformer.switchSchedulers(getApiService().requestConsultAndCdrOtherdoc(body).retryWhen(new FastRetryWhen()));
@@ -646,94 +653,44 @@ public class ApiRepository extends BaseRepository {
         return FastTransformer.switchSchedulers(getApiService().getConfigurationToThirdForPatient(body).retryWhen(new FastRetryWhen()));
     }
 
-    public Observable<CreateOrderResultEntity> createOrder(String appKey, String tid, Integer doctorId, Context mContext) {
+    /**
+     * 确认处方单信息并结算
+     */
+    public Observable<CreateOrderResultEntity> createOrder(String recipeId, String payway, String decoctionFlag, String gfFeeFlag) {
+        Map<String,String> recipeOrder =new HashMap<>(); //病历数据
+        recipeOrder.put("payway",String.valueOf(111));//支付类型代码 微信：40 卫宁付：111
+        recipeOrder.put("decoctionFlag",String.valueOf(0));//是否代煎 1：代煎，0：不代煎
+        recipeOrder.put("gfFeeFlag",String.valueOf(0));//是否收取制作费 1：表示需要制作费，0：不需要
+        recipeOrder.put("payMode",String.valueOf(1));//是否收取制作费 1：表示需要制作费，0：不需要
+        recipeOrder.put("addressId","");//是否收取制作费 1：表示需要制作费，0：不需要
+        recipeOrder.put("decoctionId","");//是否收取制作费 1：表示需要制作费，0：不需要
+        recipeOrder.put("depId","");//是否收取制作费 1：表示需要制作费，0：不需要
+        recipeOrder.put("expressFee","");//是否收取制作费 1：表示需要制作费，0：不需要
 
-//        idCard = "33052219861229693X";
-//        SPUtil.put(mContext, "termial","YTJ1001");
-//        SPUtil.put(mContext,"hosiptalNo", "A0005");
-//        SPUtil.put(mContext, "mchntId", "330160400279");
-//
-//        SPUtil.put(mContext, "posId","1001");
-
-        CreateOrderRequestEntity checkActivationStateReferenceEntity = new CreateOrderRequestEntity();
-        checkActivationStateReferenceEntity.setAppKey(appKey);
-
-        checkActivationStateReferenceEntity.setTid(tid);
-        String beanstr = ConvertJavaBean.converJavaBeanToJsonNew(checkActivationStateReferenceEntity);
-        String beanstrNew = "";
-        try {
-            beanstrNew = URLEncoder.encode(beanstr,"UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-
-//        String privateKey = "MIICeAIBADANBgkqhkiG9w0BAQEFAASCAmIwggJeAgEAAoGBAOVpyOq/CpPhns2q7S9R83u1kaGXK628rzJT7xDOzPom2CMQvnlEUrmR4K1rLgrPHJpNsE9Y1CffdlM57u8XluPqYiPI3jnSEXwg2EO9/xZpYqMlx/vAWU8E+NJ9wgTouB9cTM1BRtf/gl5MC6D6pm9hWiW3EkOUPEilMUxVpjsdAgMBAAECgYEApQc76OIUkdyzh+91P50MMemjIULFwO0Ceom2Z7jb6vcWc+MPodxsReGSZi27qTrjsHxCYFHeC/DMBYKfRo8Jkv1vznYDkmscKiezNmVJOAUyeGs1yUFRa7PABcNOdPz48zwlwGNcmMXnYOPTUAZGvSDdzS7bRWTObZo6jFgnZmECQQD+P3+DjQ0NDb/43U+pfNkQrk23od12dGP7/VqqtG8unou+JdpUZdGAGJsR4bPd2cSDG+9+6eVn3DIiR2NyDBBHAkEA5v56MBtOI8SWCX+tWteo9ZnkD5Y3W/OH1JJgCz5H8sI3BDvoDxVvyTgdnH4B/8mQi3imqe2cr1+vEuvJE0fPewJBAOuBofoXE7m9vM8nIP1cGi0rZ+3rT5rD4UGvwuZQ0JQcZFEz+vMmhVLkd++uY8/iQfc4TzX+LnNwMjgybFld900CQQCN/ztfnTlwtWVCG5GWeWIs8FgI2N/ZD6CdJQoTf0q9SXSGjsj9lMDuIifZzoAuHFtV0WoqpZ2fFSPLbtRhnNBHAkB/dzzHOH/PFRxHzecR9P/mikDkCGWYSCQXmbOJkrEgLj+I2+QP72zHCGgbsGr8LgtDsxkDxfP9gnnPXpS6tQvt";
-//        String privateKey ="MIICeQIBADANBgkqhkiG9w0BAQEFAASCAmMwggJfAgEAAoGBAKYSkP/RnkvdQXnG2vUjh3Isrh4Lw/wJu+cfAHZaAxKcqgi3vxr8i5VZvNf3XJupXB5utMrJw3o3Q0jJaTftQzkXW8jS9R1Fi6DhUpvvY9iAKM+wuuFPuTGt6NJLddLr4IV6JU840xPyG4HmfyyKt6ZDHjrzW3tuRvUCbPG/UXEZAgMBAAECgYEApL/wdsiF6C70AJIEr4HyoZKvnQEBCSzC6vK3a7G6MKGYkRNwE56L/rrKe9laVtY5m7spwa9NLBZcun2M0z2eHBDs/FPhutBVNXDw62w/Czl/EGCIjc1+dO+N5PVIlrByne9vCjRsq3o6No6DoFMj56aCgf97kvhF8YbkA5Z85L0CQQDLreS73gdFD34DR+/src/QWWJfiIVapgP5FEP/lFbR33wc0un723HpnbK7bEqNgxMc/vB+3Ijs7q/SYVN+QZ7bAkEA0LufyTaJUBkjnmvVYsAFit72DuN7F2PBQx5N35eNqrc9y/qf+QmCg3JaEQawVWHMZTaIP0MJH4dJEh0peugQGwJBAK2UaRbiRXfJmC7bo9Ek37JEOt4Hzv5N9ZzUdI7fsI3z1CYMaXRGtHHP/35S78ZiKmvPqM20zMx/LkAwyaMT8XkCQQC4ghGFYJLSXdZxdCqEhu6fSeVBVe35x/EO7lux2JqenCmhBGKiVbirjsp0oHAAmVl+4kxfd1c6KnD59RM0lKufAkEAg8KgGdB+cJGPwIImTsPVqdMNTy8ShrCCqIdsG1+pdO1aGRG8ackhDRe0jMCDtKfkDuHzLhxf3CnQVDoFEKoE/A==";
-
-
-        //正式环境签名
-        String privateKey ="MIICXQIBAAKBgQDeppiicqPIfjLjAzW1VKXjP2BsRGBjwh4nYV0C5tD8z+R0NvnLJo7de5icjhhsNnCDn6NFKtLF4WIL97x38nRgKueAD+LYjCPefJ6tZT513tMen9N8BYiUP8+9EyxSKVsVWdBCZnPEWp0GTSpN1sjv6dhk8PYjndfIHalYSY8YXQIDAQABAoGBAJ55p9SgknEnWiL46uaJPJX2SzRkqtL2nS3cgC6LiZ8Yffw2ETAG3tNIoMR1425KhWU6YCTgKSvNk1L/Xzdk7G0easRzCNRQ6EWm3H+c/UBHcDBVfSKq45SwlJvaVlU8A8c8YCmttEBFrKS2YEWln/U8DUSNkrbAs0ni/dCyOGnlAkEA+21tSJYxW2yY939yVHtsrIttCokBR3hp7sZPHEyAcXuslZ/O62k3k3PMZUWEqaXnhiAnIJWr8yrGpcTobwHfwwJBAOKzMYdtoPOswki5temLj7yyTitY9L27hTEgt+Y7y5/oCmB/P3XZlJOtpnFDu+xdJAnEpu1RuCYUUIs00l/kxV8CQGBLTKucOlMViJBh01vf2YNL8vsx9bd1urykXvArrJXKFBNKHWmz5oEmvIWc1m5TCBUqg1HLgQukumgKviqlwRkCQQCCVR9OivqT3Wi9QveQ04nJpIFIbpYWVq7WdccEeLAyuMbuf3nOmU7QMG+WgqiR1WKYsxR9MBQ84EUGI1Ini3DlAkBHyidb8c92GDPKxHG1NS2lMvAKpEOlWhPS18vtEPA1R0oQnRB942l6gekxSRZPUVpNrFXPheVApbZJLpbUaHpS";
-
-
-//        String privateKey ="MIICXwIBAAKBgQCmEpD/0Z5L3UF5xtr1I4dyLK4eC8P8CbvnHwB2WgMSnKoIt78a/IuVWbzX91ybqVwebrTKycN6N0NIyWk37UM5F1vI0vUdRYug4VKb72PYgCjPsLrhT7kxrejSS3XS6+CFeiVPONMT8huB5n8siremQx4681t7bkb1Amzxv1FxGQIDAQABAoGBAKS/8HbIhegu9ACSBK+B8qGSr50BAQkswuryt2uxujChmJETcBOei/66ynvZWlbWOZu7KcGvTSwWXLp9jNM9nhwQ7PxT4brQVTVw8OtsPws5fxBgiI3NfnTvjeT1SJawcp3vbwo0bKt6OjaOg6BTI+emgoH/e5L4RfGG5AOWfOS9AkEAy63ku94HRQ9+A0fv7K3P0FliX4iFWqYD+RRD/5RW0d98HNLp+9tx6Z2yu2xKjYMTHP7wftyI7O6v0mFTfkGe2wJBANC7n8k2iVAZI55r1WLABYre9g7jexdjwUMeTd+Xjaq3Pcv6n/kJgoNyWhEGsFVhzGU2iD9DCR+HSRIdKXroEBsCQQCtlGkW4kV3yZgu26PRJN+yRDreB87+TfWc1HSO37CN89QmDGl0RrRxz/9+Uu/GYiprz6jNtMzMfy5AMMmjE/F5AkEAuIIRhWCS0l3WcXQqhIbun0nlQVXt+cfxDu5bsdianpwpoQRiolW4q47KdKBwAJlZfuJMX3dXOipw+fUTNJSrnwJBAIPCoBnQfnCRj8CCJk7D1anTDU8vEoawgqiHbBtfqXTtWhkRvGnJIQ0XtIzAg7Sn5A7h8y4cX9wp0FQ6BRCqBPw=";
-
-        Date date = new Date();
-        String reqSeq = new SimpleDateFormat("yyyyMMddHHmmss").format(date);
-
-        String signSource = "bizContent=idCard"+""+"&hosiptalNo="+SPUtil.get(mContext,"hosiptalNo","")+"&mchntId="+SPUtil.get(mContext,"mchntId","")+"&posId="+SPUtil.get(mContext,"posId","")+"&terminal="+SPUtil.get(mContext,"termial","")+"&timestamp="+reqSeq+"";
-        Log.d("timestamp",signSource);
-        String signTarget = null;
-        try {
-            signTarget = RSASignature.sign(signSource, privateKey);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-
-
-
-        Map<String, Object> params = new HashMap<>(4);
-        params.put("logTraceId", getUUID());
-        params.put("methodCode","createOrder");
-//        params.put("mchntId", SPUtil.get(mContext,"mchntId",""));
-//        params.put("hosiptalNo", SPUtil.get(mContext,"hosiptalNo",""));
-//        params.put("terminal", SPUtil.get(mContext,"termial","")+"_5");
-        params.put("common", common.getInstance());
-        params.put("bizContent", ""+beanstr+"");
-        params.put("sign", signTarget);
-
-//        Log.d("timestamp",reqSeq);
-//        Log.d("timestamp", (String) SPUtil.get(mContext,"posId",""));
-//        Log.d("timestamp",(String) SPUtil.get(mContext,"mchntId",""));
-//        Log.d("timestamp",(String) SPUtil.get(mContext,"hosiptalNo",""));
-//        Log.d("timestamp",(String) SPUtil.get(mContext,"termial",""));
-//        Log.d("timestamp",idCard);
-//        Log.d("timestamp",""+beanstr+"");
-//        Log.d("timestamp",signTarget);
-
-        String strEntity = ConvertJavaBean.converJavaBeanToJsonNew(params);
-
-        RequestBody body = RequestBody.create(okhttp3.MediaType.parse("Content-Type:application/json;charset=UTF-8"),strEntity);
-
-//        params.put("clientVerison", FastUtil.getVersionName(App.getContext()));
+        // 除了公共的数据之外，还有其他的数据请求
+        Map<String,Object> bizContent = new HashMap<>();
+        bizContent.put("recipeId",String.valueOf(2257977));//电子处方ID
+        bizContent.put("recipeOrder",recipeOrder);//处方订单信息
+        // 请求的类型 findValidOrganProfessionForRevisit
+        RequestBody body = BodyCreate(bizContent,"createOrder",false);
         return FastTransformer.switchSchedulers(getApiService().createOrder(body).retryWhen(new FastRetryWhen()));
     }
 
     /**
-     * 获取复诊单是否已经存在
-     * 获取处方单
-     * 获取挂号单
+     * 获取复诊和处方列表
+     * 获取处方单 10 页
+     * 获取挂号单 10 页
+     * todo 会不会获取的单号过小，找不到待支付。
      */
     public Observable<GetConsultsAndRecipesResultEntity> getConsultsAndRecipes() {
         // 除了公共的数据之外，还有其他的数据请求
         Map<String,String> bizContent = new HashMap<>();
-        bizContent.put("startPage","0");
-        bizContent.put("requestMode","4");
-        bizContent.put("tabStatus","ongoing");
-        bizContent.put("recipeIndex","0");
-        bizContent.put("recipeLimit","10");
-        // 请求的类型 findValidOrganProfessionForRevisit
+        bizContent.put("startPage","0");//复诊分页开始标记(默认每页十条，从0开始)
+        bizContent.put("requestMode","4");//复诊类型,固定为4
+        bizContent.put("tabStatus","ongoing");//状态标志位,ongoing进行中tab，isover已完成tab
+        bizContent.put("recipeIndex","0");//处方分页起始位置
+        bizContent.put("recipeLimit","10");//处方每页查询量(最大不超过20)
+        // 请求的类型
         RequestBody body = BodyCreate(bizContent,"",false);
         return FastTransformer.switchSchedulers(getApiService().getConsultsAndRecipes(body).retryWhen(new FastRetryWhen()));
     }

@@ -1,6 +1,5 @@
 package com.aries.template.module.mine;
 
-import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -30,7 +29,7 @@ import butterknife.OnClick;
 
 /******
  * 已挂号界面
- *
+ * 前置必须有一个请求挂号单信息请求查询，然后把结果输入进来，如果请求成功则跳入该接口
  * @author  ::: louis luo
  * Date ::: 2022/6/16 3:45 PM
  *

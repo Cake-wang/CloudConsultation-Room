@@ -57,6 +57,7 @@ import me.yokeyword.fragmentation.anim.FragmentAnimator;
 
 /**
  * 已挂号页面
+ * 这个类已经被 OrderConsultFragment 和 OrderRecipiesFragment 所分解了。
  *
  * @author louisluo
  * @Author: AriesHoo on 2018/7/13 17:09
@@ -64,6 +65,7 @@ import me.yokeyword.fragmentation.anim.FragmentAnimator;
  * @Function: 我的
  * @Description:
  */
+@Deprecated
 public class OrderFragment extends FastTitleRefreshLoadFragment<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes.RecipeDetail> implements ISupportFragment {
     private GetConsultsAndRecipesResultEntity.QueryArrearsSummary obj;
     private  String appKey= "",tid= "";

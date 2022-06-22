@@ -1,6 +1,5 @@
 package com.aries.template.module.mine;
 
-import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -16,10 +15,8 @@ import com.aries.library.fast.util.ToastUtil;
 import com.aries.template.GlobalConfig;
 import com.aries.template.R;
 import com.aries.template.entity.FindValidDepartmentForRevisitResultEntity;
-import com.aries.template.entity.FindValidOrganProfessionForRevisitResultEntity;
 import com.aries.template.module.base.BaseEventFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
-import com.aries.template.widget.autoadopter.AutoAdaptor;
 import com.aries.template.widget.autoadopter.AutoAdaptorProxy;
 import com.aries.template.widget.autoadopter.AutoObjectAdaptor;
 import com.aries.template.widget.updownbtn.UpDownProxy;
@@ -45,8 +42,6 @@ public class DepartmentTwoFragment extends BaseEventFragment {
     public static final String KEY_ITEM_OBJECT = "key_item_object";
     /** 获取传参 一级科室组织ID 外部输入数据*/
     public static final String KEK_BUNDLE_ORGANPROFESSIONID = "key_item_organprofessionid";
-    /**  网格数据显示的最大个数 */
-    public static final int PARAM_MAX_RV_NUMBER = 9;
 
     /**
      * 输入显示对象

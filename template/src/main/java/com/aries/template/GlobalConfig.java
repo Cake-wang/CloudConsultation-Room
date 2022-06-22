@@ -1,6 +1,7 @@
 package com.aries.template;
 
 import com.aries.template.entity.SearchDoctorListByBusTypeV2ResultEntity;
+import com.decard.entitys.SSCard;
 
 /******
  * 全世界存储对象
@@ -29,9 +30,19 @@ public class GlobalConfig {
     public static  String name = "";
 
     /**
-     * 全局复诊医生信息
+     * 科室ID，当前选择的医生所在的科室
+     */
+    public static String departmentID="";
+
+    /**
+     * 复诊医生全信息
      */
     public static SearchDoctorListByBusTypeV2ResultEntity.QueryArrearsSummary.JsonResponseBean.OrganProfessionDTO.DocList.Doctor doc;
+
+    /**
+     * 用户医保卡信息，全局数据
+     */
+    public static SSCard ssCard;
 
     /**
      * 清空所有缓存数据
@@ -41,6 +52,8 @@ public class GlobalConfig {
         token="";
         name="";
         doc=null;
+        departmentID="";
+        ssCard=null;
     }
 
 }

@@ -20,6 +20,10 @@ import butterknife.BindView;
 import me.yokeyword.fragmentation.ISupportFragment;
 
 /**
+ * 显示结果页
+ * 根据传入的信息，变化各种文字和图片信息的结果页
+ *
+ * @author louisluo
  * @Author: AriesHoo on 2018/7/13 17:09
  * @E-Mail: AriesHoo@126.com
  * @Function: 我的

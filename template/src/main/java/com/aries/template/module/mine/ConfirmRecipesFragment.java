@@ -9,15 +9,23 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.aries.library.fast.retrofit.FastLoadingObserver;
 import com.aries.library.fast.util.SPUtil;
+import com.aries.library.fast.util.ToastUtil;
+import com.aries.template.GlobalConfig;
 import com.aries.template.R;
+import com.aries.template.entity.CanRequestOnlineConsultResultEntity;
+import com.aries.template.entity.CreateOrderResultEntity;
 import com.aries.template.entity.GetConsultsAndRecipesResultEntity;
 import com.aries.template.module.base.BaseEventFragment;
+import com.aries.template.module.main.HomeFragment;
+import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.template.utils.ActivityUtils;
 import com.aries.template.view.ShineButtonDialog;
 import com.aries.template.widget.autoadopter.AutoAdaptorProxy;
 import com.aries.template.widget.autoadopter.AutoObjectAdaptor;
 import com.aries.ui.view.title.TitleBarView;
+import com.trello.rxlifecycle3.android.FragmentEvent;
 import com.xuexiang.xaop.annotation.SingleClick;
 
 import java.util.ArrayList;
@@ -25,15 +33,17 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import me.yokeyword.fragmentation.SupportFragment;
 
 /******
- * 待支付处方单 界面
+ * 确认处方单
+ * 是否已经有处方需要支付为分界
  * 前置必须有一个请求处方单信息请求查询，然后把结果输入进来，如果请求成功则跳入该接口
+ * 请确认，输入本类的输入类的类型，他和 obj 还有 RV的输入类型有关系
  * @author  ::: louis luo
  * Date ::: 2022/6/16 4:54 PM
  */
-public class OrderRecipesFragment extends BaseEventFragment {
-
+public class ConfirmRecipesFragment extends BaseEventFragment {
     /** RV的存取数据的map KEY */
     private static final String KEY_ITEM_CURRENT_RECIPES = "key_item_current_recipes";
     /** 传入处理处方单的数据 */
@@ -94,9 +104,9 @@ public class OrderRecipesFragment extends BaseEventFragment {
      * 获取数据
      * @param obj 传入的数据，注意这个对象必须实现序列化
      */
-    public static OrderRecipesFragment newInstance(ArrayList<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes> obj) {
+    public static ConfirmRecipesFragment newInstance(ArrayList<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes> obj) {
         Bundle args = new Bundle();
-        OrderRecipesFragment fragment = new OrderRecipesFragment();
+        ConfirmRecipesFragment fragment = new ConfirmRecipesFragment();
         args.putSerializable("obj", obj);
         fragment.setArguments(args);
         return fragment;
@@ -127,16 +137,12 @@ public class OrderRecipesFragment extends BaseEventFragment {
         ll_order_text_r.setVisibility(View.GONE);
         ll_order_r.setVisibility(View.GONE);
         ll_prescription.setVisibility(View.VISIBLE);
-        tv_tip_message.setText("您已有处方记录，是否需要支付");
-        btn_cancel.setText("取消支付");
-        btn_inquiry.setText("去支付");
+        tv_tip_message.setVisibility(View.GONE);
+        btn_cancel.setText("取消");
+        btn_inquiry.setText("确认结算");
         tv_name.setText(SPUtil.get(mContext,"userName","")+""+SPUtil.get(mContext,"sex",""));
         tv_card.setText(SPUtil.get(mContext,"smkCard","")+"");
         tv_age_l.setText(SPUtil.get(mContext,"age","")+"");
-//            tv_dept.setText("");
-        tv_result.setText(obj.get(0).organDiseaseName);
-        tv_date.setText(obj.get(0).signDate+"");
-
         // 处理处方信息，并展示
         reflashRecyclerView(rv_contentFastLib,obj);
     }
@@ -160,8 +166,8 @@ public class OrderRecipesFragment extends BaseEventFragment {
                     showSimpleConfirmDialog();
                 break;
             case R.id.btn_inquiry:
-                    //todo 先查库存，再跳转支付页
-                     start(PayCodeFragment.newInstance(new Object()));
+                     //todo 先查询库存，再创建新处方单
+                    requestCreateOrder();
                 break;
             default:
                 break;
@@ -169,15 +175,36 @@ public class OrderRecipesFragment extends BaseEventFragment {
     }
 
     /**
+     * 确定处方单
+     */
+    public void requestCreateOrder(){
+        ApiRepository.getInstance().createOrder("","","","")
+                .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
+                .subscribe(new FastLoadingObserver<CreateOrderResultEntity>() {
+                    @Override
+                    public void _onNext(CreateOrderResultEntity entity) {
+                        if (entity == null) {
+                            ToastUtil.show("请检查网络");
+                            return;
+                        }
+                        if (entity.data.isSuccess()){
+                            start(PayCodeFragment.newInstance(new Object()));
+                        }else{
+                        }
+                    }
+                });
+    }
+
+    /**
      * 创建取消对话框
      */
     private void showSimpleConfirmDialog() {
         ShineButtonDialog dialog = new ShineButtonDialog(this.mContext);
-        dialog.tv_title_tip.setText("取消支付订单");
+        dialog.tv_title_tip.setText("取消结算");
         dialog.tv_content_tip.setText("取消后将无法再次支付，是否确认取消");
         dialog.btn_inquiry.setOnClickListener(v -> {
             dialog.dismiss();
-            // todo 取消处方单的支付返回
+                start(HomeFragment.newInstance(), SupportFragment.SINGLETASK);
         });
         dialog.btn_cancel.setOnClickListener(v -> dialog.dismiss());
         dialog.iv_close.setOnClickListener(v -> dialog.dismiss());
@@ -186,10 +213,14 @@ public class OrderRecipesFragment extends BaseEventFragment {
 
     /**
      * 获取数据后，显示处方信息列表
+     * 整个逻辑和输入的 newDatas 的类型有关系，只需要换这个类型即可
      * @param recyclerView 显示对象
      * @param newDatas 传入的数据列
      */
     protected void reflashRecyclerView(RecyclerView recyclerView, ArrayList<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes> newDatas){
+       // 安全检测
+        if (newDatas==null)
+            return;
         List<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes.RecipeDetail> allRecipe =new ArrayList<>();
         for (GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes newData : newDatas) {
             if (newData.getRecipeDetailBeans()!=null)

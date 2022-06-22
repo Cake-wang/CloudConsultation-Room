@@ -71,12 +71,14 @@ public class AutoAdaptorProxy<T>{
         adaptor.setListener(new AutoObjectAdaptor.IItemListener() {
             @Override
             public void onItemClick(AutoObjectAdaptor.ViewHolder holder, int position, Object itemData) {
-                listener.onItemClick(holder,position, ((T) itemData));
+                if (listener!=null)
+                    listener.onItemClick(holder,position, ((T) itemData));
             }
 
             @Override
             public void onItemViewDraw(AutoObjectAdaptor.ViewHolder holder, int position, Object itemData) {
-                listener.onItemViewDraw(holder,position, ((T) itemData));
+                if (listener!=null)
+                    listener.onItemViewDraw(holder,position, ((T) itemData));
             }
         });
 
@@ -84,12 +86,14 @@ public class AutoAdaptorProxy<T>{
         adaptor.setThemeListener(new AutoThemeAdaptor.IItemThemeListener() {
             @Override
             public void onClickTheme(AutoObjectAdaptor.ViewHolder holder, int position, Object itemData) {
-                themeListener.onClickTheme(holder,position, ((T) itemData));
+                if (themeListener!=null)
+                    themeListener.onClickTheme(holder,position, ((T) itemData));
             }
 
             @Override
             public void unClickTheme(AutoObjectAdaptor.ViewHolder holder, int position, Object itemData) {
-                themeListener.unClickTheme(holder,position, ((T) itemData));
+                if (themeListener!=null)
+                    themeListener.unClickTheme(holder,position, ((T) itemData));
             }
         });
     }

@@ -12,6 +12,7 @@ import com.aries.library.fast.module.fragment.FastTitleFragment;
 import com.aries.library.fast.util.SPUtil;
 import com.aries.template.MainActivity;
 import com.aries.template.R;
+import com.aries.template.module.mine.ConfirmRecipesFragment;
 import com.aries.template.module.mine.DepartmentFragment;
 import com.aries.template.module.mine.MineFragment;
 import com.aries.template.module.mine.ResultFragment;
@@ -67,10 +68,11 @@ public class HomeFragment extends FastTitleFragment implements ISupportFragment 
             public void onClick(View v) {
                 SPUtil.put(mContext,"tag","stjc");
 //                start(MineFragment.newInstance("stjc"));
-                start(DepartmentFragment.newInstance("stjc"));// todo cc
+//                start(DepartmentFragment.newInstance("stjc"));// todo cc
 //                start(PutRecordFragment.newInstance("idcard","name","smkcard"));// todo cc
 //                ((MainActivity) getActivity()).getConsultsAndRecipes();//todo cc
 //                start(ResultFragment.newInstance("cancelConsult"));
+                start(ConfirmRecipesFragment.newInstance(null));// todo cc
             }
         });
 

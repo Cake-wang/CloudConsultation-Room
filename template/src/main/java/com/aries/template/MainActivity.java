@@ -363,7 +363,7 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                                 }
                                 if (recipes.size()>0){
                                     isDepartTag = false;
-                                    start(OrderRecipesFragment.newInstance(recipes,OrderRecipesFragment.TYPE_RECIPE_OLD));
+                                    start(OrderRecipesFragment.newInstance(recipes));
                                 }
                             }
                             if (isDepartTag){

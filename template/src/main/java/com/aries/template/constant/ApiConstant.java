@@ -46,6 +46,7 @@ public class ApiConstant {
     /** 纳里复诊服务接口 */
     public static final String doBaseNgariRequest =  "ngari/revisit/doBaseNgariRequest";
 
+    /** 复诊单和挂号单 */
     public static final String getConsultsAndRecipes  =  "ngari/revisit/getConsultsAndRecipes";
 
 

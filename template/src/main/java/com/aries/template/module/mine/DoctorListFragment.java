@@ -15,10 +15,13 @@ import com.aries.library.fast.util.ToastUtil;
 import com.aries.template.GlobalConfig;
 import com.aries.template.R;
 import com.aries.template.entity.CanRequestOnlineConsultResultEntity;
+import com.aries.template.entity.FindValidDepartmentForRevisitResultEntity;
 import com.aries.template.entity.SearchDoctorListByBusTypeV2ResultEntity;
 import com.aries.template.module.base.BaseEventFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.template.widget.autoadopter.AutoAdaptor;
+import com.aries.template.widget.autoadopter.AutoAdaptorProxy;
+import com.aries.template.widget.autoadopter.AutoObjectAdaptor;
 import com.aries.template.widget.updownbtn.UpDownProxy;
 import com.aries.ui.view.title.TitleBarView;
 import com.google.gson.Gson;
@@ -51,8 +54,6 @@ public class DoctorListFragment extends BaseEventFragment {
     public static final String KEK_BUNDLE_PROFESSION = "key_item_organprofessionid";
     /** 获取传参 科室ID*/
     public static final String KEK_BUNDLE_DEPARTMENTID = "kek_bundle_departmentid";
-    /**  网格数据显示的最大个数 */
-    public static final int PARAM_MAX_RV_NUMBER = 2;
 
     /**
      * 输入显示对象
@@ -113,23 +114,23 @@ public class DoctorListFragment extends BaseEventFragment {
             public void reFlashRV(ArrayList<Map> newDatas) {
                 // 刷新时间
                 timeCount = 120;
-                AutoAdaptor adaptor =  new AutoAdaptor(recyclerView,R.layout.item_doctor,2,newDatas,getContext());
-                adaptor.setListener(new AutoAdaptor.IItemListener() {
+                AutoAdaptorProxy<Map> proxy = new AutoAdaptorProxy(recyclerView,R.layout.item_doctor,2,newDatas,getContext());
+                proxy.setListener(new AutoAdaptorProxy.IItemListener<Map>() {
                     @Override
-                    public void onItemClick(AutoAdaptor.ViewHolder holder, int position, Map itemData) {
+                    public void onItemClick(AutoObjectAdaptor.ViewHolder holder, int position, Map itemData) {
                         //进入复诊单
                         // todo 存储当前最终选择的医生信息，可以重复刷新，结束后清空
                         SearchDoctorListByBusTypeV2ResultEntity.QueryArrearsSummary.JsonResponseBean.OrganProfessionDTO.DocList.Doctor doc = ((SearchDoctorListByBusTypeV2ResultEntity.QueryArrearsSummary.JsonResponseBean.OrganProfessionDTO.DocList.Doctor) itemData.get(KEY_ITEM_CURRENT_DOC));
                         requestCanRequestOnlineConsult(doc.getDoctorId(),doc);
                     }
                     @Override
-                    public void onItemViewDraw(AutoAdaptor.ViewHolder holder, int position, Map itemData) {
+                    public void onItemViewDraw(AutoObjectAdaptor.ViewHolder holder, int position, Map itemData) {
                         SearchDoctorListByBusTypeV2ResultEntity.QueryArrearsSummary.JsonResponseBean.OrganProfessionDTO.DocList.Doctor doc = ((SearchDoctorListByBusTypeV2ResultEntity.QueryArrearsSummary.JsonResponseBean.OrganProfessionDTO.DocList.Doctor) itemData.get(KEY_ITEM_CURRENT_DOC));
                         ((TextView)holder.itemView.findViewById(R.id.jtjk_doc_item_name_tv)).setText(doc.getName());
                         ((TextView)holder.itemView.findViewById(R.id.jtjk_doc_item_introduce_tv)).setText(doc.getIntroduce());
                     }
                 });
-                adaptor.notifyDataSetChanged();
+                proxy.notifyDataSetChanged();
             }
 
             @Override
@@ -169,6 +170,7 @@ public class DoctorListFragment extends BaseEventFragment {
      */
     public void requestDoctorInfo(){
         int organid = GlobalConfig.organId;//浙大附属邵逸夫医院
+
         ApiRepository.getInstance().searchDoctorListByBusTypeV2(departmentId,profession,organid)
                 .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
                 .subscribe(new FastLoadingObserver<SearchDoctorListByBusTypeV2ResultEntity>() {
@@ -189,7 +191,7 @@ public class DoctorListFragment extends BaseEventFragment {
                             totalDatas.add(data);
                         }
                         if (totalDatas.size()>0){
-                            upDownProxy.setParamMaxNumber(9);
+                            upDownProxy.setParamMaxNumber(2);
                             upDownProxy.setTotalDatas(totalDatas);
                             upDownProxy.doStartReFlash();
                         }
@@ -211,7 +213,9 @@ public class DoctorListFragment extends BaseEventFragment {
                             return;
                         }
                         if (entity.data.isSuccess()){
-                            // 将医生信息设置为全局复诊医生信息
+                            // 请求成功，存储科室ID
+                            GlobalConfig.departmentID = departmentId;
+                            // 将医生信息存储为全局复诊医生信息
                             GlobalConfig.doc = doc;
                             // 医生可以进行复诊 跳转确认
                             start(ConfirmConsultFragment.newInstance("ok"));
