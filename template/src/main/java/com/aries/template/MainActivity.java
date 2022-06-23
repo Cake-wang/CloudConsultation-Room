@@ -66,6 +66,8 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
 
     @BindView(R.id.tabLayout_commonFastLib) CommonTabLayout mTabLayout;
     private ArrayList<FastTabEntity> mTabEntities;
+    /** 检测当前读卡请求用户状态是否进行中 */
+    private boolean isReadCardProcessing;
 
 //    @Override
 //    protected void onCreate(Bundle savedInstanceState) {
@@ -189,6 +191,16 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                 SSCard ssCard = EGovernment.EgAPP_SI_ReadSSCardInfo();
                 if(ssCard!=null){
                     Log.d("EgAPP_SI_ReadSSCardInfo",ssCard.toString());
+                    // 读卡后，发现卡的信息不一样，且不为空，判断依据是身份证 SSNum
+                    // 不在读卡页面，不在首页，则跳转回首页
+                    if (ssCard.getSSNum() != ssCard.getSSNum()){
+                        if (!(getTopFragment() instanceof HomeFragment ) || !(getTopFragment() instanceof MineFragment )){
+                            start(HomeFragment.newInstance(), SupportFragment.SINGLETASK);
+                        }
+                    }
+                    // 向全局填写当前社保卡信息
+                    GlobalConfig.ssCard = ssCard;
+                    GlobalConfig.age = getAge(Long.parseLong(ssCard.getBirthday()));
 
                     SPUtil.put(mContext,"smkCard",ssCard.getCardNum());
                     SPUtil.put(mContext,"age",getAge(Long.parseLong(ssCard.getBirthday())));
@@ -196,6 +208,8 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                     SPUtil.put(mContext,"sex",ssCard.getSex());
                     SPUtil.put(mContext,"idCard",ssCard.getSSNum());
 
+                    // 获取信息后，直接请求用户数据
+                    // todo 每3秒请求一次，可能造成资源浪费
                     readCardSuccess(ssCard.getSSNum(),ssCard.getName(),ssCard.getCardNum());
 
 
@@ -249,12 +263,24 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
         }
     }
 
-    public void readCardSuccess(String idCard,String name,String smkcard) {
 
-        ApiRepository.getInstance().findUser(idCard,mContext)
+    /**
+     * 用户信息查询
+     * @param idCard 身份证
+     */
+    public void readCardSuccess(String idCard,String name,String smkcard) {
+        if (GlobalConfig.isFindUserDone)
+            return;
+        if (isReadCardProcessing)
+            return;
+
+        Log.d("readCardSuccess","readCardSuccess");
+        // 正在执行中。。。
+        isReadCardProcessing = true;
+        // 验证用户是否注册。
+        ApiRepository.getInstance().findUser(idCard)
                 .compose(this.bindUntilEvent(ActivityEvent.DESTROY))
-                .subscribe(true ?
-                        new FastLoadingObserver<FindUserResultEntity>("请稍后...") {
+                .subscribe(new FastLoadingObserver<FindUserResultEntity>("请稍后...") {
                             @Override
                             public void _onNext(@io.reactivex.annotations.NonNull FindUserResultEntity entity) {
                                 if (entity == null) {
@@ -263,29 +289,24 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                                 }
 //                                checkVersion(entity);
                                 if (entity.isSuccess()){
-
                                     String tag = (String) SPUtil.get(mContext,"tag","fzpy");
-
                                     if (entity.getData()!=null){
+                                        GlobalConfig.isFindUserDone = true;
                                         SPUtil.put(mContext,"tid",entity.getData().getUserId());
                                         SPUtil.put(mContext,"mobile",entity.getData().getMobile());
                                         if(tag.contains("stjc")){
-
-                                            Intent intent = new Intent(Intent.ACTION_MAIN);
-                                            /**知道要跳转应用的包命与目标Activity*/
-                                            ComponentName componentName = new ComponentName("com.garea.launcher", "com.garea.launcher.login.LauncherLogin");
-                                            intent.setComponent(componentName);
-                                            intent.putExtra("userName", entity.getData().getName());//这里Intent传值
-                                            intent.putExtra("idCard", entity.getData().getIdcard());
-                                            intent.putExtra("mobile", entity.getData().getMobile());
-                                            startActivity(intent);
-
+//                                            Intent intent = new Intent(Intent.ACTION_MAIN);
+//                                            /**知道要跳转应用的包命与目标Activity*/
+//                                            ComponentName componentName = new ComponentName("com.garea.launcher", "com.garea.launcher.login.LauncherLogin");
+//                                            intent.setComponent(componentName);
+//                                            intent.putExtra("userName", entity.getData().getName());//这里Intent传值
+//                                            intent.putExtra("idCard", entity.getData().getIdcard());
+//                                            intent.putExtra("mobile", entity.getData().getMobile());
+//                                            startActivity(intent);
+                                            start(DepartmentFragment.newInstance("stjc"));// todo cc
                                         }else {
-
                                             //判断有挂号或处方
-
                                             getConsultsAndRecipes();
-
                                         }
                                     }else {
                                         if(TextUtils.isEmpty(tag)){
@@ -294,46 +315,18 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                                             start(PutRecordFragment.newInstance( idCard, name, smkcard));
                                         }
                                     }
-
-
-
                                 }else {
-
-
-
                                     ToastUtil.show(entity.getMessage());
                                 }
+                                isReadCardProcessing = false;
                             }
 
-                            @Override
-                            public void onError(Throwable e) {
-
-//                                ToastUtil.show("请检查网络和ip地址");
-                                if (true) {
-                                    super.onError(e);
-                                }
-                            }
-                        } :
-                        new FastObserver<FindUserResultEntity>() {
-                            @Override
-                            public void _onNext(@io.reactivex.annotations.NonNull FindUserResultEntity entity) {
-                                if (entity == null) {
-                                    ToastUtil.show("请检查网络");
-                                    return;
-                                }
-
-
-
-                            }
-
-                            @Override
-                            public void onError(Throwable e) {
-                                if (false) {
-                                    super.onError(e);
-                                }
-                            }
-                        });
-
+                    @Override
+                    public void _onError(Throwable e) {
+                        super._onError(e);
+                        isReadCardProcessing = false;
+                    }
+                });
     }
 
     /**

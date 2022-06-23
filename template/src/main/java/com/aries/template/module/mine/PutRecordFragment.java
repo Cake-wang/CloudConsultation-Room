@@ -1,16 +1,12 @@
 package com.aries.template.module.mine;
 
-import android.annotation.SuppressLint;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import com.aries.library.fast.retrofit.FastLoadingObserver;
 import com.aries.library.fast.util.SPUtil;
@@ -23,12 +19,8 @@ import com.aries.ui.view.title.TitleBarView;
 import com.trello.rxlifecycle3.android.FragmentEvent;
 import com.xuexiang.xaop.annotation.SingleClick;
 import com.xuexiang.xui.utils.CountDownButtonHelper;
-import com.xuexiang.xui.utils.ViewUtils;
 import com.xuexiang.xui.widget.button.roundbutton.RoundButton;
 import com.xuexiang.xui.widget.dialog.materialdialog.MaterialDialog;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatCheckBox;
@@ -42,6 +34,7 @@ import static com.aries.template.utils.RegUtils.isMobileNO;
 import static com.aries.template.utils.RegUtils.isVerifyCode;
 
 /**
+ * 手机注册界面
  * @Author: AriesHoo on 2018/7/13 17:09
  * @E-Mail: AriesHoo@126.com
  * @Function: 我的

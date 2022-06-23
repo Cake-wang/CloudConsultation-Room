@@ -187,9 +187,10 @@ public class ConfirmRecipesFragment extends BaseEventFragment {
                             ToastUtil.show("请检查网络");
                             return;
                         }
-                        if (entity.data.isSuccess()){
+                        if (entity.isSuccess()){
                             start(PayCodeFragment.newInstance(new Object()));
                         }else{
+                            ToastUtil.show(entity.message);
                         }
                     }
                 });

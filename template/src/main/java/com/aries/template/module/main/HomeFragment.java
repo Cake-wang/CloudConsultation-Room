@@ -71,8 +71,8 @@ public class HomeFragment extends FastTitleFragment implements ISupportFragment 
 //                start(DepartmentFragment.newInstance("stjc"));// todo cc
 //                start(PutRecordFragment.newInstance("idcard","name","smkcard"));// todo cc
 //                ((MainActivity) getActivity()).getConsultsAndRecipes();//todo cc
-//                start(ResultFragment.newInstance("cancelConsult"));
-                start(ConfirmRecipesFragment.newInstance(null));// todo cc
+//                start(ResultFragment.newInstance("cancelConsult"));//todo ccss
+//                start(ConfirmRecipesFragment.newInstance(null));// todo cc
             }
         });
 

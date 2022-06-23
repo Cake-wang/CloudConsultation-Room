@@ -33,6 +33,7 @@ public abstract class BaseTimerFragment extends BaseFragmentationFragment{
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
+                if (getActivity()!=null)
                 getActivity().runOnUiThread(() -> timeProcess());
             }
         },0,1000);

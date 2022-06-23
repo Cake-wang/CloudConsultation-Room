@@ -65,12 +65,13 @@ public abstract class BaseRepository {
     /**
      * 输入到通信的body创造工程
      * 由于是一个统一的网络请求，通过methodcode来调用不同的方法，所以需要输入methodCode
-     * @param isBizArray bizcontent 是否为 array。
+     * @param isBizArray bizcontent 是否为 array。有些请求，bizcontent是个字符串
      */
     protected RequestBody BodyCreate(Map map,String methodCode,boolean isBizArray){
 // bizContent 结构数据信息补全
         Map<String,String> bizContent = new HashMap<>();
         bizContent.put("appKey", ApiConstant.NALI_APPKEY);
+//        bizContent.put("appkey", ApiConstant.NALI_APPKEY);//todo cc
 //        bizContent.put("tid",ApiConstant.NALI_TID);
         bizContent.put("tid","tid_eric_1");
         bizContent.putAll(map);
@@ -94,8 +95,10 @@ public abstract class BaseRepository {
         ApiRepository.common.getInstance().machineId = "SY0001";
 //        ApiRepository.common.getInstance().userId = "2fcd34d6dde742098737b10ff0fddd9a";
         ApiRepository.common.getInstance().userId = "tid_eric_1";
+//        ApiRepository.common.getInstance().userId = "5e63e9b0906e42d4a6866175c0e4163e";
 //        final String  logTraceId = "eebcbbcf2c664c28a671e980265c6c76";//getUUID();
         final String  logTraceId = "eebcbbcf2c664c28a671e980265c6c76";//getUUID();
+//        final String  logTraceId = "1653534697397";//getUUID();
 
         final Map<String, Object> params = new HashMap<>(4);
         params.put("logTraceId", logTraceId);

@@ -39,8 +39,10 @@ public class ApiConstant {
 //查询激活状态
     public static final String isRegister  =  "ngariUserRelation/isRegister";
 
+    /** 用户信息查询 */
     public static final String findUser  =  "ngariUserRelation/findUser";
 
+    /** 用户注册 */
     public static final String register  =  "ngariUserRelation/register";
 
     /** 纳里复诊服务接口 */

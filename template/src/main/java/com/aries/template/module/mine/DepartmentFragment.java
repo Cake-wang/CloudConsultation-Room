@@ -161,7 +161,7 @@ public class DepartmentFragment extends BaseEventFragment {
      */
     public void requestLevelOne(){
         int organid = GlobalConfig.organId;//浙大附属邵逸夫医院
-        ApiRepository.getInstance().findValidOrganProfessionForRevisit(organid, getContext())
+        ApiRepository.getInstance().findValidOrganProfessionForRevisit(organid)
                 .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
                 .subscribe(new FastLoadingObserver<FindValidOrganProfessionForRevisitResultEntity>() {
                     @Override
