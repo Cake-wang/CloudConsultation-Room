@@ -201,25 +201,32 @@ public class App extends MultiDexApplication {
 
         }
 
+
+
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     private boolean isIgnoringBatteryOptimizations() {
+        Log.d("111111MODEL", "22222MODEL");
         boolean isIgnoring = false;
         PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
         if (powerManager != null) {
             isIgnoring = powerManager.isIgnoringBatteryOptimizations(getPackageName());
         }
+        Log.d("111111MODEL", isIgnoring+"");
         return isIgnoring;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     public void requestIgnoreBatteryOptimizations() {
         try {
+            Log.d("111111MODEL", "33333MODEL");
             Intent intent = new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
             intent.setData(Uri.parse("package:" + getPackageName()));
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
         } catch (Exception e) {
+            Log.d("111111MODEL", "44444MODEL");
             e.printStackTrace();
         }
     }

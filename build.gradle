@@ -26,6 +26,7 @@ allprojects {
         maven { url "https://jitpack.io" }//FastLib 及部分三方库通过JitPack发布需添加才可依赖
         //蒲公英
         maven { url "https://raw.githubusercontent.com/Pgyer/mvn_repo_pgyer/master" }
+        maven { url 'http://123.56.4.237:8081/repository/mobile-releases/' }
     }
 }
 

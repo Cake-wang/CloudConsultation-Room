@@ -90,7 +90,9 @@ dependencies {
     implementation 'com.scwang.smart:refresh-header-material:'.concat(smartRefreshLayoutVersion)
     //Glide图片加载
     implementation 'com.github.bumptech.glide:glide:'.concat(glideVersion)
-    implementation files('libs\\dc_mate_202205111943.jar')
+//    implementation files('libs\\dc_mate_202112081745.jar')
+    implementation files('libs\\dc_mate_202103191429.jar')
+//    implementation files('libs\\dc_mate_202205111943.jar')
     annotationProcessor 'com.github.bumptech.glide:compiler:'.concat(glideVersion)
     annotationProcessor 'com.jakewharton:butterknife-compiler:'.concat(butterknifeVersion)
     //以上库FastLib里使用compileOnly只是编译,使用时需根据项目选择相应版本
@@ -101,5 +103,7 @@ dependencies {
     implementation 'com.github.xuexiangjys.XAOP:xaop-runtime:1.1.0'
 // XQRCode二维码扫描
     implementation 'com.github.xuexiangjys:XQRCode:1.1.0'
+    implementation 'com.decard.mobile:logansdk-utils:3.1.00'
+    implementation 'com.decard.mobile:dc-licensesdk:3.3.11'
 
 }

@@ -124,6 +124,8 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
 
         //打开端口，usb模式，打开之前必须确保已经获取到USB权限，返回值为设备句柄号。
         int devHandle = BasicOper.dc_open("AUSB",this,"",0);
+//        int devHandle = BasicOper.dc_open("AUSB",this,"/dev/ttyHSL1",115200);
+
 //        int devHandle = BasicOper.dc_open("COM",null,"/dev/ttyS0",115200);
         Log.d("111111MODEL", devHandle+"");
         if(devHandle>0){
@@ -150,6 +152,7 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
     }
 
     private void readCardNew() {
+        Log.d("111111MODEL", getTopFragment()+"");
         if (getTopFragment() instanceof HomeFragment){
 
             return;
@@ -158,7 +161,7 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
 
         if (getTopFragment() instanceof MineFragment){
 
-            //社保卡上电
+//            //社保卡上电
             boolean bCardPowerOn = false;
             String result = null;
             String[] resultArr = null;
@@ -172,6 +175,17 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
             }
             //读取社保卡基本信息
             if(bCardPowerOn){
+
+//            byte info[] = new byte[256];
+//            long ret = SSCardDriver.iReadCardBas(1,info);
+//            try {
+//                ToastUtil.show("iReadCardBas: ret:"+ret+" info:"+new String(info,"gbk").trim());
+//                Log.d("TAG", "iReadCardBas: ret:"+ret+" info:"+new String(info,"gbk").trim());
+//            }
+//            catch (UnsupportedEncodingException e) {
+//                e.printStackTrace();
+//            }
+
                 SSCard ssCard = EGovernment.EgAPP_SI_ReadSSCardInfo();
                 if(ssCard!=null){
                     Log.d("EgAPP_SI_ReadSSCardInfo",ssCard.toString());
@@ -186,11 +200,12 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
 
 
 
-                    if (mDisposable != null) {mDisposable.dispose();}
+//                    if (mDisposable != null) {mDisposable.dispose();}
                 }else{
                     if (mDisposable != null) {mDisposable.dispose();}
                     Log.d("EgAPP_SI_ReadSSCardInfo","读取社保卡信息失败");
-                }}
+                }
+            }
             //社保卡下电
             if(bCardPowerOn){
                 result = EGovernment.EgAPP_SI_CardPowerOff(1);
