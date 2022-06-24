@@ -59,6 +59,13 @@ public class MineFragment extends BaseEventFragment{
     }
 
     @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        if (!hidden)
+            GlobalConfig.isFindUserDone = false;
+    }
+
+    @Override
     public void onStart() {
         super.onStart();
         // 每次进入读卡界面，会重置请求用户数据，检测是否已经注册

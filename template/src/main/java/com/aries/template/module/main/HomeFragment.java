@@ -67,7 +67,7 @@ public class HomeFragment extends FastTitleFragment implements ISupportFragment 
             @Override
             public void onClick(View v) {
                 SPUtil.put(mContext,"tag","stjc");
-//                start(MineFragment.newInstance("stjc"));
+                start(MineFragment.newInstance("stjc"));
 //                start(DepartmentFragment.newInstance("stjc"));// todo cc
 //                start(PutRecordFragment.newInstance("idcard","name","smkcard"));// todo cc
 //                ((MainActivity) getActivity()).getConsultsAndRecipes();//todo cc

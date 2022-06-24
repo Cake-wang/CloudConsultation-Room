@@ -37,11 +37,11 @@ import java.util.Map;
 public class AutoAdaptorProxy<T>{
 
     /** RV 数据代理对象, 这里不需要管理数据，数据统一由 adaptor管理，这里只规定输入数据的类型 */
-    private AutoThemeAdaptor adaptor;
+    protected AutoThemeAdaptor adaptor;
     /** item 监听对象 */
-    private IItemListener<T> listener;
+    protected IItemListener<T> listener;
     /** item 样式监听对象 */
-    public IItemThemeListener<T> themeListener;
+    protected IItemThemeListener<T> themeListener;
 
     public AutoAdaptorProxy(RecyclerView recyclerView, @LayoutRes int res, int spanCount , List<T> data, Context context){
         this(recyclerView,res,spanCount,new ArrayList<>(data),context);

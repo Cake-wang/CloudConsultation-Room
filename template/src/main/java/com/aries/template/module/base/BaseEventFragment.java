@@ -11,6 +11,7 @@ import com.aries.template.R;
 import com.aries.template.module.main.HomeFragment;
 import com.aries.template.utils.ActivityUtils;
 import com.aries.template.utils.DateUtils;
+import com.aries.template.utils.DefenceUtil;
 
 import me.yokeyword.fragmentation.SupportFragment;
 
@@ -48,9 +49,17 @@ public abstract class BaseEventFragment extends BaseTimerFragment{
         btnMain = this.getView().findViewById(R.id.btn_main);
         tvShowTimer = this.getView().findViewById(R.id.jtjk_fz_fragment_timer);
         if (btnBack !=null)
-            btnBack.setOnClickListener(v -> pop());
+            btnBack.setOnClickListener(v -> {
+                if (DefenceUtil.checkReSubmit("btn_back")) {
+                    pop();
+                }
+            });
         if (btnMain !=null)
-            btnMain.setOnClickListener(v -> gotoMain());
+            btnMain.setOnClickListener(v ->{
+                if (DefenceUtil.checkReSubmit("btn_main")) {
+                    gotoMain();
+                }
+            });
     }
 
     @Override

@@ -22,6 +22,8 @@ import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.template.widget.autoadopter.AutoAdaptor;
 import com.aries.template.widget.autoadopter.AutoAdaptorProxy;
 import com.aries.template.widget.autoadopter.AutoObjectAdaptor;
+import com.aries.template.widget.autoadopter.DefenceAutoAdaptorProxy;
+import com.aries.template.widget.updownbtn.DefenceUpDownProxy;
 import com.aries.template.widget.updownbtn.UpDownProxy;
 import com.aries.ui.view.title.TitleBarView;
 import com.google.gson.Gson;
@@ -72,7 +74,7 @@ public class DoctorListFragment extends BaseEventFragment {
     /** 网络获取的全一级科室数据 */
     private ArrayList<Map> totalDatas;
     /** 上一页，下一页管理器 */
-    private UpDownProxy<Map> upDownProxy;
+    private DefenceUpDownProxy<Map> upDownProxy;
 
     @BindView(R.id.btn_cancel)
     Button btn_cancel;// 上一页按钮
@@ -108,13 +110,13 @@ public class DoctorListFragment extends BaseEventFragment {
         departmentId = getArguments().getString(KEK_BUNDLE_DEPARTMENTID);
         profession = getArguments().getString(KEK_BUNDLE_PROFESSION);
         // 创建 上一页，下一页管理器
-        upDownProxy = new UpDownProxy<>();
+        upDownProxy = new DefenceUpDownProxy<>();
         upDownProxy.setOnEventListener(new UpDownProxy.EventListener<Map>() {
             @Override
             public void reFlashRV(ArrayList<Map> newDatas) {
                 // 刷新时间
                 timeCount = 120;
-                AutoAdaptorProxy<Map> proxy = new AutoAdaptorProxy(recyclerView,R.layout.item_doctor,2,newDatas,getContext());
+                DefenceAutoAdaptorProxy<Map> proxy = new DefenceAutoAdaptorProxy(recyclerView,R.layout.item_doctor,2,newDatas,getContext());
                 proxy.setListener(new AutoAdaptorProxy.IItemListener<Map>() {
                     @Override
                     public void onItemClick(AutoObjectAdaptor.ViewHolder holder, int position, Map itemData) {

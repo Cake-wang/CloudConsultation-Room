@@ -6,6 +6,7 @@ import com.aries.library.fast.retrofit.FastNullException;
 import com.aries.library.fast.retrofit.FastRetryWhen;
 import com.aries.library.fast.retrofit.FastTransformer;
 import com.aries.library.fast.util.SPUtil;
+import com.aries.template.GlobalConfig;
 import com.aries.template.constant.ApiConstant;
 import com.aries.template.utility.ConvertJavaBean;
 import com.aries.template.utility.RSASignature;
@@ -70,10 +71,9 @@ public abstract class BaseRepository {
     protected RequestBody BodyCreate(Map map,String methodCode,boolean isBizArray){
 // bizContent 结构数据信息补全
         Map<String,String> bizContent = new HashMap<>();
-        bizContent.put("appKey", ApiConstant.NALI_APPKEY);
+        bizContent.put("appKey", GlobalConfig.NALI_APPKEY);
 //        bizContent.put("appkey", ApiConstant.NALI_APPKEY);//todo cc
-//        bizContent.put("tid",ApiConstant.NALI_TID);
-        bizContent.put("tid","tid_eric_1");
+        bizContent.put("tid",GlobalConfig.NALI_TID);
         bizContent.putAll(map);
 
         ArrayList<Map> maps = new ArrayList<>();
@@ -92,16 +92,12 @@ public abstract class BaseRepository {
         // 数据加密
 
         // 创建body
-        ApiRepository.common.getInstance().machineId = "SY0001";
-//        ApiRepository.common.getInstance().userId = "2fcd34d6dde742098737b10ff0fddd9a";
-        ApiRepository.common.getInstance().userId = "tid_eric_1";
-//        ApiRepository.common.getInstance().userId = "5e63e9b0906e42d4a6866175c0e4163e";
+        ApiRepository.common.getInstance().machineId = GlobalConfig.machineId;
+        ApiRepository.common.getInstance().userId = GlobalConfig.NALI_TID;
 //        final String  logTraceId = "eebcbbcf2c664c28a671e980265c6c76";//getUUID();
-        final String  logTraceId = "eebcbbcf2c664c28a671e980265c6c76";//getUUID();
-//        final String  logTraceId = "1653534697397";//getUUID();
 
         final Map<String, Object> params = new HashMap<>(4);
-        params.put("logTraceId", logTraceId);
+        params.put("logTraceId", ApiRepository.getUUID());//getUUID 请求日志ID唯一识别流水ID，32位，推荐使用UUID
         params.put("methodCode",methodCode);
         params.put("common", ApiRepository.common.getInstance());
         if (isBizArray)

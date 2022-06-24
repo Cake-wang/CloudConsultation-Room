@@ -31,6 +31,7 @@ import com.aries.template.entity.UpdateEntity;
 import com.aries.template.retrofit.service.ApiService;
 import com.aries.template.utility.ConvertJavaBean;
 import com.aries.template.utility.RSASignature;
+import com.aries.template.utils.DefenceUtil;
 import com.aries.template.widget.mgson.MFastRetrofit;
 import com.decard.NDKMethod.BasicOper;
 

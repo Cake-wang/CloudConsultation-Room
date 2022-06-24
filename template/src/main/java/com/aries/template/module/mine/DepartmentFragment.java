@@ -15,6 +15,8 @@ import com.aries.template.module.base.BaseEventFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.template.widget.autoadopter.AutoAdaptorProxy;
 import com.aries.template.widget.autoadopter.AutoObjectAdaptor;
+import com.aries.template.widget.autoadopter.DefenceAutoAdaptorProxy;
+import com.aries.template.widget.updownbtn.DefenceUpDownProxy;
 import com.aries.template.widget.updownbtn.UpDownProxy;
 import com.aries.ui.view.title.TitleBarView;
 import com.trello.rxlifecycle3.android.FragmentEvent;
@@ -56,7 +58,7 @@ public class DepartmentFragment extends BaseEventFragment {
     /** 网络获取的全一级科室数据 */
     private ArrayList<Map> totalDatas;
     /** 上一页，下一页管理器 */
-    private UpDownProxy<Map> upDownProxy;
+    private DefenceUpDownProxy<Map> upDownProxy;
 
     @BindView(R.id.btn_cancel)
     Button btn_cancel;// 上一页按钮
@@ -83,13 +85,13 @@ public class DepartmentFragment extends BaseEventFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // 创建 上一页，下一页管理器
-        upDownProxy = new UpDownProxy<>();
+        upDownProxy = new DefenceUpDownProxy<>();
         upDownProxy.setOnEventListener(new UpDownProxy.EventListener<Map>() {
             @Override
             public void reFlashRV(ArrayList<Map> newDatas) {
                 // 刷新时间
                 timeCount = 120;
-                AutoAdaptorProxy<Map> proxy = new AutoAdaptorProxy(recyclerView,R.layout.item_dept,3,newDatas,getContext());
+                DefenceAutoAdaptorProxy<Map> proxy = new DefenceAutoAdaptorProxy(recyclerView,R.layout.item_dept,3,newDatas,getContext());
                 proxy.setListener(new AutoAdaptorProxy.IItemListener<Map>() {
                     @Override
                     public void onItemClick(AutoObjectAdaptor.ViewHolder holder, int position, Map itemData) {

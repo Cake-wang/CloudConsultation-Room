@@ -11,10 +11,18 @@ import com.decard.entitys.SSCard;
  */
 public class GlobalConfig {
 
-    /**
-     *  全世界网络通信凭据
-     */
-    public static String token = "";
+    /** 由纳里平台分配的公司标识，固定写死 */
+    public static final String NALI_APPKEY = "app_web";
+
+    /** 由纳里平台分配 第三方平台用户唯一主键，在findUser里面取的 */
+    // todo 获取 findUser
+    public static String NALI_TID = "tid_eric_1";
+
+
+
+    /** 机器编号 从获取机构编号，组织代码，机器编号的接口一并返回 */
+    // todo 机器编号
+    public static String machineId = "SY0001";
 
     /**
      * 组织代码
@@ -22,7 +30,13 @@ public class GlobalConfig {
      * 目前ID是根据机器的ID，发送到后端，后端返回组织代码给机器。
      * 一台机器的组织代码是固定的。
      */
+    // todo 获取机构编号
     public static int organId = 1;
+
+    /**
+     *  全世界网络通信凭据
+     */
+    public static String token = "";
 
     /**
      * 用户的年龄信息
