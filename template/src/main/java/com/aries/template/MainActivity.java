@@ -4,7 +4,6 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -14,7 +13,6 @@ import com.aries.library.fast.entity.FastTabEntity;
 import com.aries.library.fast.manager.LoggerManager;
 import com.aries.library.fast.module.activity.FastMainActivity;
 import com.aries.library.fast.retrofit.FastLoadingObserver;
-import com.aries.library.fast.retrofit.FastObserver;
 import com.aries.library.fast.util.SPUtil;
 import com.aries.library.fast.util.ToastUtil;
 import com.aries.template.entity.FindUserResultEntity;
@@ -98,27 +96,9 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
         mTabLayout.setVisibility(View.GONE);
     }
 
-    @Override
-    public void loadData() {
-
-        Log.d("111111MODEL", "111111MODEL");
 
 
-
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                /**
-                 *要执行的操作
-                 */
-                openSerialport();
-            }
-        }, 500);//3秒后执行Runnable中的run方法
-
-    }
-
-    private void openSerialport() {
+    public void openSerialport() {
 
         Log.d("111111MODEL", Build.MODEL);
 
@@ -144,20 +124,27 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
     /**
      * 定时循环任务
      */
-    private void timeLoop() {
+    public void timeLoop() {
+        if (mDisposable == null){
+            mDisposable = Observable.interval(DELAY, PERIOD, TimeUnit.MILLISECONDS)
+                    .map((aLong -> aLong + 1))
+                    .delay(PERIOD, TimeUnit.MILLISECONDS, true)       // 设置delayError为true，表示出现错误的时候也需要延迟5s进行通知，达到无论是请求正常还是请求失败，都是5s后重新订阅，即重新请求。
+                    .subscribeOn(Schedulers.io())
+                    .repeat()   // repeat保证请求成功后能够重新订阅。
+                    .retry()    // retry保证请求失败后能重新订阅
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(aLong -> readCardNew());//getUnreadCount()执行的任务
+        }
 
-        mDisposable = Observable.interval(DELAY, PERIOD, TimeUnit.MILLISECONDS)
-                .map((aLong -> aLong + 1))
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(aLong -> readCardNew());//getUnreadCount()执行的任务
     }
 
-    private void readCardNew() {
+    public void readCardNew() {
 //        if (fakeFunction())// todo cc
 //            return;
         Log.d("111111MODEL", getTopFragment()+"");
         if (getTopFragment() instanceof HomeFragment){
+            if (mDisposable != null) {mDisposable.dispose();}
+            BasicOper.dc_exit();
             return;
         }
 

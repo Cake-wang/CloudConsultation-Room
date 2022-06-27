@@ -1,33 +1,17 @@
 package com.aries.template.module.mine;
 
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
-import android.text.TextUtils;
+import android.os.Handler;
 import android.util.Log;
 
-import com.aries.library.fast.retrofit.FastLoadingObserver;
-import com.aries.library.fast.util.SPUtil;
-import com.aries.library.fast.util.ToastUtil;
 import com.aries.template.GlobalConfig;
+import com.aries.template.MainActivity;
 import com.aries.template.R;
-import com.aries.template.entity.FindUserResultEntity;
 import com.aries.template.module.base.BaseEventFragment;
-import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.ui.view.title.TitleBarView;
-import com.decard.NDKMethod.BasicOper;
-import com.decard.NDKMethod.EGovernment;
-import com.decard.entitys.SSCard;
-import com.trello.rxlifecycle3.android.FragmentEvent;
-
-import java.util.concurrent.TimeUnit;
 
 import androidx.annotation.Nullable;
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.annotations.NonNull;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
 
 /**
  * 医保卡
@@ -59,6 +43,26 @@ public class MineFragment extends BaseEventFragment{
     }
 
     @Override
+    public void loadData() {
+
+        Log.d("111111MODEL", "111111MODEL");
+
+
+
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                /**
+                 *要执行的操作
+                 */
+                ((MainActivity)getActivity()).openSerialport();
+            }
+        }, 500);//3秒后执行Runnable中的run方法
+
+    }
+
+    @Override
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
         if (!hidden)
@@ -87,4 +91,9 @@ public class MineFragment extends BaseEventFragment{
     public void initView(Bundle savedInstanceState) {
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+    }
 }
