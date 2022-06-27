@@ -10,11 +10,10 @@ import com.aries.library.fast.retrofit.FastRetryWhen;
 import com.aries.library.fast.retrofit.FastTransformer;
 import com.aries.library.fast.util.SPUtil;
 import com.aries.library.fast.util.ToastUtil;
-import com.aries.template.constant.ApiConstant;
+import com.aries.template.entity.AuthCodeResultEntity;
 import com.aries.template.entity.BaseMovieEntity;
 import com.aries.template.entity.CanRequestOnlineConsultResultEntity;
 import com.aries.template.entity.CancelregisterResultEntity;
-import com.aries.template.entity.CreateOrderRequestEntity;
 import com.aries.template.entity.CreateOrderResultEntity;
 import com.aries.template.entity.FindUserResultEntity;
 import com.aries.template.entity.FindValidDepartmentForRevisitResultEntity;
@@ -31,7 +30,6 @@ import com.aries.template.entity.UpdateEntity;
 import com.aries.template.retrofit.service.ApiService;
 import com.aries.template.utility.ConvertJavaBean;
 import com.aries.template.utility.RSASignature;
-import com.aries.template.utils.DefenceUtil;
 import com.aries.template.widget.mgson.MFastRetrofit;
 import com.decard.NDKMethod.BasicOper;
 
@@ -315,6 +313,7 @@ public class ApiRepository extends BaseRepository {
 
     /**
      * 用户信息查询
+     * 用于验证用户是否注册。
      * @param idCard 身份证 可能对应 SSNUM
      */
     public Observable<FindUserResultEntity> findUser(String idCard) {
@@ -328,29 +327,47 @@ public class ApiRepository extends BaseRepository {
 
     /**
      * 通过手机号注册
+     * @param idCard 证件号码
+     * @param name 姓名
+     * @param mobile 手机号
+     * @param authCode 验证码
+     * @param authCodeId 验证码ID
      */
-    public Observable<RegisterResultEntity> register(String idCard,String name,String mobile) {
+    public Observable<RegisterResultEntity> register(String idCard,String name,String mobile,String authCode,String authCodeId) {
         // 除了公共的数据之外，还有其他的数据请求
         Map<String,String> bizContent = new HashMap<>();
-//        bizContent.put("idCard",idCard);
-        bizContent.put("idCard","33052219861229693X");
-//        bizContent.put("name",name);
-        bizContent.put("name","王郭亮");
-//        bizContent.put("mobile",mobile);
-        bizContent.put("mobile","18667115892");
+        bizContent.put("idCard",idCard);
+        bizContent.put("name",name);
+        bizContent.put("mobile",mobile);
+        bizContent.put("authCode",authCode);
+        bizContent.put("authCodeId",authCodeId);
         // 请求的类型 findValidOrganProfessionForRevisit
         RequestBody body = BodyCreate(bizContent,"",false);
         return FastTransformer.switchSchedulers(getApiService().register(body).retryWhen(new FastRetryWhen()));
     }
 
     /**
+     * 手机号验证码
+     * 获取手机号注册的验证码
+     * 这个接口只在申请注册的时候，使用
+     * 这个验证码会以手机短信的形式注册在
+     */
+    public Observable<AuthCodeResultEntity> authCode(String mobile) {
+        // 除了公共的数据之外，还有其他的数据请求
+        Map<String,String> bizContent = new HashMap<>();
+        bizContent.put("phoneNo",mobile);
+        // 请求的类型 findValidOrganProfessionForRevisit
+        RequestBody body = BodyCreate(bizContent,"",false);
+        return FastTransformer.switchSchedulers(getApiService().getAuthCode(body).retryWhen(new FastRetryWhen()));
+    }
+
+    /**
      * 取消待支付挂号单
-     * @param consultId
+     * @param consultId 挂号单单号
      */
     public Observable<CancelregisterResultEntity> patientCancelGraphicTextConsult(Integer consultId) {
         Map<String,String> bizContent = new HashMap<>();
-//        bizContent.put("consultId",String.valueOf(consultId));
-        bizContent.put("consultId","815423835");
+        bizContent.put("consultId",String.valueOf(consultId));
         RequestBody body = BodyCreate(bizContent,"patientCancelGraphicTextConsult");
         return FastTransformer.switchSchedulers(getApiService().patientCancelGraphicTextConsult(body).retryWhen(new FastRetryWhen()));
     }
@@ -403,12 +420,9 @@ public class ApiRepository extends BaseRepository {
             int organId){
         // 除了公共的数据之外，还有其他的数据请求
         Map<String,String> bizContent = new HashMap<>();
-//        bizContent.put("departmentId",String.valueOf(departmentId));
-        bizContent.put("departmentId",String.valueOf(18804));
-//        bizContent.put("profession",String.valueOf(profession));
-        bizContent.put("profession",String.valueOf(444986));
-//        bizContent.put("organId",String.valueOf(organId));
-        bizContent.put("organId",String.valueOf(2000300));
+        bizContent.put("departmentId",String.valueOf(departmentId));
+        bizContent.put("profession",String.valueOf(profession));
+        bizContent.put("organId",String.valueOf(organId));
         bizContent.put("sortKey",String.valueOf(1));//排序类型(1:综合排序，2:复诊价格排序，3:复诊量排序，4: 好评排序)
         bizContent.put("recipeConsultSourceFlag",String.valueOf(2));//医生类型(1：平台排班，2：无排班，3：his排班，4：医生自主排班)
         bizContent.put("start",String.valueOf(0));//开始index点//todo 这个是否需要，还是一次性拿出来？
@@ -438,40 +452,43 @@ public class ApiRepository extends BaseRepository {
      * @param consultOrgan 复诊医生机构
      * @param consultDepart 复诊医生科室
      * @param consultDoctor 复诊医生
+     * @param mpiid userId
      */
     public Observable<RequestConsultAndCdrOtherdocResultEntity> requestConsultAndCdrOtherdoc(Long consultOrgan,
+                                                                                             String mpiid,
                                                                                              String consultDepart,
                                                                                              Long consultDoctor) {
-        Map<String,String> questionnaire =new HashMap<>(); //问卷单对象（详见questionnaire详细描述）
-        questionnaire.put("pregnent",String.valueOf(0)); //是否怀孕 -1：男 0:无 1:有
-//        questionnaire.put("pregnentMemo","");
-        questionnaire.put("alleric",String.valueOf(0));//有无过敏史 0:无 1:有
-//        questionnaire.put("allericMemo","");
-        questionnaire.put("proposedDrugs","鲜铁皮石斛");//既往用药（多个药品用、隔开）
-        questionnaire.put("haveReaction",String.valueOf(0));//服药后不良反应 0:无 1:有
-//        questionnaire.put("haveReactionMemo","");
-        questionnaire.put("disease","");//确诊疾病
-        questionnaire.put("confirmedDate","");//确诊时间，如 2019-04-03
-//        questionnaire.put("returnVisitStatus",String.valueOf(1));
-
-        Map<String,String> cdrOtherdocs =new HashMap<>(); //病历数据
-        cdrOtherdocs.put("docType",String.valueOf(9));//文档类型，默认填9 0门诊病历 1检验报告 2检查报告 10体检报告 3处方 4治疗记录 5住院病历 6医嘱 7医学影像 8病患部位 9其他
-        cdrOtherdocs.put("docName","20210522135342oz0d.jpg");//文件名，包含后缀
-        cdrOtherdocs.put("docFormat",String.valueOf(13));//文档格式 01 CDA； 02 BSXML； 11 HTMLX；12 PDF； 13 JPG
-        cdrOtherdocs.put("docContent","60a89c66f0f97817f591851c");//文件上传或返回的文件id
+//        Map<String,String> questionnaire =new HashMap<>(); //问卷单对象（详见questionnaire详细描述）
+//        questionnaire.put("pregnent",String.valueOf(0)); //是否怀孕 -1：男 0:无 1:有
+////        questionnaire.put("pregnentMemo","");
+//        questionnaire.put("alleric",String.valueOf(0));//有无过敏史 0:无 1:有
+////        questionnaire.put("allericMemo","");
+//        questionnaire.put("proposedDrugs","鲜铁皮石斛");//既往用药（多个药品用、隔开）
+//        questionnaire.put("haveReaction",String.valueOf(0));//服药后不良反应 0:无 1:有
+////        questionnaire.put("haveReactionMemo","");
+//        questionnaire.put("disease","");//确诊疾病
+//        questionnaire.put("confirmedDate","");//确诊时间，如 2019-04-03
+////        questionnaire.put("returnVisitStatus",String.valueOf(1));
+//
+//        Map<String,String> cdrOtherdocs =new HashMap<>(); //病历数据
+//        cdrOtherdocs.put("docType",String.valueOf(9));//文档类型，默认填9 0门诊病历 1检验报告 2检查报告 10体检报告 3处方 4治疗记录 5住院病历 6医嘱 7医学影像 8病患部位 9其他
+//        cdrOtherdocs.put("docName","20210522135342oz0d.jpg");//文件名，包含后缀
+//        cdrOtherdocs.put("docFormat",String.valueOf(13));//文档格式 01 CDA； 02 BSXML； 11 HTMLX；12 PDF； 13 JPG
+//        cdrOtherdocs.put("docContent","60a89c66f0f97817f591851c");//文件上传或返回的文件id
 
         Map<String,Object> bizContent = new HashMap<>();
 //        bizContent.put("appClientType",String.valueOf(appClientType));
-        bizContent.put("mpiid","2c95818f80b0ab390180b0db16ea0000");//就诊人索引
+//        bizContent.put("mpiid","2c95818f80b0ab390180b0db16ea0000");//就诊人索引
+        bizContent.put("mpiid",mpiid);//就诊人索引
         bizContent.put("appClientType","APP_WEB");//由纳里平台分配的公司标识，固定写死
         bizContent.put("appType","ngari-health");//由纳里平台分配的公司标识，固定写死
         bizContent.put("requestMode",String.valueOf(4));//类型，复诊固定为4
-        bizContent.put("consultOrgan",String.valueOf(2000300));//复诊医生机构
-//        bizContent.put("consultOrgan",String.valueOf(consultOrgan));//复诊医生机构
-        bizContent.put("consultDepart",String.valueOf(18804));//复诊医生科室
-//        bizContent.put("consultDepart",String.valueOf(consultDepart));//复诊医生科室
-        bizContent.put("consultDoctor",String.valueOf(111733));//复诊医生
-//        bizContent.put("consultDoctor",String.valueOf(consultDoctor));//复诊医生
+//        bizContent.put("consultOrgan",String.valueOf(2000300));//复诊医生机构
+        bizContent.put("consultOrgan",String.valueOf(consultOrgan));//复诊医生机构
+//        bizContent.put("consultDepart",String.valueOf(18804));//复诊医生科室
+        bizContent.put("consultDepart",String.valueOf(consultDepart));//复诊医生科室
+//        bizContent.put("consultDoctor",String.valueOf(111733));//复诊医生
+        bizContent.put("consultDoctor",String.valueOf(consultDoctor));//复诊医生
 //        bizContent.put("consultCost",String.valueOf(0));
 //        bizContent.put("consultPrice",String.valueOf(0));
 //        bizContent.put("leaveMess","");
@@ -597,13 +614,13 @@ public class ApiRepository extends BaseRepository {
     /**
      * 确认处方单信息并结算
      */
-    public Observable<CreateOrderResultEntity> createOrder(String recipeId, String payway, String decoctionFlag, String gfFeeFlag) {
+    public Observable<CreateOrderResultEntity> createOrder(String recipeId, String payway, String decoctionFlag, String payMode) {
         Map<String,String> recipeOrder =new HashMap<>(); //病历数据
-        recipeOrder.put("payway",String.valueOf(111));//支付类型代码 微信：40 卫宁付：111
-        recipeOrder.put("decoctionFlag",String.valueOf(0));//是否代煎 1：代煎，0：不代煎
+        recipeOrder.put("payway",payway);//支付类型代码 微信：40 卫宁付：111
+        recipeOrder.put("decoctionFlag",decoctionFlag);//是否代煎 1：代煎，0：不代煎
 //        recipeOrder.put("gfFeeFlag",String.valueOf(0));//是否收取制作费 1：表示需要制作费，0：不需要
 
-        recipeOrder.put("payMode",String.valueOf(1));//支付方式代码
+        recipeOrder.put("payMode",payMode);//支付方式代码
         recipeOrder.put("addressId","");
         recipeOrder.put("decoctionId","");
         recipeOrder.put("depId","");
@@ -611,7 +628,8 @@ public class ApiRepository extends BaseRepository {
 
         // 除了公共的数据之外，还有其他的数据请求
         Map<String,Object> bizContent = new HashMap<>();
-        bizContent.put("recipeId",String.valueOf(2257979));//电子处方ID
+//        bizContent.put("recipeId",String.valueOf(2257979));//电子处方ID
+        bizContent.put("recipeId",recipeId);//电子处方ID
         bizContent.put("recipeOrder",recipeOrder);//处方订单信息
         // 请求的类型 findValidOrganProfessionForRevisit
         RequestBody body = BodyCreate(bizContent,"createOrder");

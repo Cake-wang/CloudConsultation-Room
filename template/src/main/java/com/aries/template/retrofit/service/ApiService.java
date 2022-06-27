@@ -3,6 +3,7 @@ package com.aries.template.retrofit.service;
 
 import com.aries.library.fast.retrofit.FastRetrofit;
 import com.aries.template.constant.ApiConstant;
+import com.aries.template.entity.AuthCodeResultEntity;
 import com.aries.template.entity.BaseMovieEntity;
 import com.aries.template.entity.CanRequestOnlineConsultResultEntity;
 import com.aries.template.entity.CancelregisterResultEntity;
@@ -74,6 +75,10 @@ public interface ApiService {
     @Headers("Content-Type: application/json")
     @POST(ApiConstant.register)
     Observable<RegisterResultEntity> register(@Body RequestBody body);
+
+    @Headers("Content-Type: application/json")
+    @POST(ApiConstant.getAuthCode)
+    Observable<AuthCodeResultEntity> getAuthCode(@Body RequestBody body);
 
     @Headers("Content-Type: application/json")
     @POST(ApiConstant.doBaseNgariRequest)

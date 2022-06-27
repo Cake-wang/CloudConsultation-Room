@@ -14,8 +14,7 @@ public class GlobalConfig {
     /** 由纳里平台分配的公司标识，固定写死 */
     public static final String NALI_APPKEY = "app_web";
 
-    /** 由纳里平台分配 第三方平台用户唯一主键，在findUser里面取的 */
-    // todo 获取 findUser
+    /** 由纳里平台分配 第三方平台用户唯一主键，在findUser里面取的 在findUser 这个请求中获取, 这个值就是 userId  */
     public static String NALI_TID = "tid_eric_1";
 
 
@@ -78,5 +77,4 @@ public class GlobalConfig {
         departmentID="";
         ssCard=null;
     }
-
 }

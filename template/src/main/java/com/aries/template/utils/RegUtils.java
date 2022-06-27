@@ -28,7 +28,7 @@ public class RegUtils {
      */
     public static boolean isVerifyCode(String verifyCode) {
         Pattern p = Pattern
-                .compile("^\\d{4}$");
+                .compile("^\\d{6}$");
         Matcher m = p.matcher(verifyCode);
         return m.matches();
     }

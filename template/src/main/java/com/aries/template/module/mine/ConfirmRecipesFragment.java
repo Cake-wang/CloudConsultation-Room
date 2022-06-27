@@ -49,6 +49,12 @@ public class ConfirmRecipesFragment extends BaseEventFragment {
     /** 传入处理处方单的数据 */
     private ArrayList<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes> obj;
 
+    // 外部输入参数
+    public String payway = "";//支付类型代码
+    public String decoctionFlag = "";//是否代煎
+    public String payMode = "";//支付方式代码
+    public String recipeId = "";//电子处方ID
+
     @BindView(R.id.tv_name)
     TextView tv_name;
     @BindView(R.id.tv_card)
@@ -100,14 +106,28 @@ public class ConfirmRecipesFragment extends BaseEventFragment {
         return R.layout.fragment_order;
     }
 
+//    /**
+//     * 获取数据
+//     * @param obj 传入的数据，注意这个对象必须实现序列化
+//     */
+//    public static ConfirmRecipesFragment newInstance(ArrayList<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes> obj) {
+//        Bundle args = new Bundle();
+//        ConfirmRecipesFragment fragment = new ConfirmRecipesFragment();
+//        args.putSerializable("obj", obj);
+//        fragment.setArguments(args);
+//        return fragment;
+//    }
+
     /**
      * 获取数据
-     * @param obj 传入的数据，注意这个对象必须实现序列化
      */
-    public static ConfirmRecipesFragment newInstance(ArrayList<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes> obj) {
+    public static ConfirmRecipesFragment newInstance(String recipeId, String payway, String decoctionFlag, String payMode) {
         Bundle args = new Bundle();
         ConfirmRecipesFragment fragment = new ConfirmRecipesFragment();
-        args.putSerializable("obj", obj);
+        args.putString("recipeId", recipeId);
+        args.putString("payway", payway);
+        args.putString("decoctionFlag", decoctionFlag);
+        args.putString("payMode", payMode);
         fragment.setArguments(args);
         return fragment;
     }
@@ -118,7 +138,11 @@ public class ConfirmRecipesFragment extends BaseEventFragment {
         // 注入数据
         Bundle args = getArguments();
         if (args != null) {
-            obj = (ArrayList<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes>) args.getSerializable("obj");
+//            obj = (ArrayList<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes>) args.getSerializable("obj");
+            recipeId = args.getString("recipeId", "");
+            payway = args.getString("payway", "");
+            decoctionFlag = args.getString("decoctionFlag", "");
+            payMode = args.getString("payMode", "");
         }
     }
 
@@ -178,7 +202,7 @@ public class ConfirmRecipesFragment extends BaseEventFragment {
      * 确定处方单
      */
     public void requestCreateOrder(){
-        ApiRepository.getInstance().createOrder("","","","")
+        ApiRepository.getInstance().createOrder(recipeId,payway,decoctionFlag,payMode)
                 .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
                 .subscribe(new FastLoadingObserver<CreateOrderResultEntity>() {
                     @Override

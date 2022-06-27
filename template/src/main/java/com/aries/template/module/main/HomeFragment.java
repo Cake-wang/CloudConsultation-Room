@@ -15,6 +15,7 @@ import com.aries.template.R;
 import com.aries.template.module.mine.ConfirmRecipesFragment;
 import com.aries.template.module.mine.DepartmentFragment;
 import com.aries.template.module.mine.MineFragment;
+import com.aries.template.module.mine.PayCodeFragment;
 import com.aries.template.module.mine.ResultFragment;
 import com.aries.ui.view.title.TitleBarView;
 
@@ -73,6 +74,7 @@ public class HomeFragment extends FastTitleFragment implements ISupportFragment 
 //                ((MainActivity) getActivity()).getConsultsAndRecipes();//todo cc
 //                start(ResultFragment.newInstance("cancelConsult"));//todo ccss
 //                start(ConfirmRecipesFragment.newInstance(null));// todo cc
+//                start(PayCodeFragment.newInstance(new Object()));// todo cc
             }
         });
 

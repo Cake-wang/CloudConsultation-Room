@@ -29,7 +29,7 @@ public class DefenceUtil {
     }
 
     /**  默认 1000毫秒后才可以重新点击 */
-    private static final int DEFAULT_TIME = 2000; // 1000 ms 内才可以点击
+    private static final int DEFAULT_TIME = 1000; // 1000 ms 内才可以点击
     /** 上一次点击时间记录点 */
     private static long lastTime;
 

@@ -38,6 +38,9 @@ public class ApiConstant {
     /** 用户注册 */
     public static final String register  =  "ngariUserRelation/register";
 
+    /** 获取手机注册验证码 */
+    public static final String getAuthCode  =  "ngariUserRelation/getAuthCode";
+
     /** 纳里复诊服务接口 */
     public static final String doBaseNgariRequest =  "ngari/revisit/doBaseNgariRequest";
 

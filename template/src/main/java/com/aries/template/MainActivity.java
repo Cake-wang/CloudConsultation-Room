@@ -139,8 +139,6 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
     }
 
     public void readCardNew() {
-//        if (fakeFunction())// todo cc
-//            return;
         Log.d("111111MODEL", getTopFragment()+"");
         if (getTopFragment() instanceof HomeFragment){
             if (mDisposable != null) {mDisposable.dispose();}
@@ -179,7 +177,7 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                     Log.d("EgAPP_SI_ReadSSCardInfo",ssCard.toString());
                     // 读卡后，发现卡的信息不一样，且不为空，判断依据是身份证 SSNum
                     // 不在读卡页面，不在首页，则跳转回首页
-                    if (ssCard.getSSNum() != ssCard.getSSNum()){
+                    if (!Objects.equals(GlobalConfig.ssCard.getSSNum(), ssCard.getSSNum())){
                         if (!(getTopFragment() instanceof HomeFragment ) || !(getTopFragment() instanceof MineFragment )){
                             start(HomeFragment.newInstance(), SupportFragment.SINGLETASK);
                         }
@@ -240,18 +238,20 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
      * 假数据运行测试
      * todo cc
      */
-    private boolean fakeFunction(){
+    private boolean fakeDataInject(){
+        Log.d("fakeDataInject",fakeTest+"");
         if (fakeTest)
             return true;
         fakeTest = true;
-        SSCard mssCard = new SSCard();
-        mssCard.setName("330624673651937018");
-        mssCard.setSSNum("飞飞");
-        mssCard.setCardNum("15157180604");
+        // 注入全局配置数据
+        FakeDataExample.GlobalInject();
+        // 注入社保卡数据
+        SSCard mssCard = FakeDataExample.fakeSSCard();
         GlobalConfig.ssCard = mssCard;
         readCardSuccess(mssCard.getSSNum(),mssCard.getName(),mssCard.getCardNum());
         return true;
     }
+
 
 
     public static int getAge(long birthday) {
@@ -372,6 +372,11 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                                        // 挂号
                                        start(OrderConsultFragment.newInstance(item));
                                    }
+                                   // 批量取消挂号单
+                                    if (item.getConsults().getPayflag()==0 && status!=8){
+                                        // 取消挂号单 status = 8 已经取消
+                                        ApiRepository.getInstance().patientCancelGraphicTextConsult(item.getConsults().getConsultId()).subscribe();
+                                    }
                                 }
                             }
                             // 查看处方单是否多余1条处方
@@ -456,6 +461,9 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
         super.onStart();
         ActivityUtils.fullScreen(getWindow(),false);
         ActivityUtils.lightOnScreen(getWindow());
+
+        // 假数据注入启动
+        fakeDataInject();// todo cc
     }
 
     @Override

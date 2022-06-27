@@ -51,10 +51,6 @@ public class PayCodeFragment extends BaseEventFragment {
 
     /** 从外部传入的数据  */
     private  Object inputObj;
-    @BindView(R.id.btn_cancel)
-    Button btn_cancel;// 上一页按钮
-    @BindView(R.id.btn_inquiry)
-    Button btn_inquiry;// 下一页按钮
 
     @BindView(R.id.tv_name)
     TextView tv_name; //时间计时器显示对象

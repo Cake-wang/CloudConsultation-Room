@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.aries.library.fast.retrofit.FastLoadingObserver;
 import com.aries.library.fast.util.ToastUtil;
+import com.aries.template.FakeDataExample;
 import com.aries.template.GlobalConfig;
 import com.aries.template.R;
 import com.aries.template.entity.CanRequestOnlineConsultResultEntity;
@@ -171,8 +172,11 @@ public class DoctorListFragment extends BaseEventFragment {
      * 请求医生数据
      */
     public void requestDoctorInfo(){
-        int organid = GlobalConfig.organId;//浙大附属邵逸夫医院
-
+        int organid = GlobalConfig.organId;
+        // todo cc 测试数据
+        departmentId = FakeDataExample.departmentId;
+        profession = FakeDataExample.profession;
+        organid = Integer.valueOf(FakeDataExample.organId);
         ApiRepository.getInstance().searchDoctorListByBusTypeV2(departmentId,profession,organid)
                 .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
                 .subscribe(new FastLoadingObserver<SearchDoctorListByBusTypeV2ResultEntity>() {

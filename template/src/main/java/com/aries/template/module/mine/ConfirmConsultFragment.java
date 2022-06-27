@@ -222,6 +222,7 @@ public class ConfirmConsultFragment extends BaseEventFragment implements Compoun
             return;
         }
         ApiRepository.getInstance().requestConsultAndCdrOtherdoc(GlobalConfig.doc.getCurrentOrgan(),
+                        GlobalConfig.NALI_TID,
                         GlobalConfig.departmentID,
                         GlobalConfig.doc.getDoctorId())
                 .compose(this.bindUntilEvent(FragmentEvent.DESTROY))

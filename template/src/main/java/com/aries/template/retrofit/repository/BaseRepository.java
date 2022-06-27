@@ -5,15 +5,10 @@ import android.accounts.NetworkErrorException;
 import com.aries.library.fast.retrofit.FastNullException;
 import com.aries.library.fast.retrofit.FastRetryWhen;
 import com.aries.library.fast.retrofit.FastTransformer;
-import com.aries.library.fast.util.SPUtil;
 import com.aries.template.GlobalConfig;
-import com.aries.template.constant.ApiConstant;
 import com.aries.template.utility.ConvertJavaBean;
-import com.aries.template.utility.RSASignature;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -59,7 +54,7 @@ public abstract class BaseRepository {
      * @param map 输入进body的数据
      * @param methodCode 调用目标方法的code
      */
-    protected RequestBody BodyCreate(Map map,String methodCode){
+    protected RequestBody BodyCreate(Map map, String methodCode){
         return BodyCreate(map,methodCode,true);
     }
 
@@ -68,11 +63,11 @@ public abstract class BaseRepository {
      * 由于是一个统一的网络请求，通过methodcode来调用不同的方法，所以需要输入methodCode
      * @param isBizArray bizcontent 是否为 array。有些请求，bizcontent是个字符串
      */
-    protected RequestBody BodyCreate(Map map,String methodCode,boolean isBizArray){
-// bizContent 结构数据信息补全
+    protected RequestBody BodyCreate(Map map, String methodCode, boolean isBizArray){
+        // bizContent 结构数据信息补全
         Map<String,String> bizContent = new HashMap<>();
         bizContent.put("appKey", GlobalConfig.NALI_APPKEY);
-//        bizContent.put("appkey", ApiConstant.NALI_APPKEY);//todo cc
+        bizContent.put("appkey", GlobalConfig.NALI_APPKEY);//todo cc
         bizContent.put("tid",GlobalConfig.NALI_TID);
         bizContent.putAll(map);
 
@@ -108,4 +103,41 @@ public abstract class BaseRepository {
         RequestBody body = RequestBody.create(okhttp3.MediaType.parse("Content-Type:application/json;charset=UTF-8"),strEntity);
         return body;
     }
+
+
+//    /**
+//     * 输入到通信的body创造工程
+//     * 由于是一个统一的网络请求，通过methodcode来调用不同的方法，所以需要输入methodCode
+//     * 他和其他的 BodyCreate 不一样，不会添加多余的 bizContent 数据
+//     * bizContent 必须是对象
+//     *
+//     * - findUser
+//     * - authCode
+//     *
+//     * 这种方式是没有 method code 的，是我们自己的后台方式，所以会不一样
+//     */
+//    protected RequestBody BodyCreateWithoutOther(Map map){
+//        // bizContent 结构数据信息补全
+//        Map<String,String> bizContent = new HashMap<>();
+//        bizContent.putAll(map);
+//
+//        ArrayList<Map> maps = new ArrayList<>();
+//        maps.add(bizContent);
+//
+//        // 创建body
+//        ApiRepository.common.getInstance().machineId = GlobalConfig.machineId;
+//        ApiRepository.common.getInstance().userId = GlobalConfig.NALI_TID;
+//
+//        final Map<String, Object> params = new HashMap<>(4);
+//        params.put("logTraceId", ApiRepository.getUUID());//getUUID 请求日志ID唯一识别流水ID，32位，推荐使用UUID
+//        params.put("common", ApiRepository.common.getInstance());
+//        params.put("bizContent", maps.get(0));
+//        String strEntity = ConvertJavaBean.converJavaBeanToJsonNew(params);
+//        RequestBody body = RequestBody.create(okhttp3.MediaType.parse("Content-Type:application/json;charset=UTF-8"),strEntity);
+//        return body;
+//    }
+
+
+
+
 }

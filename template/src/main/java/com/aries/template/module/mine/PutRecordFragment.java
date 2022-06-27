@@ -5,13 +5,17 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 
 import com.aries.library.fast.retrofit.FastLoadingObserver;
 import com.aries.library.fast.util.SPUtil;
 import com.aries.library.fast.util.ToastUtil;
+import com.aries.template.FakeDataExample;
+import com.aries.template.GlobalConfig;
 import com.aries.template.R;
+import com.aries.template.entity.AuthCodeResultEntity;
 import com.aries.template.entity.RegisterResultEntity;
 import com.aries.template.module.base.BaseEventFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
@@ -41,7 +45,13 @@ import static com.aries.template.utils.RegUtils.isVerifyCode;
  * @Description:
  */
 public class PutRecordFragment extends BaseEventFragment implements ISupportFragment {
-    private  String idCard= "",name= "",smkcard = "";
+    // 外部传入数据
+    private  String idCard= "";
+    private  String name = "";
+    private  String smkcard= "";
+
+    // 内部数据
+    private  String authCodeId= "";
 
     @BindView(R.id.et_phone_number)
     EditText etPhoneNumber;
@@ -125,6 +135,7 @@ public class PutRecordFragment extends BaseEventFragment implements ISupportFrag
                 if (isMobileNO(etPhoneNumber.getEditableText().toString().trim())) {
                     // 启动验证码倒计时
                     mCountDownHelper.start();
+                    requestAuthCode(etPhoneNumber.getEditableText().toString().trim());
                 }else {
                     ToastUtil.show("手机号格式错误");
                 }
@@ -143,7 +154,7 @@ public class PutRecordFragment extends BaseEventFragment implements ISupportFrag
                                     .show();
                         }
                     }else{
-                        ToastUtil.show("验证码必须是4位的");
+                        ToastUtil.show("验证码必须是6位的");
                     }
                 }else{
                     ToastUtil.show("手机号格式错误");
@@ -249,15 +260,20 @@ public class PutRecordFragment extends BaseEventFragment implements ISupportFrag
      * @param verifyCode  验证码
      */
     private void loginByVerifyCode(String phoneNumber, String verifyCode) {
-        requestRegister(idCard,name,phoneNumber);
+        if (!TextUtils.isEmpty(authCodeId)){
+            requestRegister(idCard,name,phoneNumber,verifyCode,authCodeId);
+        }else{
+            ToastUtil.show("请先获取验证码");
+        }
     }
 
     /**
      * 请求注册
+     * 478465
      */
-    public void requestRegister(String idCard, String name, String phoneNumber) {
+    public void requestRegister(String idCard,String name,String mobile,String authCode,String authCodeId) {
         timeCount = 120;
-        ApiRepository.getInstance().register(idCard,name, phoneNumber)
+        ApiRepository.getInstance().register(idCard, name, mobile, authCode, authCodeId)
                 .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
                 .subscribe(new FastLoadingObserver<RegisterResultEntity>("请稍后...") {
                             @Override
@@ -269,7 +285,7 @@ public class PutRecordFragment extends BaseEventFragment implements ISupportFrag
                                 if (entity.success){
                                     //todo 向全局注入数据
                                     String tag = (String) SPUtil.get(mContext,"tag","fzpy");
-                                    SPUtil.put(mContext,"mobile",phoneNumber);
+                                    SPUtil.put(mContext,"mobile",mobile);
                                     if(tag.contains("stjc")){
                                             Intent intent = new Intent(Intent.ACTION_MAIN);
                                             /**知道要跳转应用的包命与目标Activity*/
@@ -277,15 +293,39 @@ public class PutRecordFragment extends BaseEventFragment implements ISupportFrag
                                             intent.setComponent(componentName);
                                             intent.putExtra("userName", name);//这里Intent传值
                                             intent.putExtra("idCard", idCard);
-                                            intent.putExtra("mobile",phoneNumber);
+                                            intent.putExtra("mobile",mobile);
                                             startActivity(intent);
                                     }else {
                                         //判断有挂号或处方
                                         start(DepartmentFragment.newInstance(new Object()));
                                     }
+                                }else {
+                                    ToastUtil.show(entity.message);
                                 }
                             }
                         });
+    }
+
+    /**
+     * 通过注册手机号获得验证码
+     * @param phoneNumber 手机
+     */
+    public void requestAuthCode(String phoneNumber){
+        ApiRepository.getInstance().authCode(phoneNumber)
+                .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
+                .subscribe(new FastLoadingObserver<AuthCodeResultEntity>("请稍后...") {
+                    @Override
+                    public void _onNext(@NonNull AuthCodeResultEntity entity) {
+                        if (entity == null) {
+                            ToastUtil.show("请检查网络");
+                            return;
+                        }
+                        if (entity.success){
+                            // 先获取验证码，再执行注册
+                            authCodeId = entity.data.authCodeId;
+                        }
+                    }
+                });
     }
 
     @Override

@@ -35,5 +35,21 @@ public class DefenceAutoAdaptorProxy<T> extends AutoAdaptorProxy<T>{
                     listener.onItemViewDraw(holder,position, ((T) itemData));
             }
         });
+
+        // 样式事件触发
+        adaptor.setThemeListener(new AutoThemeAdaptor.IItemThemeListener() {
+            @Override
+            public void onClickTheme(AutoObjectAdaptor.ViewHolder holder, int position, Object itemData) {
+                if (themeListener!=null)
+                    if (DefenceUtil.checkReSubmit("DefenceAutoAdaptorProxy.onClickTheme"))
+                        themeListener.onClickTheme(holder,position, ((T) itemData));
+            }
+
+            @Override
+            public void unClickTheme(AutoObjectAdaptor.ViewHolder holder, int position, Object itemData) {
+                if (themeListener!=null)
+                    themeListener.unClickTheme(holder,position, ((T) itemData));
+            }
+        });
     }
 }
