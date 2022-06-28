@@ -138,10 +138,17 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
 
     }
 
+    /**
+     * 插卡需要读芯片
+     * 如果没有芯片就需要非接设备
+     */
     public void readCardNew() {
         Log.d("111111MODEL", getTopFragment()+"");
         if (getTopFragment() instanceof HomeFragment){
-            if (mDisposable != null) {mDisposable.dispose();}
+            if (mDisposable != null) {
+                mDisposable.dispose();
+                mDisposable=null;
+            }
             BasicOper.dc_exit();
             return;
         }
@@ -177,7 +184,7 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                     Log.d("EgAPP_SI_ReadSSCardInfo",ssCard.toString());
                     // 读卡后，发现卡的信息不一样，且不为空，判断依据是身份证 SSNum
                     // 不在读卡页面，不在首页，则跳转回首页
-                    if (!Objects.equals(GlobalConfig.ssCard.getSSNum(), ssCard.getSSNum())){
+                    if (GlobalConfig.ssCard!=null && !Objects.equals(GlobalConfig.ssCard.getSSNum(), ssCard.getSSNum())){
                         if (!(getTopFragment() instanceof HomeFragment ) || !(getTopFragment() instanceof MineFragment )){
                             start(HomeFragment.newInstance(), SupportFragment.SINGLETASK);
                         }
@@ -210,47 +217,57 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
             }
 
         }else {
-            String result111 = BasicOper.dc_card_status();
-            String[] resultArr111 = result111.split("\\|",-1);
-            if(resultArr111[0].equals("0000")){
-                Log.d("dc_card_status","卡片存在");
-            }
-            else{
-                HomeFragment fragment = findFragment(HomeFragment.class);
+            //设置卡座
+            String result = BasicOper.dc_setcpu(0);
+            String[] resultArr = result.split("\\|",-1);
+            if(resultArr[0].equals("0000")) {
+                String resultAfter = BasicOper.dc_setcpupara(0,0x00, 0x5C);
+                String[] resultArrAfter = resultAfter.split("\\|", -1);
+                if (resultArrAfter[0].equals("0000")) {
+                    ////设置接触式CPU卡参数
+                    Log.d("dc_setcpupara", "接触式CPU卡参数设置成功");
+                    // 设置卡座成功之后，才可以读取卡片存在状态
+                    Log.d("dc_setcpu","success");
+                    String result111 = BasicOper.dc_card_status();
+                    String[] resultArr111 = result111.split("\\|",-1);
+                    if(resultArr111[0].equals("0000")){
+                        Log.d("dc_card_status","卡片存在");
+                    } else{
+                        HomeFragment fragment = findFragment(HomeFragment.class);
 //                Bundle newBundle = new Bundle();
-//
 //                fragment.putNewBundle(newBundle);
-                // 在栈内的HomeFragment以SingleTask模式启动（即在其之上的Fragment会出栈）
-                start(fragment, SupportFragment.SINGLETASK);
-                Log.d("dc_card_status","error code = "+resultArr111[0] +" error msg = "+resultArr111[1] );
+                        // 在栈内的HomeFragment以SingleTask模式启动（即在其之上的Fragment会出栈）
+                        start(fragment, SupportFragment.SINGLETASK);
+                        Log.d("dc_card_status","error code = "+resultArr111[0] +" error msg = "+resultArr111[1] );
+                    }
+                } else {
+                    Log.d("dc_setcpupara", "error code = " + resultArrAfter[0] + " error msg = " + resultArrAfter[1]);
+                }
+            } else {
+                Log.d("dc_setcpu","error code = "+resultArr[0] +" error msg = "+resultArr[1] );
             }
         }
-
-
-
-
-
     }
 
-    private boolean fakeTest; // todo cc
+//    private boolean fakeTest; // todo cc
     /**
      * 手动输入身份证，直接运行下一步
      * 假数据运行测试
      * todo cc
      */
-    private boolean fakeDataInject(){
-        Log.d("fakeDataInject",fakeTest+"");
-        if (fakeTest)
-            return true;
-        fakeTest = true;
-        // 注入全局配置数据
-        FakeDataExample.GlobalInject();
-        // 注入社保卡数据
-        SSCard mssCard = FakeDataExample.fakeSSCard();
-        GlobalConfig.ssCard = mssCard;
-        readCardSuccess(mssCard.getSSNum(),mssCard.getName(),mssCard.getCardNum());
-        return true;
-    }
+//    private boolean fakeDataInject(){
+//        Log.d("fakeDataInject",fakeTest+"");
+//        if (fakeTest)
+//            return true;
+//        fakeTest = true;
+//        // 注入全局配置数据
+//        FakeDataExample.GlobalInject();
+//        // 注入社保卡数据
+//        SSCard mssCard = FakeDataExample.fakeSSCard();
+//        GlobalConfig.ssCard = mssCard;
+//        readCardSuccess(mssCard.getSSNum(),mssCard.getName(),mssCard.getCardNum());
+//        return true;
+//    }
 
 
 
@@ -463,7 +480,7 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
         ActivityUtils.lightOnScreen(getWindow());
 
         // 假数据注入启动
-        fakeDataInject();// todo cc
+//        fakeDataInject();// todo cc
     }
 
     @Override
