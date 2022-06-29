@@ -97,6 +97,18 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
     }
 
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        String tag = (String) SPUtil.get(mContext,"tag","");
+        if (tag.contains("backMain")){
+                                    HomeFragment fragment = findFragment(HomeFragment.class);
+//                Bundle newBundle = new Bundle();
+//                fragment.putNewBundle(newBundle);
+                        // 在栈内的HomeFragment以SingleTask模式启动（即在其之上的Fragment会出栈）
+                        start(fragment, SupportFragment.SINGLETASK);
+        }
+    }
 
     public void openSerialport() {
 
@@ -128,7 +140,7 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
         if (mDisposable == null){
             mDisposable = Observable.interval(DELAY, PERIOD, TimeUnit.MILLISECONDS)
                     .map((aLong -> aLong + 1))
-                    .delay(PERIOD, TimeUnit.MILLISECONDS, true)       // 设置delayError为true，表示出现错误的时候也需要延迟5s进行通知，达到无论是请求正常还是请求失败，都是5s后重新订阅，即重新请求。
+//                    .delay(PERIOD, TimeUnit.MILLISECONDS, true)       // 设置delayError为true，表示出现错误的时候也需要延迟5s进行通知，达到无论是请求正常还是请求失败，都是5s后重新订阅，即重新请求。
                     .subscribeOn(Schedulers.io())
                     .repeat()   // repeat保证请求成功后能够重新订阅。
                     .retry()    // retry保证请求失败后能重新订阅
@@ -144,14 +156,14 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
      */
     public void readCardNew() {
         Log.d("111111MODEL", getTopFragment()+"");
-        if (getTopFragment() instanceof HomeFragment){
-            if (mDisposable != null) {
-                mDisposable.dispose();
-                mDisposable=null;
-            }
-            BasicOper.dc_exit();
-            return;
-        }
+//        if (getTopFragment() instanceof HomeFragment){
+//            if (mDisposable != null) {
+//                mDisposable.dispose();
+//                mDisposable=null;
+//            }
+//            BasicOper.dc_exit();
+//            return;
+//        }
 
         if (getTopFragment() instanceof MineFragment){
 //            //社保卡上电
@@ -203,11 +215,17 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                     // todo 每3秒请求一次，可能造成资源浪费
                     readCardSuccess(ssCard.getSSNum(),ssCard.getName(),ssCard.getCardNum());
 
+                    if (mDisposable != null) {
+                        mDisposable.dispose();
+                        mDisposable=null;
+                    }
+                    BasicOper.dc_exit();
 
 
 //                    if (mDisposable != null) {mDisposable.dispose();}
                 }else{
                     if (mDisposable != null) {mDisposable.dispose();}
+                    BasicOper.dc_exit();
                     Log.d("EgAPP_SI_ReadSSCardInfo","读取社保卡信息失败");
                 }
             }
@@ -217,36 +235,44 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
             }
 
         }else {
-            //设置卡座
-            String result = BasicOper.dc_setcpu(0);
-            String[] resultArr = result.split("\\|",-1);
-            if(resultArr[0].equals("0000")) {
-                String resultAfter = BasicOper.dc_setcpupara(0,0x00, 0x5C);
-                String[] resultArrAfter = resultAfter.split("\\|", -1);
-                if (resultArrAfter[0].equals("0000")) {
-                    ////设置接触式CPU卡参数
-                    Log.d("dc_setcpupara", "接触式CPU卡参数设置成功");
-                    // 设置卡座成功之后，才可以读取卡片存在状态
-                    Log.d("dc_setcpu","success");
-                    String result111 = BasicOper.dc_card_status();
-                    String[] resultArr111 = result111.split("\\|",-1);
-                    if(resultArr111[0].equals("0000")){
-                        Log.d("dc_card_status","卡片存在");
-                    } else{
-                        HomeFragment fragment = findFragment(HomeFragment.class);
-//                Bundle newBundle = new Bundle();
-//                fragment.putNewBundle(newBundle);
-                        // 在栈内的HomeFragment以SingleTask模式启动（即在其之上的Fragment会出栈）
-                        start(fragment, SupportFragment.SINGLETASK);
-                        Log.d("dc_card_status","error code = "+resultArr111[0] +" error msg = "+resultArr111[1] );
-                    }
-                } else {
-                    Log.d("dc_setcpupara", "error code = " + resultArrAfter[0] + " error msg = " + resultArrAfter[1]);
-                }
-            } else {
-                Log.d("dc_setcpu","error code = "+resultArr[0] +" error msg = "+resultArr[1] );
+            if (mDisposable != null) {
+                mDisposable.dispose();
+                mDisposable=null;
             }
+            BasicOper.dc_exit();
+            return;
         }
+//        else {
+//            //设置卡座
+//            String result = BasicOper.dc_setcpu(0);
+//            String[] resultArr = result.split("\\|",-1);
+//            if(resultArr[0].equals("0000")) {
+//                String resultAfter = BasicOper.dc_setcpupara(0,0x00, 0x5C);
+//                String[] resultArrAfter = resultAfter.split("\\|", -1);
+//                if (resultArrAfter[0].equals("0000")) {
+//                    ////设置接触式CPU卡参数
+//                    Log.d("dc_setcpupara", "接触式CPU卡参数设置成功");
+//                    // 设置卡座成功之后，才可以读取卡片存在状态
+//                    Log.d("dc_setcpu","success");
+//                    String result111 = BasicOper.dc_card_status();
+//                    String[] resultArr111 = result111.split("\\|",-1);
+//                    if(resultArr111[0].equals("0000")){
+//                        Log.d("dc_card_status","卡片存在");
+//                    } else{
+//                        HomeFragment fragment = findFragment(HomeFragment.class);
+////                Bundle newBundle = new Bundle();
+////                fragment.putNewBundle(newBundle);
+//                        // 在栈内的HomeFragment以SingleTask模式启动（即在其之上的Fragment会出栈）
+//                        start(fragment, SupportFragment.SINGLETASK);
+//                        Log.d("dc_card_status","error code = "+resultArr111[0] +" error msg = "+resultArr111[1] );
+//                    }
+//                } else {
+//                    Log.d("dc_setcpupara", "error code = " + resultArrAfter[0] + " error msg = " + resultArrAfter[1]);
+//                }
+//            } else {
+//                Log.d("dc_setcpu","error code = "+resultArr[0] +" error msg = "+resultArr[1] );
+//            }
+//        }
     }
 
 //    private boolean fakeTest; // todo cc
@@ -322,6 +348,13 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                                             Intent intent = new Intent(Intent.ACTION_MAIN);
                                             /**知道要跳转应用的包命与目标Activity*/
                                             // 启动身体检查系统
+                                           SPUtil.put(mContext,"tag","backMain");
+                                            if (mDisposable != null) {
+                                                mDisposable.dispose();
+                                                mDisposable=null;
+                                            }
+                                            BasicOper.dc_exit();
+
                                             ComponentName componentName = new ComponentName("com.garea.launcher", "com.garea.launcher.login.LauncherLogin");
                                             intent.setComponent(componentName);
                                             intent.putExtra("userName", entity.getData().getName());//这里Intent传值

@@ -12,8 +12,6 @@ import android.widget.EditText;
 import com.aries.library.fast.retrofit.FastLoadingObserver;
 import com.aries.library.fast.util.SPUtil;
 import com.aries.library.fast.util.ToastUtil;
-import com.aries.template.FakeDataExample;
-import com.aries.template.GlobalConfig;
 import com.aries.template.R;
 import com.aries.template.entity.AuthCodeResultEntity;
 import com.aries.template.entity.RegisterResultEntity;
@@ -28,7 +26,6 @@ import com.xuexiang.xui.widget.dialog.materialdialog.MaterialDialog;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatCheckBox;
-
 import butterknife.BindView;
 import butterknife.OnClick;
 import io.reactivex.annotations.NonNull;
@@ -120,6 +117,8 @@ public class PutRecordFragment extends BaseEventFragment implements ISupportFrag
         etPhoneNumber.setOnFocusChangeListener((v, hasFocus) -> focusFlagnum = hasFocus);
         // 验证码输入框
         etVerifyCode.setOnFocusChangeListener((v, hasFocus) -> focusFlagcode = hasFocus);
+
+        etPhoneNumber.requestFocus();
     }
 
     @SingleClick
@@ -163,29 +162,68 @@ public class PutRecordFragment extends BaseEventFragment implements ISupportFrag
             case R.id.btn_clear:
                 // 清除按钮
                 if (focusFlagnum){
-                    etPhoneNumber.setText(null);
+                    clearText(etPhoneNumber);
+//                    etPhoneNumber.setText(null);
                 }
                 if (focusFlagcode){
-                    etVerifyCode.setText(null);
+                    clearText(etVerifyCode);
+//                    etVerifyCode.setText(null);
                 }
                 break;
             case R.id.btn_back_text:
                 // 退格按钮
                 if (focusFlagnum){
-                    if(etPhoneNumber.getText().toString().trim().length()>1) {
-                        String str0  = etPhoneNumber.getText().toString().trim().substring(0, etPhoneNumber.getText().toString().trim().length() - 1);
-                        etPhoneNumber.setText(str0);
-                    }else {
-                        etPhoneNumber.setText(null);
+
+                    //删除选中状态的字符串（文本多选状态下的删除）
+                    if (etPhoneNumber.hasSelection()){
+                        deleteSelection(etPhoneNumber);
+                        return;
                     }
+                    //删除光标处单个字符
+                    String number = getEditTextViewString(etPhoneNumber);
+                    if (!(number.equals(null)) && !(number.trim().equals(""))){
+                        int index = getEditSelection(etPhoneNumber);//获取光标位置
+                        //防止光标处于起始位置时，点击删除按钮，程序自动退出
+                        if (index > 0){
+                            deleteEditValue(index,etPhoneNumber);
+                        }
+                        return;
+                    }
+
+
+//                    if(etPhoneNumber.getText().toString().trim().length()>1) {
+//                        String str0  = etPhoneNumber.getText().toString().trim().substring(0, etPhoneNumber.getText().toString().trim().length() - 1);
+//                        etPhoneNumber.setText(str0);
+//                    }else {
+//                        etPhoneNumber.setText(null);
+//                    }
                 }
                 if (focusFlagcode){
-                    if(etVerifyCode.getText().toString().trim().length()>1) {
-                        String str0   = etVerifyCode.getText().toString().trim().substring(0, etVerifyCode.getText().toString().trim().length() - 1);
-                        etVerifyCode.setText(str0);
-                    }else {
-                        etVerifyCode.setText(null);
+
+
+                    //删除选中状态的字符串（文本多选状态下的删除）
+                    if (etVerifyCode.hasSelection()){
+                        deleteSelection(etVerifyCode);
+                        return;
                     }
+                    //删除光标处单个字符
+                    String number = getEditTextViewString(etVerifyCode);
+                    if (!(number.equals(null)) && !(number.trim().equals(""))){
+                        int index = getEditSelection(etVerifyCode);//获取光标位置
+                        //防止光标处于起始位置时，点击删除按钮，程序自动退出
+                        if (index > 0){
+                            deleteEditValue(index,etVerifyCode);
+                        }
+                        return;
+                    }
+
+
+//                    if(etVerifyCode.getText().toString().trim().length()>1) {
+//                        String str0   = etVerifyCode.getText().toString().trim().substring(0, etVerifyCode.getText().toString().trim().length() - 1);
+//                        etVerifyCode.setText(str0);
+//                    }else {
+//                        etVerifyCode.setText(null);
+//                    }
                 }
                 break;
             case R.id.num_0:
@@ -242,14 +280,20 @@ public class PutRecordFragment extends BaseEventFragment implements ISupportFrag
      */
     public void enterNumber(int inputNum){
         if (focusFlagnum){
-            String str9 = etPhoneNumber.getText().toString().trim();
-            str9 += inputNum;
-            etPhoneNumber.setText(str9);
+
+            addNumber(inputNum+"",etPhoneNumber);
+
+//            String str9 = etPhoneNumber.getText().toString().trim();
+//            str9 += inputNum;
+//            etPhoneNumber.setText(str9);
         }
         if (focusFlagcode){
-            String str9 = etVerifyCode.getText().toString().trim();
-            str9 += inputNum;
-            etVerifyCode.setText(str9);
+
+            addNumber(inputNum+"",etVerifyCode);
+
+//            String str9 = etVerifyCode.getText().toString().trim();
+//            str9 += inputNum;
+//            etVerifyCode.setText(str9);
         }
     }
 
@@ -341,5 +385,36 @@ public class PutRecordFragment extends BaseEventFragment implements ISupportFrag
         titleBar.setBgColor(Color.WHITE)
                 .setTitleMainText(R.string.mine);
     }
+
+    //获取光标当前位置
+    public int getEditSelection(EditText et){
+        return et.getSelectionStart();
+    }
+    //获取文本框的内容
+    public String getEditTextViewString(EditText et){
+        return et.getText().toString();
+    }
+    //清楚文本框中的内容
+    public void clearText(EditText et){
+        et.getText().clear();
+    }
+    //向文本框指定位置添加内容
+    public void addNumber(String str,EditText et){
+        int index = getEditSelection(et);
+        if (index < 0 || index >= getEditTextViewString(et).length()){
+            et.append(str);
+        }else {
+            et.getEditableText().insert(index,str);
+        }
+    }
+    //删除指定位置的单个字符
+    public void deleteEditValue(int index,EditText et){
+        et.getText().delete(index-1,index);
+    }
+    //删除选中状态的多个字符串
+    public void deleteSelection(EditText et){
+        et.getText().delete(et.getSelectionStart(),et.getSelectionEnd());
+    }
+
 
 }
