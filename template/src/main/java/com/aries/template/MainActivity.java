@@ -147,8 +147,8 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                     .subscribeOn(Schedulers.io())
                     .repeat()   // repeat保证请求成功后能够重新订阅。
                     .retry()    // retry保证请求失败后能重新订阅
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(aLong -> readCardNew());//getUnreadCount()执行的任务
+                    .observeOn(Schedulers.newThread())
+                    .subscribe(aLong ->readCardNew());//getUnreadCount()执行的任务
         }
     }
 
@@ -204,7 +204,9 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                     SPUtil.put(mContext,"idCard",ssCard.getSSNum());
 
                     // 获取信息后，直接请求用户数据
-                    requestFindUser(ssCard.getSSNum(),ssCard.getName(),ssCard.getCardNum());
+                    runOnUiThread(() -> requestFindUser(ssCard.getSSNum(),ssCard.getName(),ssCard.getCardNum()));
+//                    requestFindUser(ssCard.getSSNum(),ssCard.getName(),ssCard.getCardNum());
+
 
                     // 读取成功后，清除mDisposable不再进行验证
                     if (mDisposable != null) {

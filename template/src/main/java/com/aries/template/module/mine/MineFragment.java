@@ -24,6 +24,7 @@ import androidx.annotation.Nullable;
  */
 public class MineFragment extends BaseEventFragment{
     private  String tag = "";
+    private Handler handler;
 
     public static MineFragment newInstance(String tag) {
         Bundle args = new Bundle();
@@ -44,29 +45,33 @@ public class MineFragment extends BaseEventFragment{
 
     @Override
     public void loadData() {
+    }
 
+    /**
+     * 启动社保卡
+     */
+    private void callIDMachine() {
         Log.d("111111MODEL", "111111MODEL");
-
-
-
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                /**
-                 *要执行的操作
-                 */
+        handler = new Handler();
+        handler.postDelayed(() -> {
+            // 要执行的操作 启动卡片读取操作。
+            if (getActivity() !=null)
                 ((MainActivity)getActivity()).openSerialport();
-            }
         }, 500);//3秒后执行Runnable中的run方法
-
     }
 
     @Override
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
-        if (!hidden)
+        if (!hidden){
             GlobalConfig.isFindUserDone = false;
+            callIDMachine();
+        }else{
+            if (handler!=null){
+                handler.removeCallbacksAndMessages(null);
+                handler = null;
+            }
+        }
     }
 
     @Override
@@ -74,6 +79,7 @@ public class MineFragment extends BaseEventFragment{
         super.onStart();
         // 每次进入读卡界面，会重置请求用户数据，检测是否已经注册
         GlobalConfig.isFindUserDone = false;
+        callIDMachine();
     }
 
     @Override
