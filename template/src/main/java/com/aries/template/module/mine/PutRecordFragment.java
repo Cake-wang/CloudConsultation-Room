@@ -17,6 +17,7 @@ import com.aries.template.entity.AuthCodeResultEntity;
 import com.aries.template.entity.RegisterResultEntity;
 import com.aries.template.module.base.BaseEventFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
+import com.aries.template.utils.DefenceUtil;
 import com.aries.ui.view.title.TitleBarView;
 import com.trello.rxlifecycle3.android.FragmentEvent;
 import com.xuexiang.xaop.annotation.SingleClick;
@@ -43,11 +44,15 @@ import static com.aries.template.utils.RegUtils.isVerifyCode;
  */
 public class PutRecordFragment extends BaseEventFragment implements ISupportFragment {
     // 外部传入数据
+    /** 身份证 */
     private  String idCard= "";
+    /** 姓名 */
     private  String name = "";
+    /** 市民卡 */
     private  String smkcard= "";
 
     // 内部数据
+    /** 验证码 id */
     private  String authCodeId= "";
 
     @BindView(R.id.et_phone_number)
@@ -117,11 +122,10 @@ public class PutRecordFragment extends BaseEventFragment implements ISupportFrag
         etPhoneNumber.setOnFocusChangeListener((v, hasFocus) -> focusFlagnum = hasFocus);
         // 验证码输入框
         etVerifyCode.setOnFocusChangeListener((v, hasFocus) -> focusFlagcode = hasFocus);
-
+        // 增加焦点
         etPhoneNumber.requestFocus();
     }
 
-    @SingleClick
     @OnClick({R.id.btn_get_verify_code,R.id.btn_register, R.id.tv_other_login, R.id.tv_forget_password,
             R.id.num_1, R.id.num_2, R.id.num_3, R.id.num_4,
             R.id.num_5, R.id.num_6, R.id.num_7, R.id.num_8,
@@ -140,6 +144,8 @@ public class PutRecordFragment extends BaseEventFragment implements ISupportFrag
                 }
                 break;
             case R.id.btn_register:
+                if (!DefenceUtil.checkReSubmit("PutRecordFragment.btn_register"))
+                    return;
                 if (isMobileNO(etPhoneNumber.getEditableText().toString().trim())) {
                     if (isVerifyCode(etVerifyCode.getEditableText().toString().trim())) {
                         if(cbProtocol.isChecked()){
@@ -173,7 +179,6 @@ public class PutRecordFragment extends BaseEventFragment implements ISupportFrag
             case R.id.btn_back_text:
                 // 退格按钮
                 if (focusFlagnum){
-
                     //删除选中状态的字符串（文本多选状态下的删除）
                     if (etPhoneNumber.hasSelection()){
                         deleteSelection(etPhoneNumber);
@@ -189,18 +194,8 @@ public class PutRecordFragment extends BaseEventFragment implements ISupportFrag
                         }
                         return;
                     }
-
-
-//                    if(etPhoneNumber.getText().toString().trim().length()>1) {
-//                        String str0  = etPhoneNumber.getText().toString().trim().substring(0, etPhoneNumber.getText().toString().trim().length() - 1);
-//                        etPhoneNumber.setText(str0);
-//                    }else {
-//                        etPhoneNumber.setText(null);
-//                    }
                 }
                 if (focusFlagcode){
-
-
                     //删除选中状态的字符串（文本多选状态下的删除）
                     if (etVerifyCode.hasSelection()){
                         deleteSelection(etVerifyCode);
@@ -216,14 +211,6 @@ public class PutRecordFragment extends BaseEventFragment implements ISupportFrag
                         }
                         return;
                     }
-
-
-//                    if(etVerifyCode.getText().toString().trim().length()>1) {
-//                        String str0   = etVerifyCode.getText().toString().trim().substring(0, etVerifyCode.getText().toString().trim().length() - 1);
-//                        etVerifyCode.setText(str0);
-//                    }else {
-//                        etVerifyCode.setText(null);
-//                    }
                 }
                 break;
             case R.id.num_0:
@@ -259,15 +246,6 @@ public class PutRecordFragment extends BaseEventFragment implements ISupportFrag
             case R.id.tv_other_login:
                 // 点击协议
                 break;
-//            case R.id.tv_forget_password:
-//                XToastUtils.info("忘记密码");
-//                break;
-//            case R.id.tv_user_protocol:
-//                openPage(ServiceProtocolFragment.class, KEY_PROTOCOL_TITLE, ResUtils.getString(R.string.title_user_protocol));
-//                break;
-//            case R.id.tv_privacy_protocol:
-//                openPage(ServiceProtocolFragment.class, KEY_PROTOCOL_TITLE, ResUtils.getString(R.string.title_privacy_protocol));
-//                break;
             default:
                 break;
         }
@@ -280,20 +258,10 @@ public class PutRecordFragment extends BaseEventFragment implements ISupportFrag
      */
     public void enterNumber(int inputNum){
         if (focusFlagnum){
-
             addNumber(inputNum+"",etPhoneNumber);
-
-//            String str9 = etPhoneNumber.getText().toString().trim();
-//            str9 += inputNum;
-//            etPhoneNumber.setText(str9);
         }
         if (focusFlagcode){
-
             addNumber(inputNum+"",etVerifyCode);
-
-//            String str9 = etVerifyCode.getText().toString().trim();
-//            str9 += inputNum;
-//            etVerifyCode.setText(str9);
         }
     }
 
@@ -341,7 +309,7 @@ public class PutRecordFragment extends BaseEventFragment implements ISupportFrag
                                             startActivity(intent);
                                     }else {
                                         //判断有挂号或处方
-                                        start(DepartmentFragment.newInstance(new Object()));
+                                        start(DepartmentFragment.newInstance());
                                     }
                                 }else {
                                     ToastUtil.show(entity.message);

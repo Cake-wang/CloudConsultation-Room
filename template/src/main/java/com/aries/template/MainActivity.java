@@ -53,7 +53,20 @@ import me.yokeyword.fragmentation.SupportHelper;
 import me.yokeyword.fragmentation.anim.FragmentAnimator;
 
 /**
- * 主页显示界面
+ * 界面承载容器
+ * 医保卡循环读取任务
+ * 获取 findUser 任务，确定用户是否已经登录 #requestFindUser();
+ * 检查用户是否有未支付挂号单或处方单 #requestConsultsAndRecipes();
+ *
+ * 规则：
+ * 进入体检后，立刻跳回到主页
+ * 进入读卡页面后，立刻读卡，并启动3秒读卡任务。读卡成功后，就停止读卡。
+ *
+ * 主要关注的页面
+ * HomeFragment 首页
+ *
+ *
+ * @author louisluo
  * @Author: AriesHoo on 2018/7/23 10:00
  * @E-Mail: AriesHoo@126.com
  * Function: 示例主页面
@@ -61,17 +74,14 @@ import me.yokeyword.fragmentation.anim.FragmentAnimator;
  */
 public class MainActivity extends FastMainActivity implements ISupportActivity {
 
+    /** mDelegate 控制器 FastMainActivity 的机制 */
     final SupportActivityDelegate mDelegate = new SupportActivityDelegate(this);
 
     @BindView(R.id.tabLayout_commonFastLib) CommonTabLayout mTabLayout;
     private ArrayList<FastTabEntity> mTabEntities;
+
     /** 检测当前读卡请求用户状态是否进行中 */
     private boolean isReadCardProcessing;
-
-//    @Override
-//    protected void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//    }
 
     @Override
     public boolean isSwipeEnable() {
@@ -88,7 +98,6 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
 
     @Override
     public void setTabLayout(CommonTabLayout tabLayout) {
-
     }
 
     @Override
@@ -102,39 +111,33 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
         super.onResume();
         String tag = (String) SPUtil.get(mContext,"tag","");
         if (tag.contains("backMain")){
-                                    HomeFragment fragment = findFragment(HomeFragment.class);
-//                Bundle newBundle = new Bundle();
-//                fragment.putNewBundle(newBundle);
-                        // 在栈内的HomeFragment以SingleTask模式启动（即在其之上的Fragment会出栈）
-                        start(fragment, SupportFragment.SINGLETASK);
+            HomeFragment fragment = findFragment(HomeFragment.class);
+            // 在栈内的HomeFragment以SingleTask模式启动（即在其之上的Fragment会出栈）
+            start(fragment, SupportFragment.SINGLETASK);
         }
     }
 
     public void openSerialport() {
-
         Log.d("111111MODEL", Build.MODEL);
-
         Log.d("111111MODEL", getTopFragment()+"");
-
-
         //打开端口，usb模式，打开之前必须确保已经获取到USB权限，返回值为设备句柄号。
         int devHandle = BasicOper.dc_open("AUSB",this,"",0);
 //        int devHandle = BasicOper.dc_open("AUSB",this,"/dev/ttyHSL1",115200);
-
 //        int devHandle = BasicOper.dc_open("COM",null,"/dev/ttyS0",115200);
         Log.d("111111MODEL", devHandle+"");
         if(devHandle>0){
             Log.d("open","dc_open success devHandle = "+devHandle);
             timeLoop();
         }
-
     }
 
     private static final int PERIOD = 3* 1000;
     private static final int DELAY = 100;
     private Disposable mDisposable;
+
     /**
      * 定时循环任务
+     * 每3秒检测一次
      */
     public void timeLoop() {
         if (mDisposable == null){
@@ -147,7 +150,6 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(aLong -> readCardNew());//getUnreadCount()执行的任务
         }
-
     }
 
     /**
@@ -164,7 +166,6 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
 //            BasicOper.dc_exit();
 //            return;
 //        }
-
         if (getTopFragment() instanceof MineFragment){
 //            //社保卡上电
             boolean bCardPowerOn = false;
@@ -180,7 +181,6 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
             }
             //读取社保卡基本信息
             if(bCardPowerOn){
-
 //            byte info[] = new byte[256];
 //            long ret = SSCardDriver.iReadCardBas(1,info);
 //            try {
@@ -190,17 +190,9 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
 //            catch (UnsupportedEncodingException e) {
 //                e.printStackTrace();
 //            }
-
                 SSCard ssCard = EGovernment.EgAPP_SI_ReadSSCardInfo();
                 if(ssCard!=null){
                     Log.d("EgAPP_SI_ReadSSCardInfo",ssCard.toString());
-                    // 读卡后，发现卡的信息不一样，且不为空，判断依据是身份证 SSNum
-                    // 不在读卡页面，不在首页，则跳转回首页
-                    if (GlobalConfig.ssCard!=null && !Objects.equals(GlobalConfig.ssCard.getSSNum(), ssCard.getSSNum())){
-                        if (!(getTopFragment() instanceof HomeFragment ) || !(getTopFragment() instanceof MineFragment )){
-                            start(HomeFragment.newInstance(), SupportFragment.SINGLETASK);
-                        }
-                    }
                     // 向全局填写当前社保卡信息
                     GlobalConfig.ssCard = ssCard;
                     GlobalConfig.age = getAge(Long.parseLong(ssCard.getBirthday()));
@@ -212,17 +204,14 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                     SPUtil.put(mContext,"idCard",ssCard.getSSNum());
 
                     // 获取信息后，直接请求用户数据
-                    // todo 每3秒请求一次，可能造成资源浪费
-                    readCardSuccess(ssCard.getSSNum(),ssCard.getName(),ssCard.getCardNum());
+                    requestFindUser(ssCard.getSSNum(),ssCard.getName(),ssCard.getCardNum());
 
+                    // 读取成功后，清除mDisposable不再进行验证
                     if (mDisposable != null) {
                         mDisposable.dispose();
                         mDisposable=null;
                     }
                     BasicOper.dc_exit();
-
-
-//                    if (mDisposable != null) {mDisposable.dispose();}
                 }else{
                     if (mDisposable != null) {mDisposable.dispose();}
                     BasicOper.dc_exit();
@@ -233,7 +222,6 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
             if(bCardPowerOn){
                 result = EGovernment.EgAPP_SI_CardPowerOff(1);
             }
-
         }else {
             if (mDisposable != null) {
                 mDisposable.dispose();
@@ -275,35 +263,15 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
 //        }
     }
 
-//    private boolean fakeTest; // todo cc
     /**
-     * 手动输入身份证，直接运行下一步
-     * 假数据运行测试
-     * todo cc
+     * 通过生日返回年龄
+     * @param birthday 生日
      */
-//    private boolean fakeDataInject(){
-//        Log.d("fakeDataInject",fakeTest+"");
-//        if (fakeTest)
-//            return true;
-//        fakeTest = true;
-//        // 注入全局配置数据
-//        FakeDataExample.GlobalInject();
-//        // 注入社保卡数据
-//        SSCard mssCard = FakeDataExample.fakeSSCard();
-//        GlobalConfig.ssCard = mssCard;
-//        readCardSuccess(mssCard.getSSNum(),mssCard.getName(),mssCard.getCardNum());
-//        return true;
-//    }
-
-
-
     public static int getAge(long birthday) {
         Calendar currentCalendar = Calendar.getInstance();//实例化calendar
         currentCalendar.setTimeInMillis(System.currentTimeMillis());//调用setTimeInMillis方法和System.currentTimeMillis()获取当前时间
-
         Calendar targetCalendar = Calendar.getInstance();
         targetCalendar.setTimeInMillis(birthday);//这个解析传进来的时间戳
-
         if (currentCalendar.get(Calendar.MONTH) >= targetCalendar.get(Calendar.MONTH)) {//如果现在的月份大于生日的月份
             return currentCalendar.get(Calendar.YEAR) - targetCalendar.get(Calendar.YEAR);//那就直接减,因为现在的年月都大于生日的年月
         } else {
@@ -311,16 +279,18 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
         }
     }
 
-
     /**
      * 用户信息查询
+     * 验证用户是否注册
      * @param idCard 身份证
      */
-    public void readCardSuccess(String idCard,String name,String smkcard) {
+    public void requestFindUser(String idCard, String name, String smkcard) {
+        // 验证当前 用户信息是否已经获取，如果获取，则不再请求。
         if (GlobalConfig.isFindUserDone)
             return;
         else
             isReadCardProcessing = false;
+        // 验证当前请求是否已经在执行中，如果是，则不再多次请求。
         if (isReadCardProcessing)
             return;
         Log.d("readCardSuccess","readCardSuccess");
@@ -336,7 +306,6 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                                     ToastUtil.show("请检查网络");
                                     return;
                                 }
-//                                checkVersion(entity);
                                 if (entity.isSuccess()){
                                     String tag = (String) SPUtil.get(mContext,"tag","fzpy");
                                     if (entity.getData()!=null){
@@ -354,17 +323,15 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                                                 mDisposable=null;
                                             }
                                             BasicOper.dc_exit();
-
                                             ComponentName componentName = new ComponentName("com.garea.launcher", "com.garea.launcher.login.LauncherLogin");
                                             intent.setComponent(componentName);
                                             intent.putExtra("userName", entity.getData().getName());//这里Intent传值
                                             intent.putExtra("idCard", entity.getData().getIdcard());
                                             intent.putExtra("mobile", entity.getData().getMobile());
                                             startActivity(intent);
-//                                            start(DepartmentFragment.newInstance("stjc"));// todo cc
                                         }else {
                                             //判断是否有挂号或处方，如果没有，跳转一级部门选择。
-                                            getConsultsAndRecipes();
+                                            requestConsultsAndRecipes();
                                         }
                                     }else {
                                         if(TextUtils.isEmpty(tag)){
@@ -396,8 +363,10 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
      * 获取未支付挂号单
      * 获取未支付处方
      * 如果2个都没有，则跳转一级部门选择界面
+     *
+     * 如果挂号单有多余的无效单，批量进行取消。
      */
-    public void getConsultsAndRecipes() {
+    public void requestConsultsAndRecipes() {
         ApiRepository.getInstance().getConsultsAndRecipes()
                 .compose(this.bindUntilEvent(ActivityEvent.DESTROY))
                 .subscribe(new FastLoadingObserver<GetConsultsAndRecipesResultEntity>("请稍后...") {
@@ -407,7 +376,6 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                             ToastUtil.show("请检查网络，返回首页后重试");
                             return;
                         }
-//                                checkVersion(entity);
                         if (entity.isSuccess()){
                             // 如果2个都不满足则跳转科室
                             boolean isDepartTag = true;
@@ -422,7 +390,7 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                                        // 挂号
                                        start(OrderConsultFragment.newInstance(item));
                                    }
-                                   // 批量取消挂号单
+                                    //  如果挂号单有多余的无效单，批量进行取消。
                                     if (item.getConsults().getPayflag()==0 && status!=8){
                                         // 取消挂号单 status = 8 已经取消
                                         ApiRepository.getInstance().patientCancelGraphicTextConsult(item.getConsults().getConsultId()).subscribe();
@@ -445,7 +413,7 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                             }
                             if (isDepartTag){
                                 // 如果2个都不满足则跳转科室
-                                start(DepartmentFragment.newInstance(new Object()));
+                                start(DepartmentFragment.newInstance());
                             }
                         }else {
                             ToastUtil.show(entity.getMessage());
@@ -473,15 +441,6 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
     public void onTabReselect(int position) {
         LoggerManager.d("OnTabSelectListener:onTabReselect:" + position);
     }
-
-    //    @Override
-//    @Override
-//    protected void onDestroy() {
-//        super.onDestroy();
-//        LoggerManager.i(TAG, "onDestroy");
-//    }
-
-
 
     @Override
     public SupportActivityDelegate getSupportDelegate() {
@@ -511,9 +470,6 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
         super.onStart();
         ActivityUtils.fullScreen(getWindow(),false);
         ActivityUtils.lightOnScreen(getWindow());
-
-        // 假数据注入启动
-//        fakeDataInject();// todo cc
     }
 
     @Override

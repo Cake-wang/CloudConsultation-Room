@@ -20,8 +20,8 @@ public class FakeDataExample extends BaseRepository {
 
     public static final String phoneNumber = "18667115892";
 //    public static final String idCard = "33052219861229693X";
-    public static final String idCard = "330624198703080016";
-    public static final String name = "罗成毅";
+    public static final String idCard = "330522198612296933";
+    public static final String name = "飞飞";
     public static final String consultId = "815423835";
     public static final String departmentId = "18804";//行政科室编码
     public static final String organId = "2000300";//机构Id
@@ -37,6 +37,7 @@ public class FakeDataExample extends BaseRepository {
      */
     public static void GlobalInject(){
         GlobalConfig.organId = 1;
+        GlobalConfig.ssCard = fakeSSCard();
     }
 
 

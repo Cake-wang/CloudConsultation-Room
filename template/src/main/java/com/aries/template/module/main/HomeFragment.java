@@ -10,12 +10,14 @@ import android.widget.TextClock;
 
 import com.aries.library.fast.module.fragment.FastTitleFragment;
 import com.aries.library.fast.util.SPUtil;
+import com.aries.template.GlobalConfig;
 import com.aries.template.MainActivity;
 import com.aries.template.R;
 import com.aries.template.module.mine.ConfirmRecipesFragment;
 import com.aries.template.module.mine.DepartmentFragment;
 import com.aries.template.module.mine.MineFragment;
 import com.aries.template.module.mine.PayCodeFragment;
+import com.aries.template.module.mine.PutRecordFragment;
 import com.aries.template.module.mine.ResultFragment;
 import com.aries.ui.view.title.TitleBarView;
 
@@ -29,6 +31,9 @@ import me.yokeyword.fragmentation.SupportHelper;
 import me.yokeyword.fragmentation.anim.FragmentAnimator;
 
 /**
+ * 首页
+ * 返回首页后，需要清空一些全局数据
+ *
  * @Author: AriesHoo on 2018/8/10 12:22
  * @E-Mail: AriesHoo@126.com
  * Function: 主页演示
@@ -37,9 +42,9 @@ import me.yokeyword.fragmentation.anim.FragmentAnimator;
 public class HomeFragment extends FastTitleFragment implements ISupportFragment {
 
     @BindView(R.id.iv_stjc)
-    ImageView iv_stjc;
+    ImageView iv_stjc;//身体检查
     @BindView(R.id.iv_fzpy)
-    ImageView iv_fzpy;
+    ImageView iv_fzpy;//复诊配药
 
     public static HomeFragment newInstance() {
         Bundle args = new Bundle();
@@ -51,8 +56,6 @@ public class HomeFragment extends FastTitleFragment implements ISupportFragment 
 
     @Override
     public void setTitleBar(TitleBarView titleBar) {
-//        titleBar.setTitleMainText("");
-//        titleBar.setBgColor(R.color.xui_transparent);
     }
 
     @Override
@@ -62,30 +65,22 @@ public class HomeFragment extends FastTitleFragment implements ISupportFragment 
 
     @Override
     public void initView(Bundle savedInstanceState) {
-
-
-        iv_stjc.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                SPUtil.put(mContext,"tag","stjc");
-                start(MineFragment.newInstance("stjc"));
+        // 点击身体检查
+        iv_stjc.setOnClickListener(v -> {
+            SPUtil.put(mContext,"tag","stjc");
+            start(MineFragment.newInstance("stjc"));
 //                start(DepartmentFragment.newInstance("stjc"));// todo cc
 //                start(PutRecordFragment.newInstance("idcard","name","smkcard"));// todo cc
 //                ((MainActivity) getActivity()).getConsultsAndRecipes();//todo cc
 //                start(ResultFragment.newInstance("cancelConsult"));//todo ccss
 //                start(ConfirmRecipesFragment.newInstance(null));// todo cc
 //                start(PayCodeFragment.newInstance(new Object()));// todo cc
-            }
         });
 
-        iv_fzpy.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                SPUtil.put(mContext,"tag","fzpy");
-                start(MineFragment.newInstance("fzpy"));
-
-            }
+        // 点击复诊
+        iv_fzpy.setOnClickListener(v -> {
+            SPUtil.put(mContext,"tag","fzpy");
+            start(MineFragment.newInstance("fzpy"));
         });
     }
 
@@ -126,8 +121,6 @@ public class HomeFragment extends FastTitleFragment implements ISupportFragment 
 
 
     }
-
-
 
     @Override
     public Animation onCreateAnimation(int transit, boolean enter, int nextAnim) {
@@ -174,6 +167,9 @@ public class HomeFragment extends FastTitleFragment implements ISupportFragment 
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
         mDelegate.onHiddenChanged(hidden);
+        if (!hidden){
+            GlobalConfig.clear();
+        }
     }
 
     @Override

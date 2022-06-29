@@ -17,9 +17,10 @@ public class GlobalConfig {
     /** 由纳里平台分配 第三方平台用户唯一主键，在findUser里面取的 在findUser 这个请求中获取, 这个值就是 userId  */
     public static String NALI_TID = "tid_eric_1";
 
-
-
-    /** 机器编号 从获取机构编号，组织代码，机器编号的接口一并返回 */
+    /**
+     *  机器编号 从获取机构编号，组织代码，机器编号的接口一并返回
+     *  不可以被重置
+     *  */
     // todo 机器编号
     public static String machineId = "SY0001";
 
@@ -28,6 +29,7 @@ public class GlobalConfig {
      * 用于确定医院组织的代码。1 浙大附属邵逸夫医院
      * 目前ID是根据机器的ID，发送到后端，后端返回组织代码给机器。
      * 一台机器的组织代码是固定的。
+     * 不可以被重置
      */
     // todo 获取机构编号
     public static int organId = 1;
@@ -76,5 +78,6 @@ public class GlobalConfig {
         doc=null;
         departmentID="";
         ssCard=null;
+        isFindUserDone = false;
     }
 }

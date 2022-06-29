@@ -114,9 +114,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         style="@style/my_edittext_style"
-
                         android:hint="@string/tip_please_input_phone_number"
                         android:inputType="number"
+                        android:maxLength="13"
                       />
 
 <!--                app:met_clearButton="true"-->
@@ -156,6 +156,7 @@
                         style="@style/my_edittext_style"
                         android:hint="@string/hint_please_input_verify_code"
                         android:inputType="number"
+                        android:maxLength="6"
                          />
 
 <!--                    app:met_clearButton="false"-->

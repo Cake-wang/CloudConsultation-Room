@@ -72,7 +72,7 @@ public class DepartmentFragment extends BaseEventFragment {
     /**
      * 跳转科室，需要带的数据
      */
-    public static DepartmentFragment newInstance(Object inputObj) {
+    public static DepartmentFragment newInstance() {
         DepartmentFragment fragment = new DepartmentFragment();
         return fragment;
     }
