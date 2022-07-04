@@ -6,6 +6,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -17,6 +18,7 @@ import com.aries.library.fast.util.SPUtil;
 import com.aries.library.fast.util.ToastUtil;
 import com.aries.template.entity.FindUserResultEntity;
 import com.aries.template.entity.GetConsultsAndRecipesResultEntity;
+import com.aries.template.entity.MachineEntity;
 import com.aries.template.module.main.HomeFragment;
 import com.aries.template.module.mine.DepartmentFragment;
 import com.aries.template.module.mine.MineFragment;
@@ -25,6 +27,7 @@ import com.aries.template.module.mine.OrderRecipesFragment;
 import com.aries.template.module.mine.PutRecordFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.template.utils.ActivityUtils;
+import com.aries.template.xiaoyu.EaseModeProxy;
 import com.aries.ui.view.tab.CommonTabLayout;
 import com.decard.NDKMethod.BasicOper;
 import com.decard.NDKMethod.EGovernment;
@@ -103,8 +106,22 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
     @Override
     public void initView(Bundle savedInstanceState) {
         mTabLayout.setVisibility(View.GONE);
+        // 启动时，需要立刻请求，机器相关的数据，并保存在全局
+        requestMachineInfo();
     }
 
+    /**
+     * 禁用首页的物理键
+     */
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (getTopFragment() instanceof HomeFragment){
+            if (keyCode == KeyEvent.KEYCODE_BACK) {
+                return true;
+            }
+        }
+       return super.onKeyDown(keyCode, event);
+    }
 
     @Override
     protected void onResume() {
@@ -432,6 +449,43 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                        }
                    });
 
+    }
+
+    /**
+     * 通过机器编号，获得全局的数据
+     * 并保存在全局
+     */
+    public void requestMachineInfo(){
+         String deviceId = ApiRepository.getDeviceId();
+         ApiRepository.getInstance().findByMachineId(deviceId)
+                 .compose(this.bindUntilEvent(ActivityEvent.DESTROY))
+                 .subscribe(new FastLoadingObserver<MachineEntity>("请稍后...") {
+                     @Override
+                     public void _onNext(@io.reactivex.annotations.NonNull MachineEntity entity) {
+                         if (entity == null) {
+                             ToastUtil.show("请检查网络，返回首页后重试");
+                             return;
+                         }
+                         if (entity.success){
+                             GlobalConfig.machineId = entity.data.machineId;
+                             GlobalConfig.cabinetId = entity.data.cabinetId;
+                             GlobalConfig.hospitalName = entity.data.hospitalName;
+//                             GlobalConfig.machineId = entity.data.machineStatus;// 暂定
+                             GlobalConfig.organId = Integer.valueOf(entity.data.hospitalNo);
+                         }else {
+                             ToastUtil.show(entity.message);
+                         }
+                         isReadCardProcessing = false;
+                     }
+
+                     @Override
+                     public void _onError(Throwable e) {
+                         super._onError(e);
+                         ToastUtil.show("网络问题，返回首页后重试");
+                         start(HomeFragment.newInstance(), SupportFragment.SINGLETASK);
+                         isReadCardProcessing = false;
+                     }
+                 });
     }
 
     @Override

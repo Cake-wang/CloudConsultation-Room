@@ -11,17 +11,23 @@ import com.decard.entitys.SSCard;
  */
 public class GlobalConfig {
 
-    /** 由纳里平台分配的公司标识，固定写死 */
+    /**
+     * 由纳里平台分配的公司标识，
+     * 固定写死
+     * */
     public static final String NALI_APPKEY = "app_web";
 
-    /** 由纳里平台分配 第三方平台用户唯一主键，在findUser里面取的 在findUser 这个请求中获取, 这个值就是 userId  */
+    /**
+     * 由纳里平台分配 第三方平台用户唯一主键，
+     * 在findUser里面取的 在findUser 这个请求中获取, 这个值就是 userId
+     * 不可以被清空或重置
+     * */
     public static String NALI_TID = "tid_eric_1";
 
     /**
      *  机器编号 从获取机构编号，组织代码，机器编号的接口一并返回
-     *  不可以被重置
+     *  不可以被清空或重置
      *  */
-    // todo 机器编号
     public static String machineId = "SY0001";
 
     /**
@@ -29,10 +35,23 @@ public class GlobalConfig {
      * 用于确定医院组织的代码。1 浙大附属邵逸夫医院
      * 目前ID是根据机器的ID，发送到后端，后端返回组织代码给机器。
      * 一台机器的组织代码是固定的。
-     * 不可以被重置
+     * 不可以被清空或重置
      */
-    // todo 获取机构编号
-    public static int organId = 1;
+    public static int organId = 0;
+
+    /**
+     * 药柜号
+     * 必须在启动的时候被赋值
+     * 不可以被清空或重置
+     */
+    public static String cabinetId = "";
+
+    /**
+     * 医院名称
+     * 必须在启动的时候被赋值
+     * 不可以被清空或重置
+     */
+    public static String hospitalName = "";
 
     /**
      *  全世界网络通信凭据

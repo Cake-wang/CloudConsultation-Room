@@ -15,7 +15,10 @@ import com.aries.template.impl.ActivityControlImpl;
 import com.aries.template.impl.AppImpl;
 import com.aries.template.impl.HttpRequestControlImpl;
 import com.aries.template.widget.mgson.MFastRetrofit;
+import com.aries.template.xiaoyu.EaseModeProxy;
 import com.decard.NDKMethod.BasicOper;
+import com.hyphenate.chat.EMClient;
+import com.hyphenate.chat.EMOptions;
 import com.orhanobut.logger.PrettyFormatStrategy;
 import com.xuexiang.xaop.XAOP;
 import com.xuexiang.xaop.checker.IThrowableHandler;
@@ -196,14 +199,13 @@ public class App extends MultiDexApplication {
         });
 
         if(!isIgnoringBatteryOptimizations()){
-
             requestIgnoreBatteryOptimizations();
-
         }
 
-
-
+        // 初始化并启动 easeMode
+        EaseModeProxy.with().easemobInit(getContext());
     }
+
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     private boolean isIgnoringBatteryOptimizations() {

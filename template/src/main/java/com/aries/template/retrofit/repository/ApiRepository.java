@@ -23,6 +23,7 @@ import com.aries.template.entity.GetConfigurationToThirdForPatientResultEntity;
 import com.aries.template.entity.GetConsultsAndRecipesResultEntity;
 import com.aries.template.entity.IsRegisterRequestEntity;
 import com.aries.template.entity.IsRegisterResultEntity;
+import com.aries.template.entity.MachineEntity;
 import com.aries.template.entity.RegisterResultEntity;
 import com.aries.template.entity.RequestConsultAndCdrOtherdocResultEntity;
 import com.aries.template.entity.SearchDoctorListByBusTypeV2ResultEntity;
@@ -653,6 +654,19 @@ public class ApiRepository extends BaseRepository {
         // 请求的类型
         RequestBody body = BodyCreate(bizContent,"",false);
         return FastTransformer.switchSchedulers(getApiService().getConsultsAndRecipes(body).retryWhen(new FastRetryWhen()));
+    }
+
+    /**
+     * 根据机器ID获取机器信息
+     * @param machineId 机器ID
+     */
+    public Observable<MachineEntity> findByMachineId(String machineId) {
+        // 除了公共的数据之外，还有其他的数据请求
+        Map<String,String> bizContent = new HashMap<>();
+        bizContent.put("machineId",machineId);//复诊分页开始标记(默认每页十条，从0开始)
+        // 请求的类型
+        RequestBody body = BodyCreate(bizContent,"",false);
+        return FastTransformer.switchSchedulers(getApiService().findByMachineId(body).retryWhen(new FastRetryWhen()));
     }
 
 }

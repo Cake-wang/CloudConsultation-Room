@@ -6,19 +6,13 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.animation.Animation;
 import android.widget.ImageView;
-import android.widget.TextClock;
 
 import com.aries.library.fast.module.fragment.FastTitleFragment;
 import com.aries.library.fast.util.SPUtil;
 import com.aries.template.GlobalConfig;
-import com.aries.template.MainActivity;
 import com.aries.template.R;
-import com.aries.template.module.mine.ConfirmRecipesFragment;
-import com.aries.template.module.mine.DepartmentFragment;
 import com.aries.template.module.mine.MineFragment;
-import com.aries.template.module.mine.PayCodeFragment;
-import com.aries.template.module.mine.PutRecordFragment;
-import com.aries.template.module.mine.ResultFragment;
+import com.aries.template.module.mine.VideoConsultFragment;
 import com.aries.ui.view.title.TitleBarView;
 
 import androidx.annotation.Nullable;
@@ -68,13 +62,15 @@ public class HomeFragment extends FastTitleFragment implements ISupportFragment 
         // 点击身体检查
         iv_stjc.setOnClickListener(v -> {
             SPUtil.put(mContext,"tag","stjc");
-            start(MineFragment.newInstance("stjc"));
+//            start(MineFragment.newInstance("stjc"));
 //                start(DepartmentFragment.newInstance("stjc"));// todo cc
 //                start(PutRecordFragment.newInstance("idcard","name","smkcard"));// todo cc
 //                ((MainActivity) getActivity()).getConsultsAndRecipes();//todo cc
 //                start(ResultFragment.newInstance("cancelConsult"));//todo ccss
 //                start(ConfirmRecipesFragment.newInstance(null));// todo cc
 //                start(PayCodeFragment.newInstance(new Object()));// todo cc
+                start(VideoConsultFragment.newInstance(new Object()));// todo cc
+//            startActivity(new Intent(getActivity(), MeetingActivity.class));//todo cc
         });
 
         // 点击复诊

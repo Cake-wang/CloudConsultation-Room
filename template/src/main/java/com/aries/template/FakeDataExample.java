@@ -32,6 +32,23 @@ public class FakeDataExample extends BaseRepository {
     public static final String payMode = "1";//支付方式代码
     public static final String recipeId = "2257979";//电子处方ID
 
+    //------------环信的配置
+    public static final String easemobUserName = "dev_patient_5494620"; //环信用户id
+    public static final String password = "patient123"; //固定值，不用改
+
+    //信令的配置
+    public static final String patientUserId = "627dd085cc2f202b1d2146f3"; //用户userId
+    public static final String doctorUserId = "627a861baa36e516a612dc80"; //医生userId
+
+
+    //------------小鱼的配置
+    public static final String xyAppId = "5886885697deb9f4760b3a5e1ab912b9a3b7dfd3"; //小鱼appid
+    public static final String account = "8827"; //患者小鱼id，实际上是从信令获取到的
+    //    private static final String meetingRoomNumber = "910007543093"; //会议室房间号,从接口获取到的
+    public static final String meetingRoomNumber = "9038284649"; //会议室房间号,从接口获取到的
+    //    private static final String meetingPassword = "383164"; //会议室密码，从接口获取到的
+    public static final String meetingPassword = "348642"; //会议室密码，从接口获取到的
+
     /**
      * 注入全局数据
      */

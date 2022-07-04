@@ -14,6 +14,7 @@ import com.aries.template.entity.FindValidOrganProfessionForRevisitResultEntity;
 import com.aries.template.entity.GetConfigurationToThirdForPatientResultEntity;
 import com.aries.template.entity.GetConsultsAndRecipesResultEntity;
 import com.aries.template.entity.IsRegisterResultEntity;
+import com.aries.template.entity.MachineEntity;
 import com.aries.template.entity.RegisterResultEntity;
 import com.aries.template.entity.RequestConsultAndCdrOtherdocResultEntity;
 import com.aries.template.entity.SearchDoctorListByBusTypeV2ResultEntity;
@@ -132,5 +133,9 @@ public interface ApiService {
     @Headers("Content-Type: application/json")
     @POST(ApiConstant.doBaseNgariRequest)
     Observable<RequestConsultAndCdrOtherdocResultEntity> paySuccess(@Body RequestBody body);
+
+    @Headers("Content-Type: application/json")
+    @POST(ApiConstant.machineRelationByMachineId)
+    Observable<MachineEntity> findByMachineId(@Body RequestBody body);
 
 }
