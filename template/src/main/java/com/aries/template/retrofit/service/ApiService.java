@@ -7,6 +7,7 @@ import com.aries.template.entity.AuthCodeResultEntity;
 import com.aries.template.entity.BaseMovieEntity;
 import com.aries.template.entity.CanRequestOnlineConsultResultEntity;
 import com.aries.template.entity.CancelregisterResultEntity;
+import com.aries.template.entity.ConfigurationToThirdForPatientEntity;
 import com.aries.template.entity.CreateOrderResultEntity;
 import com.aries.template.entity.FindUserResultEntity;
 import com.aries.template.entity.FindValidDepartmentForRevisitResultEntity;
@@ -114,9 +115,9 @@ public interface ApiService {
     @POST(ApiConstant.doBaseNgariRequest)
     Observable<RequestConsultAndCdrOtherdocResultEntity> requestConsultAndCdrOtherdoc(@Body RequestBody body);
 
-    @Headers("Content-Type: application/json")
-    @POST(ApiConstant.doBaseNgariRequest)
-    Observable<GetConfigurationToThirdForPatientResultEntity> getConfigurationToThirdForPatient(@Body RequestBody body);
+//    @Headers("Content-Type: application/json")
+//    @POST(ApiConstant.doBaseNgariRequest)
+//    Observable<GetConfigurationToThirdForPatientResultEntity> getConfigurationToThirdForPatient(@Body RequestBody body);
 
     @Headers("Content-Type: application/json")
     @POST(ApiConstant.doBaseNgariRequest)
@@ -137,5 +138,9 @@ public interface ApiService {
     @Headers("Content-Type: application/json")
     @POST(ApiConstant.machineRelationByMachineId)
     Observable<MachineEntity> findByMachineId(@Body RequestBody body);
+
+    @Headers("Content-Type: application/json")
+    @POST(ApiConstant.doBaseNgariRequest)
+    Observable<ConfigurationToThirdForPatientEntity> getConfigurationToThirdForPatient(@Body RequestBody body);
 
 }

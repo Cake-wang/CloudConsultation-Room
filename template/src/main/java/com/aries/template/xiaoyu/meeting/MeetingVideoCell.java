@@ -18,6 +18,11 @@ public class MeetingVideoCell extends OpenGLTextureView {
         startRender();
     }
 
+    public MeetingVideoCell(Context context, boolean b) {
+        super(context, b);
+        startRender();
+    }
+
     public void setVideoInfo(VideoInfo videoInfo) {
         //设置渲染视频的资源ID。
         String sourceID = videoInfo.getDataSourceID();

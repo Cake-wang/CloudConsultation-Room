@@ -537,6 +537,7 @@ s
         >
 
         <TextView
+            android:id="@+id/jtjk_machine_id"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="#fff"
@@ -576,10 +577,10 @@ s
             />
 
         <TextView
+            android:id="@+id/jtjk_hospital_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="#fff"
-
             android:layout_weight="1"
             android:gravity="center"
             android:text="杭州市第一人民医院" />

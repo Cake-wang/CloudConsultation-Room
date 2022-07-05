@@ -56,6 +56,16 @@ public abstract class BaseTimerFragment extends BaseFragmentationFragment{
         }
     }
 
+    /**
+     * 释放时间资源
+     */
+    protected void timeStop(){
+        if (timer!=null){
+            timer.cancel();
+            timer = null;
+        }
+    }
+
 
     /**
      * 每次执行后执行到的方法
@@ -66,9 +76,6 @@ public abstract class BaseTimerFragment extends BaseFragmentationFragment{
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (timer!=null){
-            timer.cancel();
-            timer = null;
-        }
+        timeStop();
     }
 }

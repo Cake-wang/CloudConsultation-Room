@@ -7,18 +7,21 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.aries.library.fast.retrofit.FastLoadingObserver;
 import com.aries.library.fast.util.SPUtil;
 import com.aries.library.fast.util.ToastUtil;
-import com.aries.template.FakeDataExample;
+import com.aries.template.GlobalConfig;
 import com.aries.template.R;
 import com.aries.template.entity.CancelregisterResultEntity;
+import com.aries.template.entity.ConfigurationToThirdForPatientEntity;
 import com.aries.template.module.base.BaseEventFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.template.view.ShineButtonDialog;
 import com.aries.template.xiaoyu.EaseModeProxy;
-import com.aries.template.xiaoyu.meeting.MeetingVideoCell;
 import com.aries.ui.view.title.TitleBarView;
 import com.trello.rxlifecycle3.android.FragmentEvent;
 import com.xuexiang.xaop.annotation.SingleClick;
@@ -43,8 +46,6 @@ public class VideoConsultFragment extends BaseEventFragment {
      */
     @Override
     public int getContentLayout() {
-//        EaseModeProxy.with().setActivity(getActivity());
-//        EaseModeProxy.with().xyInit(true);
         return R.layout.fragment_video;
     }
 
@@ -54,6 +55,12 @@ public class VideoConsultFragment extends BaseEventFragment {
     Button btn_stjc;// 上一页按钮
     @BindView(R.id.btn_finish)
     Button btn_finish;// 下一页按钮
+    @BindView(R.id.jtjk_video_content)
+    RelativeLayout video_content;// 全屏视频容器
+    @BindView(R.id.jtjk_video_content_parent)
+    RelativeLayout video_content_parent;// 全屏视频容器的父类
+    @BindView(R.id.jtjk_video_close_full)
+    TextView video_close_full;// 全屏按钮
 
     /**
      * 跳转科室，需要带的数据
@@ -70,15 +77,14 @@ public class VideoConsultFragment extends BaseEventFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        timeStop();
+        // 启动请求
+        requestConfigurationToThirdForPatient();
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        timeCount = 1500;
-        ViewGroup viewGroup = getActivity().findViewById(R.id.videoContent);
-        EaseModeProxy.with().init(getActivity(),viewGroup).easemobStart(getActivity(),viewGroup,FakeDataExample.easemobUserName,FakeDataExample.password);
-        EaseModeProxy.with().init(getActivity(),viewGroup).xyInit();
     }
 
     /**
@@ -90,7 +96,7 @@ public class VideoConsultFragment extends BaseEventFragment {
 
 
     @SingleClick
-    @OnClick({R.id.btn_stjc, R.id.btn_finish})
+    @OnClick({R.id.btn_stjc, R.id.btn_finish,R.id.jtjk_video_close_full})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.btn_stjc:
@@ -106,11 +112,14 @@ public class VideoConsultFragment extends BaseEventFragment {
             case R.id.btn_finish:
                 showSimpleConfirmDialog();
                 break;
+            case R.id.jtjk_video_close_full:
+                EaseModeProxy.with().doNotFullScreen();
+                video_content_parent.setVisibility(View.GONE);
+                break;
             default:
                 break;
         }
     }
-
 
     private void showSimpleConfirmDialog() {
         ShineButtonDialog dialog = new ShineButtonDialog(this.mContext);
@@ -119,14 +128,19 @@ public class VideoConsultFragment extends BaseEventFragment {
         dialog.btn_inquiry.setOnClickListener(v -> {
             dialog.dismiss();
                 // 在栈内的HomeFragment以SingleTask模式启动（即在其之上的Fragment会出栈）
-            patientFinishGraphicTextConsult(0);
+            requestPatientFinishGraphicTextConsult(0);
         });
         dialog.btn_cancel.setOnClickListener(v -> dialog.dismiss());
         dialog.iv_close.setOnClickListener(v -> dialog.dismiss());
         dialog.show();
     }
 
-    private void patientFinishGraphicTextConsult(Integer consultId) {
+
+    /**
+     * 患者取消复诊服务
+     * @param consultId 复诊单号
+     */
+    private void requestPatientFinishGraphicTextConsult(Integer consultId) {
         ApiRepository.getInstance().patientFinishGraphicTextConsult(consultId)
                 .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
                 .subscribe(new FastLoadingObserver<CancelregisterResultEntity>("请稍后...") {
@@ -145,12 +159,45 @@ public class VideoConsultFragment extends BaseEventFragment {
                 });
     }
 
+    /**
+     * 获取第三方配置信息
+     */
+    private void requestConfigurationToThirdForPatient(){
+        ApiRepository.getInstance().getConfigurationToThirdForPatient(GlobalConfig.NALI_TID,GlobalConfig.NALI_APPKEY)
+                .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
+                .subscribe(new FastLoadingObserver<ConfigurationToThirdForPatientEntity>("请稍后...") {
+                    @Override
+                    public void _onNext(ConfigurationToThirdForPatientEntity entity) {
+                        if (entity == null) {
+                            ToastUtil.show("请检查网络");
+                            return;
+                        }
+                        if (entity.success){
+                            ViewGroup viewGroup = getActivity().findViewById(R.id.videoContent);
+//                            EaseModeProxy.with().init(getActivity(),viewGroup).easemobStart(getActivity(),viewGroup,entity.data.username,entity.data.userpwd,entity.data.userId);
+                            EaseModeProxy.with().init(getActivity(),viewGroup).xyInit();
+                            EaseModeProxy.with().setListener(() -> EaseModeProxy.with().doFullScreen(video_content));
+                            video_content_parent.setVisibility(View.VISIBLE);
+                        }
+                    }
+                });
+    }
+
+    @Override
+    protected void onDismiss() {
+        super.onDismiss();
+        // 关闭，并释放所有资源
+        EaseModeProxy.with().closeVideoProxy();
+    }
+
     @Override
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
-        if (hidden)
-            // 关闭，并释放所有资源
-            EaseModeProxy.with().closeProxy();
+        if (hidden){
+        } else {
+            // 启动请求
+            requestConfigurationToThirdForPatient();
+        }
     }
 
     /**

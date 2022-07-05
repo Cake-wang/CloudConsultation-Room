@@ -6,20 +6,28 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.animation.Animation;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.aries.library.fast.module.fragment.FastTitleFragment;
+import com.aries.library.fast.retrofit.FastLoadingObserver;
 import com.aries.library.fast.util.SPUtil;
+import com.aries.library.fast.util.ToastUtil;
 import com.aries.template.GlobalConfig;
 import com.aries.template.R;
+import com.aries.template.entity.MachineEntity;
 import com.aries.template.module.mine.MineFragment;
 import com.aries.template.module.mine.VideoConsultFragment;
+import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.ui.view.title.TitleBarView;
+import com.trello.rxlifecycle3.android.ActivityEvent;
+import com.trello.rxlifecycle3.android.FragmentEvent;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
 import butterknife.BindView;
 import me.yokeyword.fragmentation.ExtraTransaction;
 import me.yokeyword.fragmentation.ISupportFragment;
+import me.yokeyword.fragmentation.SupportFragment;
 import me.yokeyword.fragmentation.SupportFragmentDelegate;
 import me.yokeyword.fragmentation.SupportHelper;
 import me.yokeyword.fragmentation.anim.FragmentAnimator;
@@ -39,6 +47,10 @@ public class HomeFragment extends FastTitleFragment implements ISupportFragment 
     ImageView iv_stjc;//身体检查
     @BindView(R.id.iv_fzpy)
     ImageView iv_fzpy;//复诊配药
+    @BindView(R.id.jtjk_machine_id)
+    TextView jtjk_machine;//机器编号
+    @BindView(R.id.jtjk_hospital_name)
+    TextView jtjk_hospital;//医院名称
 
     public static HomeFragment newInstance() {
         Bundle args = new Bundle();
@@ -46,7 +58,6 @@ public class HomeFragment extends FastTitleFragment implements ISupportFragment 
         fragment.setArguments(args);
         return fragment;
     }
-
 
     @Override
     public void setTitleBar(TitleBarView titleBar) {
@@ -86,6 +97,51 @@ public class HomeFragment extends FastTitleFragment implements ISupportFragment 
         //Fragment 可见性变化回调
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mDelegate.onCreate(savedInstanceState);
+        // 启动时，需要立刻请求，机器相关的数据，并保存在全局
+        requestMachineInfo();
+    }
+
+    /**
+     * 通过机器编号，获得全局的数据
+     * 并保存在全局
+     */
+    /**
+     * 通过机器编号，获得全局的数据
+     * 并保存在全局
+     */
+    public void requestMachineInfo(){
+        String deviceId = ApiRepository.getDeviceId();
+        ApiRepository.getInstance().findByMachineId(deviceId)
+            .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
+            .subscribe(new FastLoadingObserver<MachineEntity>("请稍后...") {
+                @Override
+                public void _onNext(@io.reactivex.annotations.NonNull MachineEntity entity) {
+                    if (entity == null) {
+                        ToastUtil.show("请检查网络，返回首页后重试");
+                        return;
+                    }
+                    if (entity.success){
+                        GlobalConfig.machineId = entity.data.machineId;
+                        GlobalConfig.cabinetId = entity.data.cabinetId;
+                        GlobalConfig.hospitalName = entity.data.hospitalName;
+//                             GlobalConfig.machineId = entity.data.machineStatus;// 暂定
+                        GlobalConfig.organId = Integer.valueOf(entity.data.hospitalNo);
+
+                        if (jtjk_hospital!=null)
+                            jtjk_hospital.setText(GlobalConfig.hospitalName);
+                        if (jtjk_machine!=null)
+                            jtjk_machine.setText(GlobalConfig.machineId);
+                    }else {
+                        ToastUtil.show(entity.message);
+                    }
+                }
+            });
+    }
+
     final SupportFragmentDelegate mDelegate = new SupportFragmentDelegate(this);
     protected FragmentActivity _mActivity;
 
@@ -108,14 +164,6 @@ public class HomeFragment extends FastTitleFragment implements ISupportFragment 
         super.onAttach(activity);
         mDelegate.onAttach(activity);
         _mActivity = mDelegate.getActivity();
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        mDelegate.onCreate(savedInstanceState);
-
-
     }
 
     @Override
