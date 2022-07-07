@@ -5,8 +5,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.hardware.Camera;
-import android.hardware.camera2.CameraAccessException;
-import android.hardware.camera2.CameraManager;
 import android.os.Handler;
 import android.util.Log;
 import android.view.ViewGroup;
@@ -32,8 +30,8 @@ import com.aries.template.xiaoyu.meeting.MeetingVideoCell;
 import com.aries.template.xiaoyu.model.RegEndPoint;
 import com.aries.template.xiaoyu.model.RegReponse;
 import com.aries.template.xiaoyu.model.RegRequest;
-import com.aries.template.xiaoyu.model.RtcStartInvokeEndPoint;
-import com.aries.template.xiaoyu.model.RtcStartInvokeRequest;
+import com.aries.template.xiaoyu.uvc.UVCCameraPresenter;
+import com.aries.template.xiaoyu.xinlin.XLMessage;
 import com.hyphenate.EMCallBack;
 import com.hyphenate.EMMessageListener;
 import com.hyphenate.chat.EMClient;
@@ -74,6 +72,8 @@ public class EaseModeProxy {
     private boolean muteVideo=false;
     /** 信令 Socket 对象*/
     private WebSocketClient webSocketClient;
+    // 使用 UCV
+    private UVCCameraPresenter uvcCameraPresenter;
 
     // 复诊单的配置
     private Integer consultId = 815423874; //复诊单id 复诊单拿
@@ -94,6 +94,7 @@ public class EaseModeProxy {
     private String meetingRoomNumber = "9038284649"; //会议室房间号,从接口获取到的 还没有
     //    private static final String meetingPassword = "383164"; //会议室密码，从接口获取到的
     private String meetingPassword = "348642"; //会议室密码，从接口获取到的 还没有
+
 
 
     //单例
@@ -144,6 +145,7 @@ public class EaseModeProxy {
     public EaseModeProxy init(Activity inputAc, ViewGroup layout){
         setActivity(inputAc);
         contentLayout = layout;
+        uvcCameraPresenter = new UVCCameraPresenter(activity.get());
         return this;
     }
 
@@ -279,6 +281,10 @@ public class EaseModeProxy {
                     // todo：这里改成用json来解析
                     if (message.contains("REG_SUCCESS")) {
                         onRegSuccess(message);
+                    }else if (message.contains("SUBSCRIBE")){
+                        // 医生已经离开
+                        // TX_RTC_SHUTDOWN_RES
+                        ToastWithLogin("医生已经离开");
                     }
                 });
             }
@@ -332,17 +338,17 @@ public class EaseModeProxy {
         Settings settings = new Settings(xyAppId);
         settings.setPrivateCloudAddress("cloud.xylink.com");
 
-        int cameraId = -1;
-        int numberOfCameras = Camera.getNumberOfCameras();
-        for (int i = 0; i < numberOfCameras; i++) {
-            Camera.CameraInfo info = new Camera.CameraInfo();
-            Camera.getCameraInfo(i, info);
-            if (info.facing != Camera.CameraInfo.CAMERA_FACING_FRONT){
-                cameraId = i;
-                break;
-            }
-        }
-        settings.setDefaultCameraId(cameraId);
+//        int cameraId = -1;
+//        int numberOfCameras = Camera.getNumberOfCameras();
+//        for (int i = 0; i < numberOfCameras; i++) {
+//            Camera.CameraInfo info = new Camera.CameraInfo();
+//            Camera.getCameraInfo(i, info);
+//            if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT){
+//                cameraId = i;
+//                break;
+//            }
+//        }
+//        settings.setDefaultCameraId(cameraId);
 
         // 初始化 NEmoSDK
         NemoSDK.getInstance().init(activity.get(), settings, new NemoSDKInitCallBack() {
@@ -405,7 +411,7 @@ public class EaseModeProxy {
             permissions.request(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO)
                     .subscribe(aBoolean -> {
                         if (aBoolean) {
-                            NemoSDK.getInstance().makeCall(meetingNumber, meetingPassword, new MakeCallResponse() {
+                            NemoSDK.getInstance().makeCall(meetingNumber, meetingPassword,new MakeCallResponse() {
                                 @Override
                                 public void onCallSuccess() {
                                     ToastWithLogin("参会成功");
@@ -446,8 +452,18 @@ public class EaseModeProxy {
                     mainThreadHandler.post(() -> {
                         if (state == CallState.CONNECTED) {
                             ToastWithLogin("入会成功: ");
+//                            NemoSDK.getInstance().releaseCamera();
                             if (listener!=null)
                                 listener.onVideoSuccessLinked();
+                            if (uvcCameraPresenter != null)
+                                uvcCameraPresenter.onStartAndRegister();
+//                                new Thread(() -> {
+//                                    try {Thread.sleep(15000000);
+////                                        uvcCameraPresenter.onStartAndRegister();
+//                                    }
+//                                    catch (InterruptedException e) {e.printStackTrace();}
+//                                }).start();
+//                                activity.get().runOnUiThread(()->{new Handler().postDelayed(() -> uvcCameraPresenter.onStart(),15000);});
                         } else if (state == CallState.DISCONNECTED) {
                             ToastWithLogin("退出会议: " + reason);
                             // 释放资源一定要写在退出会议的后面
@@ -493,34 +509,38 @@ public class EaseModeProxy {
     }
 
     /**
+     * 信令 通信
      * 向Docotor的视频端发送用户信息。
      */
     private void sendNotifyDoctorVideoMsg() {
         if (webSocketClient==null)
             return;
-        //{"topic":"TX_RTC_START_INVOKE","endPoint":{"patientUserId":"62933bcbcf8912669abf4b98","doctorUserId":"5f339ceb9cd0500a923af577","patientName":"胡江","remark":"未知","orderId":815463559,"roomId":"910007727377","thirdAppVideoConsult":"xyLink","requestMode":"4"}}
-        RtcStartInvokeRequest request = new RtcStartInvokeRequest();
-        request.setTopic("TX_RTC_START_INVOKE");
-        RtcStartInvokeEndPoint endPoint = new RtcStartInvokeEndPoint();
-        endPoint.setPatientUserId(xlPatientUserId);
-        endPoint.setPatientName("todo改掉名字");
-        endPoint.setDoctorUserId(doctorUserId);
-        endPoint.setOrderId(consultId);
-        endPoint.setRemark("未知");
-        endPoint.setRoomId(meetingRoomNumber);
-        endPoint.setThirdAppVideoConsult("xyLink");
-        endPoint.setRequestMode("4");
-
-        request.setEndPoint(endPoint);
-        String cmd = JsonUtil.toJson(request);
-
-        webSocketClient.send(cmd);
+//        //{"topic":"TX_RTC_START_INVOKE","endPoint":{"patientUserId":"62933bcbcf8912669abf4b98","doctorUserId":"5f339ceb9cd0500a923af577","patientName":"胡江","remark":"未知","orderId":815463559,"roomId":"910007727377","thirdAppVideoConsult":"xyLink","requestMode":"4"}}
+//        RtcStartInvokeRequest request = new RtcStartInvokeRequest();
+//        request.setTopic("TX_RTC_START_INVOKE");
+//        RtcStartInvokeEndPoint endPoint = new RtcStartInvokeEndPoint();
+//        endPoint.setPatientUserId(xlPatientUserId);
+//        endPoint.setPatientName("todo改掉名字");
+//        endPoint.setDoctorUserId(doctorUserId);
+//        endPoint.setOrderId(consultId);
+//        endPoint.setRemark("未知");
+//        endPoint.setRoomId(meetingRoomNumber);
+//        endPoint.setThirdAppVideoConsult("xyLink");
+//        endPoint.setRequestMode("4");
+//
+//        request.setEndPoint(endPoint);
+//        String cmd = JsonUtil.toJson(request);
+        webSocketClient.send(new XLMessage().sendDoctorMsg(xlPatientUserId,nickname,doctorUserId,consultId,meetingRoomNumber));
     }
 
     /**
      * 挂断视频
      */
     public void closeVideoProxy(){
+        // 病人离席
+        // todo webSocketClient 可能会是一个空对象，所以这里可能需要生成一个新的webSocketClient
+        if (webSocketClient!=null)
+            webSocketClient.send(new XLMessage().sendPatientLeave(doctorUserId,xlPatientUserId));
         // 释放视频资源
         NemoSDK.getInstance().hangup();// 挂断通话
     }
@@ -530,6 +550,10 @@ public class EaseModeProxy {
      */
     private void releaseProxy(){
         // 释放对象资源
+//        if (uvcCameraPresenter!=null){
+//            uvcCameraPresenter.onStop();
+//            uvcCameraPresenter.onDestroy();
+//        }
         if (activity!=null)
             activity = null;
         if (contentLayout !=null)

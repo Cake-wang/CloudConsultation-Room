@@ -172,9 +172,14 @@ public class VideoConsultFragment extends BaseEventFragment {
                             ToastUtil.show("请检查网络");
                             return;
                         }
-                        if (entity.success){
+                        if (entity.getData().isSuccess()){
+                            // 成功返回数据注入第三方数据
                             ViewGroup viewGroup = getActivity().findViewById(R.id.videoContent);
-//                            EaseModeProxy.with().init(getActivity(),viewGroup).easemobStart(getActivity(),viewGroup,entity.data.username,entity.data.userpwd,entity.data.userId);
+//                            EaseModeProxy.with().init(getActivity(),viewGroup).easemobStart(getActivity(),
+//                                    viewGroup,
+//                                    entity.getData().getJsonResponseBean().getBody().getUsername(),
+//                                    entity.getData().getJsonResponseBean().getBody().getUserpwd(),
+//                                    entity.getData().getJsonResponseBean().getBody().getUserId());
                             EaseModeProxy.with().init(getActivity(),viewGroup).xyInit();
                             EaseModeProxy.with().setListener(() -> EaseModeProxy.with().doFullScreen(video_content));
                             video_content_parent.setVisibility(View.VISIBLE);
