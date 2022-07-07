@@ -15,9 +15,21 @@ public class DateUtils {
      * 今天的格式是 "yyyy年MM月dd日 星期？ HH:mm:ss"
      * @return String 格式化的今天
      */
+    public static String getCurrentTime() {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy年MM月dd日 EEE HH:mm:ss");
+        Date dt = new Date(System.currentTimeMillis());
+        String returnStr = simpleDateFormat.format(dt);
+        return returnStr;
+    }
+
+    /**
+     * 获取今天
+     * 今天的格式是 "yyyy年MM月dd日 星期？ HH:mm:ss"
+     * @return String 格式化的今天
+     */
     public static String getToday() {
         String[] weekDays = {"星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"};
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy年MM月dd日 %%% HH:mm:ss");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy年MM月dd日 %%%");
         Date dt = new Date(System.currentTimeMillis());
         Calendar cal = Calendar.getInstance();
         cal.setTime(dt);
@@ -30,5 +42,7 @@ public class DateUtils {
         String returnStr = simpleDateFormat.format(dt).replace("%%%",weekDays[w]);
         return returnStr;
     }
+
+
 
 }

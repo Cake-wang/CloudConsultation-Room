@@ -22,7 +22,7 @@ public class FakeDataExample extends BaseRepository {
 //    public static final String idCard = "33052219861229693X";
     public static final String idCard = "330522198612296933";
     public static final String name = "飞飞";
-    public static final String consultId = "815423835";
+    public static final String consultId = "815423874";
     public static final String departmentId = "18804";//行政科室编码
     public static final String organId = "2000300";//机构Id
     public static final String profession = "444986";//专科编码
@@ -31,6 +31,9 @@ public class FakeDataExample extends BaseRepository {
     public static final String decoctionFlag = "0";//是否代煎
     public static final String payMode = "1";//支付方式代码
     public static final String recipeId = "2257979";//电子处方ID
+
+    // 复诊单的配置
+    public static final String nickname = "eric"; //复诊人姓名 复诊单拿
 
     //------------环信的配置
     public static final String easemobUserName = "dev_patient_5494620"; //环信用户id

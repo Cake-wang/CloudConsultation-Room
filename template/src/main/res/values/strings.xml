@@ -24,4 +24,12 @@
     <string name="lab_yes">是</string>
     <string name="lab_no">否</string>
 
+    <!-- 小鱼视频状态提示 -->
+    <string name="video_status_normal">网络正常</string>
+    <string name="video_status_as_low_local_bw">本地网络不稳定</string>
+    <string name="video_status_as_low_local_hardware">系统忙，视频质量降低</string>
+    <string name="video_status_as_low_local_remote">对方网络不稳定</string>
+    <string name="video_status_network_error">网络不稳定，请稍候</string>
+    <string name="video_status_local_wifi_issue">WiFi信号不稳定</string>
+
 </resources>

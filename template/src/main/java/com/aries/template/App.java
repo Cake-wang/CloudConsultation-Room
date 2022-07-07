@@ -17,8 +17,6 @@ import com.aries.template.impl.HttpRequestControlImpl;
 import com.aries.template.widget.mgson.MFastRetrofit;
 import com.aries.template.xiaoyu.EaseModeProxy;
 import com.decard.NDKMethod.BasicOper;
-import com.hyphenate.chat.EMClient;
-import com.hyphenate.chat.EMOptions;
 import com.orhanobut.logger.PrettyFormatStrategy;
 import com.xuexiang.xaop.XAOP;
 import com.xuexiang.xaop.checker.IThrowableHandler;
@@ -203,7 +201,7 @@ public class App extends MultiDexApplication {
         }
 
         // 初始化并启动 easeMode
-        EaseModeProxy.with().easemobInit(getContext());
+        EaseModeProxy.with().initInAPP(getContext());
     }
 
 

@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.aries.library.fast.retrofit.FastLoadingObserver;
 import com.aries.library.fast.util.SPUtil;
 import com.aries.library.fast.util.ToastUtil;
+import com.aries.template.FakeDataExample;
 import com.aries.template.R;
 import com.aries.template.entity.CancelregisterResultEntity;
 import com.aries.template.entity.GetConsultsAndRecipesResultEntity;
@@ -150,7 +151,8 @@ public class OrderConsultFragment extends BaseEventFragment {
                 break;
             case R.id.btn_inquiry:
                 //跳视频问诊
-                start(VideoConsultFragment.newInstance(new Object()));
+                // todo 动态输入参数
+                start(VideoConsultFragment.newInstance(FakeDataExample.consultId,FakeDataExample.nickname,FakeDataExample.doctorUserId));
                 break;
             default:
                 break;

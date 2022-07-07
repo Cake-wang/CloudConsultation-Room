@@ -18,6 +18,7 @@ import com.aries.library.fast.retrofit.FastLoadingObserver;
 import com.aries.library.fast.retrofit.FastObserver;
 import com.aries.library.fast.util.SPUtil;
 import com.aries.library.fast.util.ToastUtil;
+import com.aries.template.FakeDataExample;
 import com.aries.template.R;
 import com.aries.template.adapter.RecipesAdapter;
 import com.aries.template.entity.CancelregisterResultEntity;
@@ -338,11 +339,9 @@ public class OrderFragment extends FastTitleRefreshLoadFragment<GetConsultsAndRe
             case R.id.btn_inquiry:
 
                 if (obj.getConsults().size()>0){
-
                     //跳视频问诊
-                    start(VideoConsultFragment.newInstance(new Object()));
-
-
+                    // todo 动态输入参数
+                    start(VideoConsultFragment.newInstance(FakeDataExample.consultId,FakeDataExample.nickname,FakeDataExample.doctorUserId));
                 }else if (obj.getRecipes().size()>0){
 
                     //先查库存，再跳转支付页

@@ -1,6 +1,8 @@
 package com.aries.template.module.base;
 
 import android.annotation.SuppressLint;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
@@ -11,6 +13,7 @@ import com.aries.template.GlobalConfig;
 import com.aries.template.R;
 import com.aries.template.module.main.HomeFragment;
 import com.aries.template.utils.ActivityUtils;
+import com.aries.template.utils.DateUtils;
 import com.aries.template.utils.DefenceUtil;
 
 import me.yokeyword.fragmentation.SupportFragment;
@@ -38,8 +41,14 @@ public abstract class BaseEventFragment extends BaseTimerFragment{
     protected TextView machineIDTv;
     /** 组织名称 */
     protected TextView hospitalNameTv;
+    /** 时钟显示  */
+    protected TextView textClock;
+    /** 时钟显示  */
+    protected TextView versionCode;
     /** 120  秒倒计时间 */
     protected int timeCount = 120;
+    /** 是否关闭倒计时显示对象 true 关闭*/
+    private boolean dismissCountTimeTag;
 
 
     @Override
@@ -54,7 +63,11 @@ public abstract class BaseEventFragment extends BaseTimerFragment{
         btnMain = getView().findViewById(R.id.btn_main);
         tvShowTimer = getView().findViewById(R.id.jtjk_fz_fragment_timer);
         machineIDTv = getView().findViewById(R.id.jtjk_machine_id);
+        textClock = getView().findViewById(R.id.tv_clock);
+        versionCode = getView().findViewById(R.id.tv_version);
         hospitalNameTv = getView().findViewById(R.id.jtjk_hospital_name);
+
+        // set
         if (btnBack !=null)
             btnBack.setOnClickListener(v -> {
                 if (DefenceUtil.checkReSubmit("btn_back")) {
@@ -69,17 +82,25 @@ public abstract class BaseEventFragment extends BaseTimerFragment{
                     gotoMain();
                 }
             });
-
+        if (versionCode!=null){
+            PackageInfo info = null;
+            try {
+                info = getActivity().getPackageManager().getPackageInfo(mContext.getPackageName(),0);
+                versionCode.setText("当前版本: "+info.versionName);
+            } catch (PackageManager.NameNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
         resetView();
     }
 
     @Override
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
-        if (!hidden){
-            // 重新进入后，刷新数据
-            resetView();
-        }
+//        if (!hidden){
+//            // 重新进入后，刷新数据
+//            resetView();
+//        }
     }
 
     /**
@@ -89,7 +110,7 @@ public abstract class BaseEventFragment extends BaseTimerFragment{
      */
     private void resetView(){
         if (machineIDTv !=null);
-        machineIDTv.setText("机器编号:"+GlobalConfig.machineId);
+            machineIDTv.setText("机器编号:"+GlobalConfig.machineId);
 
         if (hospitalNameTv !=null)
             hospitalNameTv.setText(GlobalConfig.hospitalName);
@@ -97,11 +118,22 @@ public abstract class BaseEventFragment extends BaseTimerFragment{
         timeCount = 120;
     }
 
+    /**
+     * 关闭时间计时器
+     */
     @Override
     protected void timeStop() {
         super.timeStop();
         if (tvShowTimer != null)
             tvShowTimer.setText("");
+    }
+
+    /**
+     * 关闭倒计时显示
+     * 不显示倒计时，不进行倒计时计算
+     */
+    protected void dismissCountTimeStop(){
+        dismissCountTimeTag = true;
     }
 
     /**
@@ -111,14 +143,21 @@ public abstract class BaseEventFragment extends BaseTimerFragment{
     @Override
     protected void timeProcess() {
         super.timeProcess();
-        /**显示对象 计时器*/
-        if ( tvShowTimer !=null){
-            String[] param = {"#38ABA0",--timeCount+"","#333333","秒"};
-            tvShowTimer.setText(ActivityUtils.formatTextView(param));
+        // 是否执行 倒计时 显示对象任务
+        if (!dismissCountTimeTag){
+            // 显示对象 计时器
+            if ( tvShowTimer !=null){
+                String[] param = {"#38ABA0",--timeCount+"","#333333","秒"};
+                tvShowTimer.setText(ActivityUtils.formatTextView(param));
+            }
+            // 显示对象 到时后跳转到主页
+            if (timeCount==0){
+                gotoMain();
+            }
         }
-        if (timeCount==0){
-            gotoMain();
-        }
+        // 下方时钟对象
+        if (textClock!=null)
+            textClock.setText(DateUtils.getCurrentTime());
     }
 
     /**
@@ -130,7 +169,7 @@ public abstract class BaseEventFragment extends BaseTimerFragment{
     }
 
     /**
-     * 看不见了，消失了
+     * fragment页面隐藏
      * 不论是按到返回还是回到首页
      * 只要按到这里两个按钮，就触发
      */

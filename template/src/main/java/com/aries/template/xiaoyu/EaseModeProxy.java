@@ -4,12 +4,14 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.hardware.Camera;
 import android.os.Handler;
 import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import androidx.annotation.IntDef;
 import androidx.fragment.app.FragmentActivity;
 
 import com.ainemo.sdk.otf.ConnectNemoCallback;
@@ -26,6 +28,7 @@ import com.ainemo.sdk.otf.Settings;
 import com.ainemo.sdk.otf.SimpleNemoSDkListener;
 import com.ainemo.sdk.otf.VideoInfo;
 import com.ainemo.util.JsonUtil;
+import com.aries.template.R;
 import com.aries.template.xiaoyu.meeting.MeetingVideoCell;
 import com.aries.template.xiaoyu.model.RegEndPoint;
 import com.aries.template.xiaoyu.model.RegReponse;
@@ -39,6 +42,8 @@ import com.hyphenate.chat.EMMessage;
 import com.hyphenate.chat.EMOptions;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.lang.ref.WeakReference;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -60,7 +65,7 @@ import tech.gusavila92.websocketclient.WebSocketClient;
  */
 public class EaseModeProxy {
 
-    //弱应用
+    //弱应用 activity
     private WeakReference<Activity> activity;
     // 非全屏时，MeetingVideoCell 的容器
     private ViewGroup contentLayout;
@@ -70,7 +75,7 @@ public class EaseModeProxy {
     private boolean muteMic=false;
     // 是否关闭画面
     private boolean muteVideo=false;
-    /** 信令 Socket 对象*/
+    // 信令 Socket 对象
     private WebSocketClient webSocketClient;
     // 使用 UCV
     private UVCCameraPresenter uvcCameraPresenter;
@@ -123,8 +128,9 @@ public class EaseModeProxy {
 
     /**
      * easeMode初始化 视频三方组件
+     * 这个初始化必须写在 application 里面
      */
-    public void easemobInit(Context context) {
+    public void initInAPP(Context context) {
         //参看：https://docs-im.easemob.com/im/android/sdk/basic
         EMOptions options = new EMOptions();
         // 是否自动将消息附件上传到环信服务器，默认为True是使用环信服务器上传下载，如果设为 false，需要开发者自己处理附件消息的上传和下载
@@ -139,10 +145,12 @@ public class EaseModeProxy {
 
     /**
      * 初始化参数
+     * 和 onStartVideo 一起放在 onstart上面执行
+     * 这个初始化，是初始化界面用的，写在activity或者 fragment里面
      * @param inputAc 初始化 activity对象，全局使用
      * @param layout 初始化 存储显示对象容器
      */
-    public EaseModeProxy init(Activity inputAc, ViewGroup layout){
+    public EaseModeProxy initView(Activity inputAc, ViewGroup layout){
         setActivity(inputAc);
         contentLayout = layout;
         uvcCameraPresenter = new UVCCameraPresenter(activity.get());
@@ -150,26 +158,46 @@ public class EaseModeProxy {
     }
 
     /**
+     * 启动摄像头
+     * 在Fragement的 onstart 上面执行，和init 一起执行
+     * EaseModeProxy.with().init(getActivity(),viewGroup).onStartVideo();
+     */
+    public void onStartVideo(){
+        if (uvcCameraPresenter!=null){
+            uvcCameraPresenter.onStart();
+        }
+    }
+
+    /**
      * 环信登录
      * 如果不初始化，会导致 MeetingVideoCell 崩溃
      * 医生端有消息返回后，才会调用onMessageReceived 否则视作医生无响应。
-     * @param layout 存储显示对象的容器，防止初始化失败的崩溃
+     * @param consultId 复诊单id
+     * @param nickname 复诊人姓名
+     * @param doctorUserId 医生userId
      * @param userName 环信的用户名
      * @param password 环信的密码
      * @param xlName 信令的用户ID
      */
-    public void easemobStart(Activity inputAc, ViewGroup layout , String userName, String password,String xlName) {
-        if (userName==null || password==null || xlName==null)
+    public void easemobStart(Activity inputAc,
+                             String consultId,
+                             String nickname,
+                             String doctorUserId,
+                             String userName,
+                             String password,
+                             String xlName) {
+        if (consultId==null ||nickname==null ||doctorUserId==null ||userName==null || password==null || xlName==null)
             return;
-
         // 设置成员变量
+        this.consultId = Integer.valueOf(consultId);
+        this.nickname = nickname;
+        this.doctorUserId = doctorUserId;
         easemobUserName = userName;
         easemobPassword = password;
         xlPatientUserId = xlName;
 
         // 启动验证请求
         setActivity(inputAc);
-        contentLayout = layout;
         //注册监听消息的回调地址 参看：https://docs-im.easemob.com/im/android/basics/message#%E6%8E%A5%E6%94%B6%E6%B6%88%E6%81%AF
         EMClient.getInstance().chatManager().addMessageListener(new EMMessageListener() {
             @Override
@@ -452,18 +480,8 @@ public class EaseModeProxy {
                     mainThreadHandler.post(() -> {
                         if (state == CallState.CONNECTED) {
                             ToastWithLogin("入会成功: ");
-//                            NemoSDK.getInstance().releaseCamera();
                             if (listener!=null)
                                 listener.onVideoSuccessLinked();
-                            if (uvcCameraPresenter != null)
-                                uvcCameraPresenter.onStartAndRegister();
-//                                new Thread(() -> {
-//                                    try {Thread.sleep(15000000);
-////                                        uvcCameraPresenter.onStartAndRegister();
-//                                    }
-//                                    catch (InterruptedException e) {e.printStackTrace();}
-//                                }).start();
-//                                activity.get().runOnUiThread(()->{new Handler().postDelayed(() -> uvcCameraPresenter.onStart(),15000);});
                         } else if (state == CallState.DISCONNECTED) {
                             ToastWithLogin("退出会议: " + reason);
                             // 释放资源一定要写在退出会议的后面
@@ -493,6 +511,13 @@ public class EaseModeProxy {
                             return elements;
                         });
                     });
+                }
+
+                @Override
+                public void onVideoStatusChange(int videoStatus) {
+                    super.onVideoStatusChange(videoStatus);
+                    // 提示用户当前信息
+                    showVideoStatusChange(videoStatus);
                 }
 
                 @Override
@@ -550,10 +575,10 @@ public class EaseModeProxy {
      */
     private void releaseProxy(){
         // 释放对象资源
-//        if (uvcCameraPresenter!=null){
-//            uvcCameraPresenter.onStop();
-//            uvcCameraPresenter.onDestroy();
-//        }
+        if (uvcCameraPresenter!=null){
+            uvcCameraPresenter.onStop();
+            uvcCameraPresenter.onDestroy();
+        }
         if (activity!=null)
             activity = null;
         if (contentLayout !=null)
@@ -568,6 +593,12 @@ public class EaseModeProxy {
         }
         // 释放 环信
         EMClient.getInstance().logout(true,emcallback);
+
+        // 释放小鱼
+        NemoSDK.getInstance().setNemoSDKListener(null);
+        NemoSDK.getInstance().releaseLayout();
+        NemoSDK.getInstance().releaseCamera();
+        NemoSDK.getInstance().releaseAudioMic();
     }
 
     /** 对外监听 */
@@ -618,5 +649,43 @@ public class EaseModeProxy {
         if (videoCell.getParent()!=null)
             ((ViewGroup) videoCell.getParent()).removeView(videoCell);
         contentLayout.addView(videoCell);
+    }
+
+    /**
+     * 小鱼网络状态值对照表
+     */
+    @IntDef({
+            VideoStatus.VIDEO_STATUS_NORMAL, VideoStatus.VIDEO_STATUS_LOW_AS_LOCAL_BW,
+            VideoStatus.VIDEO_STATUS_LOW_AS_LOCAL_HARDWARE, VideoStatus.VIDEO_STATUS_LOW_AS_REMOTE,
+            VideoStatus.VIDEO_STATUS_NETWORK_ERROR, VideoStatus.VIDEO_STATUS_LOCAL_WIFI_ISSUE
+    })
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface VideoStatus {
+        int VIDEO_STATUS_NORMAL = 0;
+        int VIDEO_STATUS_LOW_AS_LOCAL_BW = 1;
+        int VIDEO_STATUS_LOW_AS_LOCAL_HARDWARE = 2;
+        int VIDEO_STATUS_LOW_AS_REMOTE = 3;
+        int VIDEO_STATUS_NETWORK_ERROR = 4;
+        int VIDEO_STATUS_LOCAL_WIFI_ISSUE = 5;
+    }
+
+    /**
+     * 小鱼视频网络状态提示
+     * @param videoStatus 状态值
+     */
+    public void showVideoStatusChange(int videoStatus) {
+        if (videoStatus == VideoStatus.VIDEO_STATUS_NORMAL) {
+            ToastWithLogin( activity.get().getString(R.string.video_status_normal));
+        } else if (videoStatus == VideoStatus.VIDEO_STATUS_LOW_AS_LOCAL_BW) {
+            ToastWithLogin( activity.get().getString(R.string.video_status_as_low_local_bw));
+        } else if (videoStatus == VideoStatus.VIDEO_STATUS_LOW_AS_LOCAL_HARDWARE) {
+            ToastWithLogin( activity.get().getString(R.string.video_status_as_low_local_hardware));
+        } else if (videoStatus == VideoStatus.VIDEO_STATUS_LOW_AS_REMOTE) {
+            ToastWithLogin( activity.get().getString(R.string.video_status_as_low_local_remote));
+        } else if (videoStatus == VideoStatus.VIDEO_STATUS_NETWORK_ERROR) {
+            ToastWithLogin( activity.get().getString(R.string.video_status_network_error));
+        } else if (videoStatus == VideoStatus.VIDEO_STATUS_LOCAL_WIFI_ISSUE) {
+            ToastWithLogin( activity.get().getString(R.string.video_status_local_wifi_issue));
+        }
     }
 }

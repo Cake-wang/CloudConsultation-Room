@@ -551,8 +551,6 @@
         android:layout_height="50dp"
         android:layout_alignParentBottom="true"
         android:background="#00000000"
-
-
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
@@ -560,6 +558,7 @@
             android:id="@+id/jtjk_machine_id"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:paddingLeft="16dp"
             android:layout_weight="1"
             android:gravity="center"
             android:text="机器编号：583958794759"
@@ -570,34 +569,47 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="10dp"
-            android:layout_weight="1"
             android:text="服务电话：96225"
             android:textColor="#333"
             android:visibility="gone" />
 
 
-        <TextClock
+        <TextView
             android:id="@+id/tv_clock"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:layout_marginRight="20dp"
-            android:layout_marginBottom="8dp"
+            android:paddingLeft="16dp"
             android:layout_weight="1"
+            android:layout_marginBottom="8dp"
             android:fontFamily="sans-serif-light"
-            android:format12Hour="yyyy年MM月dd日 EEE HH:mm:ss 1.2.11.13"
-            android:format24Hour="yyyy年MM月dd日 EEE HH:mm:ss 1.2.11.13"
             android:gravity="left"
             android:textColor="#fff"
             android:textSize="16dp"
             android:textStyle="normal" />
 
         <TextView
-            android:id="@+id/jtjk_hospital_name"
+            android:id="@+id/tv_version"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:layout_marginTop="8dp"
+            android:paddingLeft="16dp"
+            android:layout_marginBottom="8dp"
+            android:fontFamily="sans-serif-light"
+            android:gravity="left"
+            android:textColor="#fff"
+            android:textSize="16dp"
+            android:textStyle="normal"
+            />
+
+        <TextView
+            android:id="@+id/jtjk_hospital_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="16dp"
             android:gravity="center"
+            android:layout_weight="2"
             android:text="杭州市第一人民医院"
             android:textColor="#fff" />
     </LinearLayout>

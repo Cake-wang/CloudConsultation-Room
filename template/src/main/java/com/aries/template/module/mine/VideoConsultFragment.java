@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -41,6 +40,10 @@ import butterknife.OnClick;
  */
 public class VideoConsultFragment extends BaseEventFragment {
 
+    private String consultId; //复诊单id 复诊单拿
+    private String nickname; //复诊人姓名 复诊单拿
+    private String doctorUserId; //医生userId 复诊单拿
+
     /**
      * 输入显示对象
      */
@@ -61,12 +64,23 @@ public class VideoConsultFragment extends BaseEventFragment {
     RelativeLayout video_content_parent;// 全屏视频容器的父类
     @BindView(R.id.jtjk_video_close_full)
     TextView video_close_full;// 全屏按钮
+    @BindView(R.id.btn_full_screen)
+    TextView btn_full_screen;// 全屏按钮
 
     /**
      * 跳转科室，需要带的数据
+     * @param consultId 复诊单id 复诊单拿
+     * @param nickname 复诊人姓名 复诊单拿
+     * @param doctorUserId 医生userId 复诊单拿
      */
-    public static VideoConsultFragment newInstance(Object inputObj) {
+    public static VideoConsultFragment newInstance(String consultId,String nickname, String  doctorUserId) {
+        // 复诊单的配置
         VideoConsultFragment fragment = new VideoConsultFragment();
+        Bundle args = new Bundle();
+        args.putString("consultId",consultId);
+        args.putString("nickname",nickname);
+        args.putString("doctorUserId",doctorUserId);
+        fragment.setArguments(args);
         return fragment;
     }
 
@@ -77,7 +91,13 @@ public class VideoConsultFragment extends BaseEventFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        timeStop();
+        // 停止界面的时间计时器
+        dismissCountTimeStop();
+        // 注入数据
+        Bundle args = getArguments();
+        consultId = args.getString("consultId");
+        nickname = args.getString("nickname");
+        doctorUserId = args.getString("doctorUserId");
         // 启动请求
         requestConfigurationToThirdForPatient();
     }
@@ -85,6 +105,8 @@ public class VideoConsultFragment extends BaseEventFragment {
     @Override
     public void onStart() {
         super.onStart();
+        ViewGroup viewGroup = getActivity().findViewById(R.id.videoContent);
+        EaseModeProxy.with().initView(getActivity(),viewGroup).onStartVideo();
     }
 
     /**
@@ -96,7 +118,7 @@ public class VideoConsultFragment extends BaseEventFragment {
 
 
     @SingleClick
-    @OnClick({R.id.btn_stjc, R.id.btn_finish,R.id.jtjk_video_close_full})
+    @OnClick({R.id.btn_stjc, R.id.btn_finish,R.id.jtjk_video_close_full,R.id.btn_full_screen})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.btn_stjc:
@@ -116,11 +138,18 @@ public class VideoConsultFragment extends BaseEventFragment {
                 EaseModeProxy.with().doNotFullScreen();
                 video_content_parent.setVisibility(View.GONE);
                 break;
+            case R.id.btn_full_screen:
+                EaseModeProxy.with().doFullScreen(video_content);
+                video_content_parent.setVisibility(View.VISIBLE);
+                break;
             default:
                 break;
         }
     }
 
+    /**
+     * 显示对话框
+     */
     private void showSimpleConfirmDialog() {
         ShineButtonDialog dialog = new ShineButtonDialog(this.mContext);
         dialog.tv_title_tip.setText("结束问诊");
@@ -174,15 +203,14 @@ public class VideoConsultFragment extends BaseEventFragment {
                         }
                         if (entity.getData().isSuccess()){
                             // 成功返回数据注入第三方数据
-                            ViewGroup viewGroup = getActivity().findViewById(R.id.videoContent);
-//                            EaseModeProxy.with().init(getActivity(),viewGroup).easemobStart(getActivity(),
-//                                    viewGroup,
+//                            EaseModeProxy.with().easemobStart(getActivity(),
+//                                    consultId,
+//                                    nickname,
+//                                    doctorUserId,
 //                                    entity.getData().getJsonResponseBean().getBody().getUsername(),
 //                                    entity.getData().getJsonResponseBean().getBody().getUserpwd(),
 //                                    entity.getData().getJsonResponseBean().getBody().getUserId());
-                            EaseModeProxy.with().init(getActivity(),viewGroup).xyInit();
-                            EaseModeProxy.with().setListener(() -> EaseModeProxy.with().doFullScreen(video_content));
-                            video_content_parent.setVisibility(View.VISIBLE);
+                            EaseModeProxy.with().xyInit();
                         }
                     }
                 });

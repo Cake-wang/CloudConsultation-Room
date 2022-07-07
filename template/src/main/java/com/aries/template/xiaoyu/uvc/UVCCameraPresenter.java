@@ -64,7 +64,7 @@ public class UVCCameraPresenter {
         @Override
         public void onAttach(final UsbDevice device) {
             L.i(TAG, "onAttach:");
-            Toast.makeText(mContext, "USB_DEVICE_ATTACHED", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(mContext, "USB_DEVICE_ATTACHED", Toast.LENGTH_SHORT).show();
             synchronized (mSync) {
                 onDialogResult(true);
             }
@@ -233,40 +233,40 @@ public class UVCCameraPresenter {
         }
     }
 
-    /**
-     * 初始化注册
-     * mUSBMonitor USB
-     * mUVCCamera 摄像头
-     * onDialogResult 权限
-     */
-    public void onInit(){
-        if (mUSBMonitor != null) {
-            mUSBMonitor.register();
-        }
-        synchronized (mSync) {
-            if (mUVCCamera != null) {
-                mUVCCamera.setFrameCallback(mIFrameCallback, UVCCamera.PIXEL_FORMAT_YUV420SP);
-            }
-        }
-        onDialogResult(true);
-    }
-
-    /**
-     * 启动摄像头
-     */
-    public void onStart(){
-        if (mUVCCamera!=null
-                && proceccing!=true){
-            mUVCCamera.startPreview();
-            proceccing = true;
-        }
-    }
+//    /**
+//     * 初始化注册
+//     * mUSBMonitor USB
+//     * mUVCCamera 摄像头
+//     * onDialogResult 权限
+//     */
+//    public void onInit(){
+//        if (mUSBMonitor != null) {
+//            mUSBMonitor.register();
+//        }
+//        synchronized (mSync) {
+//            if (mUVCCamera != null) {
+//                mUVCCamera.setFrameCallback(mIFrameCallback, UVCCamera.PIXEL_FORMAT_YUV420SP);
+//            }
+//        }
+//        onDialogResult(true);
+//    }
+//
+//    /**
+//     * 启动摄像头
+//     */
+//    public void onStart(){
+//        if (mUVCCamera!=null
+//                && proceccing!=true){
+//            mUVCCamera.startPreview();
+//            proceccing = true;
+//        }
+//    }
 
     /**
      * 一气呵成的装载
-     * 可能会有问题，会崩溃
+     * onDialogResult 绝对不能启动，会崩溃的
      */
-    public void onStartAndRegister() {
+    public void onStart() {
         if (mUSBMonitor != null) {
             mUSBMonitor.register();
         }
@@ -276,7 +276,8 @@ public class UVCCameraPresenter {
                 mUVCCamera.startPreview();
             }
         }
-        onDialogResult(true);
+        // 绝对不能启动 onDialogResult
+//        onDialogResult(true);
     }
 
     private synchronized void releaseUsbMonitor() {
