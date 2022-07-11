@@ -6,6 +6,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -17,12 +18,14 @@ import com.aries.library.fast.util.SPUtil;
 import com.aries.library.fast.util.ToastUtil;
 import com.aries.template.entity.FindUserResultEntity;
 import com.aries.template.entity.GetConsultsAndRecipesResultEntity;
+import com.aries.template.module.base.BaseEventFragment;
 import com.aries.template.module.main.HomeFragment;
 import com.aries.template.module.mine.DepartmentFragment;
 import com.aries.template.module.mine.MineFragment;
 import com.aries.template.module.mine.OrderConsultFragment;
 import com.aries.template.module.mine.OrderRecipesFragment;
 import com.aries.template.module.mine.PutRecordFragment;
+import com.aries.template.module.mine.VideoConsultFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.template.utils.ActivityUtils;
 import com.aries.ui.view.tab.CommonTabLayout;
@@ -105,18 +108,24 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
 
     }
 
-//    /**
-//     * 禁用首页的物理键
-//     */
-//    @Override
-//    public boolean onKeyDown(int keyCode, KeyEvent event) {
-//        if (getTopFragment() instanceof HomeFragment){
-//            if (keyCode == KeyEvent.KEYCODE_BACK) {
+    /**
+     * 禁用首页的物理键
+     */
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (getTopFragment() instanceof HomeFragment){
+            if (keyCode == KeyEvent.KEYCODE_BACK) {
 //                return true;
-//            }
-//        }
-//       return super.onKeyDown(keyCode, event);
-//    }
+                return super.onKeyDown(keyCode, event);
+            }
+        }else if (getTopFragment() instanceof VideoConsultFragment){
+            return true;
+        }else if (getTopFragment() instanceof BaseEventFragment){
+            ((BaseEventFragment) getTopFragment()).pop();
+            return true;
+        }
+       return super.onKeyDown(keyCode, event);
+    }
 
     @Override
     protected void onResume() {

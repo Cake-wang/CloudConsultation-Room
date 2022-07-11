@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.hardware.Camera;
+import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
 import android.view.ViewGroup;
@@ -26,6 +27,7 @@ import com.ainemo.sdk.otf.Roster;
 import com.ainemo.sdk.otf.RosterWrapper;
 import com.ainemo.sdk.otf.Settings;
 import com.ainemo.sdk.otf.SimpleNemoSDkListener;
+import com.ainemo.sdk.otf.VideoConfig;
 import com.ainemo.sdk.otf.VideoInfo;
 import com.ainemo.util.JsonUtil;
 import com.aries.template.R;
@@ -101,7 +103,6 @@ public class EaseModeProxy {
     private String meetingPassword = "348642"; //会议室密码，从接口获取到的 还没有
 
 
-
     //单例
     private static volatile EaseModeProxy sInstance;
     // 环信 callback
@@ -129,6 +130,7 @@ public class EaseModeProxy {
     /**
      * easeMode初始化 视频三方组件
      * 这个初始化必须写在 application 里面
+     * 这个初始化只全局初始化一次
      */
     public void initInAPP(Context context) {
         //参看：https://docs-im.easemob.com/im/android/sdk/basic
@@ -141,6 +143,36 @@ public class EaseModeProxy {
         EMClient.getInstance().init(context, options);
         //在做打包混淆时，关闭debug模式，避免消耗不必要的资源
         EMClient.getInstance().setDebugMode(true);
+
+        //如果没有，则继续初始化
+        Settings settings = new Settings(xyAppId);
+        settings.setPrivateCloudAddress("cloud.xylink.com");
+        settings.setVideoMaxResolutionTx(VideoConfig.VD_1280x720);
+        settings.setDefaultCameraId(1);
+
+        // 初始化 NEmoSDK
+        NemoSDK.getInstance().init(context, settings, new NemoSDKInitCallBack() {
+            @Override
+            public void nemoSdkInitSuccess() {
+                ToastWithLogin("初始化成功，开始登陆");
+            }
+
+            @Override
+            public void nemoSdkInitFail(String s, String s1) {
+                ToastWithLogin(s + " " + s1);
+            }
+        });
+
+        // 启动之初执行释放，防止由于错误原因导致的没有释放资源
+        releaseProxy();
+
+        // GPUS
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NemoSDK.getInstance().getGpusInfo(gpus -> {
+                //ThirdPart filter logic
+                NemoSDK.getInstance().setEnableGPUs(gpus);
+            });
+        }
     }
 
     /**
@@ -359,45 +391,26 @@ public class EaseModeProxy {
     }
 
     /**
-     * 启动小鱼登录
+     * 小鱼登录启动初始化配置
      */
     public void xyInit() {
-        //如果没有，则继续初始化
-        Settings settings = new Settings(xyAppId);
-        settings.setPrivateCloudAddress("cloud.xylink.com");
-
-//        int cameraId = -1;
-//        int numberOfCameras = Camera.getNumberOfCameras();
-//        for (int i = 0; i < numberOfCameras; i++) {
-//            Camera.CameraInfo info = new Camera.CameraInfo();
-//            Camera.getCameraInfo(i, info);
-//            if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT){
-//                cameraId = i;
-//                break;
-//            }
-//        }
-//        settings.setDefaultCameraId(cameraId);
-
-        // 初始化 NEmoSDK
-        NemoSDK.getInstance().init(activity.get(), settings, new NemoSDKInitCallBack() {
-            @Override
-            public void nemoSdkInitSuccess() {
-                ToastWithLogin("初始化成功，开始登陆");
-                xyThirdPartyLogin(account, nickname);
-            }
-
-            @Override
-            public void nemoSdkInitFail(String s, String s1) {
-                ToastWithLogin(s + " " + s1);
-            }
-        });
+        // 如果没有uvc则使用前置摄像头，包括中途拔出 USB 摄像头的情况
+        // 不能写在 onstart 上面，会让USB摄像头使用无效。
+        if (!uvcCameraPresenter.hasUvcCamera()) {
+            NemoSDK.getInstance().switchCamera(0);
+        }
 
         // 初始化界面
         // 设置手机系统方向
         NemoSDK.getInstance().setOrientation(Orientation.LANDSCAPE);
+
         // 创建显示对象
         videoCell = new MeetingVideoCell(activity.get());
         contentLayout.addView(videoCell);
+
+        // 启动小鱼登录
+        // 这个启动要在小鱼 NemoSDK.getInstance().init 执行之后
+        xyThirdPartyLogin(account, nickname);
     }
 
     /**
@@ -443,6 +456,18 @@ public class EaseModeProxy {
                                 @Override
                                 public void onCallSuccess() {
                                     ToastWithLogin("参会成功");
+
+                                    //渲染local画面
+                                    VideoInfo videoInfo = new VideoInfo();
+                                    videoInfo.setDataSourceID(NemoSDK.getLocalVideoStreamID());
+                                    videoInfo.setAudioMute(muteMic);
+                                    videoInfo.setVideoMute(muteVideo);
+                                    videoCell.setVideoInfo(videoInfo);// 启动本地视频窗口
+
+                                    // 向医生端口发送消息
+                                    sendNotifyDoctorVideoMsg();
+
+                                    // 开始入会
                                     onJoinMeetingOk();
                                 }
 
@@ -461,75 +486,125 @@ public class EaseModeProxy {
     /**
      * 启动会议
      */
-    private void onJoinMeetingOk() {
-        activity.get().runOnUiThread(() -> {
-            sendNotifyDoctorVideoMsg();
-            Handler mainThreadHandler = new Handler();
+    public void onJoinMeetingOk() {
+//        activity.get().runOnUiThread(() -> {
+//            // 会不会造成内存泄漏
+//            Handler mainThreadHandler = new Handler();
+//            NemoSDK.getInstance().setNemoSDKListener(new SimpleNemoSDkListener() {
+//                @Override
+//                public void onCallStateChange(CallState state, String reason) {
+//                    //1.监听会议状态
+//                    mainThreadHandler.post(() -> {
+//
+//                    });
+//                    activity.get().runOnUiThread(()->{
+//                        if (state == CallState.CONNECTED) {
+//                            ToastWithLogin("入会成功: ");
+//                            // 可能会造成多次入会成功
+//                            if (listener!=null)
+//                                listener.onVideoSuccessLinked();
+//                        } else if (state == CallState.DISCONNECTED) {
+//                            ToastWithLogin("退出会议: " + reason);
+//                            // 释放资源一定要写在退出会议的后面
+//                            releaseProxy();
+//                        }
+//                    });
+//                }
+//
+//                @Override
+//                public void onRosterChange(RosterWrapper rosterWrapper) {
+//                    //参会者信息回调
+//                    mainThreadHandler.post(() -> {
+//                        //2.计算请流集合
+//                        NemoSDK.getInstance().setLayoutBuilder(policy -> {
+//                            List<LayoutElement> elements = new ArrayList<>();
+//                            //请求所有参会者
+//                            ArrayList<Roster> rosters = rosterWrapper.getRosters();
+//                            if (rosters != null && !rosters.isEmpty()) {
+//                                LayoutElement element;
+//                                for (Roster roster : rosters) {
+//                                    element = new LayoutElement();
+//                                    element.setParticipantId(roster.getParticipantId());
+//                                    element.setResolutionRatio(ResolutionRatio.RESO_360P_NORMAL);
+//                                    elements.add(element);
+//                                }
+//                            }
+//                            return elements;
+//                        });
+//                    });
+//                }
+//
+//                @Override
+//                public void onVideoStatusChange(int videoStatus) {
+//                    super.onVideoStatusChange(videoStatus);
+//                    // 提示用户当前信息
+//                    showVideoStatusChange(videoStatus);
+//                }
+//
+//                @Override
+//                public void onVideoDataSourceChange(List<VideoInfo> videoInfos, boolean hasVideoContent) {
+//                    mainThreadHandler.post(() -> {
+//                        if (videoInfos.size()>0){
+////                            if (videoCell !=null)
+////                                videoCell.setVideoInfo(videoInfos.get(0));
+//                        }
+//                    });
+//                }
+//            });
+//        });
 
-            //渲染local画面
-            VideoInfo videoInfo = new VideoInfo();
-            videoInfo.setDataSourceID(NemoSDK.getLocalVideoStreamID());
-            videoInfo.setAudioMute(muteMic);
-            videoInfo.setVideoMute(muteVideo);
-            videoCell.setVideoInfo(videoInfo);// 启动本地视频窗口
-
-            NemoSDK.getInstance().setNemoSDKListener(new SimpleNemoSDkListener() {
-                @Override
-                public void onCallStateChange(CallState state, String reason) {
-                    //1.监听会议状态
-                    mainThreadHandler.post(() -> {
-                        if (state == CallState.CONNECTED) {
-                            ToastWithLogin("入会成功: ");
-                            if (listener!=null)
-                                listener.onVideoSuccessLinked();
-                        } else if (state == CallState.DISCONNECTED) {
-                            ToastWithLogin("退出会议: " + reason);
-                            // 释放资源一定要写在退出会议的后面
-                            releaseProxy();
-                        }
-                    });
+        NemoSDK.getInstance().setNemoSDKListener(new SimpleNemoSDkListener() {
+            @Override
+            public void onCallStateChange(CallState state, String reason) {
+                //1.监听会议状态
+                if (state == CallState.CONNECTED) {
+//                        ToastWithLogin("入会成功: ");
+                    Log.e("TAG", "onCallStateChange: 入会成功");
+                    // 可能会造成多次入会成功
+                    if (listener!=null)
+                        listener.onVideoSuccessLinked();
+                } else if (state == CallState.DISCONNECTED) {
+//                        ToastWithLogin("退出会议: " + reason);
+                    // 释放资源一定要写在退出会议的后面
+                    releaseProxy();
                 }
+            }
 
-                @Override
-                public void onRosterChange(RosterWrapper rosterWrapper) {
-                    //参会者信息回调
-                    mainThreadHandler.post(() -> {
-                        //2.计算请流集合
-                        NemoSDK.getInstance().setLayoutBuilder(policy -> {
-                            List<LayoutElement> elements = new ArrayList<>();
-                            //请求所有参会者
-                            ArrayList<Roster> rosters = rosterWrapper.getRosters();
-                            if (rosters != null && !rosters.isEmpty()) {
-                                LayoutElement element;
-                                for (Roster roster : rosters) {
-                                    element = new LayoutElement();
-                                    element.setParticipantId(roster.getParticipantId());
-                                    element.setResolutionRatio(ResolutionRatio.RESO_360P_NORMAL);
-                                    elements.add(element);
-                                }
+            @Override
+            public void onRosterChange(RosterWrapper rosterWrapper) {
+                //参会者信息回调
+                    //2.计算请流集合
+                    NemoSDK.getInstance().setLayoutBuilder(policy -> {
+                        List<LayoutElement> elements = new ArrayList<>();
+                        //请求所有参会者
+                        ArrayList<Roster> rosters = rosterWrapper.getRosters();
+                        if (rosters != null && !rosters.isEmpty()) {
+                            LayoutElement element;
+                            for (Roster roster : rosters) {
+                                element = new LayoutElement();
+                                element.setParticipantId(roster.getParticipantId());
+                                element.setResolutionRatio(ResolutionRatio.RESO_360P_NORMAL);
+                                elements.add(element);
                             }
-                            return elements;
-                        });
+                        }
+                        return elements;
                     });
-                }
+            }
 
-                @Override
-                public void onVideoStatusChange(int videoStatus) {
-                    super.onVideoStatusChange(videoStatus);
-                    // 提示用户当前信息
-                    showVideoStatusChange(videoStatus);
-                }
+            @Override
+            public void onVideoStatusChange(int videoStatus) {
+                super.onVideoStatusChange(videoStatus);
+                // 提示用户当前信息
+                showVideoStatusChange(videoStatus);
+            }
 
-                @Override
-                public void onVideoDataSourceChange(List<VideoInfo> videoInfos, boolean hasVideoContent) {
-                    mainThreadHandler.post(() -> {
-                        if (videoInfos.size()>0){
+            @Override
+            public void onVideoDataSourceChange(List<VideoInfo> videoInfos, boolean hasVideoContent) {
+                    if (videoInfos.size()>0){
 //                            if (videoCell !=null)
 //                                videoCell.setVideoInfo(videoInfos.get(0));
-                        }
-                    });
-                }
-            });
+                    }
+            }
         });
     }
 
@@ -578,6 +653,7 @@ public class EaseModeProxy {
         if (uvcCameraPresenter!=null){
             uvcCameraPresenter.onStop();
             uvcCameraPresenter.onDestroy();
+            Log.e("TAG", "releaseProxy: done" );
         }
         if (activity!=null)
             activity = null;
@@ -592,29 +668,14 @@ public class EaseModeProxy {
             webSocketClient = null;
         }
         // 释放 环信
-        EMClient.getInstance().logout(true,emcallback);
+        if (emcallback!=null)
+            EMClient.getInstance().logout(true,emcallback);
 
         // 释放小鱼
         NemoSDK.getInstance().setNemoSDKListener(null);
         NemoSDK.getInstance().releaseLayout();
         NemoSDK.getInstance().releaseCamera();
         NemoSDK.getInstance().releaseAudioMic();
-    }
-
-    /** 对外监听 */
-    private ProxyEventListener listener;
-
-    /** 对外监听设置入口 */
-    public void setListener(ProxyEventListener listener) {
-        this.listener = listener;
-    }
-
-    /**
-     * 对外监听
-     */
-    public interface ProxyEventListener{
-        /** 当医生进入的时候，将医生的 video Info 给予外部 */
-        void onVideoSuccessLinked();
     }
 
     /**
@@ -636,7 +697,7 @@ public class EaseModeProxy {
     public void doFullScreen(ViewGroup viewGroup){
         if (viewGroup==null)
             return;
-        if (videoCell.getParent()!=null)
+        if (videoCell!=null && videoCell.getParent()!=null)
             ((ViewGroup) videoCell.getParent()).removeView(videoCell);
         viewGroup.addView(videoCell);
     }
@@ -646,7 +707,7 @@ public class EaseModeProxy {
      * 会将 videoCell 方回到原来的容器里面
      */
     public void doNotFullScreen(){
-        if (videoCell.getParent()!=null)
+        if (videoCell!=null && videoCell.getParent()!=null)
             ((ViewGroup) videoCell.getParent()).removeView(videoCell);
         contentLayout.addView(videoCell);
     }
@@ -674,18 +735,38 @@ public class EaseModeProxy {
      * @param videoStatus 状态值
      */
     public void showVideoStatusChange(int videoStatus) {
-        if (videoStatus == VideoStatus.VIDEO_STATUS_NORMAL) {
-            ToastWithLogin( activity.get().getString(R.string.video_status_normal));
-        } else if (videoStatus == VideoStatus.VIDEO_STATUS_LOW_AS_LOCAL_BW) {
-            ToastWithLogin( activity.get().getString(R.string.video_status_as_low_local_bw));
-        } else if (videoStatus == VideoStatus.VIDEO_STATUS_LOW_AS_LOCAL_HARDWARE) {
-            ToastWithLogin( activity.get().getString(R.string.video_status_as_low_local_hardware));
-        } else if (videoStatus == VideoStatus.VIDEO_STATUS_LOW_AS_REMOTE) {
-            ToastWithLogin( activity.get().getString(R.string.video_status_as_low_local_remote));
-        } else if (videoStatus == VideoStatus.VIDEO_STATUS_NETWORK_ERROR) {
-            ToastWithLogin( activity.get().getString(R.string.video_status_network_error));
-        } else if (videoStatus == VideoStatus.VIDEO_STATUS_LOCAL_WIFI_ISSUE) {
-            ToastWithLogin( activity.get().getString(R.string.video_status_local_wifi_issue));
-        }
+        if (activity==null)
+            return;
+        activity.get().runOnUiThread(() -> {
+            if (videoStatus == VideoStatus.VIDEO_STATUS_NORMAL) {
+                ToastWithLogin( activity.get().getString(R.string.video_status_normal));
+            } else if (videoStatus == VideoStatus.VIDEO_STATUS_LOW_AS_LOCAL_BW) {
+                ToastWithLogin( activity.get().getString(R.string.video_status_as_low_local_bw));
+            } else if (videoStatus == VideoStatus.VIDEO_STATUS_LOW_AS_LOCAL_HARDWARE) {
+                ToastWithLogin( activity.get().getString(R.string.video_status_as_low_local_hardware));
+            } else if (videoStatus == VideoStatus.VIDEO_STATUS_LOW_AS_REMOTE) {
+                ToastWithLogin( activity.get().getString(R.string.video_status_as_low_local_remote));
+            } else if (videoStatus == VideoStatus.VIDEO_STATUS_NETWORK_ERROR) {
+                ToastWithLogin( activity.get().getString(R.string.video_status_network_error));
+            } else if (videoStatus == VideoStatus.VIDEO_STATUS_LOCAL_WIFI_ISSUE) {
+                ToastWithLogin( activity.get().getString(R.string.video_status_local_wifi_issue));
+            }
+        });
+    }
+
+    /** 对外监听 */
+    private ProxyEventListener listener;
+
+    /** 对外监听设置入口 */
+    public void setListener(ProxyEventListener listener) {
+        this.listener = listener;
+    }
+
+    /**
+     * 对外监听
+     */
+    public interface ProxyEventListener{
+        /** 当医生进入的时候，将医生的 video Info 给予外部 */
+        void onVideoSuccessLinked();
     }
 }

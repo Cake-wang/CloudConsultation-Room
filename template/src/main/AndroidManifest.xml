@@ -18,6 +18,9 @@
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.SYSTEM_OVERLAY_WINDOW" />
     <uses-permission android:name="android.permission.REORDER_TASKS" />
+
+<!--    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>-->
+
     <!-- chat SDK required start -->
     <uses-permission android:name="android.permission.VIBRATE" />
     <!-- After api 21 is marked as deprecated -->

@@ -7,9 +7,11 @@ import android.log.L;
 import android.opengl.GLES20;
 import android.os.Handler;
 import android.text.TextUtils;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.ainemo.sdk.otf.NemoSDK;
+import com.ainemo.sdk.otf.Orientation;
 import com.aries.template.R;
 import com.serenegiant.usb.DeviceFilter;
 import com.serenegiant.usb.IFrameCallback;
@@ -32,9 +34,6 @@ public class UVCCameraPresenter {
     private UVCCamera mUVCCamera;
     private SurfaceTexture mSurfaceTexture;
 
-    /** 已经正在播放中 */
-    private boolean proceccing;
-
     private boolean isUvcCamera;
     private int currentCamera = 0; // 0 前置 1 后置 2 UVC
 
@@ -51,16 +50,17 @@ public class UVCCameraPresenter {
 
     private void initSurfaceTexture() {
         int[] texture = new int[1];
-
         GLES20.glGenTextures(1, texture, 0);
-
         GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
-
         mSurfaceTexture = new SurfaceTexture(texture[0]);
     }
 
     private final USBMonitor.OnDeviceConnectListener mOnDeviceConnectListener = new USBMonitor.OnDeviceConnectListener() {
 
+        /**
+         * 插入 USB
+         * 这里的接口会被多次调用注意。
+         */
         @Override
         public void onAttach(final UsbDevice device) {
             L.i(TAG, "onAttach:");
@@ -112,14 +112,20 @@ public class UVCCameraPresenter {
             }, 0);
         }
 
+        /**
+         * 发现USB 断开链接
+         */
         @Override
         public void onDisconnect(final UsbDevice device, final USBMonitor.UsbControlBlock ctrlBlock) {
             handler.postDelayed(() -> releaseCamera(), 0);
         }
 
+        /**
+         * 拔出 USB
+         */
         @Override
         public void onDettach(final UsbDevice device) {
-            Toast.makeText(mContext, "USB_DEVICE_DETACHED", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(mContext, "USB_DEVICE_DETACHED", Toast.LENGTH_SHORT).show();
             updateCameraInfo(false, 1);
             NemoSDK.getInstance().switchCamera(1);
             NemoSDK.getInstance().requestCamera();
@@ -147,7 +153,6 @@ public class UVCCameraPresenter {
                 return devices.get(0);
             }
         }
-
         return null;
     }
 
@@ -173,13 +178,44 @@ public class UVCCameraPresenter {
                 captureWidth, captureHeight, 0, false);
     };
 
+    /**
+     * 获取权限
+     * 有很大的可能会在这里崩溃，注意操作
+     * 里面的processConnect 如果过多次数的执行，会崩溃
+     */
     public void onDialogResult(boolean canceled) {
-        if (canceled && mUSBMonitor != null) {
+        // 加固代码
+        try{
+            if (canceled && mUSBMonitor != null) {
+                UsbDevice usbdevice = getUsbDevice();
+                if (usbdevice != null) {
+                    if (11785 == usbdevice.getVendorId() && 48 == usbdevice.getProductId()) {
+                    } else {
+                        mUSBMonitor.requestPermission(usbdevice);
+                    }
+                }
+            }
+        }catch (Exception e){
+            Log.e(TAG, "onDialogResult: 崩溃了，请重新尝试");
+        }
+    }
+
+    /**
+     * 经常进行判断USB是否已经被拿到权限
+     * 如果拿到权限了，就不做任何操作
+     * 如果没有，就申请
+     * 插入USB 可能会无法启动，这是由于 .processConnect(device); 没有执行造成的
+     * todo 优化，第二次执行，发现有设备的时候，执行 .processConnect(device);
+     */
+    public void onDialogResult(){
+        if (mUSBMonitor!=null){
             UsbDevice usbdevice = getUsbDevice();
             if (usbdevice != null) {
                 if (11785 == usbdevice.getVendorId() && 48 == usbdevice.getProductId()) {
                 } else {
-                    mUSBMonitor.requestPermission(usbdevice);
+                    if (!mUSBMonitor.hasPermission(usbdevice)){
+                        mUSBMonitor.requestPermission(usbdevice);
+                    }
                 }
             }
         }
@@ -204,19 +240,22 @@ public class UVCCameraPresenter {
                 NemoSDK.getInstance().releaseCamera();
                 updateCameraInfo(true, 2);
                 NemoSDK.getInstance().switchCamera(2);
-                onDialogResult(true);
+                onDialogResult();
                 break;
             case 2:
                 updateCameraInfo(false, 0);
                 releaseCamera();
                 NemoSDK.getInstance().switchCamera(0);
-//                    NemoSDK.getInstance().requestCamera();
+                NemoSDK.getInstance().requestCamera();
                 break;
             default:
                 break;
         }
     }
 
+    /**
+     * 释放摄像头
+     */
     public synchronized void releaseCamera() {
         if (mUVCCamera != null) {
             try {
@@ -233,35 +272,6 @@ public class UVCCameraPresenter {
         }
     }
 
-//    /**
-//     * 初始化注册
-//     * mUSBMonitor USB
-//     * mUVCCamera 摄像头
-//     * onDialogResult 权限
-//     */
-//    public void onInit(){
-//        if (mUSBMonitor != null) {
-//            mUSBMonitor.register();
-//        }
-//        synchronized (mSync) {
-//            if (mUVCCamera != null) {
-//                mUVCCamera.setFrameCallback(mIFrameCallback, UVCCamera.PIXEL_FORMAT_YUV420SP);
-//            }
-//        }
-//        onDialogResult(true);
-//    }
-//
-//    /**
-//     * 启动摄像头
-//     */
-//    public void onStart(){
-//        if (mUVCCamera!=null
-//                && proceccing!=true){
-//            mUVCCamera.startPreview();
-//            proceccing = true;
-//        }
-//    }
-
     /**
      * 一气呵成的装载
      * onDialogResult 绝对不能启动，会崩溃的
@@ -276,8 +286,8 @@ public class UVCCameraPresenter {
                 mUVCCamera.startPreview();
             }
         }
-        // 绝对不能启动 onDialogResult
-//        onDialogResult(true);
+//         绝对不能启动 onDialogResult
+//        onDialogResult();
     }
 
     private synchronized void releaseUsbMonitor() {
@@ -298,7 +308,6 @@ public class UVCCameraPresenter {
     }
 
     public void onStop() {
-        proceccing = false;
         releaseCamera();
         synchronized (mSync) {
             if (mUSBMonitor != null) {
