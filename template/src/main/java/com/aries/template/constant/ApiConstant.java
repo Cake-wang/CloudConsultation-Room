@@ -44,6 +44,9 @@ public class ApiConstant {
     /** 纳里复诊服务接口 */
     public static final String doBaseNgariRequest =  "ngari/revisit/doBaseNgariRequest";
 
+    /** 盖瑞接口 */
+    public static final String doBaseGareaRequest =  "garea/doBaseGareaRequest";
+
     /** 调用机器全部初始信息 */
     public static final String machineRelationByMachineId =  "machineRelation/findByMachineId";
 

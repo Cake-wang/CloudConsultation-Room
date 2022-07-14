@@ -4,6 +4,7 @@ buildscript {
     repositories {
 //        jcenter()
 //        google()
+        maven { url "http://raw.github.com/saki4510t/libcommon/master/repository/" }
         maven { url 'https://maven.aliyun.com/repository/google' }
         maven { url 'https://maven.aliyun.com/repository/jcenter' }
         maven { url 'http://maven.aliyun.com/nexus/content/groups/public' }
@@ -20,6 +21,7 @@ allprojects {
     repositories {
 //        jcenter()
 //        google() //AndroidStudio v3.0 可以使用 google() 替代 maven { url "https://maven.google.com" }
+        maven { url "http://raw.github.com/saki4510t/libcommon/master/repository/" }
         maven { url 'https://maven.aliyun.com/repository/google' }
         maven { url 'https://maven.aliyun.com/repository/jcenter' }
         maven { url 'http://maven.aliyun.com/nexus/content/groups/public' }

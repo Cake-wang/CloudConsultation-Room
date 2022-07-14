@@ -343,16 +343,11 @@ public class OrderFragment extends FastTitleRefreshLoadFragment<GetConsultsAndRe
                     // todo 动态输入参数
                     start(VideoConsultFragment.newInstance(FakeDataExample.consultId,FakeDataExample.nickname,FakeDataExample.doctorUserId));
                 }else if (obj.getRecipes().size()>0){
-
                     //先查库存，再跳转支付页
                     queryInventory();
-
                 }else {
-
-                    start(PayCodeFragment.newInstance(new Object()));
-
+                    start(PayCodeFragment.newInstance(FakeDataExample.recipeFee,FakeDataExample.recipeIds,FakeDataExample.recipeCode));// todo cc
                 }
-
                 break;
             default:
                 break;
@@ -360,9 +355,7 @@ public class OrderFragment extends FastTitleRefreshLoadFragment<GetConsultsAndRe
     }
 
     private void queryInventory() {
-
-        start(PayCodeFragment.newInstance(new Object()));
-
+        start(PayCodeFragment.newInstance(FakeDataExample.recipeFee,FakeDataExample.recipeIds,FakeDataExample.recipeCode));// todo cc
     }
 
     private void showSimpleConfirmDialog(String opflag) {

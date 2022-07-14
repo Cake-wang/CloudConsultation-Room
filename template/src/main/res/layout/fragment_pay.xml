@@ -451,7 +451,6 @@
                         android:id="@+id/iv_qrcode"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-
                         android:background="@drawable/bg_pay_w_yzs"
                         android:minWidth="200dp"
                         android:minHeight="200dp"

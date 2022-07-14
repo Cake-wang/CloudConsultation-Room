@@ -12,11 +12,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.aries.library.fast.retrofit.FastLoadingObserver;
 import com.aries.library.fast.util.SPUtil;
 import com.aries.library.fast.util.ToastUtil;
+import com.aries.template.FakeDataExample;
 import com.aries.template.GlobalConfig;
 import com.aries.template.R;
 import com.aries.template.entity.CanRequestOnlineConsultResultEntity;
 import com.aries.template.entity.CreateOrderResultEntity;
 import com.aries.template.entity.GetConsultsAndRecipesResultEntity;
+import com.aries.template.entity.GetStockInfoEntity;
+import com.aries.template.entity.PrescriptionPushEntity;
 import com.aries.template.module.base.BaseEventFragment;
 import com.aries.template.module.main.HomeFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
@@ -190,7 +193,7 @@ public class ConfirmRecipesFragment extends BaseEventFragment {
                     showSimpleConfirmDialog();
                 break;
             case R.id.btn_inquiry:
-                     //todo 先查询库存，再创建新处方单
+                     //先查询库存，再创建新处方单
                     requestCreateOrder();
                 break;
             default:
@@ -212,9 +215,75 @@ public class ConfirmRecipesFragment extends BaseEventFragment {
                             return;
                         }
                         if (entity.isSuccess()){
-                            start(PayCodeFragment.newInstance(new Object()));
+//                            requestGetStockInfo();
                         }else{
                             ToastUtil.show(entity.message);
+                        }
+                    }
+                });
+    }
+
+    /**
+     * 查询药品库存是否还有
+     * @param clinicSn 诊亭编号
+     * @param skus 药品编码 列表
+     */
+    public void requestGetStockInfo(String clinicSn, ArrayList<String> skus){
+        ApiRepository.getInstance().getStockInfo(FakeDataExample.clinicSn,FakeDataExample.skus)
+                .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
+                .subscribe(new FastLoadingObserver<GetStockInfoEntity>("请稍后...") {
+                    @Override
+                    public void _onNext(GetStockInfoEntity entity) {
+                        if (entity == null) {
+                            ToastUtil.show("请检查网络，返回首页后重试");
+                            return;
+                        }
+                        if (entity.isSuccess()){
+                            // 拉到数据了，有库存
+                            // 然后取支付页面请求支付，合并处方单
+                            // 启动处方单推送接口
+                            requestPrescriptionPush();
+                        }
+                    }
+                });
+    }
+
+
+    /**
+     * 有库存，启动处方单详细信息推送到服务端
+     */
+    public void requestPrescriptionPush(){
+        ApiRepository.getInstance().prescriptionPush(FakeDataExample.clinicSn,
+                        FakeDataExample.hospitalName,
+                        FakeDataExample.deptName,
+                        FakeDataExample.patientIdCard,
+                        FakeDataExample.patientGender,
+                        FakeDataExample.doctorName,
+                        FakeDataExample.patientName,
+                        FakeDataExample.patientMobile,
+                        FakeDataExample.patientDateOfBirth,
+                        FakeDataExample.complaint,
+                        FakeDataExample.diseaseName,
+                        FakeDataExample.outerOrderNo,
+                        FakeDataExample.prescriptionType,
+                        FakeDataExample.totalAmount,
+                        FakeDataExample.billNo,
+                        FakeDataExample.paymentSeqNo,
+                        FakeDataExample.drugs)
+                .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
+                .subscribe(new FastLoadingObserver<PrescriptionPushEntity>("请稍后...") {
+                    @Override
+                    public void _onNext(PrescriptionPushEntity entity) {
+                        if (entity == null) {
+                            ToastUtil.show("请检查网络，返回首页后重试");
+                            return;
+                        }
+                        if (entity.isSuccess()){
+                            // 拉到数据了，有库存
+                            // 然后取支付页面请求支付，合并处方单
+                            // 启动处方单推送接口
+                            // todo dd
+                            start(PayCodeFragment.newInstance(FakeDataExample.recipeFee,FakeDataExample.recipeIds,FakeDataExample.recipeCode));// todo cc
                         }
                     }
                 });

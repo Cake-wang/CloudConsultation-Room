@@ -126,9 +126,9 @@ public class UVCCameraPresenter {
         @Override
         public void onDettach(final UsbDevice device) {
 //            Toast.makeText(mContext, "USB_DEVICE_DETACHED", Toast.LENGTH_SHORT).show();
-            updateCameraInfo(false, 1);
-            NemoSDK.getInstance().switchCamera(1);
-            NemoSDK.getInstance().requestCamera();
+//            updateCameraInfo(false, 1);
+//            NemoSDK.getInstance().switchCamera(1);
+//            NemoSDK.getInstance().requestCamera();
         }
 
         @Override

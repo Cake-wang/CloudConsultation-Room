@@ -5,6 +5,7 @@ import com.aries.library.fast.retrofit.FastRetrofit;
 import com.aries.template.constant.ApiConstant;
 import com.aries.template.entity.AuthCodeResultEntity;
 import com.aries.template.entity.BaseMovieEntity;
+import com.aries.template.entity.BatchCreateOrderEntity;
 import com.aries.template.entity.CanRequestOnlineConsultResultEntity;
 import com.aries.template.entity.CancelregisterResultEntity;
 import com.aries.template.entity.ConfigurationToThirdForPatientEntity;
@@ -14,10 +15,15 @@ import com.aries.template.entity.FindValidDepartmentForRevisitResultEntity;
 import com.aries.template.entity.FindValidOrganProfessionForRevisitResultEntity;
 import com.aries.template.entity.GetConfigurationToThirdForPatientResultEntity;
 import com.aries.template.entity.GetConsultsAndRecipesResultEntity;
+import com.aries.template.entity.GetMedicalInfoEntity;
+import com.aries.template.entity.GetStockInfoEntity;
 import com.aries.template.entity.IsRegisterResultEntity;
 import com.aries.template.entity.MachineEntity;
+import com.aries.template.entity.PayOrderEntity;
+import com.aries.template.entity.PrescriptionPushEntity;
 import com.aries.template.entity.RegisterResultEntity;
 import com.aries.template.entity.RequestConsultAndCdrOtherdocResultEntity;
+import com.aries.template.entity.RoomIdInsAuthEntity;
 import com.aries.template.entity.SearchDoctorListByBusTypeV2ResultEntity;
 import com.aries.template.entity.UpdateEntity;
 import com.aries.template.widget.mgson.MFastRetrofit;
@@ -28,6 +34,7 @@ import io.reactivex.Observable;
 import okhttp3.RequestBody;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
+import retrofit2.http.Header;
 import retrofit2.http.Headers;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
@@ -135,12 +142,68 @@ public interface ApiService {
     @POST(ApiConstant.doBaseNgariRequest)
     Observable<RequestConsultAndCdrOtherdocResultEntity> paySuccess(@Body RequestBody body);
 
+    /**
+     * 2.1.7 根据机器ID获取机器信息
+     */
     @Headers("Content-Type: application/json")
     @POST(ApiConstant.machineRelationByMachineId)
     Observable<MachineEntity> findByMachineId(@Body RequestBody body);
 
+    /**
+     * 3.1.11 获取第三方配置信息
+     */
     @Headers("Content-Type: application/json")
     @POST(ApiConstant.doBaseNgariRequest)
     Observable<ConfigurationToThirdForPatientEntity> getConfigurationToThirdForPatient(@Body RequestBody body);
+
+
+    /**
+     * 3.1.18 查询复诊单的小鱼视频会议室房间号和密码 v
+     * 通过这2个参数，来打开小鱼视频
+     */
+    @Headers("Content-Type: application/json")
+    @POST(ApiConstant.doBaseNgariRequest)
+    Observable<RoomIdInsAuthEntity> roomIdInsAuth(@Body RequestBody body);
+
+    /**
+     * 4.1.4 处方药品推送接口 v
+     * 完成支付之后，执行库存推送接口
+     * 注意这是个 doBaseGareaRequest 盖瑞接口
+     */
+    @Headers("Content-Type: application/json")
+    @POST(ApiConstant.doBaseGareaRequest)
+    Observable<PrescriptionPushEntity> prescriptionPush(@Body RequestBody body);
+
+    /**
+     * 4.1.5 查询设备所有库存接口 v
+     * 注意这是个 doBaseGareaRequest 盖瑞接口
+     */
+    @Headers("Content-Type: application/json")
+    @POST(ApiConstant.doBaseGareaRequest)
+    Observable<GetMedicalInfoEntity> getMedicalInfo(@Body RequestBody body);
+
+    /**
+     * 4.1.6 查询部分库存信息 v
+     * 注意这是个 doBaseGareaRequest 盖瑞接口
+     */
+    @Headers("Content-Type: application/json")
+    @POST(ApiConstant.doBaseGareaRequest)
+    Observable<GetStockInfoEntity> getStockInfo(@Body RequestBody body);
+
+    /**
+     * 3.11.	处方合并生成订单接口
+     * 历史原因，处方下单的时候，可以让医院传递具体的费用（有些药品可能医院那边的价格更准确）
+     */
+    @Headers("Content-Type: application/json")
+    @POST(ApiConstant.doBaseNgariRequest)
+    Observable<BatchCreateOrderEntity> batchCreateOrder(@Body RequestBody body);
+
+    /**
+     * 3.12.	处方合并生成订单接口
+     * 历史原因，处方下单的时候，可以让医院传递具体的费用（有些药品可能医院那边的价格更准确）
+     */
+    @Headers("Content-Type: application/json")
+    @POST(ApiConstant.doBaseNgariRequest)
+    Observable<PayOrderEntity> payOrder(@Body RequestBody body);
 
 }

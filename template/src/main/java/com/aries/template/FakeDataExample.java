@@ -3,6 +3,7 @@ package com.aries.template;
 import com.aries.template.retrofit.repository.BaseRepository;
 import com.decard.entitys.SSCard;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,8 +33,38 @@ public class FakeDataExample extends BaseRepository {
     public static final String payMode = "1";//支付方式代码
     public static final String recipeId = "2257979";//电子处方ID
 
+    public static final String clinicSn = "0017";//诊亭编号
+    public static final String hospitalName = "test医院";//
+    public static final String deptName = "test";//
+    public static final String patientIdCard = "320511199704230754";//
+    public static final String patientGender = "M";//
+    public static final String doctorName = "gogo";//
+    public static final String patientName = "gogo";//
+    public static final String patientMobile = "13913884146";//
+    public static final String patientDateOfBirth = "1990-04-13";//
+    public static final String complaint = "感冒发烧";//
+    public static final String diseaseName = "细菌感染";//
+    public static final String outerOrderNo = "112131212131321320";//
+    public static final String prescriptionType = "";//
+    public static final String totalAmount = "100";//
+    public static final String billNo = "";//
+    public static final String paymentSeqNo = "";//
+    public static final ArrayList<Map> drugs = new ArrayList(){{add(drugs());}};//
+    public static final ArrayList<String> skus = new ArrayList(){{
+        add("OTC-G-0012");
+        add("OTC-G-0013");
+    }};//
     // 复诊单的配置
     public static final String nickname = "eric"; //复诊人姓名 复诊单拿
+
+    // 支付
+    public static final String recipeFee = "0.01";//
+    public static final ArrayList<String> recipeIds = new ArrayList(){{
+        add("2258510");
+    }};//
+     public static final ArrayList<String> recipeCode = new ArrayList(){{
+        add("2258594ngari999");
+    }};//
 
     //------------环信的配置
     public static final String easemobUserName = "dev_patient_5494620"; //环信用户id
@@ -51,6 +82,22 @@ public class FakeDataExample extends BaseRepository {
     public static final String meetingRoomNumber = "9038284649"; //会议室房间号,从接口获取到的
     //    private static final String meetingPassword = "383164"; //会议室密码，从接口获取到的
     public static final String meetingPassword = "348642"; //会议室密码，从接口获取到的
+
+    public static Map<String,Object> drugs(){
+        Map<String, Object> drugs = new HashMap<>();
+        drugs.put("direction","口服");
+        drugs.put("dosageUnit","粒");
+        drugs.put("drugCommonName","牛黄蛇胆川贝液");
+        drugs.put("drugTradeName","牛黄蛇胆川贝液");
+        drugs.put("eachDosage","1");
+        drugs.put("itemDays","3");
+        drugs.put("price","1");
+        drugs.put("quantity","1");
+        drugs.put("quantityUnit","盒");
+        drugs.put("sku","packing-bag");
+        drugs.put("spec","12支/盒");
+        return drugs;
+    }
 
     /**
      * 注入全局数据
@@ -71,7 +118,6 @@ public class FakeDataExample extends BaseRepository {
         ssCard.setCardNum(phoneNumber);
         return ssCard;
     }
-
 
     //===================
     // netWorkFake

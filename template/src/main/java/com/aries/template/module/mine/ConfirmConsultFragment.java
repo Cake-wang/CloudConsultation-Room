@@ -14,6 +14,7 @@ import android.widget.Toast;
 import com.aries.library.fast.retrofit.FastLoadingObserver;
 import com.aries.library.fast.util.SPUtil;
 import com.aries.library.fast.util.ToastUtil;
+import com.aries.template.FakeDataExample;
 import com.aries.template.GlobalConfig;
 import com.aries.template.R;
 import com.aries.template.adapter.FlowTagAdapter;
@@ -235,7 +236,7 @@ public class ConfirmConsultFragment extends BaseEventFragment implements Compoun
                         }
                         if (entity.data.success){
                             // 医生 确认复诊，并进入复诊阶段
-                            start(PayCodeFragment.newInstance(new Object()));
+                            start(PayCodeFragment.newInstance(FakeDataExample.recipeFee,FakeDataExample.recipeIds,FakeDataExample.recipeCode));// todo cc
                         }else{
                             // 如果不能复诊，则检查异常原因
                             errorCheck(entity.data.jsonResponseBean.msg,entity.data.jsonResponseBean.code);

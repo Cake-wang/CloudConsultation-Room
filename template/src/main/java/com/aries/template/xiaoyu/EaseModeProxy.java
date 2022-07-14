@@ -58,6 +58,7 @@ import tech.gusavila92.websocketclient.WebSocketClient;
 /******
  * 环信 + 信令 + 小鱼
  * 点对点直播
+ * 这的所有请求都是第三方的请求，不会包含我们自己的请求在内
  *
  * @author  ::: louis luo
  * Date ::: 2022/6/30 2:26 PM
@@ -210,6 +211,8 @@ public class EaseModeProxy {
      * @param userName 环信的用户名
      * @param password 环信的密码
      * @param xlName 信令的用户ID
+     * @param xyroomid 小鱼视频 房间号
+     * @param xyroompwd 小鱼视频 房间密码
      */
     public void easemobStart(Activity inputAc,
                              String consultId,
@@ -217,7 +220,9 @@ public class EaseModeProxy {
                              String doctorUserId,
                              String userName,
                              String password,
-                             String xlName) {
+                             String xlName,
+                             String  xyroomid,
+                             String xyroompwd) {
         if (consultId==null ||nickname==null ||doctorUserId==null ||userName==null || password==null || xlName==null)
             return;
         // 设置成员变量

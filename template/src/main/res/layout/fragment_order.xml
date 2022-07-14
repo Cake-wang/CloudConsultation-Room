@@ -501,6 +501,7 @@
                     android:layout_marginLeft="30dp"
                     android:layout_marginRight="60dp"
                     android:background="@drawable/btn_ago_yzs"
+                    android:visibility="gone"
                     />
 
                 <Button

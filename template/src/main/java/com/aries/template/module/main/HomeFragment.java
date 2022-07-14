@@ -9,12 +9,20 @@ import com.aries.library.fast.util.SPUtil;
 import com.aries.library.fast.util.ToastUtil;
 import com.aries.template.FakeDataExample;
 import com.aries.template.GlobalConfig;
+import com.aries.template.MainActivity;
 import com.aries.template.R;
+import com.aries.template.entity.BatchCreateOrderEntity;
+import com.aries.template.entity.GetMedicalInfoEntity;
+import com.aries.template.entity.GetStockInfoEntity;
 import com.aries.template.entity.MachineEntity;
+import com.aries.template.entity.PrescriptionPushEntity;
+import com.aries.template.entity.RoomIdInsAuthEntity;
 import com.aries.template.module.base.BaseEventFragment;
 import com.aries.template.module.mine.MineFragment;
+import com.aries.template.module.mine.PayCodeFragment;
 import com.aries.template.module.mine.VideoConsultFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
+import com.aries.template.xiaoyu.EaseModeProxy;
 import com.aries.ui.view.title.TitleBarView;
 import com.trello.rxlifecycle3.android.FragmentEvent;
 
@@ -67,11 +75,12 @@ public class HomeFragment extends BaseEventFragment{
 //            start(MineFragment.newInstance("stjc"));
 //                start(DepartmentFragment.newInstance("stjc"));// todo cc
 //                start(PutRecordFragment.newInstance("idcard","name","smkcard"));// todo cc
-//                ((MainActivity) getActivity()).getConsultsAndRecipes();//todo cc
+//                ((MainActivity) getActivity()).requestConsultsAndRecipes();//todo cc
 //                start(ResultFragment.newInstance("cancelConsult"));//todo ccss
 //                start(ConfirmRecipesFragment.newInstance(null));// todo cc
 //                start(PayCodeFragment.newInstance(new Object()));// todo cc
-                start(VideoConsultFragment.newInstance(FakeDataExample.consultId,FakeDataExample.nickname,FakeDataExample.doctorUserId));// todo cc
+//                start(VideoConsultFragment.newInstance(FakeDataExample.consultId,FakeDataExample.nickname,FakeDataExample.doctorUserId));// todo cc
+                start(PayCodeFragment.newInstance(FakeDataExample.recipeFee,FakeDataExample.recipeIds,FakeDataExample.recipeCode));// todo cc
 //            startActivity(new Intent(getActivity(), MeetingActivity.class));//todo cc
         });
 
@@ -87,6 +96,8 @@ public class HomeFragment extends BaseEventFragment{
         super.onCreate(savedInstanceState);
         // 启动时，需要立刻请求，机器相关的数据，并保存在全局
         requestMachineInfo();
+        //todo cc
+        requestText();
     }
 
     /**
@@ -123,6 +134,27 @@ public class HomeFragment extends BaseEventFragment{
                     }
                 }
             });
+    }
+
+    /**
+     * 测试入口
+     * todo cc
+     */
+    public void requestText(){
+        /**
+         * 查询复诊单的小鱼视频会议室房间号和密码
+         */
+        ApiRepository.getInstance().batchCreateOrder(FakeDataExample.recipeFee,FakeDataExample.recipeIds,FakeDataExample.recipeCode)
+                .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
+                .subscribe(new FastLoadingObserver<BatchCreateOrderEntity>("请稍后...") {
+                    @Override
+                    public void _onNext(BatchCreateOrderEntity entity) {
+                        if (entity == null) {
+                            ToastUtil.show("请检查网络");
+                            return;
+                        }
+                    }
+                });
     }
 
     @Override

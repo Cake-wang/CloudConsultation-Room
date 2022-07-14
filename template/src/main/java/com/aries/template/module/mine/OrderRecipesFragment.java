@@ -9,15 +9,22 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.aries.library.fast.retrofit.FastLoadingObserver;
 import com.aries.library.fast.util.SPUtil;
+import com.aries.library.fast.util.ToastUtil;
+import com.aries.template.FakeDataExample;
 import com.aries.template.R;
 import com.aries.template.entity.GetConsultsAndRecipesResultEntity;
+import com.aries.template.entity.GetStockInfoEntity;
+import com.aries.template.entity.PrescriptionPushEntity;
 import com.aries.template.module.base.BaseEventFragment;
+import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.template.utils.ActivityUtils;
 import com.aries.template.view.ShineButtonDialog;
 import com.aries.template.widget.autoadopter.AutoAdaptorProxy;
 import com.aries.template.widget.autoadopter.AutoObjectAdaptor;
 import com.aries.ui.view.title.TitleBarView;
+import com.trello.rxlifecycle3.android.FragmentEvent;
 import com.xuexiang.xaop.annotation.SingleClick;
 
 import java.util.ArrayList;
@@ -34,10 +41,8 @@ import butterknife.OnClick;
  */
 public class OrderRecipesFragment extends BaseEventFragment {
 
-    /** RV的存取数据的map KEY */
-    private static final String KEY_ITEM_CURRENT_RECIPES = "key_item_current_recipes";
     /** 传入处理处方单的数据 */
-    private ArrayList<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes> obj;
+    private GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes obj;
 
     @BindView(R.id.tv_name)
     TextView tv_name;
@@ -94,7 +99,7 @@ public class OrderRecipesFragment extends BaseEventFragment {
      * 获取数据
      * @param obj 传入的数据，注意这个对象必须实现序列化
      */
-    public static OrderRecipesFragment newInstance(ArrayList<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes> obj) {
+    public static OrderRecipesFragment newInstance(GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes obj) {
         Bundle args = new Bundle();
         OrderRecipesFragment fragment = new OrderRecipesFragment();
         args.putSerializable("obj", obj);
@@ -108,7 +113,7 @@ public class OrderRecipesFragment extends BaseEventFragment {
         // 注入数据
         Bundle args = getArguments();
         if (args != null) {
-            obj = (ArrayList<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes>) args.getSerializable("obj");
+            obj = (GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes) args.getSerializable("obj");
         }
     }
 
@@ -134,8 +139,8 @@ public class OrderRecipesFragment extends BaseEventFragment {
         tv_card.setText(SPUtil.get(mContext,"smkCard","")+"");
         tv_age_l.setText(SPUtil.get(mContext,"age","")+"");
 //            tv_dept.setText("");
-        tv_result.setText(obj.get(0).organDiseaseName);
-        tv_date.setText(obj.get(0).signDate+"");
+        tv_result.setText(obj.organDiseaseName);
+        tv_date.setText(obj.signDate+"");
 
         // 处理处方信息，并展示
         reflashRecyclerView(rv_contentFastLib,obj);
@@ -152,16 +157,16 @@ public class OrderRecipesFragment extends BaseEventFragment {
     @OnClick({R.id.btn_back, R.id.btn_main, R.id.btn_cancel, R.id.btn_inquiry})
     public void onViewClicked(View view) {
         switch (view.getId()) {
-//            case R.id.btn_back:
-//                break;
-//            case R.id.btn_main:
-//                break;
             case R.id.btn_cancel:
                     showSimpleConfirmDialog();
                 break;
             case R.id.btn_inquiry:
-                    //todo 先查库存，再跳转支付页
-                     start(PayCodeFragment.newInstance(new Object()));
+                    //先查库存，再跳转支付页
+                    ArrayList<String> list = new ArrayList<>();
+                    for (GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes.RecipeDetail item : obj.recipeDetailBeans) {
+                        list.add(item.organDrugCode);
+                    }
+                    requestGetStockInfo(String.valueOf(obj.recipeId),list);
                 break;
             default:
                 break;
@@ -189,12 +194,14 @@ public class OrderRecipesFragment extends BaseEventFragment {
      * @param recyclerView 显示对象
      * @param newDatas 传入的数据列
      */
-    protected void reflashRecyclerView(RecyclerView recyclerView, ArrayList<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes> newDatas){
+    protected void reflashRecyclerView(RecyclerView recyclerView, GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes newDatas){
         List<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes.RecipeDetail> allRecipe =new ArrayList<>();
-        for (GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes newData : newDatas) {
-            if (newData.getRecipeDetailBeans()!=null)
-                allRecipe.addAll(newData.getRecipeDetailBeans());
-        }
+//        for (GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes newData : newDatas) {
+//            if (newData.getRecipeDetailBeans()!=null)
+//                allRecipe.addAll(newData.getRecipeDetailBeans());
+//        }
+        allRecipe.addAll(newDatas.getRecipeDetailBeans());
+
 
         AutoAdaptorProxy<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes.RecipeDetail> proxy
                 = new AutoAdaptorProxy<>(recyclerView, R.layout.item_recipes, 1, allRecipe, getContext());
@@ -219,5 +226,70 @@ public class OrderRecipesFragment extends BaseEventFragment {
     @Override
     public void setTitleBar(TitleBarView titleBar) {
 
+    }
+
+    /**
+     * 查询药品库存是否还有
+     * @param clinicSn 诊亭编号
+     * @param skus 药品编码 列表
+     */
+    public void requestGetStockInfo(String clinicSn, ArrayList<String> skus){
+        ApiRepository.getInstance().getStockInfo(FakeDataExample.clinicSn,FakeDataExample.skus)
+                .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
+                .subscribe(new FastLoadingObserver<GetStockInfoEntity>("请稍后...") {
+                    @Override
+                    public void _onNext(GetStockInfoEntity entity) {
+                        if (entity == null) {
+                            ToastUtil.show("请检查网络，返回首页后重试");
+                            return;
+                        }
+                        if (entity.isSuccess()){
+                            // 拉到数据了，有库存
+                            // 然后取支付页面请求支付，合并处方单
+                            // 启动处方单推送接口
+                            requestPrescriptionPush();
+                        }
+                    }
+                });
+    }
+
+
+    /**
+     * 有库存，启动处方单详细信息推送到服务端
+     */
+    public void requestPrescriptionPush(){
+        ApiRepository.getInstance().prescriptionPush(FakeDataExample.clinicSn,
+                        FakeDataExample.hospitalName,
+                        FakeDataExample.deptName,
+                        FakeDataExample.patientIdCard,
+                        FakeDataExample.patientGender,
+                        FakeDataExample.doctorName,
+                        FakeDataExample.patientName,
+                        FakeDataExample.patientMobile,
+                        FakeDataExample.patientDateOfBirth,
+                        FakeDataExample.complaint,
+                        FakeDataExample.diseaseName,
+                        FakeDataExample.outerOrderNo,
+                        FakeDataExample.prescriptionType,
+                        FakeDataExample.totalAmount,
+                        FakeDataExample.billNo,
+                        FakeDataExample.paymentSeqNo,
+                        FakeDataExample.drugs)
+                .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
+                .subscribe(new FastLoadingObserver<PrescriptionPushEntity>("请稍后...") {
+                    @Override
+                    public void _onNext(PrescriptionPushEntity entity) {
+                        if (entity == null) {
+                            ToastUtil.show("请检查网络，返回首页后重试");
+                            return;
+                        }
+                        if (entity.isSuccess()){
+                            // 拉到数据了，有库存
+                            // 然后取支付页面请求支付，合并处方单
+                            // 启动处方单推送接口
+                            start(PayCodeFragment.newInstance(FakeDataExample.recipeFee,FakeDataExample.recipeIds,FakeDataExample.recipeCode));// todo cc
+                        }
+                    }
+                });
     }
 }

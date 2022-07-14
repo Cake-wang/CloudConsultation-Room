@@ -1,18 +1,19 @@
 package com.aries.template.module.mine;
 
-import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.aries.library.fast.retrofit.FastLoadingObserver;
-import com.aries.library.fast.retrofit.FastObserver;
 import com.aries.library.fast.util.ToastUtil;
+import com.aries.template.FakeDataExample;
+import com.aries.template.GlobalConfig;
 import com.aries.template.R;
+import com.aries.template.entity.BatchCreateOrderEntity;
+import com.aries.template.entity.GetConsultsAndRecipesResultEntity;
+import com.aries.template.entity.PayOrderEntity;
 import com.aries.template.entity.RequestConsultAndCdrOtherdocResultEntity;
 import com.aries.template.module.base.BaseEventFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
@@ -21,14 +22,16 @@ import com.trello.rxlifecycle3.android.FragmentEvent;
 import com.xuexiang.xaop.annotation.IOThread;
 import com.xuexiang.xaop.annotation.MainThread;
 import com.xuexiang.xaop.enums.ThreadType;
+import com.xuexiang.xqrcode.XQRCode;
 
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import butterknife.BindView;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
@@ -50,26 +53,33 @@ public class PayCodeFragment extends BaseEventFragment {
     }
 
     /** 从外部传入的数据  */
-    private  Object inputObj;
+    private String recipeFee;
+    private ArrayList<String> recipeIds;
+    private ArrayList<String> recipeCode;
 
     @BindView(R.id.tv_name)
-    TextView tv_name; //时间计时器显示对象
+    TextView tv_name; //患者姓名
     @BindView(R.id.tv_fee_type)
-    TextView tv_fee_type; //时间计时器显示对象
+    TextView tv_fee_type; //费用类型
     @BindView(R.id.tv_fee_all)
-    TextView tv_fee_all; //时间计时器显示对象
+    TextView tv_fee_all; //费用总额
     @BindView(R.id.tv_fee_yb)
-    TextView tv_fee_yb; //时间计时器显示对象
+    TextView tv_fee_yb; //医保支付费用显示
     @BindView(R.id.tv_fee_zf)
-    TextView tv_fee_zf; //时间计时器显示对象
-
+    TextView tv_fee_zf; //自费支付费用显示
     @BindView(R.id.iv_qrcode)
-    ImageView mIvQrcode;
+    ImageView mIvQrcode;// 二维码
+
     /**
      * 跳转科室，需要带的数据
      */
-    public static PayCodeFragment newInstance(Object inputObj) {
+    public static PayCodeFragment newInstance(String recipeFee, ArrayList<String> recipeIds, ArrayList<String> recipeCode) {
         PayCodeFragment fragment = new PayCodeFragment();
+        Bundle args = new Bundle();
+        args.putString("recipeFee", recipeFee);
+        args.putSerializable("recipeIds", recipeIds);
+        args.putSerializable("recipeCode", recipeCode);
+        fragment.setArguments(args);
         return fragment;
     }
 
@@ -80,6 +90,19 @@ public class PayCodeFragment extends BaseEventFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // 注入数据
+        Bundle args = getArguments();
+        if (args != null) {
+            recipeFee = args.getString("recipeFee");
+            recipeIds = ((ArrayList<String>) args.getSerializable("recipeIds"));
+            recipeCode = ((ArrayList<String>) args.getSerializable("recipeCode"));
+        }
+
+        //数据展示
+//        if (GlobalConfig.ssCard!=null)
+//        tv_name.setText(GlobalConfig.ssCard.getName());
+//        tv_fee_all.setText(recipeFee);
     }
 
     /**
@@ -100,16 +123,19 @@ public class PayCodeFragment extends BaseEventFragment {
 ////                        entity.data.requestId;
 //                    }
 //                });
+
+        requestBatchCreateOrder(recipeFee,recipeIds,recipeCode);
+//        requestPayOrder(String.valueOf(74521));
     }
 
     private static final int PERIOD = 3* 1000;
     private static final int DELAY = 100;
     private Disposable mDisposable;
+
     /**
      * 定时循环任务
      */
     private void timeLoop() {
-
         mDisposable = Observable.interval(DELAY, PERIOD, TimeUnit.MILLISECONDS)
                 .map((aLong -> aLong + 1))
                 .subscribeOn(Schedulers.io())
@@ -117,12 +143,14 @@ public class PayCodeFragment extends BaseEventFragment {
                 .subscribe(aLong -> paySuccess());//getUnreadCount()执行的任务
     }
 
+    /**
+     * 检查当前支付是否完成
+     * 循环任务，没3秒检查一次
+     */
     private void paySuccess() {
-//
-//
 //        ApiRepository.getInstance().paySuccess("","","",mContext)
 //                .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
-//                .subscribe(true ?
+//                .subscribe(
 //                        new FastLoadingObserver<RequestConsultAndCdrOtherdocResultEntity>("请稍后...") {
 //                            @Override
 //                            public void _onNext(@NonNull RequestConsultAndCdrOtherdocResultEntity entity) {
@@ -130,57 +158,29 @@ public class PayCodeFragment extends BaseEventFragment {
 //                                    ToastUtil.show("请检查网络");
 //                                    return;
 //                                }
-////                                checkVersion(entity);
 //                                if (entity.isSuccess()){
-//
 //                                    if (entity.getData().isSuccess()){
-//
 //                                        //跳视频问诊
-//                                        start(VideoConsultFragment.newInstance(new Object()));
-//
+////                                        start(VideoConsultFragment.newInstance(new Object()));
 //                                    }
-//
-//
 //                                }else {
-//
-////                                    ToastUtil.show(entity.getRespDesc());
+//                                    ToastUtil.show(entity.getRespDesc());
 //                                }
 //                            }
 //
 //                            @Override
 //                            public void onError(Throwable e) {
-//
-////                                ToastUtil.show("请检查网络和ip地址");
+//                                ToastUtil.show("请检查网络和ip地址");
 //                                if (true) {
 //                                    super.onError(e);
 //                                }
 //                            }
-//                        } :
-//                        new FastObserver<RequestConsultAndCdrOtherdocResultEntity>() {
-//                            @Override
-//                            public void _onNext(@NonNull RequestConsultAndCdrOtherdocResultEntity entity) {
-//                                if (entity == null) {
-//                                    ToastUtil.show("请检查网络");
-//                                    return;
-//                                }
-//
-//
-//
-//                            }
-//
-//                            @Override
-//                            public void onError(Throwable e) {
-//                                if (false) {
-//                                    super.onError(e);
-//                                }
-//                            }
 //                        });
-//
-//
     }
 
     @Override
     public void loadData() {
+        //  发起复诊
 //        ApiRepository.getInstance().presettlement("","","",mContext)
 //                .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
 //                .subscribe(true ?
@@ -265,6 +265,53 @@ public class PayCodeFragment extends BaseEventFragment {
     @MainThread
     private void showQRCode(Bitmap QRCode) {
         mIvQrcode.setImageBitmap(QRCode);
+    }
+
+    /**
+     * 处方合并生成订单接口
+     * 这个接口的返回是3.12.	支付请求接口的输入
+     * todo 返回的数据没有通
+     */
+    private void requestBatchCreateOrder(String recipeFee, ArrayList<String> recipeIds, ArrayList<String> recipeCode){
+        ApiRepository.getInstance().batchCreateOrder(recipeFee, recipeIds, recipeCode)
+                .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
+                .subscribe(new FastLoadingObserver<BatchCreateOrderEntity>("请稍后...") {
+                    @Override
+                    public void _onNext(BatchCreateOrderEntity entity) {
+                        if (entity == null) {
+                            ToastUtil.show("请检查网络");
+                            return;
+                        }
+                        if (entity.isSuccess()){
+                            String busId = String.valueOf(entity.getData().getJsonResponseBean().getBody());
+                            if (!busId.equals("0"))
+                                requestPayOrder(busId);
+                        }
+                    }
+                });
+    }
+
+    /**
+     * 获得订单二维码和其他详细数据
+     * @param busId 订单号
+     */
+    private void requestPayOrder(String busId){
+        ApiRepository.getInstance().payOrder(busId)
+                .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
+                .subscribe(new FastLoadingObserver<PayOrderEntity>("请稍后...") {
+                    @Override
+                    public void _onNext(PayOrderEntity entity) {
+                        if (entity == null) {
+                            ToastUtil.show("请检查网络");
+                            return;
+                        }
+                        if (entity.isSuccess()){
+                            // 显示二维码
+                           String qrStr = entity.getData().getJsonResponseBean().getBody().qr_code;
+                           showQRCode(XQRCode.createQRCodeWithLogo(qrStr, 400, 400, null));
+                        }
+                    }
+                });
     }
 
 

@@ -7,7 +7,15 @@ import com.aries.library.fast.retrofit.FastRetryWhen;
 import com.aries.library.fast.retrofit.FastTransformer;
 import com.aries.template.GlobalConfig;
 import com.aries.template.utility.ConvertJavaBean;
+import com.aries.template.utility.JTJKRsaUtil;
+import com.aries.template.utility.JTJSONUtils;
+import com.aries.template.utility.RSASignature;
+import com.aries.template.utility.RSAUtil;
 
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SignatureException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -61,7 +69,7 @@ public abstract class BaseRepository {
     /**
      * 输入到通信的body创造工程
      * 由于是一个统一的网络请求，通过methodcode来调用不同的方法，所以需要输入methodCode
-     * @param isBizArray bizcontent 是否为 array。有些请求，bizcontent是个字符串
+     * @param isBizArray bizcontent 是否为 array。纳里的请求bizcontent是个数组,
      */
     protected RequestBody BodyCreate(Map map, String methodCode, boolean isBizArray){
         // bizContent 结构数据信息补全
@@ -74,7 +82,21 @@ public abstract class BaseRepository {
         ArrayList<Map> maps = new ArrayList<>();
         maps.add(bizContent);
 
-        // 签名加密
+        // 创建body
+        ApiRepository.common.getInstance().machineId = GlobalConfig.machineId;
+        ApiRepository.common.getInstance().userId = GlobalConfig.NALI_TID;
+
+        //  由于加密要求，必须要按照字母顺序排列
+        final Map<String, Object> params = new HashMap<>(4);
+        if (isBizArray)
+            params.put("bizContent", maps);
+        else
+            params.put("bizContent", maps.get(0));// 不是取第一个值，而是取bizContent数组的第一位，maps是多个bizContent
+        params.put("common", ApiRepository.common.getInstance());
+        params.put("logTraceId", ApiRepository.getUUID());//getUUID 请求日志ID唯一识别流水ID，32位，推荐使用UUID
+        params.put("methodCode",methodCode);
+
+//        // 签名加密
 //        final String timeStamp = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());//时间戳
 //        final String signSource = "bizContent=idCard"+""+"&hosiptalNo="+ SPUtil.get(mContext,"hosiptalNo","")+"&mchntId="+SPUtil.get(mContext,"mchntId","")+"&posId="+SPUtil.get(mContext,"posId","")+"&terminal="+SPUtil.get(mContext,"termial","")+"&timestamp="+timeStamp+"";
 //        String signTarget = null;
@@ -83,60 +105,23 @@ public abstract class BaseRepository {
 //        } catch (Exception e) {
 //            e.printStackTrace();
 //        }
-
-        // 数据加密
-
-        // 创建body
-        ApiRepository.common.getInstance().machineId = GlobalConfig.machineId;
-        ApiRepository.common.getInstance().userId = GlobalConfig.NALI_TID;
-//        final String  logTraceId = "eebcbbcf2c664c28a671e980265c6c76";//getUUID();
-
-        final Map<String, Object> params = new HashMap<>(4);
-        params.put("logTraceId", ApiRepository.getUUID());//getUUID 请求日志ID唯一识别流水ID，32位，推荐使用UUID
-        params.put("methodCode",methodCode);
-        params.put("common", ApiRepository.common.getInstance());
-        if (isBizArray)
-            params.put("bizContent", maps);
-        else
-            params.put("bizContent", maps.get(0));
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            //将最外层参数中除sign字段外的所有字段按照按字母序排序，键和值用=号连接，键值对之间用&符号分隔
+            try {
+                String noSgin = JTJSONUtils.translateSign(params);
+                String sgin = RSAUtil.sign(noSgin,GlobalConfig.PUBLIC_KEY);
+//                String sgin = RSASignature.sign(noSgin, GlobalConfig.PUBLIC_KEY);
+//                String sgin = JTJKRsaUtil.encryptByPublicKey(noSgin,GlobalConfig.PUBLIC_KEY);
+                if (sgin!=null)
+                    params.put("sign",sgin);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         String strEntity = ConvertJavaBean.converJavaBeanToJsonNew(params);
         RequestBody body = RequestBody.create(okhttp3.MediaType.parse("Content-Type:application/json;charset=UTF-8"),strEntity);
         return body;
     }
-
-
-//    /**
-//     * 输入到通信的body创造工程
-//     * 由于是一个统一的网络请求，通过methodcode来调用不同的方法，所以需要输入methodCode
-//     * 他和其他的 BodyCreate 不一样，不会添加多余的 bizContent 数据
-//     * bizContent 必须是对象
-//     *
-//     * - findUser
-//     * - authCode
-//     *
-//     * 这种方式是没有 method code 的，是我们自己的后台方式，所以会不一样
-//     */
-//    protected RequestBody BodyCreateWithoutOther(Map map){
-//        // bizContent 结构数据信息补全
-//        Map<String,String> bizContent = new HashMap<>();
-//        bizContent.putAll(map);
-//
-//        ArrayList<Map> maps = new ArrayList<>();
-//        maps.add(bizContent);
-//
-//        // 创建body
-//        ApiRepository.common.getInstance().machineId = GlobalConfig.machineId;
-//        ApiRepository.common.getInstance().userId = GlobalConfig.NALI_TID;
-//
-//        final Map<String, Object> params = new HashMap<>(4);
-//        params.put("logTraceId", ApiRepository.getUUID());//getUUID 请求日志ID唯一识别流水ID，32位，推荐使用UUID
-//        params.put("common", ApiRepository.common.getInstance());
-//        params.put("bizContent", maps.get(0));
-//        String strEntity = ConvertJavaBean.converJavaBeanToJsonNew(params);
-//        RequestBody body = RequestBody.create(okhttp3.MediaType.parse("Content-Type:application/json;charset=UTF-8"),strEntity);
-//        return body;
-//    }
-
 
 
 

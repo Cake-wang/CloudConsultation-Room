@@ -12,6 +12,7 @@ import com.aries.library.fast.util.SPUtil;
 import com.aries.library.fast.util.ToastUtil;
 import com.aries.template.entity.AuthCodeResultEntity;
 import com.aries.template.entity.BaseMovieEntity;
+import com.aries.template.entity.BatchCreateOrderEntity;
 import com.aries.template.entity.CanRequestOnlineConsultResultEntity;
 import com.aries.template.entity.CancelregisterResultEntity;
 import com.aries.template.entity.ConfigurationToThirdForPatientEntity;
@@ -22,18 +23,29 @@ import com.aries.template.entity.FindValidOrganProfessionForRevisitResultEntity;
 import com.aries.template.entity.GetConfigurationToThirdForPatientRequestEntity;
 import com.aries.template.entity.GetConfigurationToThirdForPatientResultEntity;
 import com.aries.template.entity.GetConsultsAndRecipesResultEntity;
+import com.aries.template.entity.GetMedicalInfoEntity;
+import com.aries.template.entity.GetStockInfoEntity;
 import com.aries.template.entity.IsRegisterRequestEntity;
 import com.aries.template.entity.IsRegisterResultEntity;
 import com.aries.template.entity.MachineEntity;
+import com.aries.template.entity.PayOrderEntity;
+import com.aries.template.entity.PrescriptionPushEntity;
 import com.aries.template.entity.RegisterResultEntity;
 import com.aries.template.entity.RequestConsultAndCdrOtherdocResultEntity;
+import com.aries.template.entity.RoomIdInsAuthEntity;
 import com.aries.template.entity.SearchDoctorListByBusTypeV2ResultEntity;
 import com.aries.template.entity.UpdateEntity;
 import com.aries.template.retrofit.service.ApiService;
 import com.aries.template.utility.ConvertJavaBean;
+import com.aries.template.utility.JTJSONUtils;
 import com.aries.template.utility.RSASignature;
 import com.aries.template.widget.mgson.MFastRetrofit;
 import com.decard.NDKMethod.BasicOper;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+
+import org.json.JSONArray;
+import org.json.JSONException;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -42,8 +54,10 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -539,48 +553,9 @@ public class ApiRepository extends BaseRepository {
         return FastTransformer.switchSchedulers(getApiService().paySuccess(body).retryWhen(new FastRetryWhen()));
     }
 
-//    public Observable<GetConfigurationToThirdForPatientResultEntity> getConfigurationToThirdForPatient(String thirdParty, String tid, Context mContext) {
-//        GetConfigurationToThirdForPatientRequestEntity checkActivationStateReferenceEntity = new GetConfigurationToThirdForPatientRequestEntity();
-//        checkActivationStateReferenceEntity.setThirdParty(thirdParty);
-//
-//        checkActivationStateReferenceEntity.setTid(tid);
-//        String beanstr = ConvertJavaBean.converJavaBeanToJsonNew(checkActivationStateReferenceEntity);
-//        String beanstrNew = "";
-//        try {
-//            beanstrNew = URLEncoder.encode(beanstr,"UTF-8");
-//        } catch (UnsupportedEncodingException e) {
-//            e.printStackTrace();
-//        }
-//
-//        //正式环境签名
-//        String privateKey ="MIICXQIBAAKBgQDeppiicqPIfjLjAzW1VKXjP2BsRGBjwh4nYV0C5tD8z+R0NvnLJo7de5icjhhsNnCDn6NFKtLF4WIL97x38nRgKueAD+LYjCPefJ6tZT513tMen9N8BYiUP8+9EyxSKVsVWdBCZnPEWp0GTSpN1sjv6dhk8PYjndfIHalYSY8YXQIDAQABAoGBAJ55p9SgknEnWiL46uaJPJX2SzRkqtL2nS3cgC6LiZ8Yffw2ETAG3tNIoMR1425KhWU6YCTgKSvNk1L/Xzdk7G0easRzCNRQ6EWm3H+c/UBHcDBVfSKq45SwlJvaVlU8A8c8YCmttEBFrKS2YEWln/U8DUSNkrbAs0ni/dCyOGnlAkEA+21tSJYxW2yY939yVHtsrIttCokBR3hp7sZPHEyAcXuslZ/O62k3k3PMZUWEqaXnhiAnIJWr8yrGpcTobwHfwwJBAOKzMYdtoPOswki5temLj7yyTitY9L27hTEgt+Y7y5/oCmB/P3XZlJOtpnFDu+xdJAnEpu1RuCYUUIs00l/kxV8CQGBLTKucOlMViJBh01vf2YNL8vsx9bd1urykXvArrJXKFBNKHWmz5oEmvIWc1m5TCBUqg1HLgQukumgKviqlwRkCQQCCVR9OivqT3Wi9QveQ04nJpIFIbpYWVq7WdccEeLAyuMbuf3nOmU7QMG+WgqiR1WKYsxR9MBQ84EUGI1Ini3DlAkBHyidb8c92GDPKxHG1NS2lMvAKpEOlWhPS18vtEPA1R0oQnRB942l6gekxSRZPUVpNrFXPheVApbZJLpbUaHpS";
-//
-//        Date date = new Date();
-//        String reqSeq = new SimpleDateFormat("yyyyMMddHHmmss").format(date);
-//
-//        String signSource = "bizContent=idCard"+""+"&hosiptalNo="+SPUtil.get(mContext,"hosiptalNo","")+"&mchntId="+SPUtil.get(mContext,"mchntId","")+"&posId="+SPUtil.get(mContext,"posId","")+"&terminal="+SPUtil.get(mContext,"termial","")+"&timestamp="+reqSeq+"";
-//        Log.d("timestamp",signSource);
-//        String signTarget = null;
-//        try {
-//            signTarget = RSASignature.sign(signSource, privateKey);
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//
-//        Map<String, Object> params = new HashMap<>(4);
-//        params.put("logTraceId", getUUID());
-//        params.put("methodCode","getConfigurationToThirdForPatient");
-//        params.put("common", common.getInstance());
-//        params.put("bizContent", ""+beanstr+"");
-//        params.put("sign", signTarget);
-//        String strEntity = ConvertJavaBean.converJavaBeanToJsonNew(params);
-//        RequestBody body = RequestBody.create(okhttp3.MediaType.parse("Content-Type:application/json;charset=UTF-8"),strEntity);
-//        return FastTransformer.switchSchedulers(getApiService().getConfigurationToThirdForPatient(body).retryWhen(new FastRetryWhen()));
-//    }
-
     /**
      * 获取第三方配置信息
+     * 比如 信
      * @param tid 就是tid
      * @param thirdParty 就是第三方的APP_KEY
      */
@@ -631,7 +606,9 @@ public class ApiRepository extends BaseRepository {
         bizContent.put("requestMode","4");//复诊类型,固定为4
         bizContent.put("tabStatus","ongoing");//状态标志位,ongoing进行中tab，isover已完成tab
         bizContent.put("recipeIndex","0");//处方分页起始位置
+        bizContent.put("index","0");//处方分页起始位置
         bizContent.put("recipeLimit","10");//处方每页查询量(最大不超过20)
+        bizContent.put("limit","10");//处方每页查询量(最大不超过20)
         // 请求的类型
         RequestBody body = BodyCreate(bizContent,"",false);
         return FastTransformer.switchSchedulers(getApiService().getConsultsAndRecipes(body).retryWhen(new FastRetryWhen()));
@@ -649,5 +626,145 @@ public class ApiRepository extends BaseRepository {
         RequestBody body = BodyCreate(bizContent,"",false);
         return FastTransformer.switchSchedulers(getApiService().findByMachineId(body).retryWhen(new FastRetryWhen()));
     }
+
+    /**
+     * 查询复诊单的小鱼视频会议室房间号和密码 v
+     *
+     * todo 好像返回的数据格式有问题，拿不到房间号和房间密码
+     * @param orderId 复诊单ID
+     * @param thirdParty 就是第三方的APP_KEY
+     */
+    public Observable<RoomIdInsAuthEntity> getRoomIdInsAuth(String orderId, String thirdParty) {
+        Map<String, Object> bizContent = new HashMap<>();
+        bizContent.put("orderId", orderId); //	复诊单ID
+        bizContent.put("thirdParty", thirdParty); //	复诊单ID
+        bizContent.put("appType", "xylink"); //视频的SDK名字 固定xylink
+        bizContent.put("type", "add");//暂时小鱼SDK用不上 固定add
+        // 请求的类型 findValidOrganProfessionForRevisit
+        RequestBody body = BodyCreate(bizContent, "roomIdInsAuth");
+        return FastTransformer.switchSchedulers(getApiService().roomIdInsAuth(body).retryWhen(new FastRetryWhen()));
+    }
+
+    /**
+     * 4.1.4 处方药品推送接口
+     * todo 动态化输入
+     */
+    public Observable<PrescriptionPushEntity> prescriptionPush(String  clinicSN,
+                                                               String  hospitalName,
+                                                               String  doctorName,
+                                                               String  deptName,
+                                                               String  patientIdCard,
+                                                               String  patientGender,
+                                                               String  patientName,
+                                                               String  patientMobile,
+                                                               String  patientDateOfBirth,
+                                                               String  complaint,
+                                                               String  diseaseName,
+                                                               String  outerOrderNo,
+                                                               String  prescriptionType,
+                                                               String  totalAmount,
+                                                               String  billNo,
+                                                               String  paymentSeqNo,
+                                                               ArrayList<Map> drugs
+                                                               ) {
+        // 外部引入的 arrayList 必须在这里再重新组装一遍，
+        // 有可能会出现数组不能被Gson格式话的问题
+        ArrayList<Map> maps = new ArrayList<>();
+        for (Map item : drugs) {
+            maps.add(item);
+        }
+
+        // 除了公共的数据之外，还有其他的数据请求
+        Map<String,Object> bizContent = new HashMap<>();
+        bizContent.put("clinicSN",clinicSN);//
+        bizContent.put("hospitalName",hospitalName);//
+        bizContent.put("doctorName",doctorName);//
+        bizContent.put("deptName",deptName);//
+        bizContent.put("patientIdCard",patientIdCard);//
+        bizContent.put("patientGender",patientGender);//
+        bizContent.put("patientName",patientName);//
+        bizContent.put("patientMobile",patientMobile);//
+        bizContent.put("patientDateOfBirth",patientDateOfBirth);//
+        bizContent.put("complaint",complaint);//
+        bizContent.put("diseaseName",diseaseName);//
+        bizContent.put("outerOrderNo",outerOrderNo);//
+        bizContent.put("prescriptionType",prescriptionType);//
+        bizContent.put("totalAmount",totalAmount);//
+        bizContent.put("billNo",billNo);//
+        bizContent.put("paymentSeqNo",paymentSeqNo);//
+        bizContent.put("paymentType","SELF");//
+        bizContent.put("timeout","1440");//
+        bizContent.put("drugs",maps);//
+        // 请求的类型
+        RequestBody body = BodyCreate(bizContent,"prescriptionPush",false);
+        return FastTransformer.switchSchedulers(getApiService().prescriptionPush(body).retryWhen(new FastRetryWhen()));
+    }
+
+    /**
+     * 4.1.5 查询设备所有库存接口
+     * todo 返回的 GetMedicalInfoEntity.data.data 是一个json的字符串，不能转换为对象
+     * @param clinicSn 诊亭编号
+     */
+    public Observable<GetMedicalInfoEntity> getMedicalInfo(String clinicSn) {
+        // 除了公共的数据之外，还有其他的数据请求
+        Map<String,String> bizContent = new HashMap<>();
+        bizContent.put("clinicSn",clinicSn);//复诊分页开始标记(默认每页十条，从0开始)
+        // 请求的类型
+        RequestBody body = BodyCreate(bizContent,"getMedicalInfo",false);
+        return FastTransformer.switchSchedulers(getApiService().getMedicalInfo(body).retryWhen(new FastRetryWhen()));
+    }
+
+    /**
+     * 4.1.6 查询部分库存信息
+     * todo 返回的 GetStockInfoEntity.data.data 是一个json的字符串，不能转换为对象
+     * @param clinicSn 诊亭编号
+     * @param skus 药品编码 列表
+     */
+    public Observable<GetStockInfoEntity> getStockInfo(String clinicSn, ArrayList<String> skus) {
+        // 除了公共的数据之外，还有其他的数据请求
+        Map<String,Object> bizContent = new HashMap<>();
+        bizContent.put("clinicSn",clinicSn);//诊亭编号
+        bizContent.put("skus", JTJSONUtils.pressJsonArray(skus));//药品编码
+        // 请求的类型
+        RequestBody body = BodyCreate(bizContent,"getStockInfo",false);
+        return FastTransformer.switchSchedulers(getApiService().getStockInfo(body).retryWhen(new FastRetryWhen()));
+    }
+
+
+    /**
+     * 3.11.	处方合并生成订单接口
+     */
+    public Observable<BatchCreateOrderEntity> batchCreateOrder(String recipeFee, ArrayList<String> recipeIds,ArrayList<String> recipeCode) {
+        // 除了公共的数据之外，还有其他的数据请求
+        Map<String,Object> bizContent = new HashMap<>();
+        bizContent.put("giveMode","2");//2 暂定
+        bizContent.put("payway", "32");//32 支付宝
+        bizContent.put("recipeFee", recipeFee);//挂号费
+        bizContent.put("recipeIds", JTJSONUtils.pressJsonArray(recipeIds));//处方ID集合
+        bizContent.put("recipeCode", JTJSONUtils.pressJsonArray(recipeCode));//HIS处方编码集合，可以从处方详情中获取
+
+        // 请求的类型
+        RequestBody body = BodyCreate(bizContent,"batchCreateOrder");
+        return FastTransformer.switchSchedulers(getApiService().batchCreateOrder(body).retryWhen(new FastRetryWhen()));
+    }
+
+    /**
+     * 3.12.	支付请求接口
+     * 获取支付的二维码和详细数据
+     * 从3.11节获取的订单id
+     * 轮询处方单详情，读取payFlag字段，如果为1表示已经支付成功。
+     */
+    public Observable<PayOrderEntity> payOrder(String busId) {
+        // 除了公共的数据之外，还有其他的数据请求
+        Map<String,Object> bizContent = new HashMap<>();
+        bizContent.put("payWay", "32");//32 支付宝
+        bizContent.put("busId", busId);//业务订单id 从3.11节获取的订单id
+        bizContent.put("busType", "recipe");//处方:recipe,复诊：revisit
+
+        // 请求的类型
+        RequestBody body = BodyCreate(bizContent,"order");
+        return FastTransformer.switchSchedulers(getApiService().payOrder(body).retryWhen(new FastRetryWhen()));
+    }
+
 
 }

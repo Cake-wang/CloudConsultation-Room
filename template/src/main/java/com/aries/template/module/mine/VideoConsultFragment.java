@@ -17,6 +17,7 @@ import com.aries.template.GlobalConfig;
 import com.aries.template.R;
 import com.aries.template.entity.CancelregisterResultEntity;
 import com.aries.template.entity.ConfigurationToThirdForPatientEntity;
+import com.aries.template.entity.RoomIdInsAuthEntity;
 import com.aries.template.module.base.BaseEventFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.template.view.ShineButtonDialog;
@@ -43,6 +44,10 @@ public class VideoConsultFragment extends BaseEventFragment {
     private String consultId; //复诊单id 复诊单拿
     private String nickname; //复诊人姓名 复诊单拿
     private String doctorUserId; //医生userId 复诊单拿
+
+    private String username; //医生userId 复诊单拿
+    private String userpwd; //医生userId 复诊单拿
+    private String userId; //医生userId 复诊单拿
 
     /**
      * 输入显示对象
@@ -202,14 +207,39 @@ public class VideoConsultFragment extends BaseEventFragment {
                             return;
                         }
                         if (entity.getData().isSuccess()){
-                            // 成功返回数据注入第三方数据
-//                            EaseModeProxy.with().easemobStart(getActivity(),
-//                                    consultId,
-//                                    nickname,
-//                                    doctorUserId,
-//                                    entity.getData().getJsonResponseBean().getBody().getUsername(),
-//                                    entity.getData().getJsonResponseBean().getBody().getUserpwd(),
-//                                    entity.getData().getJsonResponseBean().getBody().getUserId());
+                            username = entity.getData().getJsonResponseBean().getBody().getUsername();
+                            userpwd = entity.getData().getJsonResponseBean().getBody().getUserpwd();
+                            userId = entity.getData().getJsonResponseBean().getBody().getUserId();
+                            requestGetRoomIdInsAuth();
+                        }
+                    }
+                });
+    }
+
+    /**
+     * 查询复诊单的小鱼视频会议室房间号和密码
+     */
+    private void requestGetRoomIdInsAuth(){
+        ApiRepository.getInstance().getRoomIdInsAuth(doctorUserId,GlobalConfig.NALI_APPKEY)
+                .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
+                .subscribe(new FastLoadingObserver<RoomIdInsAuthEntity>("请稍后...") {
+                    @Override
+                    public void _onNext(RoomIdInsAuthEntity entity) {
+                        if (entity == null) {
+                            ToastUtil.show("请检查网络");
+                            return;
+                        }
+                        if (entity.getData().isSuccess()){
+                                    EaseModeProxy.with().easemobStart(getActivity(),
+                                            consultId,
+                                            nickname,
+                                            doctorUserId,
+                                            username,
+                                            userpwd,
+                                            userId,
+                                            String.valueOf(entity.getData().getJsonResponseBean().getCode()),
+                                            String.valueOf(entity.getData().getJsonResponseBean().getBody())
+                                            );
                             EaseModeProxy.with().xyInit();
                         }
                     }

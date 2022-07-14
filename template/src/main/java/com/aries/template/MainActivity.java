@@ -24,6 +24,7 @@ import com.aries.template.module.mine.DepartmentFragment;
 import com.aries.template.module.mine.MineFragment;
 import com.aries.template.module.mine.OrderConsultFragment;
 import com.aries.template.module.mine.OrderRecipesFragment;
+import com.aries.template.module.mine.OrderRecipesListFragment;
 import com.aries.template.module.mine.PutRecordFragment;
 import com.aries.template.module.mine.VideoConsultFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
@@ -404,6 +405,7 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                             boolean isDepartTag = true;
                             // 挂号单和处方单不会同时出现，如果同时出现，则需要调整逻辑
                             // 查看挂号是否多余1条
+
                             if(entity.getData().getConsults().size()>0){
                                 for (GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Consults item : entity.getData().getConsults()) {
                                     int status = item.getConsults().getStatus();
@@ -411,7 +413,7 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                                            (status==1 || status ==2 || status == 3)){
                                        isDepartTag = false;
                                        // 挂号
-                                       start(OrderConsultFragment.newInstance(item));
+                                      start(OrderConsultFragment.newInstance(item));
                                    }
                                     //  如果挂号单有多余的无效单，批量进行取消。
                                     if (item.getConsults().getPayflag()==0 && status!=8){
@@ -419,7 +421,9 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                                         ApiRepository.getInstance().patientCancelGraphicTextConsult(item.getConsults().getConsultId()).subscribe();
                                     }
                                 }
+
                             }
+//                            ArrayList<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes> recipes = new ArrayList<>();
                             // 查看处方单是否多余1条处方
                             if (entity.getData().getRecipes().size()>0){
                                 // 每一个处方单中，都有一个处方信息，这个处方信息是需要合并的
@@ -429,9 +433,11 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                                         recipes.add(item);
                                     }
                                 }
+                                // 如果未支付处方单有，则进入批量处理界面
                                 if (recipes.size()>0){
                                     isDepartTag = false;
-                                    start(OrderRecipesFragment.newInstance(recipes));
+                                    start(OrderRecipesListFragment.newInstance(recipes));
+//                                    start(OrderRecipesFragment.newInstance(recipes));
                                 }
                             }
                             if (isDepartTag){
