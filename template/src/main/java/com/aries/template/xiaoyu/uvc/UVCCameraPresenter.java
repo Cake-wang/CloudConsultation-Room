@@ -301,6 +301,7 @@ public class UVCCameraPresenter {
         releaseCamera();
         releaseUsbMonitor();
         mSurfaceTexture.release();
+        handler.removeCallbacksAndMessages(null);
     }
 
     public boolean isUvcCamera() {

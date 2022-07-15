@@ -17,8 +17,10 @@ import com.aries.template.GlobalConfig;
 import com.aries.template.R;
 import com.aries.template.entity.CancelregisterResultEntity;
 import com.aries.template.entity.ConfigurationToThirdForPatientEntity;
+import com.aries.template.entity.FindRecipesForPatientAndTabStatusEntity;
 import com.aries.template.entity.RoomIdInsAuthEntity;
 import com.aries.template.module.base.BaseEventFragment;
+import com.aries.template.module.main.HomeFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.template.view.ShineButtonDialog;
 import com.aries.template.xiaoyu.EaseModeProxy;
@@ -28,8 +30,15 @@ import com.xuexiang.xaop.annotation.SingleClick;
 
 import androidx.annotation.Nullable;
 
+import java.util.concurrent.TimeUnit;
+
 import butterknife.BindView;
 import butterknife.OnClick;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
+import me.yokeyword.fragmentation.SupportFragment;
 
 /**
  * 科室展示页面
@@ -49,6 +58,8 @@ public class VideoConsultFragment extends BaseEventFragment {
     private String userpwd; //医生userId 复诊单拿
     private String userId; //医生userId 复诊单拿
 
+    private boolean doctorInRoomFlag=false;// 医生是否进入
+
     /**
      * 输入显示对象
      */
@@ -57,8 +68,6 @@ public class VideoConsultFragment extends BaseEventFragment {
         return R.layout.fragment_video;
     }
 
-    /** 从外部传入的数据  */
-    private  Object inputObj;
     @BindView(R.id.btn_stjc)
     Button btn_stjc;// 上一页按钮
     @BindView(R.id.btn_finish)
@@ -112,6 +121,12 @@ public class VideoConsultFragment extends BaseEventFragment {
         super.onStart();
         ViewGroup viewGroup = getActivity().findViewById(R.id.videoContent);
         EaseModeProxy.with().initView(getActivity(),viewGroup).onStartVideo();
+        EaseModeProxy.with().setListener(new EaseModeProxy.ProxyEventListener() {
+            @Override
+            public void onDoctorInRoom() {
+                doctorInRoomFlag = true;
+            }
+        });
     }
 
     /**
@@ -161,12 +176,32 @@ public class VideoConsultFragment extends BaseEventFragment {
         dialog.tv_content_tip.setText("是否结束问诊");
         dialog.btn_inquiry.setOnClickListener(v -> {
             dialog.dismiss();
+            if (doctorInRoomFlag){
+                // 结束问诊，如果有问诊单，则根据这个问诊单进入支付
                 // 在栈内的HomeFragment以SingleTask模式启动（即在其之上的Fragment会出栈）
-            requestPatientFinishGraphicTextConsult(0);
+            }else{
+                // 取消复诊
+                requestPatientFinishGraphicTextConsult(consultId);
+            }
         });
         dialog.btn_cancel.setOnClickListener(v -> dialog.dismiss());
         dialog.iv_close.setOnClickListener(v -> dialog.dismiss());
         dialog.show();
+    }
+
+    private static final int PERIOD = 5* 1000;
+    private static final int DELAY = 100;
+    private Disposable mDisposable;
+    /**
+     * 定时循环任务
+     * 5秒循环查询新的待处理处方信息
+     */
+    private void timeLoop() {
+        mDisposable = Observable.interval(DELAY, PERIOD, TimeUnit.MILLISECONDS)
+                .map((aLong -> aLong + 1))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(aLong -> requestFindRecipesForPatientAndTabStatus());//getUnreadCount()执行的任务
     }
 
 
@@ -174,8 +209,8 @@ public class VideoConsultFragment extends BaseEventFragment {
      * 患者取消复诊服务
      * @param consultId 复诊单号
      */
-    private void requestPatientFinishGraphicTextConsult(Integer consultId) {
-        ApiRepository.getInstance().patientFinishGraphicTextConsult(consultId)
+    private void requestPatientFinishGraphicTextConsult(String consultId) {
+        ApiRepository.getInstance().patientCancelGraphicTextConsult(consultId)
                 .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
                 .subscribe(new FastLoadingObserver<CancelregisterResultEntity>("请稍后...") {
                     @Override
@@ -186,7 +221,8 @@ public class VideoConsultFragment extends BaseEventFragment {
                         }
                         if (entity.isSuccess()){
                             if (entity.getData().isSuccess()){
-                                start(OrderFragment.newInstance(null));
+                                // 医生不曾进入到视频中
+                                start(HomeFragment.newInstance(), SupportFragment.SINGLETASK);
                             }
                         }
                     }
@@ -220,7 +256,7 @@ public class VideoConsultFragment extends BaseEventFragment {
      * 查询复诊单的小鱼视频会议室房间号和密码
      */
     private void requestGetRoomIdInsAuth(){
-        ApiRepository.getInstance().getRoomIdInsAuth(doctorUserId,GlobalConfig.NALI_APPKEY)
+        ApiRepository.getInstance().getRoomIdInsAuth(consultId,GlobalConfig.NALI_APPKEY)
                 .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
                 .subscribe(new FastLoadingObserver<RoomIdInsAuthEntity>("请稍后...") {
                     @Override
@@ -237,10 +273,31 @@ public class VideoConsultFragment extends BaseEventFragment {
                                             username,
                                             userpwd,
                                             userId,
-                                            String.valueOf(entity.getData().getJsonResponseBean().getCode()),
-                                            String.valueOf(entity.getData().getJsonResponseBean().getBody())
+                                            String.valueOf(entity.getData().getJsonResponseBean().getBody().getDetail().getMeetingNumber()),
+                                            String.valueOf(entity.getData().getJsonResponseBean().getBody().getDetail().getControlPassword())
                                             );
-                            EaseModeProxy.with().xyInit();
+//                            EaseModeProxy.with().xyInit();
+                        }
+                    }
+                });
+    }
+
+    /**
+     * 3.1.3 患者最新待处理处方
+     */
+    private void requestFindRecipesForPatientAndTabStatus(){
+        ApiRepository.getInstance().findRecipesForPatientAndTabStatus()
+                .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
+                .subscribe(new FastLoadingObserver<FindRecipesForPatientAndTabStatusEntity>("请稍后...") {
+                    @Override
+                    public void _onNext(FindRecipesForPatientAndTabStatusEntity entity) {
+                        if (entity == null) {
+                            ToastUtil.show("请检查网络");
+                            return;
+                        }
+                        if (entity.getData().isSuccess()){
+                            // todo 刷新 RV 处方单界面
+                            // todo 查看返回的所有处方单的处方信息，状态是不是1或者2，如果不是，则不能支付。
                         }
                     }
                 });

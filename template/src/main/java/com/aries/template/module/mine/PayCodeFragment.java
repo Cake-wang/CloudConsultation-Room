@@ -12,9 +12,11 @@ import com.aries.template.FakeDataExample;
 import com.aries.template.GlobalConfig;
 import com.aries.template.R;
 import com.aries.template.entity.BatchCreateOrderEntity;
+import com.aries.template.entity.GetConsultAndPatientAndDoctorByIdEntity;
 import com.aries.template.entity.GetConsultsAndRecipesResultEntity;
+import com.aries.template.entity.GetPatientRecipeByIdEntity;
 import com.aries.template.entity.PayOrderEntity;
-import com.aries.template.entity.RequestConsultAndCdrOtherdocResultEntity;
+import com.aries.template.entity.PrescriptionPushEntity;
 import com.aries.template.module.base.BaseEventFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.ui.view.title.TitleBarView;
@@ -25,9 +27,10 @@ import com.xuexiang.xaop.enums.ThreadType;
 import com.xuexiang.xqrcode.XQRCode;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import butterknife.BindView;
 import io.reactivex.Observable;
@@ -36,8 +39,8 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 /**
- * 科室展示页面
- * 用于显示一级部门，二级部门
+ * 支付复诊
+ * 仅处理复诊的支付界面
  * @author louisluo
  * @Author: AriesHoo on 2018/7/13 17:09
  * @E-Mail: AriesHoo@126.com
@@ -53,9 +56,13 @@ public class PayCodeFragment extends BaseEventFragment {
     }
 
     /** 从外部传入的数据  */
-    private String recipeFee;
-    private ArrayList<String> recipeIds;
-    private ArrayList<String> recipeCode;
+    private String recipeId;//处方单ID
+    private String recipeFee;//药品费 当处方单产生订单，并且订单有效时取的是订单的真实金额，其他时候取的处方的总金额保留两位小数
+    private ArrayList<String> recipeIds;//处方ID集合
+    private ArrayList<String> recipeCode;//HIS处方编码集合，可以从处方详情中获取
+
+    /** 传入处理处方单的数据 */
+    private GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes obj;
 
     @BindView(R.id.tv_name)
     TextView tv_name; //患者姓名
@@ -72,13 +79,20 @@ public class PayCodeFragment extends BaseEventFragment {
 
     /**
      * 跳转科室，需要带的数据
+     * @param recipeId 处方单ID
+     * @param recipeFee 总费用
+     * @param recipeIds 处方ID集合
+     * @param recipeCode 处方编号集合
+     * @param obj 处方单信息
      */
-    public static PayCodeFragment newInstance(String recipeFee, ArrayList<String> recipeIds, ArrayList<String> recipeCode) {
+    public static PayCodeFragment newInstance(String recipeId ,String recipeFee, ArrayList<String> recipeIds, ArrayList<String> recipeCode,GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes obj) {
         PayCodeFragment fragment = new PayCodeFragment();
         Bundle args = new Bundle();
+        args.putString("recipeId", recipeId);
         args.putString("recipeFee", recipeFee);
         args.putSerializable("recipeIds", recipeIds);
         args.putSerializable("recipeCode", recipeCode);
+        args.putSerializable("obj", obj);
         fragment.setArguments(args);
         return fragment;
     }
@@ -94,9 +108,11 @@ public class PayCodeFragment extends BaseEventFragment {
         // 注入数据
         Bundle args = getArguments();
         if (args != null) {
+            recipeId = args.getString("recipeId");
             recipeFee = args.getString("recipeFee");
             recipeIds = ((ArrayList<String>) args.getSerializable("recipeIds"));
             recipeCode = ((ArrayList<String>) args.getSerializable("recipeCode"));
+            obj = (GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes) args.getSerializable("obj");
         }
 
         //数据展示
@@ -123,9 +139,9 @@ public class PayCodeFragment extends BaseEventFragment {
 ////                        entity.data.requestId;
 //                    }
 //                });
-
         requestBatchCreateOrder(recipeFee,recipeIds,recipeCode);
 //        requestPayOrder(String.valueOf(74521));
+        timeLoop();
     }
 
     private static final int PERIOD = 3* 1000;
@@ -140,116 +156,85 @@ public class PayCodeFragment extends BaseEventFragment {
                 .map((aLong -> aLong + 1))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(aLong -> paySuccess());//getUnreadCount()执行的任务
+                .subscribe(aLong -> requestPaySuccess());//getUnreadCount()执行的任务
     }
 
     /**
      * 检查当前支付是否完成
      * 循环任务，没3秒检查一次
+     * 检查处方单详情
      */
-    private void paySuccess() {
-//        ApiRepository.getInstance().paySuccess("","","",mContext)
-//                .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
-//                .subscribe(
-//                        new FastLoadingObserver<RequestConsultAndCdrOtherdocResultEntity>("请稍后...") {
-//                            @Override
-//                            public void _onNext(@NonNull RequestConsultAndCdrOtherdocResultEntity entity) {
-//                                if (entity == null) {
-//                                    ToastUtil.show("请检查网络");
-//                                    return;
-//                                }
-//                                if (entity.isSuccess()){
-//                                    if (entity.getData().isSuccess()){
-//                                        //跳视频问诊
-////                                        start(VideoConsultFragment.newInstance(new Object()));
-//                                    }
-//                                }else {
-//                                    ToastUtil.show(entity.getRespDesc());
-//                                }
-//                            }
-//
-//                            @Override
-//                            public void onError(Throwable e) {
-//                                ToastUtil.show("请检查网络和ip地址");
-//                                if (true) {
-//                                    super.onError(e);
-//                                }
-//                            }
-//                        });
+    private void requestPaySuccess() {
+        ApiRepository.getInstance().getPatientRecipeById(recipeId)
+                .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
+                .subscribe(new FastLoadingObserver<GetPatientRecipeByIdEntity>("请稍后...") {
+                    @Override
+                    public void _onNext(GetPatientRecipeByIdEntity entity) {
+                        if (entity == null) {
+                            ToastUtil.show("请检查网络");
+                            return;
+                        }
+                        // 检查 payFlag 如果是 1 就是支付成功
+                        if (entity.isSuccess()){
+                            if (entity.getData().getJsonResponseBean().getBody().getRecipe().getPayFlag()==1){
+                                // 4.1.4 处方药品推送接口
+                                requestPrescriptionPush(GlobalConfig.cabinetId);
+                            }
+                        }
+                    }
+                });
+    }
+
+
+    /**
+     * 推送处方单
+     * 有库存，详细信息推送到服务端，准备进入支付阶段
+     * 支付的基础是创建一个可以支付的处方单。里面有很多处方。
+     */
+    public void requestPrescriptionPush(String clinicSn){
+        // 生成处方单药物集
+        ArrayList<Map> drugs = new ArrayList<>();
+        for (GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes.RecipeDetail item : obj.recipeDetailBeans) {
+            Map<String, Object> drug= new HashMap<>();
+            //            drugs.put("direction","口服");
+            drug.put("dosageUnit",item.drugUnit);
+            drug.put("drugCommonName",item.drugName);
+            drug.put("drugTradeName",item.drugName);
+            drug.put("eachDosage",item.defaultUseDose);
+            drug.put("itemDays",item.dosageUnit);
+            drug.put("price",item.drugCost);
+            drug.put("quantity",item.sendNumber);
+            drug.put("quantityUnit",item.drugUnit);
+            drug.put("sku",item.organDrugCode);
+            drug.put("spec",item.pack);
+            drugs.add(drug);
+        }
+        ApiRepository.getInstance().prescriptionPush(clinicSn,
+                        GlobalConfig.hospitalName,
+                        GlobalConfig.ssCard.getSSNum(),
+                        obj.patientSex,
+                        obj.patientName,
+                        obj.organDiseaseName,
+                        String.valueOf(obj.recipeId),
+                        String.valueOf(obj.totalMoney),
+                        drugs)
+                .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
+                .subscribe(new FastLoadingObserver<PrescriptionPushEntity>("请稍后...") {
+                    @Override
+                    public void _onNext(PrescriptionPushEntity entity) {
+                        if (entity == null) {
+                            ToastUtil.show("请检查网络，返回首页后重试");
+                            return;
+                        }
+                        if (entity.isSuccess()){
+                            // todo 打印取药单
+                        }
+                    }
+                });
     }
 
     @Override
     public void loadData() {
-        //  发起复诊
-//        ApiRepository.getInstance().presettlement("","","",mContext)
-//                .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
-//                .subscribe(true ?
-//                        new FastLoadingObserver<RequestConsultAndCdrOtherdocResultEntity>("请稍后...") {
-//                            @Override
-//                            public void _onNext(@NonNull RequestConsultAndCdrOtherdocResultEntity entity) {
-//                                if (entity == null) {
-//                                    ToastUtil.show("请检查网络");
-//                                    return;
-//                                }
-////                                checkVersion(entity);
-//                                if (entity.isSuccess()){
-//
-//                                    if (entity.getData().isSuccess()){
-//
-//                                      tv_name.setText(""); //时间计时器显示对象
-//                                      tv_fee_type.setText(""); //时间计时器显示对象
-//                                      tv_fee_all.setText(""); //时间计时器显示对象
-//                                      tv_fee_yb.setText(""); //时间计时器显示对象
-//                                      tv_fee_zf.setText("");
-//
-//
-//                                        BitmapFactory.Options bfoOptions =new BitmapFactory.Options();
-//
-//                                        bfoOptions.inScaled =false;
-//
-//                                        Bitmap img1 = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher, bfoOptions);
-//
-//                                        createQRCodeWithLogo(img1);
-//
-//                                        timeLoop();
-//
-//                                    }
-//
-//
-//                                }else {
-//
-////                                    ToastUtil.show(entity.getRespDesc());
-//                                }
-//                            }
-//
-//                            @Override
-//                            public void onError(Throwable e) {
-//
-////                                ToastUtil.show("请检查网络和ip地址");
-//                                if (true) {
-//                                    super.onError(e);
-//                                }
-//                            }
-//                        } :
-//                        new FastObserver<RequestConsultAndCdrOtherdocResultEntity>() {
-//                            @Override
-//                            public void _onNext(@NonNull RequestConsultAndCdrOtherdocResultEntity entity) {
-//                                if (entity == null) {
-//                                    ToastUtil.show("请检查网络");
-//                                    return;
-//                                }
-//
-//
-//
-//                            }
-//
-//                            @Override
-//                            public void onError(Throwable e) {
-//                                if (false) {
-//                                    super.onError(e);
-//                                }
-//                            }
-//                        });
     }
 
     /**

@@ -236,7 +236,7 @@ public class ConfirmConsultFragment extends BaseEventFragment implements Compoun
                         }
                         if (entity.data.success){
                             // 医生 确认复诊，并进入复诊阶段
-                            start(PayCodeFragment.newInstance(FakeDataExample.recipeFee,FakeDataExample.recipeIds,FakeDataExample.recipeCode));// todo cc
+                            start(VideoConsultFragment.newInstance(FakeDataExample.consultId,FakeDataExample.nickname,FakeDataExample.doctorUserId));// todo cc
                         }else{
                             // 如果不能复诊，则检查异常原因
                             errorCheck(entity.data.jsonResponseBean.msg,entity.data.jsonResponseBean.code);

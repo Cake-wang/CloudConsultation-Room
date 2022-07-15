@@ -418,7 +418,7 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                                     //  如果挂号单有多余的无效单，批量进行取消。
                                     if (item.getConsults().getPayflag()==0 && status!=8){
                                         // 取消挂号单 status = 8 已经取消
-                                        ApiRepository.getInstance().patientCancelGraphicTextConsult(item.getConsults().getConsultId()).subscribe();
+                                        ApiRepository.getInstance().patientCancelGraphicTextConsult(String.valueOf(item.getConsults().getConsultId())).subscribe();
                                     }
                                 }
 

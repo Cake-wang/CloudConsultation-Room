@@ -10,12 +10,15 @@ import com.aries.template.entity.CanRequestOnlineConsultResultEntity;
 import com.aries.template.entity.CancelregisterResultEntity;
 import com.aries.template.entity.ConfigurationToThirdForPatientEntity;
 import com.aries.template.entity.CreateOrderResultEntity;
+import com.aries.template.entity.FindRecipesForPatientAndTabStatusEntity;
 import com.aries.template.entity.FindUserResultEntity;
 import com.aries.template.entity.FindValidDepartmentForRevisitResultEntity;
 import com.aries.template.entity.FindValidOrganProfessionForRevisitResultEntity;
 import com.aries.template.entity.GetConfigurationToThirdForPatientResultEntity;
+import com.aries.template.entity.GetConsultAndPatientAndDoctorByIdEntity;
 import com.aries.template.entity.GetConsultsAndRecipesResultEntity;
 import com.aries.template.entity.GetMedicalInfoEntity;
+import com.aries.template.entity.GetPatientRecipeByIdEntity;
 import com.aries.template.entity.GetStockInfoEntity;
 import com.aries.template.entity.IsRegisterResultEntity;
 import com.aries.template.entity.MachineEntity;
@@ -206,4 +209,28 @@ public interface ApiService {
     @POST(ApiConstant.doBaseNgariRequest)
     Observable<PayOrderEntity> payOrder(@Body RequestBody body);
 
+    /**
+     * 复诊单详细信息
+     * 可以被用来轮询是否已经支付
+     */
+    @Headers("Content-Type: application/json")
+    @POST(ApiConstant.doBaseNgariRequest)
+    Observable<GetConsultAndPatientAndDoctorByIdEntity> getConsultAndPatientAndDoctorById(@Body RequestBody body);
+
+    /**
+     * 3.1.3 患者最新待处理处方
+     *
+     */
+    @Headers("Content-Type: application/json")
+    @POST(ApiConstant.doBaseNgariRequest)
+    Observable<FindRecipesForPatientAndTabStatusEntity> findRecipesForPatientAndTabStatus(@Body RequestBody body);
+
+
+    /**
+     * 处方单详细信息
+     * 可以被用来轮询是否已经支付
+     */
+    @Headers("Content-Type: application/json")
+    @POST(ApiConstant.doBaseNgariRequest)
+    Observable<GetPatientRecipeByIdEntity> getPatientRecipeById(@Body RequestBody body);
 }

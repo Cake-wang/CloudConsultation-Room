@@ -608,6 +608,8 @@ public class EaseModeProxy {
                     if (videoInfos.size()>0){
 //                            if (videoCell !=null)
 //                                videoCell.setVideoInfo(videoInfos.get(0));
+                        if (listener!=null)
+                            listener.onDoctorInRoom();
                     }
             }
         });
@@ -771,7 +773,7 @@ public class EaseModeProxy {
      * 对外监听
      */
     public interface ProxyEventListener{
-        /** 当医生进入的时候，将医生的 video Info 给予外部 */
-        void onVideoSuccessLinked();
+        default void onVideoSuccessLinked(){};// 入会成功
+        default void onDoctorInRoom(){};//医生进入的时候，将医生的 video Info 给予外部
     }
 }

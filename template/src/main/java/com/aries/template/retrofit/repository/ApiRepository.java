@@ -17,13 +17,16 @@ import com.aries.template.entity.CanRequestOnlineConsultResultEntity;
 import com.aries.template.entity.CancelregisterResultEntity;
 import com.aries.template.entity.ConfigurationToThirdForPatientEntity;
 import com.aries.template.entity.CreateOrderResultEntity;
+import com.aries.template.entity.FindRecipesForPatientAndTabStatusEntity;
 import com.aries.template.entity.FindUserResultEntity;
 import com.aries.template.entity.FindValidDepartmentForRevisitResultEntity;
 import com.aries.template.entity.FindValidOrganProfessionForRevisitResultEntity;
 import com.aries.template.entity.GetConfigurationToThirdForPatientRequestEntity;
 import com.aries.template.entity.GetConfigurationToThirdForPatientResultEntity;
+import com.aries.template.entity.GetConsultAndPatientAndDoctorByIdEntity;
 import com.aries.template.entity.GetConsultsAndRecipesResultEntity;
 import com.aries.template.entity.GetMedicalInfoEntity;
+import com.aries.template.entity.GetPatientRecipeByIdEntity;
 import com.aries.template.entity.GetStockInfoEntity;
 import com.aries.template.entity.IsRegisterRequestEntity;
 import com.aries.template.entity.IsRegisterResultEntity;
@@ -378,23 +381,23 @@ public class ApiRepository extends BaseRepository {
     }
 
     /**
-     * 取消待支付挂号单
+     * 3.1.16 患者取消复诊服务
      * @param consultId 挂号单单号
      */
-    public Observable<CancelregisterResultEntity> patientCancelGraphicTextConsult(Integer consultId) {
+    public Observable<CancelregisterResultEntity> patientCancelGraphicTextConsult(String consultId) {
         Map<String,String> bizContent = new HashMap<>();
-        bizContent.put("consultId",String.valueOf(consultId));
+        bizContent.put("consultId",consultId);
         RequestBody body = BodyCreate(bizContent,"patientCancelGraphicTextConsult");
         return FastTransformer.switchSchedulers(getApiService().patientCancelGraphicTextConsult(body).retryWhen(new FastRetryWhen()));
     }
 
-    public Observable<CancelregisterResultEntity> patientFinishGraphicTextConsult(Integer consultId) {
-        Map<String,String> bizContent = new HashMap<>();
-//        bizContent.put("consultId",String.valueOf(consultId));
-        bizContent.put("consultId","815423835");
-        RequestBody body = BodyCreate(bizContent,"patientCancelGraphicTextConsult");
-        return FastTransformer.switchSchedulers(getApiService().patientCancelGraphicTextConsult(body).retryWhen(new FastRetryWhen()));
-    }
+//    public Observable<CancelregisterResultEntity> patientFinishGraphicTextConsult(Integer consultId) {
+//        Map<String,String> bizContent = new HashMap<>();
+////        bizContent.put("consultId",String.valueOf(consultId));
+//        bizContent.put("consultId","815423835");
+//        RequestBody body = BodyCreate(bizContent,"patientCancelGraphicTextConsult");
+//        return FastTransformer.switchSchedulers(getApiService().patientCancelGraphicTextConsult(body).retryWhen(new FastRetryWhen()));
+//    }
 
     /**
      * 获得复诊按机构查找一级科室
@@ -516,7 +519,6 @@ public class ApiRepository extends BaseRepository {
     }
 
     public Observable<RequestConsultAndCdrOtherdocResultEntity> presettlement(String appKey, String tid, String appClientType, Context mContext) {
-
 //        idCard = "33052219861229693X";
 //        SPUtil.put(mContext, "termial","YTJ1001");
 //        SPUtil.put(mContext,"hosiptalNo", "A0005");
@@ -534,8 +536,10 @@ public class ApiRepository extends BaseRepository {
         return FastTransformer.switchSchedulers(getApiService().presettlement(body).retryWhen(new FastRetryWhen()));
     }
 
+    /**
+     * 发起复诊接口
+     */
     public Observable<RequestConsultAndCdrOtherdocResultEntity> paySuccess(String appKey, String tid, String appClientType, Context mContext) {
-
 //        idCard = "33052219861229693X";
 //        SPUtil.put(mContext, "termial","YTJ1001");
 //        SPUtil.put(mContext,"hosiptalNo", "A0005");
@@ -647,24 +651,16 @@ public class ApiRepository extends BaseRepository {
 
     /**
      * 4.1.4 处方药品推送接口
-     * todo 动态化输入
+     * todo 处方单里面没有医生和科室信息？
      */
     public Observable<PrescriptionPushEntity> prescriptionPush(String  clinicSN,
                                                                String  hospitalName,
-                                                               String  doctorName,
-                                                               String  deptName,
                                                                String  patientIdCard,
                                                                String  patientGender,
                                                                String  patientName,
-                                                               String  patientMobile,
-                                                               String  patientDateOfBirth,
-                                                               String  complaint,
                                                                String  diseaseName,
                                                                String  outerOrderNo,
-                                                               String  prescriptionType,
                                                                String  totalAmount,
-                                                               String  billNo,
-                                                               String  paymentSeqNo,
                                                                ArrayList<Map> drugs
                                                                ) {
         // 外部引入的 arrayList 必须在这里再重新组装一遍，
@@ -676,22 +672,22 @@ public class ApiRepository extends BaseRepository {
 
         // 除了公共的数据之外，还有其他的数据请求
         Map<String,Object> bizContent = new HashMap<>();
-        bizContent.put("clinicSN",clinicSN);//
-        bizContent.put("hospitalName",hospitalName);//
-        bizContent.put("doctorName",doctorName);//
-        bizContent.put("deptName",deptName);//
+        bizContent.put("clinicSN",clinicSN);//诊亭编号
+        bizContent.put("hospitalName",hospitalName);//医院名称
+//        bizContent.put("doctorName",doctorName);//医生名称
+//        bizContent.put("deptName",deptName);//挂号科室
         bizContent.put("patientIdCard",patientIdCard);//
         bizContent.put("patientGender",patientGender);//
         bizContent.put("patientName",patientName);//
-        bizContent.put("patientMobile",patientMobile);//
-        bizContent.put("patientDateOfBirth",patientDateOfBirth);//
-        bizContent.put("complaint",complaint);//
-        bizContent.put("diseaseName",diseaseName);//
-        bizContent.put("outerOrderNo",outerOrderNo);//
-        bizContent.put("prescriptionType",prescriptionType);//
+//        bizContent.put("patientMobile",patientMobile);//
+//        bizContent.put("patientDateOfBirth",patientDateOfBirth);//
+//        bizContent.put("complaint",complaint);//主诉 比如感冒发烧
+        bizContent.put("diseaseName",diseaseName);//诊断名称
+        bizContent.put("outerOrderNo",outerOrderNo);//处方流水号
+        bizContent.put("prescriptionType","");//可以为空
         bizContent.put("totalAmount",totalAmount);//
-        bizContent.put("billNo",billNo);//
-        bizContent.put("paymentSeqNo",paymentSeqNo);//
+        bizContent.put("billNo","");//可以为空
+        bizContent.put("paymentSeqNo","");//可以为空
         bizContent.put("paymentType","SELF");//
         bizContent.put("timeout","1440");//
         bizContent.put("drugs",maps);//
@@ -732,7 +728,9 @@ public class ApiRepository extends BaseRepository {
 
 
     /**
-     * 3.11.	处方合并生成订单接口
+     * 3.1.19 处方合并生成订单接口
+     * 合并处方并生成处方订单号，供用户支付。
+     * 处方订单号，是支付的凭据。
      */
     public Observable<BatchCreateOrderEntity> batchCreateOrder(String recipeFee, ArrayList<String> recipeIds,ArrayList<String> recipeCode) {
         // 除了公共的数据之外，还有其他的数据请求
@@ -749,7 +747,7 @@ public class ApiRepository extends BaseRepository {
     }
 
     /**
-     * 3.12.	支付请求接口
+     * 3.1.20 支付请求接口
      * 获取支付的二维码和详细数据
      * 从3.11节获取的订单id
      * 轮询处方单详情，读取payFlag字段，如果为1表示已经支付成功。
@@ -765,6 +763,51 @@ public class ApiRepository extends BaseRepository {
         RequestBody body = BodyCreate(bizContent,"order");
         return FastTransformer.switchSchedulers(getApiService().payOrder(body).retryWhen(new FastRetryWhen()));
     }
+
+    /**
+     * 复诊单 详情
+     */
+    public Observable<GetConsultAndPatientAndDoctorByIdEntity> getConsultAndPatientAndDoctorById(String consultId) {
+        // 除了公共的数据之外，还有其他的数据请求
+        Map<String,Object> bizContent = new HashMap<>();
+        bizContent.put("consultId", consultId);//复诊单 ID
+
+        // 请求的类型
+        RequestBody body = BodyCreate(bizContent,"getConsultAndPatientAndDoctorById");
+        return FastTransformer.switchSchedulers(getApiService().getConsultAndPatientAndDoctorById(body).retryWhen(new FastRetryWhen()));
+    }
+
+    /**
+     * 3.1.3 患者最新待处理处方
+     * 轮询处方单详情，视频可以获得医生最新的轮训处方单
+     */
+    public Observable<FindRecipesForPatientAndTabStatusEntity> findRecipesForPatientAndTabStatus() {
+        // 除了公共的数据之外，还有其他的数据请求
+        Map<String,Object> bizContent = new HashMap<>();
+        bizContent.put("tabStatus", "ongoing");//状态标志位
+        bizContent.put("index", "0");//分页起始位置
+        bizContent.put("limit", "10");//每页查询量
+
+        // 请求的类型
+        RequestBody body = BodyCreate(bizContent,"findRecipesForPatientAndTabStatus");
+        return FastTransformer.switchSchedulers(getApiService().findRecipesForPatientAndTabStatus(body).retryWhen(new FastRetryWhen()));
+    }
+
+
+    /**
+     * 处方单  详情
+     * 轮询处方单详情，读取payFlag字段，如果为1表示已经支付成功。
+     */
+    public Observable<GetPatientRecipeByIdEntity> getPatientRecipeById(String recipeId) {
+        // 除了公共的数据之外，还有其他的数据请求
+        Map<String,Object> bizContent = new HashMap<>();
+        bizContent.put("recipeId", recipeId);//处方单 ID
+
+        // 请求的类型
+        RequestBody body = BodyCreate(bizContent,"getPatientRecipeById");
+        return FastTransformer.switchSchedulers(getApiService().getPatientRecipeById(body).retryWhen(new FastRetryWhen()));
+    }
+
 
 
 }

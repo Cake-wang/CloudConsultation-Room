@@ -43,6 +43,7 @@ import me.yokeyword.fragmentation.SupportFragment;
  * 是否已经有处方需要支付为分界
  * 前置必须有一个请求处方单信息请求查询，然后把结果输入进来，如果请求成功则跳入该接口
  * 请确认，输入本类的输入类的类型，他和 obj 还有 RV的输入类型有关系
+ * todo 动态化
  * @author  ::: louis luo
  * Date ::: 2022/6/16 4:54 PM
  */
@@ -253,40 +254,37 @@ public class ConfirmRecipesFragment extends BaseEventFragment {
      * 有库存，启动处方单详细信息推送到服务端
      */
     public void requestPrescriptionPush(){
-        ApiRepository.getInstance().prescriptionPush(FakeDataExample.clinicSn,
-                        FakeDataExample.hospitalName,
-                        FakeDataExample.deptName,
-                        FakeDataExample.patientIdCard,
-                        FakeDataExample.patientGender,
-                        FakeDataExample.doctorName,
-                        FakeDataExample.patientName,
-                        FakeDataExample.patientMobile,
-                        FakeDataExample.patientDateOfBirth,
-                        FakeDataExample.complaint,
-                        FakeDataExample.diseaseName,
-                        FakeDataExample.outerOrderNo,
-                        FakeDataExample.prescriptionType,
-                        FakeDataExample.totalAmount,
-                        FakeDataExample.billNo,
-                        FakeDataExample.paymentSeqNo,
-                        FakeDataExample.drugs)
-                .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
-                .subscribe(new FastLoadingObserver<PrescriptionPushEntity>("请稍后...") {
-                    @Override
-                    public void _onNext(PrescriptionPushEntity entity) {
-                        if (entity == null) {
-                            ToastUtil.show("请检查网络，返回首页后重试");
-                            return;
-                        }
-                        if (entity.isSuccess()){
-                            // 拉到数据了，有库存
-                            // 然后取支付页面请求支付，合并处方单
-                            // 启动处方单推送接口
-                            // todo dd
-                            start(PayCodeFragment.newInstance(FakeDataExample.recipeFee,FakeDataExample.recipeIds,FakeDataExample.recipeCode));// todo cc
-                        }
-                    }
-                });
+//        ApiRepository.getInstance().prescriptionPush(FakeDataExample.clinicSn,
+//                        FakeDataExample.hospitalName,
+//                        FakeDataExample.deptName,
+//                        FakeDataExample.patientIdCard,
+//                        FakeDataExample.patientGender,
+//                        FakeDataExample.doctorName,
+//                        FakeDataExample.patientName,
+//                        FakeDataExample.patientMobile,
+//                        FakeDataExample.patientDateOfBirth,
+//                        FakeDataExample.complaint,
+//                        FakeDataExample.diseaseName,
+//                        FakeDataExample.outerOrderNo,
+//                        FakeDataExample.totalAmount,
+//                        FakeDataExample.drugs)
+//                .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
+//                .subscribe(new FastLoadingObserver<PrescriptionPushEntity>("请稍后...") {
+//                    @Override
+//                    public void _onNext(PrescriptionPushEntity entity) {
+//                        if (entity == null) {
+//                            ToastUtil.show("请检查网络，返回首页后重试");
+//                            return;
+//                        }
+//                        if (entity.isSuccess()){
+//                            // 拉到数据了，有库存
+//                            // 然后取支付页面请求支付，合并处方单
+//                            // 启动处方单推送接口
+//                            // todo dd
+//                            start(PayCodeFragment.newInstance(FakeDataExample.recipeFee,FakeDataExample.recipeIds,FakeDataExample.recipeCode));// todo cc
+//                        }
+//                    }
+//                });
     }
 
     /**

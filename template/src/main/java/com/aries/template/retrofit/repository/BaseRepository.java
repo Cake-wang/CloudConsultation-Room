@@ -5,6 +5,7 @@ import android.accounts.NetworkErrorException;
 import com.aries.library.fast.retrofit.FastNullException;
 import com.aries.library.fast.retrofit.FastRetryWhen;
 import com.aries.library.fast.retrofit.FastTransformer;
+import com.aries.template.FakeDataExample;
 import com.aries.template.GlobalConfig;
 import com.aries.template.utility.ConvertJavaBean;
 import com.aries.template.utility.JTJKRsaUtil;
@@ -94,6 +95,7 @@ public abstract class BaseRepository {
             params.put("bizContent", maps.get(0));// 不是取第一个值，而是取bizContent数组的第一位，maps是多个bizContent
         params.put("common", ApiRepository.common.getInstance());
         params.put("logTraceId", ApiRepository.getUUID());//getUUID 请求日志ID唯一识别流水ID，32位，推荐使用UUID
+        params.put("merchantId",GlobalConfig.merchantId);
         params.put("methodCode",methodCode);
 
 //        // 签名加密
@@ -108,10 +110,10 @@ public abstract class BaseRepository {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             //将最外层参数中除sign字段外的所有字段按照按字母序排序，键和值用=号连接，键值对之间用&符号分隔
             try {
-                String noSgin = JTJSONUtils.translateSign(params);
-                String sgin = RSAUtil.sign(noSgin,GlobalConfig.PUBLIC_KEY);
-//                String sgin = RSASignature.sign(noSgin, GlobalConfig.PUBLIC_KEY);
-//                String sgin = JTJKRsaUtil.encryptByPublicKey(noSgin,GlobalConfig.PUBLIC_KEY);
+                String noSgin = JTJSONUtils.translateSign2(params);
+                String sgin = RSAUtil.sign(noSgin,GlobalConfig.PRIVATE_KEY);
+//                String tryStr = "bizContent={appKey=app_web, tid=tid_2, startPage=0, requestMode=4, tabStatus=ongoing, recipeIndex=0, recipeLimit=10}&common={\"machineId\":\"SY0001\",\"userId\":\"2fcd34d6dde742098737b10ff0fddd9a\"}&logTraceId=1657847389340&merchantId=123456&methodCode=patientList";
+//                String tryStrSgin = RSAUtil.sign(tryStr,GlobalConfig.PRIVATE_KEY);
                 if (sgin!=null)
                     params.put("sign",sgin);
             } catch (Exception e) {

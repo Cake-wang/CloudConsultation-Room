@@ -1,15 +1,15 @@
-//package com.hfi.health.cloud.hospital.common.sign.sign;
+//package com.aries.template.utility;
 //
-//import com.alibaba.fastjson.JSON;
-//import com.alibaba.fastjson.JSONObject;
-//import com.alibaba.fastjson.parser.Feature;
+//import android.os.Build;
+//import android.util.Log;
 //
-//import com.hfi.health.cloud.hospital.dto.req.BaseRequest;
-//import com.hfi.health.cloud.hospital.dto.res.BaseResponse;
-//import com.hfi.health.starters.common.util.JsonUtil;
-//import lombok.extern.slf4j.Slf4j;
+//import androidx.annotation.RequiresApi;
 //
-//import javax.servlet.http.HttpServletRequest;
+//import com.decard.dc_licensesdk.bean.BaseResponse;
+//import com.google.gson.Gson;
+//
+//import org.json.JSONObject;
+//
 //import java.io.UnsupportedEncodingException;
 //import java.security.InvalidKeyException;
 //import java.security.NoSuchAlgorithmException;
@@ -22,7 +22,6 @@
 // * @Describe
 // * @Version 1.0
 // */
-//@Slf4j
 //public class SignStr {
 //
 //    private static Set<String> keySet = new TreeSet();
@@ -39,59 +38,60 @@
 //
 ////    public static String publicKey = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQD23osNFGU3gBrmbMNhhYY9u/IRn5zoDQ2atr44Qjsd58sL9r7qkBMiwUKR9zYr8NdDJ1Pa/v9/9KTOntaj0QRl4HhLGZ16Dt2cTBaFp359ngy83ok1/q8mAEXn3SJ/PQnzR3QAVYMahbyGyeAHejAgejR0kNDEoaOZQCngeeAJZwIDAQAB";
 //
-//    public static void main(String[] args) {
-//        f1();
-////        v2();
-//    }
+////    public static void main(String[] args) {
+////        f1();
+//////        v2();
+////    }
 //
-//    public static void f1() {
+//    @RequiresApi(api = Build.VERSION_CODES.O)
+//    public static void f1(String request1) {
 //        keySet.add("sign");
-//        String input = "{\n" +
-//                "    \"bizContent\": {\n" +
-//                "        \"list\": [\n" +
-//                "            {\n" +
-//                "                \"hospType\": \"6\",\n" +
-//                "                \"serviceAddress\": \"http://111.0.83.240:8062/\",\n" +
-//                "                \"telephone\": \"0571-89710576\",\n" +
-//                "                \"hospState\": \"0\",\n" +
-//                "                \"hospId\": \"MA2CF6M4233010315D1202\",\n" +
-//                "                \"hospName\": \"孙泰和国医国药馆\",\n" +
-//                "                \"hospImgUrl\": \"http://111.0.83.240:8089/static/57172.jpg\",\n" +
-//                "                \"locationCode\": \"330102\",\n" +
-//                "                \"hospLevelCode\": \"00\"\n" +
-//                "            },\n" +
-//                "            {\n" +
-//                "                \"hospType\": \"6\",\n" +
-//                "                \"serviceAddress\": \"http://111.0.83.240:8062/\",\n" +
-//                "                \"telephone\": \"0571-89710576\",\n" +
-//                "                \"hospState\": \"0\",\n" +
-//                "                \"hospId\": \"MA2CF6M4233010315D1202\",\n" +
-//                "                \"hospName\": \"孙泰和国医国药馆\",\n" +
-//                "                \"hospImgUrl\": \"http://111.0.83.240:8089/static/57172.jpg\",\n" +
-//                "                \"locationCode\": \"330102\",\n" +
-//                "                \"hospLevelCode\": \"00\"\n" +
-//                "            },\n" +
-//                "            {\n" +
-//                "                \"hospType\": \"6\",\n" +
-//                "                \"serviceAddress\": \"http://111.0.83.240:8062/\",\n" +
-//                "                \"telephone\": \"0571-89710576\",\n" +
-//                "                \"hospState\": \"0\",\n" +
-//                "                \"hospId\": \"MA2CF6M4233010315D1202\",\n" +
-//                "                \"hospName\": \"孙泰和国医国药馆\",\n" +
-//                "                \"hospImgUrl\": \"http://111.0.83.240:8089/static/57172.jpg\",\n" +
-//                "                \"locationCode\": \"330102\",\n" +
-//                "                \"hospLevelCode\": \"00\"\n" +
-//                "            }\n" +
-//                "        ]\n" +
-//                "    },\n" +
-//                "    \"logTraceId\": \"111111\",\n" +
-//                "    \"methodCode\": \"123456\",\n" +
-//                "    \"sign\": \"\"\n" +
-//                "}";
-//        BaseRequest request1 = JSONObject.parseObject(input, BaseRequest.class);
-//        System.out.println(JsonUtil.serialize(request1));
-//        request1.setBizContent(request1.getBizContent().toString());
-//        System.out.println(JsonUtil.serialize(request1));
+////        String input = "{\n" +
+////                "    \"bizContent\": {\n" +
+////                "        \"list\": [\n" +
+////                "            {\n" +
+////                "                \"hospType\": \"6\",\n" +
+////                "                \"serviceAddress\": \"http://111.0.83.240:8062/\",\n" +
+////                "                \"telephone\": \"0571-89710576\",\n" +
+////                "                \"hospState\": \"0\",\n" +
+////                "                \"hospId\": \"MA2CF6M4233010315D1202\",\n" +
+////                "                \"hospName\": \"孙泰和国医国药馆\",\n" +
+////                "                \"hospImgUrl\": \"http://111.0.83.240:8089/static/57172.jpg\",\n" +
+////                "                \"locationCode\": \"330102\",\n" +
+////                "                \"hospLevelCode\": \"00\"\n" +
+////                "            },\n" +
+////                "            {\n" +
+////                "                \"hospType\": \"6\",\n" +
+////                "                \"serviceAddress\": \"http://111.0.83.240:8062/\",\n" +
+////                "                \"telephone\": \"0571-89710576\",\n" +
+////                "                \"hospState\": \"0\",\n" +
+////                "                \"hospId\": \"MA2CF6M4233010315D1202\",\n" +
+////                "                \"hospName\": \"孙泰和国医国药馆\",\n" +
+////                "                \"hospImgUrl\": \"http://111.0.83.240:8089/static/57172.jpg\",\n" +
+////                "                \"locationCode\": \"330102\",\n" +
+////                "                \"hospLevelCode\": \"00\"\n" +
+////                "            },\n" +
+////                "            {\n" +
+////                "                \"hospType\": \"6\",\n" +
+////                "                \"serviceAddress\": \"http://111.0.83.240:8062/\",\n" +
+////                "                \"telephone\": \"0571-89710576\",\n" +
+////                "                \"hospState\": \"0\",\n" +
+////                "                \"hospId\": \"MA2CF6M4233010315D1202\",\n" +
+////                "                \"hospName\": \"孙泰和国医国药馆\",\n" +
+////                "                \"hospImgUrl\": \"http://111.0.83.240:8089/static/57172.jpg\",\n" +
+////                "                \"locationCode\": \"330102\",\n" +
+////                "                \"hospLevelCode\": \"00\"\n" +
+////                "            }\n" +
+////                "        ]\n" +
+////                "    },\n" +
+////                "    \"logTraceId\": \"111111\",\n" +
+////                "    \"methodCode\": \"123456\",\n" +
+////                "    \"sign\": \"\"\n" +
+////                "}";
+////        BaseRequest request1 = JSONObject.parseObject(input, BaseRequest.class);
+////        System.out.println(JsonUtil.serialize(request1));
+////        request1.setBizContent(request1.getBizContent().toString());
+////        System.out.println(JsonUtil.serialize(request1));
 ////
 ////        request.setLogTraceId("aaaaasssssdddddfffffggggghhhh102");
 ////
@@ -107,7 +107,7 @@
 ////        String sign2 = getSignStr("bizContent={\"paperNo\":\"bJLf0y/nYWLhNC/CtMuqctHBir4zC5gjcHYRZYmTCUI=\",\"logTraceID\":\"1613076535737000\",\"name\":\"钱文学\"}&interfaceMethod=104&logTraceId=1613076535737000&merchantId=2021020801&subMerchantId=20210208562918&termId=20210208977834",privateKey);
 ////        System.out.println("获取sign2签名字符串\n"+sign2);
 ////        request.setSign(sign);
-//        String signStr = InitSignStr(request1, null);
+//        String signStr = InitSignStr(request1);
 //        System.out.println(signStr);
 //        String sign = createSign(request1, privateKey);
 //        System.out.println("获取的签名字符串结果：");
@@ -137,148 +137,146 @@
 //        }
 //    }
 //
-//    public static void f2(){
-//        String str = "bizContent={\"hospType\":\"6\",\"hospId\":\"47011661433010211A1001\",\"hospName\":\"方法急急急\",\"hospImgUrl\":\"\",\"locationCode\":\"3301020000000000000000\",\"hospLevelCode\":\"23\",\"hospState\":\"0\"}&interfaceMethod=10001&logTraceId=e3567f54-c7cb-43c5-bcec-e04a900c13ab&merchantId=2021042296";
+////    public static void f2(){
+////        String str = "bizContent={\"hospType\":\"6\",\"hospId\":\"47011661433010211A1001\",\"hospName\":\"方法急急急\",\"hospImgUrl\":\"\",\"locationCode\":\"3301020000000000000000\",\"hospLevelCode\":\"23\",\"hospState\":\"0\"}&interfaceMethod=10001&logTraceId=e3567f54-c7cb-43c5-bcec-e04a900c13ab&merchantId=2021042296";
+////
+////        String inputSign = "TdXuuWkLsYZLlg9/HkwoC8qPa+calz0ZMGi7PFZwnCqiemGasnVeH3JCCrpH9+VfavXFbWVZgcNlNt1BTvaifNIMwFE+D/cg3AIm8ILTwwouHEOzEMSFiHR1ESXHQYKUgNUpoVM7Gdytj9uc+FvztrIFSuVE75HETHOCOAY+Q8QeNr9pa7Qni4+/2p3/71Jele3biyxrlw6jICBtNJLjFJpIqjPxAvxodEkFf1qUlZTm7QWGI0JdKJWaASF3+SUemi/O1deXkl/UH8MKwde88rXNRU/Nrg3FtJ5YLi+JXt5Q7ZaDoSL0gRgGxOWJUyipkjUxXgG91sP+Xj+I5mQ2+g==";
+////
+////        String sign = getSignStr(str,privateKey);
+////        System.out.println("获取的签名字符串结果：");
+////        System.out.println(sign);
+////        boolean b = false;
+////        try {
+////            b = RSAUtil.verify(str, sign, publicKey);
+////        } catch (NoSuchAlgorithmException e) {
+////            e.printStackTrace();
+////        } catch (InvalidKeyException e) {
+////            e.printStackTrace();
+////        } catch (UnsupportedEncodingException e) {
+////            e.printStackTrace();
+////        } catch (SignatureException e) {
+////            e.printStackTrace();
+////        }
+////        System.out.println(b);
+////
+////    }
 //
-//        String inputSign = "TdXuuWkLsYZLlg9/HkwoC8qPa+calz0ZMGi7PFZwnCqiemGasnVeH3JCCrpH9+VfavXFbWVZgcNlNt1BTvaifNIMwFE+D/cg3AIm8ILTwwouHEOzEMSFiHR1ESXHQYKUgNUpoVM7Gdytj9uc+FvztrIFSuVE75HETHOCOAY+Q8QeNr9pa7Qni4+/2p3/71Jele3biyxrlw6jICBtNJLjFJpIqjPxAvxodEkFf1qUlZTm7QWGI0JdKJWaASF3+SUemi/O1deXkl/UH8MKwde88rXNRU/Nrg3FtJ5YLi+JXt5Q7ZaDoSL0gRgGxOWJUyipkjUxXgG91sP+Xj+I5mQ2+g==";
+////    public static void f3(){
+////        String str = "bizContent={\"list\":[{\"hospType\":\"6\",\"hospId\":\"MA2CF6M4233010315D1202\",\"hospName\":\"孙泰和国医国药馆\",\"hospImgUrl\":\"http://111.0.83.240:8089/static/57172.jpg\",\"serviceAddress\":\"http://111.0.83.240:8062/\",\"telephone\":\"0571-89710576\",\"locationCode\":\"330102\",\"hospLevelCode\":\"00\",\"hospState\":\"0\"}]}&interfaceMethod=10001&logTraceId=80eebff54a2940a6b110b8fa94205985&merchantId=2021042296";
+////
+////
+////        String sign = getSignStr(str,privateKey);
+////        System.out.println("获取的签名结果：");
+////        System.out.println(sign);
+////        boolean b = false;
+////        try {
+////            b = RSAUtil.verify(str, sign, publicKey);
+////        } catch (NoSuchAlgorithmException e) {
+////            e.printStackTrace();
+////        } catch (InvalidKeyException e) {
+////            e.printStackTrace();
+////        } catch (UnsupportedEncodingException e) {
+////            e.printStackTrace();
+////        } catch (SignatureException e) {
+////            e.printStackTrace();
+////        }
+////        System.out.println(b);
+////    }
 //
-//        String sign = getSignStr(str,privateKey);
-//        System.out.println("获取的签名字符串结果：");
-//        System.out.println(sign);
-//        boolean b = false;
-//        try {
-//            b = RSAUtil.verify(str, sign, publicKey);
-//        } catch (NoSuchAlgorithmException e) {
-//            e.printStackTrace();
-//        } catch (InvalidKeyException e) {
-//            e.printStackTrace();
-//        } catch (UnsupportedEncodingException e) {
-//            e.printStackTrace();
-//        } catch (SignatureException e) {
-//            e.printStackTrace();
-//        }
-//        System.out.println(b);
+////    public static void f4(){
+////        String result = "";
+////        JSONObject ret = new JSONObject();
+////        ret.put("aaa","aaa");
+////        ret.put("bbb","");
+////        ret.put("ccc",111);
+////        ret.put("ddd",null);
+////        BaseResponse r = BaseResponse.success(ret);
+////        System.out.println(r.toString());
+////        String signedData = SignStr.createSign(r,privateKey);
+////        System.out.println(signedData);
+////    }
 //
+////    public static void v2(){
+////        String str = "bizContent={\"paperNo\":\"dJKUn3U0ep3d9R47YZ9GEJzKJ/yPfDpljKnsZ3mk1j8ElRNjQvhOUPszJWeQIQ+8\",\"name\":\"泮俊羲\"}&interfaceMethod=1007&logTraceId=NucleicAcid-1629767167036&merchantId=2021081799";
+////
+////        String sign = getSignStr(str,privateKey);
+////        System.out.println(sign);
+////
+////        try {
+////            System.out.println("待签名字符串："+str);
+////
+////            System.out.println("公钥为："+publicKey);
+////            //            boolean b = RSAUtil.verify(InitSignStr(request), sign, publicKey);
+////            boolean b = RSAUtil.verify(str, sign, publicKey);
+////            System.out.println("验证结果:"+b);
+////        } catch (NoSuchAlgorithmException e) {
+////            e.printStackTrace();
+////        } catch (InvalidKeyException e) {
+////            e.printStackTrace();
+////        } catch (UnsupportedEncodingException e) {
+////            e.printStackTrace();
+////        } catch (SignatureException e) {
+////            e.printStackTrace();
+////        }
+////
+////
+////    }
+//
+////    private static void v1(){
+////        try {
+//////            String str = "bizContent={\"list\":[{\"hospType\":\"6\",\"serviceAddress\":\"http://111.0.83.240:8062/\",\"telephone\":\"0571-89710576\",\"hospState\":\"0\",\"hospId\":\"MA2CF6M4233010315D1202\",\"hospName\":\"杭州孙泰和国医馆\",\"hospImgUrl\":\"http://111.0.83.240:8089/static/57170.jpg\",\"locationCode\":\"330103\",\"hospLevelCode\":\"00\",\"introduction\":\"\"}]}interfaceMethod=10001logTraceId=54331f5cfcdf46e5a8ce21d662150a63merchantId=2021042296";
+////            String str = "bizContent={\"appId\":\"2021050866\",\"channel\":\"ALIPAY\",\"merCode\":\"330100810026\",\"reqSeq\":\"20201014000000036520\",\"settleOrderNo\":\"202105120947442991238797\",\"version\":\"2.0.0\"}&interfaceMethod=10052&logTraceId=40b6053a0265444697aa15f66650bf8e&merchantId=2021050866";
+//////            String publicKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAhIUhVERUIB2rPLS4aRepFSiImwFjWBQoxzgZL22sQxphy4VZ48942DOf++MSmzHeW38GNCkZ8QBAJbnwDwDGLygXSY+fgEX43a7KJbwRtM5J9orJdPvHSmfSwe1nbZ3ZCOH7rl2zZJ33yWMxFwr554nv5COFEJDjVkpXgqwE2pJy+f3nNp8boBdDcaDE4sWk9+pOH8MZlAdfwo002jxUd+tgxki58aLcxFWaUSbEcteCoZfhEE46upZmhvihEYs88Sz5F27h+snlqSISfGguY+KeogiR7aVK5VkStvmtPWcq7QBGLFeaeiTYksk+4eWzhD0E+kRf35Isbz+Pjv+z6QIDAQA";
+////            String inputSign = "VrSFqvySi8ff8e0zJSKaWX/iGkSjklbSyNc82BowLQ1qcrOcIPh/8GSNWnb+Kyl9fKdkuas13Tf/aHr1BHlusXrWV/ctEaOoL8f8gtTofBVRyjgMbHW0wUQ5xfbJJFJdGMMYyo+l5PkUOLNiqBHkbdFLCZcLWm8ZfBhRAiJ9m8w4tedV2KfmQKv40bC1qrNOERybnMxaj7Zj9JGuVGZbl5p/+KepuUAQEILYrtqItoaeucJJg8Q2eahO5UkuyZNA7naCdZoVqL2ongofFpgVCc++UpdDzloT5F7xOBK9M4JNV9tmuE0GMUWafv7nMBjlSM5Ogu7moGdfZO/SfgktEQ==";
+////
+////
+////
+////            System.out.println("待签名字符串："+str);
+////            System.out.println("签名串："+inputSign);
+////            System.out.println("公钥为："+publicKey);
+////            //            boolean b = RSAUtil.verify(InitSignStr(request), sign, publicKey);
+////            boolean b = RSAUtil.verify(str, inputSign, publicKey);
+////            System.out.println("验证结果:"+b);
+////        } catch (NoSuchAlgorithmException e) {
+////            e.printStackTrace();
+////        } catch (InvalidKeyException e) {
+////            e.printStackTrace();
+////        } catch (UnsupportedEncodingException e) {
+////            e.printStackTrace();
+////        } catch (SignatureException e) {
+////            e.printStackTrace();
+////        }
+////    }
+//
+//
+//    @RequiresApi(api = Build.VERSION_CODES.O)
+//    public static String createSign(String input, String privateKey) {
+//        return getSignStr(InitSignStr(input), privateKey);
 //    }
 //
-//    public static void f3(){
-//        String str = "bizContent={\"list\":[{\"hospType\":\"6\",\"hospId\":\"MA2CF6M4233010315D1202\",\"hospName\":\"孙泰和国医国药馆\",\"hospImgUrl\":\"http://111.0.83.240:8089/static/57172.jpg\",\"serviceAddress\":\"http://111.0.83.240:8062/\",\"telephone\":\"0571-89710576\",\"locationCode\":\"330102\",\"hospLevelCode\":\"00\",\"hospState\":\"0\"}]}&interfaceMethod=10001&logTraceId=80eebff54a2940a6b110b8fa94205985&merchantId=2021042296";
+////    public static String createSign(Object input, HttpServletRequest request, String privateKey) {
+////        return getSignStr(InitSignStr(input, request), privateKey);
+////    }
 //
-//
-//        String sign = getSignStr(str,privateKey);
-//        System.out.println("获取的签名结果：");
-//        System.out.println(sign);
-//        boolean b = false;
-//        try {
-//            b = RSAUtil.verify(str, sign, publicKey);
-//        } catch (NoSuchAlgorithmException e) {
-//            e.printStackTrace();
-//        } catch (InvalidKeyException e) {
-//            e.printStackTrace();
-//        } catch (UnsupportedEncodingException e) {
-//            e.printStackTrace();
-//        } catch (SignatureException e) {
-//            e.printStackTrace();
-//        }
-//        System.out.println(b);
-//    }
-//
-//    public static void f4(){
-//        String result = "";
-//        JSONObject ret = new JSONObject();
-//        ret.put("aaa","aaa");
-//        ret.put("bbb","");
-//        ret.put("ccc",111);
-//        ret.put("ddd",null);
-//        BaseResponse r = BaseResponse.success(ret);
-//        System.out.println(r.toString());
-//        String signedData = SignStr.createSign(r,privateKey);
-//        System.out.println(signedData);
-//    }
-//
-//    public static void v2(){
-//        String str = "bizContent={\"paperNo\":\"dJKUn3U0ep3d9R47YZ9GEJzKJ/yPfDpljKnsZ3mk1j8ElRNjQvhOUPszJWeQIQ+8\",\"name\":\"泮俊羲\"}&interfaceMethod=1007&logTraceId=NucleicAcid-1629767167036&merchantId=2021081799";
-//
-//        String sign = getSignStr(str,privateKey);
-//        System.out.println(sign);
-//
-//        try {
-//            System.out.println("待签名字符串："+str);
-//
-//            System.out.println("公钥为："+publicKey);
-//            //            boolean b = RSAUtil.verify(InitSignStr(request), sign, publicKey);
-//            boolean b = RSAUtil.verify(str, sign, publicKey);
-//            System.out.println("验证结果:"+b);
-//        } catch (NoSuchAlgorithmException e) {
-//            e.printStackTrace();
-//        } catch (InvalidKeyException e) {
-//            e.printStackTrace();
-//        } catch (UnsupportedEncodingException e) {
-//            e.printStackTrace();
-//        } catch (SignatureException e) {
-//            e.printStackTrace();
-//        }
-//
-//
-//    }
-//
-//    private static void v1(){
-//        try {
-////            String str = "bizContent={\"list\":[{\"hospType\":\"6\",\"serviceAddress\":\"http://111.0.83.240:8062/\",\"telephone\":\"0571-89710576\",\"hospState\":\"0\",\"hospId\":\"MA2CF6M4233010315D1202\",\"hospName\":\"杭州孙泰和国医馆\",\"hospImgUrl\":\"http://111.0.83.240:8089/static/57170.jpg\",\"locationCode\":\"330103\",\"hospLevelCode\":\"00\",\"introduction\":\"\"}]}interfaceMethod=10001logTraceId=54331f5cfcdf46e5a8ce21d662150a63merchantId=2021042296";
-//            String str = "bizContent={\"appId\":\"2021050866\",\"channel\":\"ALIPAY\",\"merCode\":\"330100810026\",\"reqSeq\":\"20201014000000036520\",\"settleOrderNo\":\"202105120947442991238797\",\"version\":\"2.0.0\"}&interfaceMethod=10052&logTraceId=40b6053a0265444697aa15f66650bf8e&merchantId=2021050866";
-////            String publicKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAhIUhVERUIB2rPLS4aRepFSiImwFjWBQoxzgZL22sQxphy4VZ48942DOf++MSmzHeW38GNCkZ8QBAJbnwDwDGLygXSY+fgEX43a7KJbwRtM5J9orJdPvHSmfSwe1nbZ3ZCOH7rl2zZJ33yWMxFwr554nv5COFEJDjVkpXgqwE2pJy+f3nNp8boBdDcaDE4sWk9+pOH8MZlAdfwo002jxUd+tgxki58aLcxFWaUSbEcteCoZfhEE46upZmhvihEYs88Sz5F27h+snlqSISfGguY+KeogiR7aVK5VkStvmtPWcq7QBGLFeaeiTYksk+4eWzhD0E+kRf35Isbz+Pjv+z6QIDAQA";
-//            String inputSign = "VrSFqvySi8ff8e0zJSKaWX/iGkSjklbSyNc82BowLQ1qcrOcIPh/8GSNWnb+Kyl9fKdkuas13Tf/aHr1BHlusXrWV/ctEaOoL8f8gtTofBVRyjgMbHW0wUQ5xfbJJFJdGMMYyo+l5PkUOLNiqBHkbdFLCZcLWm8ZfBhRAiJ9m8w4tedV2KfmQKv40bC1qrNOERybnMxaj7Zj9JGuVGZbl5p/+KepuUAQEILYrtqItoaeucJJg8Q2eahO5UkuyZNA7naCdZoVqL2ongofFpgVCc++UpdDzloT5F7xOBK9M4JNV9tmuE0GMUWafv7nMBjlSM5Ogu7moGdfZO/SfgktEQ==";
-//
-//
-//
-//            System.out.println("待签名字符串："+str);
-//            System.out.println("签名串："+inputSign);
-//            System.out.println("公钥为："+publicKey);
-//            //            boolean b = RSAUtil.verify(InitSignStr(request), sign, publicKey);
-//            boolean b = RSAUtil.verify(str, inputSign, publicKey);
-//            System.out.println("验证结果:"+b);
-//        } catch (NoSuchAlgorithmException e) {
-//            e.printStackTrace();
-//        } catch (InvalidKeyException e) {
-//            e.printStackTrace();
-//        } catch (UnsupportedEncodingException e) {
-//            e.printStackTrace();
-//        } catch (SignatureException e) {
-//            e.printStackTrace();
-//        }
-//    }
-//
-//
-//    public static String createSign(Object input, String privateKey) {
-//        return getSignStr(InitSignStr(input, null), privateKey);
-//    }
-//
-//    public static String createSign(Object input, HttpServletRequest request, String privateKey) {
-//        return getSignStr(InitSignStr(input, request), privateKey);
-//    }
-//
-//    /**
-//     * 获得待加签字符串
-//     *
-//     * @param o
-//     * @return
-//     */
-//
-//    public static String InitSignStr(Object o) {
-//        return InitSignStr(o, null);
-//    }
+////    /**
+////     * 获得待加签字符串
+////     *
+////     * @param o
+////     * @return
+////     */
+////
+////    public static String InitSignStr(Object o) {
+////        return InitSignStr(o, null);
+////    }
 //
 //    /**
 //     * 获得待加签字符串，顺序不乱，请使用此方法获取待签名字符串
-//     *
-//     * @param o
-//     * @param request
-//     * @return
 //     */
-//    public static String InitSignStr(Object o, HttpServletRequest request) {
+//    public static String InitSignStr(String str) {
+//
 //        LinkedHashMap<String, String> map = JSON.parseObject(JSONObject.toJSONString(o),LinkedHashMap.class, Feature.OrderedField);
 //
-//        log.debug("InitSortSignStr map:{}",map);
+//        Log.d("TAG","InitSortSignStr map:{}"+map);
 //        StringBuilder stringBuilder = new StringBuilder();
 //        List<Map.Entry<String, String>> list = sortMap(map);
 //        for (Map.Entry<String, String> entry : list) {
@@ -295,7 +293,7 @@
 //
 //        // System.out.println("InitSignStr Encode前：" + stringBuilder.toString());
 //        String sign = stringBuilder.toString();
-//        log.debug("【InitSignStr签名字符串】：" +sign);
+//        Log.d("TAG","【InitSignStr签名字符串】：" +sign);
 //        return sign;
 //    }
 //
@@ -347,6 +345,7 @@
 //     * @param privateKey
 //     * @return
 //     */
+//    @RequiresApi(api = Build.VERSION_CODES.O)
 //    public static String getSignStr(String input, String privateKey) {
 //        String signStr = null;
 //        try {

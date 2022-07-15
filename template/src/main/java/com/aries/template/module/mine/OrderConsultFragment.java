@@ -173,7 +173,7 @@ public class OrderConsultFragment extends BaseEventFragment {
             public void onClick(View v) {
                 dialog.dismiss();
                 if (opflag.contains("consults")){
-                    requestCancelConsult(consultId);
+                    requestCancelConsult(String.valueOf(consultId));
                 }
             }
         });
@@ -196,7 +196,7 @@ public class OrderConsultFragment extends BaseEventFragment {
      * 取消待支付挂号单
      * @param consultId 挂号单id
      */
-    public void requestCancelConsult(Integer consultId) {
+    public void requestCancelConsult(String consultId) {
         ApiRepository.getInstance().patientCancelGraphicTextConsult(consultId)
                 .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
                 .subscribe(new FastLoadingObserver<CancelregisterResultEntity>("请稍后...") {

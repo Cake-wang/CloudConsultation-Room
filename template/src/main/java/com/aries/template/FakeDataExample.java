@@ -1,5 +1,6 @@
 package com.aries.template;
 
+import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.template.retrofit.repository.BaseRepository;
 import com.decard.entitys.SSCard;
 
@@ -97,6 +98,17 @@ public class FakeDataExample extends BaseRepository {
         drugs.put("sku","packing-bag");
         drugs.put("spec","12支/盒");
         return drugs;
+    }
+
+
+    public static Map<String,Object> getSignExampleMap(){
+        Map<String,Object> tempMap = new HashMap<>();
+        tempMap.put("bizContent","{appKey=app_web, tid=tid_2, startPage=0, requestMode=4, tabStatus=ongoing, recipeIndex=0, recipeLimit=10}");
+        tempMap.put("common", ApiRepository.common.getInstance());
+        tempMap.put("logTraceId","1657847389340");
+        tempMap.put("merchantId","123456");
+        tempMap.put("methodCode","patientList");
+        return tempMap;
     }
 
     /**

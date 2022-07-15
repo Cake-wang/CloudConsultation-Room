@@ -1157,6 +1157,7 @@ public class GetConsultsAndRecipesResultEntity {
                 public String drugUnit;
                 public String drugName;
                 public Double useDose;
+                public Double drugCost;
                 public Double defaultUseDose;
                 public String useDoseUnit;
                 public String dosageUnit;
@@ -1167,6 +1168,14 @@ public class GetConsultsAndRecipesResultEntity {
                 public Integer useDays;
                 public String memo;
                 public String organDrugCode;
+
+                public Double getDrugCost() {
+                    return drugCost;
+                }
+
+                public void setDrugCost(Double drugCost) {
+                    this.drugCost = drugCost;
+                }
 
                 public Integer getRecipeDetailId() {
                     return recipeDetailId;

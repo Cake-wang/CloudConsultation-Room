@@ -75,12 +75,12 @@ public class HomeFragment extends BaseEventFragment{
 //            start(MineFragment.newInstance("stjc"));
 //                start(DepartmentFragment.newInstance("stjc"));// todo cc
 //                start(PutRecordFragment.newInstance("idcard","name","smkcard"));// todo cc
-//                ((MainActivity) getActivity()).requestConsultsAndRecipes();//todo cc
+                ((MainActivity) getActivity()).requestConsultsAndRecipes();//todo cc
 //                start(ResultFragment.newInstance("cancelConsult"));//todo ccss
 //                start(ConfirmRecipesFragment.newInstance(null));// todo cc
 //                start(PayCodeFragment.newInstance(new Object()));// todo cc
 //                start(VideoConsultFragment.newInstance(FakeDataExample.consultId,FakeDataExample.nickname,FakeDataExample.doctorUserId));// todo cc
-                start(PayCodeFragment.newInstance(FakeDataExample.recipeFee,FakeDataExample.recipeIds,FakeDataExample.recipeCode));// todo cc
+//                start(PayCodeFragment.newInstance(FakeDataExample.recipeFee,FakeDataExample.recipeIds,FakeDataExample.recipeCode));// todo cc
 //            startActivity(new Intent(getActivity(), MeetingActivity.class));//todo cc
         });
 
