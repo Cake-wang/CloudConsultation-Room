@@ -107,13 +107,13 @@ public abstract class BaseRepository {
 //        } catch (Exception e) {
 //            e.printStackTrace();
 //        }
+
+        //签名
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             //将最外层参数中除sign字段外的所有字段按照按字母序排序，键和值用=号连接，键值对之间用&符号分隔
             try {
                 String noSgin = JTJSONUtils.translateSign2(params);
                 String sgin = RSAUtil.sign(noSgin,GlobalConfig.PRIVATE_KEY);
-//                String tryStr = "bizContent={appKey=app_web, tid=tid_2, startPage=0, requestMode=4, tabStatus=ongoing, recipeIndex=0, recipeLimit=10}&common={\"machineId\":\"SY0001\",\"userId\":\"2fcd34d6dde742098737b10ff0fddd9a\"}&logTraceId=1657847389340&merchantId=123456&methodCode=patientList";
-//                String tryStrSgin = RSAUtil.sign(tryStr,GlobalConfig.PRIVATE_KEY);
                 if (sgin!=null)
                     params.put("sign",sgin);
             } catch (Exception e) {

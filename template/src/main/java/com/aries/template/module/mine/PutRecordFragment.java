@@ -272,11 +272,12 @@ public class PutRecordFragment extends BaseEventFragment implements ISupportFrag
      * @param verifyCode  验证码
      */
     private void loginByVerifyCode(String phoneNumber, String verifyCode) {
-        if (!TextUtils.isEmpty(authCodeId)){
-            requestRegister(idCard,name,phoneNumber,verifyCode,authCodeId);
-        }else{
-            ToastUtil.show("请先获取验证码");
-        }
+//        if (!TextUtils.isEmpty(authCodeId)){
+//            requestRegister(idCard,name,phoneNumber,verifyCode,authCodeId);
+//        }else{
+//            ToastUtil.show("请先获取验证码");
+//        }
+        requestRegister(idCard,name,phoneNumber,verifyCode,"123456");
     }
 
     /**
@@ -295,7 +296,7 @@ public class PutRecordFragment extends BaseEventFragment implements ISupportFrag
                                     return;
                                 }
                                 if (entity.success){
-                                    //todo 向全局注入数据
+                                    // 向全局注入数据
                                     String tag = (String) SPUtil.get(mContext,"tag","fzpy");
                                     SPUtil.put(mContext,"mobile",mobile);
                                     if(tag.contains("stjc")){
@@ -309,7 +310,9 @@ public class PutRecordFragment extends BaseEventFragment implements ISupportFrag
                                             startActivity(intent);
                                     }else {
                                         //判断有挂号或处方
-                                        start(DepartmentFragment.newInstance());
+                                        // 返回读卡，重新返回 tid 数据
+                                        start(MineFragment.newInstance("fzpy"));
+//                                        start(DepartmentFragment.newInstance());
                                     }
                                 }else {
                                     ToastUtil.show(entity.message);

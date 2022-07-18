@@ -72,10 +72,10 @@ public class HomeFragment extends BaseEventFragment{
         // 点击身体检查
         iv_stjc.setOnClickListener(v -> {
             SPUtil.put(mContext,"tag","stjc");
-//            start(MineFragment.newInstance("stjc"));
+            start(MineFragment.newInstance("stjc")); // 进入身体检查
 //                start(DepartmentFragment.newInstance("stjc"));// todo cc
 //                start(PutRecordFragment.newInstance("idcard","name","smkcard"));// todo cc
-                ((MainActivity) getActivity()).requestConsultsAndRecipes();//todo cc
+//                ((MainActivity) getActivity()).requestConsultsAndRecipes();//todo cc
 //                start(ResultFragment.newInstance("cancelConsult"));//todo ccss
 //                start(ConfirmRecipesFragment.newInstance(null));// todo cc
 //                start(PayCodeFragment.newInstance(new Object()));// todo cc
@@ -96,8 +96,6 @@ public class HomeFragment extends BaseEventFragment{
         super.onCreate(savedInstanceState);
         // 启动时，需要立刻请求，机器相关的数据，并保存在全局
         requestMachineInfo();
-        //todo cc
-        requestText();
     }
 
     /**
@@ -125,6 +123,7 @@ public class HomeFragment extends BaseEventFragment{
                         GlobalConfig.hospitalName = entity.data.hospitalName;
 //                             GlobalConfig.machineId = entity.data.machineStatus;// 暂定
                         GlobalConfig.organId = Integer.valueOf(entity.data.hospitalNo);
+                        GlobalConfig.machineIp = entity.data.machineIp;
                         if (jtjk_hospital!=null)
                             jtjk_hospital.setText(GlobalConfig.hospitalName);
                         if (jtjk_machine!=null)
@@ -134,27 +133,6 @@ public class HomeFragment extends BaseEventFragment{
                     }
                 }
             });
-    }
-
-    /**
-     * 测试入口
-     * todo cc
-     */
-    public void requestText(){
-        /**
-         * 查询复诊单的小鱼视频会议室房间号和密码
-         */
-        ApiRepository.getInstance().batchCreateOrder(FakeDataExample.recipeFee,FakeDataExample.recipeIds,FakeDataExample.recipeCode)
-                .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
-                .subscribe(new FastLoadingObserver<BatchCreateOrderEntity>("请稍后...") {
-                    @Override
-                    public void _onNext(BatchCreateOrderEntity entity) {
-                        if (entity == null) {
-                            ToastUtil.show("请检查网络");
-                            return;
-                        }
-                    }
-                });
     }
 
     @Override

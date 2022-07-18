@@ -173,10 +173,6 @@ public class DoctorListFragment extends BaseEventFragment {
      */
     public void requestDoctorInfo(){
         int organid = GlobalConfig.organId;
-        // todo cc 测试数据
-        departmentId = FakeDataExample.departmentId;
-        profession = FakeDataExample.profession;
-        organid = Integer.valueOf(FakeDataExample.organId);
         ApiRepository.getInstance().searchDoctorListByBusTypeV2(departmentId,profession,organid)
                 .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
                 .subscribe(new FastLoadingObserver<SearchDoctorListByBusTypeV2ResultEntity>() {

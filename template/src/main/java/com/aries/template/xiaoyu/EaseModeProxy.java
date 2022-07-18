@@ -4,10 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
-import android.hardware.Camera;
 import android.os.Build;
-import android.os.Handler;
 import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -31,12 +28,14 @@ import com.ainemo.sdk.otf.VideoConfig;
 import com.ainemo.sdk.otf.VideoInfo;
 import com.ainemo.util.JsonUtil;
 import com.aries.template.R;
+import com.aries.template.xiaoyu.dapinsocket.SocThread;
 import com.aries.template.xiaoyu.meeting.MeetingVideoCell;
 import com.aries.template.xiaoyu.model.RegEndPoint;
 import com.aries.template.xiaoyu.model.RegReponse;
 import com.aries.template.xiaoyu.model.RegRequest;
+import com.aries.template.xiaoyu.model.RtcStartInvokeEndPoint;
+import com.aries.template.xiaoyu.model.RtcStartInvokeRequest;
 import com.aries.template.xiaoyu.uvc.UVCCameraPresenter;
-import com.aries.template.xiaoyu.xinlin.XLMessage;
 import com.hyphenate.EMCallBack;
 import com.hyphenate.EMMessageListener;
 import com.hyphenate.chat.EMClient;
@@ -78,8 +77,10 @@ public class EaseModeProxy {
     private boolean muteMic=false;
     // 是否关闭画面
     private boolean muteVideo=false;
-    // 信令 Socket 对象
+    // 信令 Socket 对象, 这个socket 不需要设置心跳包
     private WebSocketClient webSocketClient;
+    // 向大屏进行通讯的socket，不需要设置心跳包
+    private SocThread dapinSocket;
     // 使用 UCV
     private UVCCameraPresenter uvcCameraPresenter;
 
@@ -462,12 +463,12 @@ public class EaseModeProxy {
                                 public void onCallSuccess() {
                                     ToastWithLogin("参会成功");
 
-                                    //渲染local画面
-                                    VideoInfo videoInfo = new VideoInfo();
-                                    videoInfo.setDataSourceID(NemoSDK.getLocalVideoStreamID());
-                                    videoInfo.setAudioMute(muteMic);
-                                    videoInfo.setVideoMute(muteVideo);
-                                    videoCell.setVideoInfo(videoInfo);// 启动本地视频窗口
+//                                    //渲染local画面
+//                                    VideoInfo videoInfo = new VideoInfo();
+//                                    videoInfo.setDataSourceID(NemoSDK.getLocalVideoStreamID());
+//                                    videoInfo.setAudioMute(muteMic);
+//                                    videoInfo.setVideoMute(muteVideo);
+//                                    videoCell.setVideoInfo(videoInfo);// 启动本地视频窗口
 
                                     // 向医生端口发送消息
                                     sendNotifyDoctorVideoMsg();
@@ -606,8 +607,8 @@ public class EaseModeProxy {
             @Override
             public void onVideoDataSourceChange(List<VideoInfo> videoInfos, boolean hasVideoContent) {
                     if (videoInfos.size()>0){
-//                            if (videoCell !=null)
-//                                videoCell.setVideoInfo(videoInfos.get(0));
+                            if (videoCell !=null)
+                                videoCell.setVideoInfo(videoInfos.get(0));
                         if (listener!=null)
                             listener.onDoctorInRoom();
                     }
@@ -622,22 +623,21 @@ public class EaseModeProxy {
     private void sendNotifyDoctorVideoMsg() {
         if (webSocketClient==null)
             return;
-//        //{"topic":"TX_RTC_START_INVOKE","endPoint":{"patientUserId":"62933bcbcf8912669abf4b98","doctorUserId":"5f339ceb9cd0500a923af577","patientName":"胡江","remark":"未知","orderId":815463559,"roomId":"910007727377","thirdAppVideoConsult":"xyLink","requestMode":"4"}}
-//        RtcStartInvokeRequest request = new RtcStartInvokeRequest();
-//        request.setTopic("TX_RTC_START_INVOKE");
-//        RtcStartInvokeEndPoint endPoint = new RtcStartInvokeEndPoint();
-//        endPoint.setPatientUserId(xlPatientUserId);
-//        endPoint.setPatientName("todo改掉名字");
-//        endPoint.setDoctorUserId(doctorUserId);
-//        endPoint.setOrderId(consultId);
-//        endPoint.setRemark("未知");
-//        endPoint.setRoomId(meetingRoomNumber);
-//        endPoint.setThirdAppVideoConsult("xyLink");
-//        endPoint.setRequestMode("4");
-//
-//        request.setEndPoint(endPoint);
-//        String cmd = JsonUtil.toJson(request);
-        webSocketClient.send(new XLMessage().sendDoctorMsg(xlPatientUserId,nickname,doctorUserId,consultId,meetingRoomNumber));
+        //{"topic":"TX_RTC_START_INVOKE","endPoint":{"patientUserId":"62933bcbcf8912669abf4b98","doctorUserId":"5f339ceb9cd0500a923af577","patientName":"胡江","remark":"未知","orderId":815463559,"roomId":"910007727377","thirdAppVideoConsult":"xyLink","requestMode":"4"}}
+        RtcStartInvokeRequest request = new RtcStartInvokeRequest();
+        request.setTopic("TX_RTC_START_INVOKE");
+        RtcStartInvokeEndPoint endPoint = new RtcStartInvokeEndPoint();
+        endPoint.setPatientUserId(xlPatientUserId);
+        endPoint.setPatientName("todo改掉名字");
+        endPoint.setDoctorUserId(doctorUserId);
+        endPoint.setOrderId(consultId);
+        endPoint.setRemark("未知");
+        endPoint.setRoomId(meetingRoomNumber);
+        endPoint.setThirdAppVideoConsult("xyLink");
+        endPoint.setRequestMode("4");
+
+        request.setEndPoint(endPoint);
+        String cmd = JsonUtil.toJson(request);
     }
 
     /**
@@ -645,9 +645,7 @@ public class EaseModeProxy {
      */
     public void closeVideoProxy(){
         // 病人离席
-        // todo webSocketClient 可能会是一个空对象，所以这里可能需要生成一个新的webSocketClient
-        if (webSocketClient!=null)
-            webSocketClient.send(new XLMessage().sendPatientLeave(doctorUserId,xlPatientUserId));
+        // todo 向大屏幕socket传递离开信息
         // 释放视频资源
         NemoSDK.getInstance().hangup();// 挂断通话
     }

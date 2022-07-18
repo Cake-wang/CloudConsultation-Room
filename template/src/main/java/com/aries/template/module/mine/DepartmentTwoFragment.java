@@ -106,7 +106,7 @@ public class DepartmentTwoFragment extends BaseEventFragment {
                         if (itemData.get(KEY_ITEM_OBJECT)!=null){
                             FindValidDepartmentForRevisitResultEntity.QueryArrearsSummary.JsonResponseBean.OrganProfessionDTO data
                                     = ((FindValidDepartmentForRevisitResultEntity.QueryArrearsSummary.JsonResponseBean.OrganProfessionDTO) itemData.get(KEY_ITEM_OBJECT));
-                            start(DoctorListFragment.newInstance(data.getCode(),data.getProfessionCode()));
+                            start(DoctorListFragment.newInstance(String.valueOf(data.getDeptId()),data.getProfessionCode()));
                         }
                     }
                     @Override

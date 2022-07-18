@@ -18,18 +18,25 @@ import com.aries.template.R;
 import com.aries.template.entity.CancelregisterResultEntity;
 import com.aries.template.entity.ConfigurationToThirdForPatientEntity;
 import com.aries.template.entity.FindRecipesForPatientAndTabStatusEntity;
+import com.aries.template.entity.GetConsultsAndRecipesResultEntity;
 import com.aries.template.entity.RoomIdInsAuthEntity;
 import com.aries.template.module.base.BaseEventFragment;
 import com.aries.template.module.main.HomeFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
+import com.aries.template.utils.ActivityUtils;
 import com.aries.template.view.ShineButtonDialog;
+import com.aries.template.widget.autoadopter.AutoAdaptorProxy;
+import com.aries.template.widget.autoadopter.AutoObjectAdaptor;
 import com.aries.template.xiaoyu.EaseModeProxy;
 import com.aries.ui.view.title.TitleBarView;
 import com.trello.rxlifecycle3.android.FragmentEvent;
 import com.xuexiang.xaop.annotation.SingleClick;
 
 import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
@@ -41,7 +48,7 @@ import io.reactivex.schedulers.Schedulers;
 import me.yokeyword.fragmentation.SupportFragment;
 
 /**
- * 科室展示页面
+ * 视频问诊
  * 用于显示一级部门，二级部门
  * @author louisluo
  * @Author: AriesHoo on 2018/7/13 17:09
@@ -59,6 +66,8 @@ public class VideoConsultFragment extends BaseEventFragment {
     private String userId; //医生userId 复诊单拿
 
     private boolean doctorInRoomFlag=false;// 医生是否进入
+
+    private boolean isRecipeCheckedFlag=false;// 医生开出的处方状态是不是1或者不是2，则不能支付。即不能结束问诊
 
     /**
      * 输入显示对象
@@ -80,6 +89,8 @@ public class VideoConsultFragment extends BaseEventFragment {
     TextView video_close_full;// 全屏按钮
     @BindView(R.id.btn_full_screen)
     TextView btn_full_screen;// 全屏按钮
+    @BindView(R.id.rv_video_tip)
+    RecyclerView rv_video_tip;
 
     /**
      * 跳转科室，需要带的数据
@@ -126,6 +137,12 @@ public class VideoConsultFragment extends BaseEventFragment {
             public void onDoctorInRoom() {
                 doctorInRoomFlag = true;
             }
+
+            @Override
+            public void onVideoSuccessLinked() {
+                //入会成功, 启动轮训处方单状态
+                timeLoop();
+            }
         });
     }
 
@@ -135,7 +152,6 @@ public class VideoConsultFragment extends BaseEventFragment {
     @Override
     public void initView(Bundle savedInstanceState) {
     }
-
 
     @SingleClick
     @OnClick({R.id.btn_stjc, R.id.btn_finish,R.id.jtjk_video_close_full,R.id.btn_full_screen})
@@ -297,10 +313,48 @@ public class VideoConsultFragment extends BaseEventFragment {
                         }
                         if (entity.getData().isSuccess()){
                             // todo 刷新 RV 处方单界面
-                            // todo 查看返回的所有处方单的处方信息，状态是不是1或者2，如果不是，则不能支付。
+                            // todo 查看返回的所有处方单的处方信息，状态是不是1或者不是2，则不能支付。即不能结束问诊
+                            // 处理处方信息，并展示
+//                            reflashRecyclerView(rv_video_tip,entity.getData().getJsonResponseBean().getBody());
                         }
                     }
                 });
+    }
+
+    /**
+     * 获取数据后，显示处方信息列表
+     * 整个逻辑和输入的 newDatas 的类型有关系，只需要换这个类型即可
+     * @param recyclerView 显示对象
+     * @param newDatas 传入的数据列
+     */
+    protected void reflashRecyclerView(RecyclerView recyclerView, ArrayList<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes> newDatas){
+        // 安全检测
+        if (newDatas==null)
+            return;
+        List<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes.RecipeDetail> allRecipe =new ArrayList<>();
+        for (GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes newData : newDatas) {
+            if (newData.getRecipeDetailBeans()!=null)
+                allRecipe.addAll(newData.getRecipeDetailBeans());
+        }
+
+        AutoAdaptorProxy<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes.RecipeDetail> proxy
+                = new AutoAdaptorProxy<>(recyclerView, R.layout.item_recipes, 1, allRecipe, getContext());
+
+        proxy.setListener(new AutoAdaptorProxy.IItemListener<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes.RecipeDetail>() {
+            @Override
+            public void onItemClick(AutoObjectAdaptor.ViewHolder holder, int position, GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes.RecipeDetail itemData) {
+            }
+
+            @Override
+            public void onItemViewDraw(AutoObjectAdaptor.ViewHolder holder, int position, GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes.RecipeDetail itemData) {
+                String drugName = (position+1)+"、"+itemData.getDrugName();
+                String wayToUse = "(1天"+itemData.getUseTotalDose()/itemData.getUseDays()+"次，每次"+itemData.getUseDose()+"片)";
+                String[] orders = {"#333333",drugName,"#38ABA0",wayToUse};
+                ((TextView)holder.itemView.findViewById(R.id.tv_useDose)).setText(ActivityUtils.formatTextView(orders));//使用方法
+            }
+        });
+        //刷新
+        proxy.notifyDataSetChanged();
     }
 
     @Override

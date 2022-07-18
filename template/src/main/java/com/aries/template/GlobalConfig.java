@@ -43,6 +43,12 @@ public class GlobalConfig {
     public static String merchantId = "123456";
 
     /**
+     * 用于视频问诊 大屏幕链接的 socket的地址
+     * 不可以被清空或重置
+     */
+    public static String machineIp;
+
+    /**
      * 组织代码
      * 用于确定医院组织的代码。1 浙大附属邵逸夫医院
      * 目前ID是根据机器的ID，发送到后端，后端返回组织代码给机器。
@@ -99,8 +105,6 @@ public class GlobalConfig {
      * 只有在读卡界面才会验证是否注册，其他界面不会。
      */
     public static boolean isFindUserDone;
-
-
 
     /**
      * 清空所有缓存数据

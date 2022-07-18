@@ -14,7 +14,6 @@ import android.widget.Toast;
 import com.aries.library.fast.retrofit.FastLoadingObserver;
 import com.aries.library.fast.util.SPUtil;
 import com.aries.library.fast.util.ToastUtil;
-import com.aries.template.FakeDataExample;
 import com.aries.template.GlobalConfig;
 import com.aries.template.R;
 import com.aries.template.adapter.FlowTagAdapter;
@@ -116,18 +115,6 @@ public class ConfirmConsultFragment extends BaseEventFragment implements Compoun
         cb_protocol_o.setOnCheckedChangeListener(this);
         cb_protocol_tw.setOnCheckedChangeListener(this);
         cb_protocol_tr.setOnCheckedChangeListener(this);
-//        int organid = 1;//浙大附属邵逸夫医院
-//        ApiRepository.getInstance().findValidOrganProfessionForRevisit(organid, getContext())
-//                .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
-//                .subscribe(new FastLoadingObserver<FindValidOrganProfessionForRevisitResultEntity>() {
-//                    @Override
-//                    public void _onNext(FindValidOrganProfessionForRevisitResultEntity entity) {
-//                        if (entity == null) {
-//                            ToastUtil.show("请检查网络");
-//                            return;
-//                        }
-////                        entity.data.requestId;
-//                    }
     }
 
 
@@ -222,9 +209,19 @@ public class ConfirmConsultFragment extends BaseEventFragment implements Compoun
             // todo 添加用户提示
             return;
         }
+        String alleric = String.valueOf(flowlayout_single_select_o.getSelectedIndex());
+        String haveReaction = String.valueOf(flowlayout_single_select_t.getSelectedIndex());
+        String confirmedDate = tv_date.getText().toString();
+        if (cb_protocol_o.isChecked()) returnVisitStatus =0;
+        if (cb_protocol_tw.isChecked())returnVisitStatus=1;
+        if (cb_protocol_tr.isChecked())returnVisitStatus=2;
         ApiRepository.getInstance().requestConsultAndCdrOtherdoc(GlobalConfig.doc.getCurrentOrgan(),
                         GlobalConfig.NALI_TID,
                         GlobalConfig.departmentID,
+                        alleric,
+                        haveReaction,
+                        confirmedDate,
+                        String.valueOf(returnVisitStatus),
                         GlobalConfig.doc.getDoctorId())
                 .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
                 .subscribe(new FastLoadingObserver<RequestConsultAndCdrOtherdocResultEntity>() {
@@ -235,8 +232,15 @@ public class ConfirmConsultFragment extends BaseEventFragment implements Compoun
                             return;
                         }
                         if (entity.data.success){
+                            // 通过确诊单，进入到复诊单支付
+//                            start(PayConsultFragment.newInstance());
                             // 医生 确认复诊，并进入复诊阶段
-                            start(VideoConsultFragment.newInstance(FakeDataExample.consultId,FakeDataExample.nickname,FakeDataExample.doctorUserId));// todo cc
+//                            start(VideoConsultFragment.newInstance(String.valueOf(entity.data.jsonResponseBean.body.consult.consultId),
+//                                    entity.data.jsonResponseBean.body.patient.patientName,
+//                                    String.valueOf(entity.data.jsonResponseBean.body.doctor.doctorId)));// todo cc
+                            start(PayConsultFragment.newInstance(String.valueOf(entity.data.jsonResponseBean.body.consult.consultId),
+                                    entity.data.jsonResponseBean.body.patient.patientName,
+                                    String.valueOf(entity.data.jsonResponseBean.body.doctor.doctorId)));
                         }else{
                             // 如果不能复诊，则检查异常原因
                             errorCheck(entity.data.jsonResponseBean.msg,entity.data.jsonResponseBean.code);

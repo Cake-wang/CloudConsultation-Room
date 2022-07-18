@@ -5,18 +5,20 @@ package com.aries.template.entity;
  * 调用地址：/cloudHospital/machineRelation/findByMachineId
  */
 public class MachineEntity {
-
-    public String code;
     public boolean success;
+    public String code;
     public String message;
+    public DataDTO data;
     public String sign;
 
-    public QueryArrearsSummary data;
-    public class QueryArrearsSummary {
+    public static class DataDTO {
         public String machineId;
         public String cabinetId;
         public String hospitalNo;
         public String hospitalName;
-        public Integer machineStatus;
+        public int machineStatus;
+        public String machineIp;
+        public String createTime;
+        public String updateTime;
     }
 }

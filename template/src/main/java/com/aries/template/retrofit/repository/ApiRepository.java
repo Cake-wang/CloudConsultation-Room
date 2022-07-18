@@ -31,6 +31,7 @@ import com.aries.template.entity.GetStockInfoEntity;
 import com.aries.template.entity.IsRegisterRequestEntity;
 import com.aries.template.entity.IsRegisterResultEntity;
 import com.aries.template.entity.MachineEntity;
+import com.aries.template.entity.PatientListEntity;
 import com.aries.template.entity.PayOrderEntity;
 import com.aries.template.entity.PrescriptionPushEntity;
 import com.aries.template.entity.RegisterResultEntity;
@@ -476,18 +477,22 @@ public class ApiRepository extends BaseRepository {
     public Observable<RequestConsultAndCdrOtherdocResultEntity> requestConsultAndCdrOtherdoc(Long consultOrgan,
                                                                                              String mpiid,
                                                                                              String consultDepart,
+                                                                                             String alleric,
+                                                                                             String haveReaction,
+                                                                                             String confirmedDate,
+                                                                                             String returnVisitStatus,
                                                                                              Long consultDoctor) {
-//        Map<String,String> questionnaire =new HashMap<>(); //问卷单对象（详见questionnaire详细描述）
-//        questionnaire.put("pregnent",String.valueOf(0)); //是否怀孕 -1：男 0:无 1:有
-////        questionnaire.put("pregnentMemo","");
-//        questionnaire.put("alleric",String.valueOf(0));//有无过敏史 0:无 1:有
-////        questionnaire.put("allericMemo","");
+        Map<String,String> questionnaire =new HashMap<>(); //问卷单对象（详见questionnaire详细描述）
+//        questionnaire.put("pregnent",pregnent); //是否怀孕 -1：男 0:无 1:有
+//        questionnaire.put("pregnentMemo","");
+        questionnaire.put("alleric",alleric);//有无过敏史 0:无 1:有
+//        questionnaire.put("allericMemo","");
 //        questionnaire.put("proposedDrugs","鲜铁皮石斛");//既往用药（多个药品用、隔开）
-//        questionnaire.put("haveReaction",String.valueOf(0));//服药后不良反应 0:无 1:有
-////        questionnaire.put("haveReactionMemo","");
+        questionnaire.put("haveReaction",haveReaction);//服药后不良反应 0:无 1:有
+//        questionnaire.put("haveReactionMemo","");
 //        questionnaire.put("disease","");//确诊疾病
-//        questionnaire.put("confirmedDate","");//确诊时间，如 2019-04-03
-////        questionnaire.put("returnVisitStatus",String.valueOf(1));
+        questionnaire.put("confirmedDate",confirmedDate);//确诊时间，如 2019-04-03
+        questionnaire.put("returnVisitStatus",returnVisitStatus);// 复诊情况选择。-1:未选 0:本院同医生复诊 1:本院非同医生复诊 2:非本院复诊
 //
 //        Map<String,String> cdrOtherdocs =new HashMap<>(); //病历数据
 //        cdrOtherdocs.put("docType",String.valueOf(9));//文档类型，默认填9 0门诊病历 1检验报告 2检查报告 10体检报告 3处方 4治疗记录 5住院病历 6医嘱 7医学影像 8病患部位 9其他
@@ -502,11 +507,8 @@ public class ApiRepository extends BaseRepository {
         bizContent.put("appClientType","APP_WEB");//由纳里平台分配的公司标识，固定写死
         bizContent.put("appType","ngari-health");//由纳里平台分配的公司标识，固定写死
         bizContent.put("requestMode",String.valueOf(4));//类型，复诊固定为4
-//        bizContent.put("consultOrgan",String.valueOf(2000300));//复诊医生机构
         bizContent.put("consultOrgan",String.valueOf(consultOrgan));//复诊医生机构
-//        bizContent.put("consultDepart",String.valueOf(18804));//复诊医生科室
         bizContent.put("consultDepart",String.valueOf(consultDepart));//复诊医生科室
-//        bizContent.put("consultDoctor",String.valueOf(111733));//复诊医生
         bizContent.put("consultDoctor",String.valueOf(consultDoctor));//复诊医生
 //        bizContent.put("consultCost",String.valueOf(0));
 //        bizContent.put("consultPrice",String.valueOf(0));
@@ -806,6 +808,20 @@ public class ApiRepository extends BaseRepository {
         // 请求的类型
         RequestBody body = BodyCreate(bizContent,"getPatientRecipeById");
         return FastTransformer.switchSchedulers(getApiService().getPatientRecipeById(body).retryWhen(new FastRetryWhen()));
+    }
+
+
+    /**
+     * 获取病人详细数据 根据 TID
+     * 唯一获得 mpiId 的地方
+     */
+    public Observable<PatientListEntity> getPatientList(String recipeId) {
+        // 除了公共的数据之外，还有其他的数据请求
+        Map<String,Object> bizContent = new HashMap<>();
+
+        // 请求的类型
+        RequestBody body = BodyCreate(bizContent,"patientList");
+        return FastTransformer.switchSchedulers(getApiService().getPatientList(body).retryWhen(new FastRetryWhen()));
     }
 
 

@@ -39,8 +39,9 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 /**
- * 支付复诊
- * 仅处理复诊的支付界面
+ * 支付处方单
+ * 仅处理处方单界面
+ * 包括未支付的处方单和新处方单。
  * @author louisluo
  * @Author: AriesHoo on 2018/7/13 17:09
  * @E-Mail: AriesHoo@126.com

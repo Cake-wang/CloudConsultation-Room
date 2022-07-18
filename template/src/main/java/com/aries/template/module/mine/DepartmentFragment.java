@@ -180,7 +180,7 @@ public class DepartmentFragment extends BaseEventFragment {
                         for (FindValidOrganProfessionForRevisitResultEntity.QueryArrearsSummary.JsonResponseBean.OrganProfessionDTO item : entity.data.jsonResponseBean.body) {
                             Map<String,String> data = new HashMap<>();
                             data.put(KEY_ITEM_VALUE,item.name);
-                            data.put(KEY_ITEM_ORGANPROFESSIONID,item.professionCode);
+                            data.put(KEY_ITEM_ORGANPROFESSIONID,String.valueOf(item.id));
                             totalDatas.add(data);
                         }
                         if (totalDatas.size()>0){

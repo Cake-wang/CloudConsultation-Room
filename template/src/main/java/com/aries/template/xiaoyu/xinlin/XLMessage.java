@@ -1,18 +1,110 @@
 package com.aries.template.xiaoyu.xinlin;
 
+
 import com.ainemo.util.JsonUtil;
 import com.aries.template.xiaoyu.model.RtcStartInvokeEndPoint;
 import com.aries.template.xiaoyu.model.RtcStartInvokeRequest;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
+
+import tech.gusavila92.websocketclient.WebSocketClient;
 
 /**
  * 信令
  * 消息发送填装器
+ * 信令的发送任务
+ * - 病人离开，向医生发送消息
+ * - 病人入会成功，向医生发送消息
  */
 public class XLMessage {
+
+    /**
+     * 信令通信socket对象
+     * 不进行心跳包，通信一次后，可能就会断开
+     */
+    private WebSocketClient webSocketClient;
+//
+//    /**
+//     * 信令登录
+//     * 创造socket 常链接
+//     * 获取房间信息，房间 account
+//     */
+//    public void createWebSocketClient() {
+//        URI uri;
+//        try {
+//            // Connect to local host
+//            uri = new URI("ws://172.21.1.95:9090/");
+//        } catch (URISyntaxException e) {
+//            e.printStackTrace();
+//            return;
+//        }
+//
+//        webSocketClient = new WebSocketClient(uri) {
+//            @Override
+//            public void onOpen() {
+//                Log.i("WebSocket", "Session is starting");
+//
+//                //连接成功服务器后必须要注册
+//                //{"topic":"REG","endPoint":{"userId":"62933bcbcf8912669abf4b98","roleId":"patient","appVersion":"4.1.1","isInVideo":0,"appType":4}}
+//                RegEndPoint regEndPoint = new RegEndPoint();
+//                regEndPoint.setUserId(xlPatientUserId);
+//                regEndPoint.setRoleId("patient");
+//                regEndPoint.setAppVersion("4.1.1");
+//                regEndPoint.setIsInVideo(0);
+//                regEndPoint.setAppType(4);
+//
+//                RegRequest regRequest = new RegRequest();
+//                regRequest.setTopic("REG");
+//                regRequest.setEndPoint(regEndPoint);
+//                String registerMsg = JsonUtil.toJson(regRequest);
+//                webSocketClient.send(registerMsg);
+//            }
+//
+//            @Override
+//            public void onTextReceived(String s) {
+//                final String message = s;
+//                ToastWithLogin(message);
+//                activity.get().runOnUiThread(() -> {
+//                    // todo：这里改成用json来解析
+//                    if (message.contains("REG_SUCCESS")) {
+//                        onRegSuccess(message);
+//                    }else if (message.contains("SUBSCRIBE")){
+//                        // 医生已经离开
+//                        // TX_RTC_SHUTDOWN_RES
+//                        ToastWithLogin("医生已经离开");
+//                    }
+//                });
+//            }
+//
+//            @Override
+//            public void onBinaryReceived(byte[] data) {
+//            }
+//
+//            @Override
+//            public void onPingReceived(byte[] data) {
+//            }
+//
+//            @Override
+//            public void onPongReceived(byte[] data) {
+//            }
+//
+//            @Override
+//            public void onException(Exception e) {
+//                System.out.println(e.getMessage());
+//            }
+//
+//            @Override
+//            public void onCloseReceived() {
+//                Log.i("WebSocket", "Closed ");
+//                System.out.println("onCloseReceived");
+//            }
+//        };
+//        webSocketClient.setConnectTimeout(10000);
+//        webSocketClient.setReadTimeout(60000);
+//        webSocketClient.enableAutomaticReconnection(5000);
+//        webSocketClient.connect();
+//    }
 
     /**
      * 向doctor发送信息
