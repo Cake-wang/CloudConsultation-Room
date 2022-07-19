@@ -27,7 +27,12 @@ import com.ainemo.sdk.otf.SimpleNemoSDkListener;
 import com.ainemo.sdk.otf.VideoConfig;
 import com.ainemo.sdk.otf.VideoInfo;
 import com.ainemo.util.JsonUtil;
+import com.aries.library.fast.retrofit.FastLoadingObserver;
+import com.aries.library.fast.util.ToastUtil;
+import com.aries.template.GlobalConfig;
 import com.aries.template.R;
+import com.aries.template.entity.RoomIdInsAuthEntity;
+import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.template.xiaoyu.dapinsocket.SocThread;
 import com.aries.template.xiaoyu.meeting.MeetingVideoCell;
 import com.aries.template.xiaoyu.model.RegEndPoint;
@@ -42,6 +47,7 @@ import com.hyphenate.chat.EMClient;
 import com.hyphenate.chat.EMMessage;
 import com.hyphenate.chat.EMOptions;
 import com.tbruyelle.rxpermissions2.RxPermissions;
+import com.trello.rxlifecycle3.android.FragmentEvent;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -77,6 +83,7 @@ public class EaseModeProxy {
     private boolean muteMic=false;
     // 是否关闭画面
     private boolean muteVideo=false;
+
     // 信令 Socket 对象, 这个socket 不需要设置心跳包
     private WebSocketClient webSocketClient;
     // 向大屏进行通讯的socket，不需要设置心跳包
@@ -84,7 +91,8 @@ public class EaseModeProxy {
     // 使用 UCV
     private UVCCameraPresenter uvcCameraPresenter;
 
-    // 复诊单的配置
+    // 复诊单
+    // 复诊单号，用于请求小鱼房间号和密码
     private Integer consultId = 815423874; //复诊单id 复诊单拿
     private String nickname = "eric"; //复诊人姓名 复诊单拿
     private String doctorUserId = "627a861baa36e516a612dc80"; //医生userId 复诊单拿
@@ -95,6 +103,7 @@ public class EaseModeProxy {
 
     // 信令的配置
     private String xlPatientUserId = "627dd085cc2f202b1d2146f3"; //用户userId getConfigurationToThirdForPatient
+    private final String XL_URL = "ws://172.21.1.95:9090/";
 
     //------------小鱼的配置
     private static final String xyAppId = "5886885697deb9f4760b3a5e1ab912b9a3b7dfd3"; //小鱼appid 固定
@@ -211,9 +220,7 @@ public class EaseModeProxy {
      * @param doctorUserId 医生userId
      * @param userName 环信的用户名
      * @param password 环信的密码
-     * @param xlName 信令的用户ID
-     * @param xyroomid 小鱼视频 房间号
-     * @param xyroompwd 小鱼视频 房间密码
+     * @param xlPatientUserId 信令的用户ID
      */
     public void easemobStart(Activity inputAc,
                              String consultId,
@@ -221,10 +228,8 @@ public class EaseModeProxy {
                              String doctorUserId,
                              String userName,
                              String password,
-                             String xlName,
-                             String  xyroomid,
-                             String xyroompwd) {
-        if (consultId==null ||nickname==null ||doctorUserId==null ||userName==null || password==null || xlName==null)
+                             String xlPatientUserId) {
+        if (consultId==null ||nickname==null ||doctorUserId==null ||userName==null || password==null || xlPatientUserId==null)
             return;
         // 设置成员变量
         this.consultId = Integer.valueOf(consultId);
@@ -232,9 +237,9 @@ public class EaseModeProxy {
         this.doctorUserId = doctorUserId;
         easemobUserName = userName;
         easemobPassword = password;
-        xlPatientUserId = xlName;
+        this.xlPatientUserId = xlPatientUserId;
 
-        // 启动验证请求
+        // 添加 Activity 弱引用
         setActivity(inputAc);
         //注册监听消息的回调地址 参看：https://docs-im.easemob.com/im/android/basics/message#%E6%8E%A5%E6%94%B6%E6%B6%88%E6%81%AF
         EMClient.getInstance().chatManager().addMessageListener(new EMMessageListener() {
@@ -256,9 +261,12 @@ public class EaseModeProxy {
                         if (msgType == null || !msgType.equals("26")) {
                             continue;
                         }
-//                        todo 请自己调用openAPI方法设置meetingRoomNumber， meetingPassword
-                        //获取房间信息
-                        createWebSocketClient();
+                        // 信令请求 socket 没有心跳，返回医生请求状态
+                        try {
+                            createWebSocketClient();
+                        } catch (URISyntaxException e) {
+                            e.printStackTrace();
+                        }
                         //todo 提示患者，医生挂断视频
                     }
                 });
@@ -300,7 +308,9 @@ public class EaseModeProxy {
                 ToastWithLogin("登录环信聊天服务器失败, message:" + message);
             }
         };
-        EMClient.getInstance().login(userName, password,emcallback );
+        // 防止用户由于特殊原因登出，然后再进来的时候，被提示已经登录
+        EMClient.getInstance().logout(true);
+        EMClient.getInstance().login(easemobUserName, easemobPassword,emcallback );
     }
 
     /**
@@ -308,16 +318,8 @@ public class EaseModeProxy {
      * 创造socket 常链接
      * 获取房间信息，房间 account
      */
-    public void createWebSocketClient() {
-        URI uri;
-        try {
-            // Connect to local host
-            uri = new URI("ws://172.21.1.95:9090/");
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-            return;
-        }
-
+    public void createWebSocketClient() throws URISyntaxException {
+        URI uri = new URI(XL_URL);
         webSocketClient = new WebSocketClient(uri) {
             @Override
             public void onOpen() {
@@ -397,7 +399,31 @@ public class EaseModeProxy {
     }
 
     /**
+     * 查询复诊单的小鱼视频会议室房间号和密码
+     */
+    private void requestGetRoomIdInsAuth(String consultId){
+        ApiRepository.getInstance().getRoomIdInsAuth(consultId, GlobalConfig.NALI_APPKEY)
+                .subscribe(new FastLoadingObserver<RoomIdInsAuthEntity>("请稍后...") {
+                    @Override
+                    public void _onNext(RoomIdInsAuthEntity entity) {
+                        if (entity == null) {
+                            ToastUtil.show("请检查网络");
+                            return;
+                        }
+                        if (entity.getData().isSuccess()){
+                            if (entity.getData().getJsonResponseBean().getBody()!=null){
+                                meetingRoomNumber = entity.getData().getJsonResponseBean().getBody().getDetail().getMeetingNumber();
+                                meetingPassword = entity.getData().getJsonResponseBean().getBody().getDetail().getControlPassword();
+                                xyJoinMeeting(meetingRoomNumber, meetingPassword);
+                            }
+                        }
+                    }
+                });
+    }
+
+    /**
      * 小鱼登录启动初始化配置
+     * todo 可能需要在这里请求房间号和密码
      */
     public void xyInit() {
         // 如果没有uvc则使用前置摄像头，包括中途拔出 USB 摄像头的情况
@@ -435,7 +461,7 @@ public class EaseModeProxy {
                 @Override
                 public void onSuccess(LoginResponseData loginResponseData, boolean b) {
                     ToastWithLogin("登录成功");
-                    xyJoinMeeting(meetingRoomNumber, meetingPassword);
+                    requestGetRoomIdInsAuth(String.valueOf(consultId));
                 }
 
                 @Override

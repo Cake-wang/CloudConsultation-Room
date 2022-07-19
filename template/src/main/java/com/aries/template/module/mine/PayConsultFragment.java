@@ -1,6 +1,8 @@
 package com.aries.template.module.mine;
 
+import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.widget.ImageView;
@@ -9,6 +11,7 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 
 import com.aries.library.fast.retrofit.FastLoadingObserver;
+import com.aries.library.fast.retrofit.FastObserver;
 import com.aries.library.fast.util.ToastUtil;
 import com.aries.template.GlobalConfig;
 import com.aries.template.R;
@@ -20,6 +23,7 @@ import com.aries.template.entity.PayOrderEntity;
 import com.aries.template.entity.PrescriptionPushEntity;
 import com.aries.template.module.base.BaseEventFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
+import com.aries.template.utils.ActivityUtils;
 import com.aries.ui.view.title.TitleBarView;
 import com.trello.rxlifecycle3.android.FragmentEvent;
 import com.xuexiang.xaop.annotation.IOThread;
@@ -59,6 +63,7 @@ public class PayConsultFragment extends BaseEventFragment {
     private String consultId;//处方单ID
     private String patientName;//病人姓名
     private String doctorId;//医生ID
+    private String doctorName;
 
     @BindView(R.id.tv_name)
     TextView tv_name; //患者姓名
@@ -72,19 +77,23 @@ public class PayConsultFragment extends BaseEventFragment {
     TextView tv_fee_zf; //自费支付费用显示
     @BindView(R.id.iv_qrcode)
     ImageView mIvQrcode;// 二维码
+    @BindView(R.id.jtjk_pay_text)
+    TextView jtjk_pay_text;
 
     /**
      * 跳转科室，需要带的数据
      * @param consultId 复诊单ID
      * @param patientName 病人姓名
      * @param doctorId 医生ID
+     * @param doctorName 医生姓名
      */
-    public static PayConsultFragment newInstance(String consultId , String patientName, String doctorId) {
+    public static PayConsultFragment newInstance(String consultId , String patientName, String doctorId, String doctorName) {
         PayConsultFragment fragment = new PayConsultFragment();
         Bundle args = new Bundle();
         args.putString("consultId", consultId);
         args.putString("patientName", patientName);
         args.putSerializable("doctorId", doctorId);
+        args.putSerializable("doctorName", doctorName);
         fragment.setArguments(args);
         return fragment;
     }
@@ -103,12 +112,8 @@ public class PayConsultFragment extends BaseEventFragment {
             consultId = args.getString("consultId");
             patientName = args.getString("patientName");
             doctorId = args.getString("doctorId");
+            doctorName = args.getString("doctorName");
         }
-
-        //数据展示
-//        if (GlobalConfig.ssCard!=null)
-//        tv_name.setText(GlobalConfig.ssCard.getName());
-//        tv_fee_all.setText(recipeFee);
     }
 
     /**
@@ -120,9 +125,17 @@ public class PayConsultFragment extends BaseEventFragment {
         timeLoop();
         // 获得支付二维码
         requestPayOrder(consultId);
+
+        //数据展示
+        if (GlobalConfig.ssCard!=null)
+            tv_name.setText(GlobalConfig.ssCard.getName());
+//        tv_fee_all.setText(recipeFee);
+
+        String[] orders = {"#38ABA0","支付宝·","#333333","扫一扫"};
+        jtjk_pay_text.setText(ActivityUtils.formatTextView(orders));
     }
 
-    private static final int PERIOD = 3* 1000;
+    private static final int PERIOD = 5* 1000;
     private static final int DELAY = 100;
     private Disposable mDisposable;
 
@@ -139,13 +152,14 @@ public class PayConsultFragment extends BaseEventFragment {
 
     /**
      * 检查当前支付是否完成
-     * 循环任务，没3秒检查一次
+     * 循环任务，每5秒检查一次
      * 检查处方单详情
+     * FastObserver
      */
     private void requestPaySuccess() {
         ApiRepository.getInstance().getConsultAndPatientAndDoctorById(consultId)
                 .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
-                .subscribe(new FastLoadingObserver<GetConsultAndPatientAndDoctorByIdEntity>("请稍后...") {
+                .subscribe(new FastLoadingObserver<GetConsultAndPatientAndDoctorByIdEntity>("请等待") {
                     @Override
                     public void _onNext(GetConsultAndPatientAndDoctorByIdEntity entity) {
                         if (entity == null) {
@@ -158,7 +172,10 @@ public class PayConsultFragment extends BaseEventFragment {
                                 // 跳转到视频
                                 start(VideoConsultFragment.newInstance(consultId,
                                         patientName,
-                                        doctorId));
+                                        doctorId,
+                                        doctorName));
+                                // 释放对象资源
+                                onDismiss();
                             }
                         }
                     }
@@ -186,10 +203,10 @@ public class PayConsultFragment extends BaseEventFragment {
 
     /**
      * 获得订单二维码和其他详细数据
-     * @param busId 订单号 直接使用 复诊id
+     * @param busId 订单号 直接使用 复诊id 815423957
      */
     private void requestPayOrder(String busId){
-        ApiRepository.getInstance().payOrder(busId)
+        ApiRepository.getInstance().payOrder(busId,"onlinerecipe")
                 .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
                 .subscribe(new FastLoadingObserver<PayOrderEntity>("请稍后...") {
                     @Override
@@ -201,7 +218,9 @@ public class PayConsultFragment extends BaseEventFragment {
                         if (entity.isSuccess()){
                             // 显示二维码
                            String qrStr = entity.getData().getJsonResponseBean().getBody().qr_code;
-                           showQRCode(XQRCode.createQRCodeWithLogo(qrStr, 400, 400, null));
+                           Resources res = getActivity().getResources();
+                           Bitmap bmp= BitmapFactory.decodeResource(res, R.drawable.pay_alilogo);
+                           showQRCode(XQRCode.createQRCodeWithLogo(qrStr, 400, 400, bmp));
                         }
                     }
                 });
@@ -215,5 +234,27 @@ public class PayConsultFragment extends BaseEventFragment {
     public void setTitleBar(TitleBarView titleBar) {
         titleBar.setBgColor(Color.WHITE)
                 .setTitleMainText(R.string.mine);
+    }
+
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        if (hidden){
+            //清除mDisposable不再进行验证
+            if (mDisposable != null) {
+                mDisposable.dispose();
+                mDisposable = null;
+            }
+        }
+    }
+
+    @Override
+    public void onDismiss() {
+        super.onDismiss();
+        //清除mDisposable不再进行验证
+        if (mDisposable != null) {
+            mDisposable.dispose();
+            mDisposable = null;
+        }
     }
 }

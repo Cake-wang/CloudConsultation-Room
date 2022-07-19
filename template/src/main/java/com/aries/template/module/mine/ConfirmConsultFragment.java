@@ -17,6 +17,7 @@ import com.aries.library.fast.util.ToastUtil;
 import com.aries.template.GlobalConfig;
 import com.aries.template.R;
 import com.aries.template.adapter.FlowTagAdapter;
+import com.aries.template.entity.PatientListEntity;
 import com.aries.template.entity.RequestConsultAndCdrOtherdocResultEntity;
 import com.aries.template.module.base.BaseEventFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
@@ -180,7 +181,7 @@ public class ConfirmConsultFragment extends BaseEventFragment implements Compoun
                 break;
             case R.id.btn_inquiry:
                 // 确认，发起复诊请求
-                requestConsultAndCdrOtherdoc();
+                requestGetPatientList();
                 break;
             default:
                 break;
@@ -202,9 +203,31 @@ public class ConfirmConsultFragment extends BaseEventFragment implements Compoun
     }
 
     /**
-     * 执行复诊确认
+     * 获取病人信息
+     * 为了能够获得Mpiid
      */
-    public void requestConsultAndCdrOtherdoc(){
+    public  void requestGetPatientList(){
+        ApiRepository.getInstance().getPatientList()
+                .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
+                .subscribe(new FastLoadingObserver<PatientListEntity>() {
+                    @Override
+                    public void _onNext(PatientListEntity entity) {
+                        if (entity == null) {
+                            ToastUtil.show("请检查网络");
+                            return;
+                        }
+                        if (entity.data.success){
+                            requestConsultAndCdrOtherdoc(entity.data.jsonResponseBean.body.patient.mpiId);
+                        }
+                    }
+                });
+    }
+
+    /**
+     * 执行复诊确认
+     * 发起复诊单
+     */
+    public void requestConsultAndCdrOtherdoc(String mpiid){
         if (GlobalConfig.doc==null && GlobalConfig.departmentID==null){
             // todo 添加用户提示
             return;
@@ -216,12 +239,14 @@ public class ConfirmConsultFragment extends BaseEventFragment implements Compoun
         if (cb_protocol_tw.isChecked())returnVisitStatus=1;
         if (cb_protocol_tr.isChecked())returnVisitStatus=2;
         ApiRepository.getInstance().requestConsultAndCdrOtherdoc(GlobalConfig.doc.getCurrentOrgan(),
-                        GlobalConfig.NALI_TID,
+                        mpiid,
                         GlobalConfig.departmentID,
                         alleric,
                         haveReaction,
                         confirmedDate,
                         String.valueOf(returnVisitStatus),
+                        "0.01",
+                "0.01",
                         GlobalConfig.doc.getDoctorId())
                 .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
                 .subscribe(new FastLoadingObserver<RequestConsultAndCdrOtherdocResultEntity>() {
@@ -240,7 +265,8 @@ public class ConfirmConsultFragment extends BaseEventFragment implements Compoun
 //                                    String.valueOf(entity.data.jsonResponseBean.body.doctor.doctorId)));// todo cc
                             start(PayConsultFragment.newInstance(String.valueOf(entity.data.jsonResponseBean.body.consult.consultId),
                                     entity.data.jsonResponseBean.body.patient.patientName,
-                                    String.valueOf(entity.data.jsonResponseBean.body.doctor.doctorId)));
+                                    String.valueOf(entity.data.jsonResponseBean.body.doctor.doctorId),
+                                    entity.data.jsonResponseBean.body.doctor.name));
                         }else{
                             // 如果不能复诊，则检查异常原因
                             errorCheck(entity.data.jsonResponseBean.msg,entity.data.jsonResponseBean.code);

@@ -45,11 +45,6 @@ import com.aries.template.utility.JTJSONUtils;
 import com.aries.template.utility.RSASignature;
 import com.aries.template.widget.mgson.MFastRetrofit;
 import com.decard.NDKMethod.BasicOper;
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-
-import org.json.JSONArray;
-import org.json.JSONException;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -144,43 +139,29 @@ public class ApiRepository extends BaseRepository {
 
     public static String getDeviceSN(Context context) {
         Log.d("open","dc_open success devHandle = "+Build.MODEL);
-
         String serialNumber = android.os.Build.SERIAL;
-
         String serialNumber_new = "";
-
         if (Build.MODEL.equals("f11_x1")){
-
             //向系统申请使用USB权限,此过程为异步,建议放在程序启动时调用。
-
 //            BasicOper.dc_AUSB_ReqPermission(this);
-
 //打开端口，usb模式，打开之前必须确保已经获取到USB权限，返回值为设备句柄号。
-
             int devHandle = BasicOper.dc_open("COM",null,"/dev/ttyUSB0",115200);
             Log.d("open","dc_open success devHandle = "+devHandle);
             if(devHandle>0){
                 Log.d("open","dc_open success devHandle = "+devHandle);
-
 //        if(devHandle>0){
                 serialNumber_new =BasicOper.dc_GetDeviceUid().substring(5);
 //        }
             }
-
             //串口使用之前确保设备支持串口，并且已知设备串口路径。
-
         }else if (Build.MODEL.equals("Z90N")){
-
             int devHandle1 = BasicOper.dc_open("COM",null,"/dev/ttyHSL1",115200);//返回值为设备句柄号。
             if(devHandle1>0){
                 Log.d("openhhhhhh","dc_open success devHandle = "+devHandle1);
-
-
 //        if(devHandle>0){
                 serialNumber_new =BasicOper.dc_GetDeviceUid().substring(5);
 //        }
 //                        readCard();
-
 //                  mTimeCounterRunnable = new Runnable() {
 //                    @Override
 //                    public void run() {//在此添加需轮寻的接口
@@ -188,26 +169,13 @@ public class ApiRepository extends BaseRepository {
 //                        mHandler.postDelayed(this, 3* 1000);
 //                    }
 //                };
-
-
-
-
             }
-
         }
-
         if (TextUtils.isEmpty(serialNumber_new)){
             ToastUtil.showWarning("未获取到设备号");
         }else {
-
-
-
                 BasicOper.dc_exit();
-
-
         }
-
-        
         return serialNumber_new;
     }
 
@@ -218,13 +186,10 @@ public class ApiRepository extends BaseRepository {
     }
 
     public static class common {
-
         public String machineId;
         public String userId;
-
         private static volatile common instance;
         private ApiService mApiService;
-
 //        private common() {
 //            mApiService = getApiService();
 //        }
@@ -481,6 +446,8 @@ public class ApiRepository extends BaseRepository {
                                                                                              String haveReaction,
                                                                                              String confirmedDate,
                                                                                              String returnVisitStatus,
+                                                                                             String consultCost,
+                                                                                             String consultPrice,
                                                                                              Long consultDoctor) {
         Map<String,String> questionnaire =new HashMap<>(); //问卷单对象（详见questionnaire详细描述）
 //        questionnaire.put("pregnent",pregnent); //是否怀孕 -1：男 0:无 1:有
@@ -510,54 +477,54 @@ public class ApiRepository extends BaseRepository {
         bizContent.put("consultOrgan",String.valueOf(consultOrgan));//复诊医生机构
         bizContent.put("consultDepart",String.valueOf(consultDepart));//复诊医生科室
         bizContent.put("consultDoctor",String.valueOf(consultDoctor));//复诊医生
-//        bizContent.put("consultCost",String.valueOf(0));
-//        bizContent.put("consultPrice",String.valueOf(0));
+        bizContent.put("consultCost",String.valueOf(consultCost));
+        bizContent.put("consultPrice",String.valueOf(consultPrice));
 //        bizContent.put("leaveMess","");
-//        bizContent.put("questionnaire",questionnaire);
+        bizContent.put("questionnaire",questionnaire);
 //        bizContent.put("cdrOtherdocs",cdrOtherdocs);
 
         RequestBody body = BodyCreate(bizContent,"requestConsultAndCdrOtherdoc");
         return FastTransformer.switchSchedulers(getApiService().requestConsultAndCdrOtherdoc(body).retryWhen(new FastRetryWhen()));
     }
 
-    public Observable<RequestConsultAndCdrOtherdocResultEntity> presettlement(String appKey, String tid, String appClientType, Context mContext) {
-//        idCard = "33052219861229693X";
-//        SPUtil.put(mContext, "termial","YTJ1001");
-//        SPUtil.put(mContext,"hosiptalNo", "A0005");
-//        SPUtil.put(mContext, "mchntId", "330160400279");
+//    public Observable<RequestConsultAndCdrOtherdocResultEntity> presettlement(String appKey, String tid, String appClientType, Context mContext) {
+////        idCard = "33052219861229693X";
+////        SPUtil.put(mContext, "termial","YTJ1001");
+////        SPUtil.put(mContext,"hosiptalNo", "A0005");
+////        SPUtil.put(mContext, "mchntId", "330160400279");
+////
+////        SPUtil.put(mContext, "posId","1001");
 //
-//        SPUtil.put(mContext, "posId","1001");
+////        CanRequestOnlineConsultRequestEntity checkActivationStateReferenceEntity = new CanRequestOnlineConsultRequestEntity();
+////        checkActivationStateReferenceEntity.setAppKey(appKey);
+////        checkActivationStateReferenceEntity.setDoctorId(doctorId);
+////        checkActivationStateReferenceEntity.setTid(tid);
+//        Map<String,String> bizContent = new HashMap<>();
+//        bizContent.put("appClientType",appClientType);
+//        RequestBody body = BodyCreate(bizContent,"requestConsultAndCdrOtherdoc");
+//        return FastTransformer.switchSchedulers(getApiService().presettlement(body).retryWhen(new FastRetryWhen()));
+//    }
 
-//        CanRequestOnlineConsultRequestEntity checkActivationStateReferenceEntity = new CanRequestOnlineConsultRequestEntity();
-//        checkActivationStateReferenceEntity.setAppKey(appKey);
-//        checkActivationStateReferenceEntity.setDoctorId(doctorId);
-//        checkActivationStateReferenceEntity.setTid(tid);
-        Map<String,String> bizContent = new HashMap<>();
-        bizContent.put("appClientType",appClientType);
-        RequestBody body = BodyCreate(bizContent,"requestConsultAndCdrOtherdoc");
-        return FastTransformer.switchSchedulers(getApiService().presettlement(body).retryWhen(new FastRetryWhen()));
-    }
-
-    /**
-     * 发起复诊接口
-     */
-    public Observable<RequestConsultAndCdrOtherdocResultEntity> paySuccess(String appKey, String tid, String appClientType, Context mContext) {
-//        idCard = "33052219861229693X";
-//        SPUtil.put(mContext, "termial","YTJ1001");
-//        SPUtil.put(mContext,"hosiptalNo", "A0005");
-//        SPUtil.put(mContext, "mchntId", "330160400279");
+//    /**
+//     * 发起复诊接口
+//     */
+//    public Observable<RequestConsultAndCdrOtherdocResultEntity> paySuccess(String appKey, String tid, String appClientType, Context mContext) {
+////        idCard = "33052219861229693X";
+////        SPUtil.put(mContext, "termial","YTJ1001");
+////        SPUtil.put(mContext,"hosiptalNo", "A0005");
+////        SPUtil.put(mContext, "mchntId", "330160400279");
+////
+////        SPUtil.put(mContext, "posId","1001");
 //
-//        SPUtil.put(mContext, "posId","1001");
-
-//        CanRequestOnlineConsultRequestEntity checkActivationStateReferenceEntity = new CanRequestOnlineConsultRequestEntity();
-//        checkActivationStateReferenceEntity.setAppKey(appKey);
-//        checkActivationStateReferenceEntity.setDoctorId(doctorId);
-//        checkActivationStateReferenceEntity.setTid(tid);
-        Map<String,String> bizContent = new HashMap<>();
-        bizContent.put("appClientType",appClientType);
-        RequestBody body = BodyCreate(bizContent,"requestConsultAndCdrOtherdoc");
-        return FastTransformer.switchSchedulers(getApiService().paySuccess(body).retryWhen(new FastRetryWhen()));
-    }
+////        CanRequestOnlineConsultRequestEntity checkActivationStateReferenceEntity = new CanRequestOnlineConsultRequestEntity();
+////        checkActivationStateReferenceEntity.setAppKey(appKey);
+////        checkActivationStateReferenceEntity.setDoctorId(doctorId);
+////        checkActivationStateReferenceEntity.setTid(tid);
+//        Map<String,String> bizContent = new HashMap<>();
+//        bizContent.put("appClientType",appClientType);
+//        RequestBody body = BodyCreate(bizContent,"requestConsultAndCdrOtherdoc");
+//        return FastTransformer.switchSchedulers(getApiService().paySuccess(body).retryWhen(new FastRetryWhen()));
+//    }
 
     /**
      * 获取第三方配置信息
@@ -612,9 +579,7 @@ public class ApiRepository extends BaseRepository {
         bizContent.put("requestMode","4");//复诊类型,固定为4
         bizContent.put("tabStatus","ongoing");//状态标志位,ongoing进行中tab，isover已完成tab
         bizContent.put("recipeIndex","0");//处方分页起始位置
-        bizContent.put("index","0");//处方分页起始位置
-        bizContent.put("recipeLimit","10");//处方每页查询量(最大不超过20)
-        bizContent.put("limit","10");//处方每页查询量(最大不超过20)
+        bizContent.put("recipeLimit","20");//处方每页查询量(最大不超过20)
         // 请求的类型
         RequestBody body = BodyCreate(bizContent,"",false);
         return FastTransformer.switchSchedulers(getApiService().getConsultsAndRecipes(body).retryWhen(new FastRetryWhen()));
@@ -753,13 +718,15 @@ public class ApiRepository extends BaseRepository {
      * 获取支付的二维码和详细数据
      * 从3.11节获取的订单id
      * 轮询处方单详情，读取payFlag字段，如果为1表示已经支付成功。
+     * @param busId 交易订单，如果是复诊单，则是复诊单id
+     * @param busType 类型只有2种 处方:recipe,复诊：onlinerecipe
      */
-    public Observable<PayOrderEntity> payOrder(String busId) {
+    public Observable<PayOrderEntity> payOrder(String busId,String busType) {
         // 除了公共的数据之外，还有其他的数据请求
         Map<String,Object> bizContent = new HashMap<>();
         bizContent.put("payWay", "32");//32 支付宝
         bizContent.put("busId", busId);//业务订单id 从3.11节获取的订单id
-        bizContent.put("busType", "recipe");//处方:recipe,复诊：revisit
+        bizContent.put("busType", busType);//处方:recipe,复诊：onlinerecipe
 
         // 请求的类型
         RequestBody body = BodyCreate(bizContent,"order");
@@ -788,7 +755,7 @@ public class ApiRepository extends BaseRepository {
         Map<String,Object> bizContent = new HashMap<>();
         bizContent.put("tabStatus", "ongoing");//状态标志位
         bizContent.put("index", "0");//分页起始位置
-        bizContent.put("limit", "10");//每页查询量
+        bizContent.put("limit", "20");//每页查询量
 
         // 请求的类型
         RequestBody body = BodyCreate(bizContent,"findRecipesForPatientAndTabStatus");
@@ -815,7 +782,7 @@ public class ApiRepository extends BaseRepository {
      * 获取病人详细数据 根据 TID
      * 唯一获得 mpiId 的地方
      */
-    public Observable<PatientListEntity> getPatientList(String recipeId) {
+    public Observable<PatientListEntity> getPatientList() {
         // 除了公共的数据之外，还有其他的数据请求
         Map<String,Object> bizContent = new HashMap<>();
 

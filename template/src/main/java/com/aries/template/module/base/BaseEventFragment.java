@@ -173,6 +173,6 @@ public abstract class BaseEventFragment extends BaseTimerFragment{
      * 不论是按到返回还是回到首页
      * 只要按到这里两个按钮，就触发
      */
-    protected void onDismiss(){
+    public void onDismiss(){
     }
 }

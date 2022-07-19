@@ -423,20 +423,17 @@
                     android:gravity="center"
                     android:layout_marginLeft="120dp"
                     android:visibility="visible"
-
                     android:orientation="vertical"
                     >
 
                     <TextView
+                        android:id="@+id/jtjk_pay_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="#333333"
-
-
-                        android:layout_marginBottom="10dp"
+                        android:layout_marginTop="16dp"
                         android:textSize="22dp"
                         android:gravity="left"
-
                         android:text="支付宝·扫一扫" />
 
 
@@ -452,8 +449,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="@drawable/bg_pay_w_yzs"
-                        android:minWidth="200dp"
-                        android:minHeight="200dp"
+                        android:layout_marginTop="10dp"
+                        android:minWidth="180dp"
+                        android:minHeight="180dp"
                         android:scaleType="fitXY" />
 
                 </LinearLayout>

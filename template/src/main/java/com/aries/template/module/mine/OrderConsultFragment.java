@@ -1,6 +1,7 @@
 package com.aries.template.module.mine;
 
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -13,8 +14,10 @@ import com.aries.library.fast.retrofit.FastLoadingObserver;
 import com.aries.library.fast.util.SPUtil;
 import com.aries.library.fast.util.ToastUtil;
 import com.aries.template.FakeDataExample;
+import com.aries.template.GlobalConfig;
 import com.aries.template.R;
 import com.aries.template.entity.CancelregisterResultEntity;
+import com.aries.template.entity.GetConsultAndPatientAndDoctorByIdEntity;
 import com.aries.template.entity.GetConsultsAndRecipesResultEntity;
 import com.aries.template.module.base.BaseEventFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
@@ -37,7 +40,10 @@ import butterknife.OnClick;
  */
 public class OrderConsultFragment extends BaseEventFragment {
     private GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Consults obj;
-    private Integer consultId ;
+    private String consultId ;
+    private String patientName ;
+    private String doctorId ;
+    private String doctorName;
 
     @BindView(R.id.tv_name)
     TextView tv_name;
@@ -84,6 +90,7 @@ public class OrderConsultFragment extends BaseEventFragment {
     @BindView(R.id.rv_contentFastLib)
     RecyclerView rv_contentFastLib;
 
+
     @Override
     public int getContentLayout() {
         return R.layout.fragment_order;
@@ -128,18 +135,45 @@ public class OrderConsultFragment extends BaseEventFragment {
         ll_order_text_r.setVisibility(View.VISIBLE);
         ll_order_r.setVisibility(View.VISIBLE);
         ll_prescription.setVisibility(View.GONE);
+        btn_cancel.setVisibility(View.VISIBLE);
 
         tv_tip_message.setText("您已有挂号记录，是否发起问诊");
         btn_cancel.setText("取消挂号");
         btn_inquiry.setText("去问诊");
 
-        tv_name.setText(obj.getConsults().getMpiName()+ SPUtil.get(mContext,"sex",""));
-        tv_card.setText(SPUtil.get(mContext,"smkCard","")+"");
-        tv_age.setText(SPUtil.get(mContext,"age","")+"");
+        String sex = GlobalConfig.ssCard.getSex().equals("0")?"女":"男";
+        tv_name.setText(obj.getConsults().getMpiName()+"("+sex+")");
+        tv_card.setText(GlobalConfig.ssCard.getCardNum());
+        tv_age.setText(String.valueOf(GlobalConfig.age));
         tv_doc.setText(obj.getConsults().getConsultDoctorText());
         tv_dept_r.setText(obj.getConsults().getConsultDepartText());
         tv_date_r.setText(obj.getConsults().getRequestTime());
-        consultId = obj.getConsults().getConsultId();
+        consultId = String.valueOf(obj.getConsults().getConsultId());
+
+        requestPaySuccess();
+    }
+
+    /**
+     * 获取复诊单详情
+     */
+    private void requestPaySuccess() {
+        ApiRepository.getInstance().getConsultAndPatientAndDoctorById(consultId)
+                .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
+                .subscribe(new FastLoadingObserver<GetConsultAndPatientAndDoctorByIdEntity>("请等待") {
+                    @Override
+                    public void _onNext(GetConsultAndPatientAndDoctorByIdEntity entity) {
+                        if (entity == null) {
+                            ToastUtil.show("请检查网络");
+                            return;
+                        }
+                        // 检查 payFlag 如果是 1 就是支付成功
+                        if (entity.isSuccess()){
+                            patientName = GlobalConfig.ssCard.getName();
+                            doctorId=String.valueOf(entity.getData().getJsonResponseBean().getBody().getDoctor().getDoctorId());
+                            doctorName=String.valueOf(entity.getData().getJsonResponseBean().getBody().getDoctor().getName());
+                        }
+                    }
+                });
     }
 
     @SingleClick
@@ -150,9 +184,13 @@ public class OrderConsultFragment extends BaseEventFragment {
                 showSimpleConfirmDialog("consults");
                 break;
             case R.id.btn_inquiry:
-                //跳视频问诊
-                // todo 动态输入参数
-                start(VideoConsultFragment.newInstance(FakeDataExample.consultId,FakeDataExample.nickname,FakeDataExample.doctorUserId));
+                // 跳视频问诊
+                // 动态输入参数
+                if (!TextUtils.isEmpty(patientName))
+                    start(VideoConsultFragment.newInstance(consultId,
+                            patientName,
+                            doctorId,
+                            doctorName));
                 break;
             default:
                 break;
@@ -168,27 +206,14 @@ public class OrderConsultFragment extends BaseEventFragment {
             dialog.tv_title_tip.setText("取消挂号订单");
             dialog.tv_content_tip.setText("取消后问诊需重新挂号，是否确认取消");
         }
-        dialog.btn_inquiry.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.dismiss();
-                if (opflag.contains("consults")){
-                    requestCancelConsult(String.valueOf(consultId));
-                }
+        dialog.btn_inquiry.setOnClickListener(v -> {
+            dialog.dismiss();
+            if (opflag.contains("consults")){
+                requestCancelConsult(String.valueOf(consultId));
             }
         });
-        dialog.btn_cancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.dismiss();
-            }
-        });
-        dialog.iv_close.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.dismiss();
-            }
-        });
+        dialog.btn_cancel.setOnClickListener(v -> dialog.dismiss());
+        dialog.iv_close.setOnClickListener(v -> dialog.dismiss());
         dialog.show();
     }
 
@@ -208,7 +233,10 @@ public class OrderConsultFragment extends BaseEventFragment {
                         }
                         if (entity.isSuccess()){
                             if (entity.getData().isSuccess()){
-                                start(ResultFragment.newInstance("cancelConsult"));
+                                if (entity.data.jsonResponseBean.body)
+                                    start(ResultFragment.newInstance("cancelConsult"));
+                                else
+                                    ToastUtil.show("取消失败，请重试");
                             }
                         }
                     }

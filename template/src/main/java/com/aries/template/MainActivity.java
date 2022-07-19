@@ -29,6 +29,7 @@ import com.aries.template.module.mine.PutRecordFragment;
 import com.aries.template.module.mine.VideoConsultFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.template.utils.ActivityUtils;
+import com.aries.template.utils.DateUtils;
 import com.aries.ui.view.tab.CommonTabLayout;
 import com.decard.NDKMethod.BasicOper;
 import com.decard.NDKMethod.EGovernment;
@@ -123,6 +124,7 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
             return true;
         }else if (getTopFragment() instanceof BaseEventFragment){
             ((BaseEventFragment) getTopFragment()).pop();
+            ((BaseEventFragment) getTopFragment()).onDismiss();
             return true;
         }
        return super.onKeyDown(keyCode, event);
@@ -292,15 +294,16 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
      * @param birthday 生日
      */
     public static int getAge(long birthday) {
-        Calendar currentCalendar = Calendar.getInstance();//实例化calendar
-        currentCalendar.setTimeInMillis(System.currentTimeMillis());//调用setTimeInMillis方法和System.currentTimeMillis()获取当前时间
-        Calendar targetCalendar = Calendar.getInstance();
-        targetCalendar.setTimeInMillis(birthday);//这个解析传进来的时间戳
-        if (currentCalendar.get(Calendar.MONTH) >= targetCalendar.get(Calendar.MONTH)) {//如果现在的月份大于生日的月份
-            return currentCalendar.get(Calendar.YEAR) - targetCalendar.get(Calendar.YEAR);//那就直接减,因为现在的年月都大于生日的年月
-        } else {
-            return currentCalendar.get(Calendar.YEAR) - targetCalendar.get(Calendar.YEAR) - 1;//否则,减掉一年
-        }
+        return DateUtils.getAge(String.valueOf(birthday));
+//        Calendar currentCalendar = Calendar.getInstance();//实例化calendar
+//        currentCalendar.setTimeInMillis(System.currentTimeMillis());//调用setTimeInMillis方法和System.currentTimeMillis()获取当前时间
+//        Calendar targetCalendar = Calendar.getInstance();
+//        targetCalendar.setTimeInMillis(birthday);//这个解析传进来的时间戳
+//        if (currentCalendar.get(Calendar.MONTH) >= targetCalendar.get(Calendar.MONTH)) {//如果现在的月份大于生日的月份
+//            return currentCalendar.get(Calendar.YEAR) - targetCalendar.get(Calendar.YEAR);//那就直接减,因为现在的年月都大于生日的年月
+//        } else {
+//            return currentCalendar.get(Calendar.YEAR) - targetCalendar.get(Calendar.YEAR) - 1;//否则,减掉一年
+//        }
     }
 
     /**
@@ -355,6 +358,7 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                                             startActivity(intent);
                                         }else {
                                             //判断是否有挂号或处方，如果没有，跳转一级部门选择。
+//                                            start(DepartmentFragment.newInstance());//todo cc
                                             requestConsultsAndRecipes();
                                         }
                                     }else {
@@ -405,12 +409,12 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                             boolean isDepartTag = true;
                             // 挂号单和处方单不会同时出现，如果同时出现，则需要调整逻辑
                             // 查看挂号是否多余1条
-
                             if(entity.getData().getConsults().size()>0){
                                 for (GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Consults item : entity.getData().getConsults()) {
                                     int status = item.getConsults().getStatus();
                                    if ( item.getConsults().getPayflag()==1 &&
-                                           (status==1 || status ==2 || status == 3)){
+                                           (status==1 || status ==2 || status == 3 || status == 4)){
+                                       //status=4 问诊中
                                        isDepartTag = false;
                                        // 挂号
                                       start(OrderConsultFragment.newInstance(item));

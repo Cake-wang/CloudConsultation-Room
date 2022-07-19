@@ -62,6 +62,9 @@ public class ShineButtonDialog extends CustomMaterialDialog {
         tv_title_tip = findViewById(R.id.tv_title_tip);
         tv_content_tip = findViewById(R.id.tv_content_tip);
 
+        //设置 对话的宽高
+        this.getDialog().getWindow().setLayout(450,240);
+
 
         //修复在对话框中的显示问题
 //        shineButton.fitDialog(mDialog);
