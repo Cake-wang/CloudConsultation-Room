@@ -9,7 +9,7 @@ package com.aries.template.xiaoyu.model;
  * @author bejson.com (i@bejson.com)
  * @website http://www.bejson.com/java2pojo/
  */
-public class RtcStartInvokeEndPoint {
+public class EndPoint {
 
     private String patientUserId;
     private String doctorUserId;

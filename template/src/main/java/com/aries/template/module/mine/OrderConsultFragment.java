@@ -33,6 +33,9 @@ import butterknife.OnClick;
 
 /******
  * 已挂号界面
+ *
+ * 挂号费费用已经结清，但是没有完成视频问诊
+ *
  * 前置必须有一个请求挂号单信息请求查询，然后把结果输入进来，如果请求成功则跳入该接口
  * @author  ::: louis luo
  * Date ::: 2022/6/16 3:45 PM
@@ -169,7 +172,7 @@ public class OrderConsultFragment extends BaseEventFragment {
                         // 检查 payFlag 如果是 1 就是支付成功
                         if (entity.isSuccess()){
                             patientName = GlobalConfig.ssCard.getName();
-                            doctorId=String.valueOf(entity.getData().getJsonResponseBean().getBody().getDoctor().getDoctorId());
+                            doctorId=String.valueOf(entity.getData().getJsonResponseBean().getBody().getDoctor().getLoginId());
                             doctorName=String.valueOf(entity.getData().getJsonResponseBean().getBody().getDoctor().getName());
                         }
                     }

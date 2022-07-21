@@ -38,6 +38,9 @@ import butterknife.BindView;
  * 未支付处方单列表
  * 用于显示未支付处方单
  * 每一次显示2个处方单
+ *
+ * 视频问诊已经完成，但是没有完成处方单支付
+ *
  * 先处理处方单的列表，然后进入处方单详细页处理未支付
  * @author louisluo
  */
@@ -61,7 +64,7 @@ public class OrderRecipesListFragment extends BaseEventFragment {
     Button btn_cancel;// 上一页按钮
     @BindView(R.id.btn_inquiry)
     Button btn_inquiry;// 下一页按钮
-    @BindView(R.id.jtjk_fz_fragment_rv)
+    @BindView(R.id.jtjk_recipe_fragment_rv)
     RecyclerView recyclerView;// 网格显示
     @BindView(R.id.jtjk_fz_fragment_title)
     TextView title;// 网格显示
@@ -71,9 +74,9 @@ public class OrderRecipesListFragment extends BaseEventFragment {
      * 获取数据
      * @param obj 传入的数据，注意这个对象必须实现序列化
      */
-    public static OrderRecipesFragment newInstance(ArrayList<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes> obj) {
+    public static OrderRecipesListFragment newInstance(ArrayList<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes> obj) {
         Bundle args = new Bundle();
-        OrderRecipesFragment fragment = new OrderRecipesFragment();
+        OrderRecipesListFragment fragment = new OrderRecipesListFragment();
         args.putSerializable("obj", obj);
         fragment.setArguments(args);
         return fragment;
@@ -145,9 +148,6 @@ public class OrderRecipesListFragment extends BaseEventFragment {
                 }
             }
         });
-        upDownProxy.setParamMaxNumber(2);
-        upDownProxy.setTotalDatas(obj);
-        upDownProxy.doStartReFlash();
     }
 
     /**
@@ -161,6 +161,10 @@ public class OrderRecipesListFragment extends BaseEventFragment {
         // 点击下一页
         btn_cancel.setOnClickListener(v -> {upDownProxy.doProReFlash();});
         title.setText("未支付的处方单");
+
+        upDownProxy.setParamMaxNumber(2);
+        upDownProxy.setTotalDatas(obj);
+        upDownProxy.doStartReFlash();
     }
 
 

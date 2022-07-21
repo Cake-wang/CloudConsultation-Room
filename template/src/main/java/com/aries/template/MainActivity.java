@@ -21,11 +21,10 @@ import com.aries.template.entity.GetConsultsAndRecipesResultEntity;
 import com.aries.template.module.base.BaseEventFragment;
 import com.aries.template.module.main.HomeFragment;
 import com.aries.template.module.mine.DepartmentFragment;
-import com.aries.template.module.mine.MineFragment;
+import com.aries.template.module.mine.MineCardFragment;
 import com.aries.template.module.mine.OrderConsultFragment;
-import com.aries.template.module.mine.OrderRecipesFragment;
 import com.aries.template.module.mine.OrderRecipesListFragment;
-import com.aries.template.module.mine.PutRecordFragment;
+import com.aries.template.module.mine.PhoneRegisterFragment;
 import com.aries.template.module.mine.VideoConsultFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.template.utils.ActivityUtils;
@@ -37,7 +36,6 @@ import com.decard.entitys.SSCard;
 import com.trello.rxlifecycle3.android.ActivityEvent;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -96,7 +94,7 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
     public List<FastTabEntity> getTabList() {
         mTabEntities = new ArrayList<>();
         mTabEntities.add(new FastTabEntity(R.string.home, R.drawable.ic_home_normal, R.drawable.ic_home_selected, HomeFragment.newInstance()));
-        mTabEntities.add(new FastTabEntity(R.string.mine, R.drawable.ic_mine_normal, R.drawable.ic_mine_selected, MineFragment.newInstance("")));
+        mTabEntities.add(new FastTabEntity(R.string.mine, R.drawable.ic_mine_normal, R.drawable.ic_mine_selected, MineCardFragment.newInstance("")));
         return mTabEntities;
     }
 
@@ -190,7 +188,7 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
 //            BasicOper.dc_exit();
 //            return;
 //        }
-        if (getTopFragment() instanceof MineFragment){
+        if (getTopFragment() instanceof MineCardFragment){
 //            //社保卡上电
             boolean bCardPowerOn = false;
             String result = null;
@@ -367,13 +365,13 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                                             isReadCardProcessing = false;
                                         }else {
                                             // 如果没有注册，跳转到手机注册页面
-                                            start(PutRecordFragment.newInstance( idCard, name, smkcard));
+                                            start(PhoneRegisterFragment.newInstance( idCard, name, smkcard));
                                         }
                                     }
                                 }else {
                                     ToastUtil.show(entity.getMessage());
                                     if (Objects.equals(entity.code, "2100"))// 如果没有注册，跳转到手机注册页面
-                                        start(PutRecordFragment.newInstance( idCard, name, smkcard));
+                                        start(PhoneRegisterFragment.newInstance( idCard, name, smkcard));
                                     isReadCardProcessing = false;
                                 }
                             }

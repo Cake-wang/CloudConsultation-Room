@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 
@@ -20,7 +19,6 @@ import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.template.utils.DefenceUtil;
 import com.aries.ui.view.title.TitleBarView;
 import com.trello.rxlifecycle3.android.FragmentEvent;
-import com.xuexiang.xaop.annotation.SingleClick;
 import com.xuexiang.xui.utils.CountDownButtonHelper;
 import com.xuexiang.xui.widget.button.roundbutton.RoundButton;
 import com.xuexiang.xui.widget.dialog.materialdialog.MaterialDialog;
@@ -42,7 +40,7 @@ import static com.aries.template.utils.RegUtils.isVerifyCode;
  * @Function: 我的
  * @Description:
  */
-public class PutRecordFragment extends BaseEventFragment implements ISupportFragment {
+public class PhoneRegisterFragment extends BaseEventFragment implements ISupportFragment {
     // 外部传入数据
     /** 身份证 */
     private  String idCard= "";
@@ -79,9 +77,9 @@ public class PutRecordFragment extends BaseEventFragment implements ISupportFrag
      * @param name 姓名
      * @param smkcard 市民卡
      */
-    public static PutRecordFragment newInstance(String idCard,String name,String smkcard) {
+    public static PhoneRegisterFragment newInstance(String idCard, String name, String smkcard) {
         Bundle args = new Bundle();
-        PutRecordFragment fragment = new PutRecordFragment();
+        PhoneRegisterFragment fragment = new PhoneRegisterFragment();
         args.putString("idCard",idCard);
         args.putString("name",name);
         args.putString("smkcard",smkcard);
@@ -311,7 +309,7 @@ public class PutRecordFragment extends BaseEventFragment implements ISupportFrag
                                     }else {
                                         //判断有挂号或处方
                                         // 返回读卡，重新返回 tid 数据
-                                        start(MineFragment.newInstance("fzpy"));
+                                        start(MineCardFragment.newInstance("fzpy"));
 //                                        start(DepartmentFragment.newInstance());
                                     }
                                 }else {

@@ -1,32 +1,36 @@
 package com.aries.template.module.main;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.aries.library.fast.retrofit.FastLoadingObserver;
 import com.aries.library.fast.util.SPUtil;
 import com.aries.library.fast.util.ToastUtil;
-import com.aries.template.FakeDataExample;
 import com.aries.template.GlobalConfig;
 import com.aries.template.MainActivity;
 import com.aries.template.R;
-import com.aries.template.entity.BatchCreateOrderEntity;
-import com.aries.template.entity.GetMedicalInfoEntity;
-import com.aries.template.entity.GetStockInfoEntity;
+import com.aries.template.entity.ConfigurationToThirdForPatientEntity;
 import com.aries.template.entity.MachineEntity;
-import com.aries.template.entity.PrescriptionPushEntity;
-import com.aries.template.entity.RoomIdInsAuthEntity;
 import com.aries.template.module.base.BaseEventFragment;
-import com.aries.template.module.mine.MineFragment;
-import com.aries.template.module.mine.PayCodeFragment;
-import com.aries.template.module.mine.VideoConsultFragment;
+import com.aries.template.module.mine.MineCardFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.template.xiaoyu.EaseModeProxy;
 import com.aries.ui.view.title.TitleBarView;
+import com.hyphenate.EMCallBack;
+import com.hyphenate.EMMessageListener;
+import com.hyphenate.chat.EMClient;
+import com.hyphenate.chat.EMMessage;
+import com.trello.rxlifecycle3.android.ActivityEvent;
 import com.trello.rxlifecycle3.android.FragmentEvent;
 
 import androidx.annotation.Nullable;
+
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Map;
+
 import butterknife.BindView;
 
 /**
@@ -72,7 +76,7 @@ public class HomeFragment extends BaseEventFragment{
         // 点击身体检查
         iv_stjc.setOnClickListener(v -> {
             SPUtil.put(mContext,"tag","stjc");
-            start(MineFragment.newInstance("stjc")); // 进入身体检查
+            start(MineCardFragment.newInstance("stjc")); // 进入身体检查
 //                start(DepartmentFragment.newInstance("stjc"));// todo cc
 //                start(PutRecordFragment.newInstance("idcard","name","smkcard"));// todo cc
 //                ((MainActivity) getActivity()).requestConsultsAndRecipes();//todo cc
@@ -87,7 +91,7 @@ public class HomeFragment extends BaseEventFragment{
         // 点击复诊
         iv_fzpy.setOnClickListener(v -> {
             SPUtil.put(mContext,"tag","fzpy");
-            start(MineFragment.newInstance("fzpy"));
+            start(MineCardFragment.newInstance("fzpy"));
         });
     }
 
@@ -96,6 +100,56 @@ public class HomeFragment extends BaseEventFragment{
         super.onCreate(savedInstanceState);
         // 启动时，需要立刻请求，机器相关的数据，并保存在全局
         requestMachineInfo();
+        // 启动环信视频
+        requestConfigurationToThirdForPatient();
+    }
+
+    /**
+     * 获取第三方配置信息
+     * 专门登录环信 专用
+     */
+    private void requestConfigurationToThirdForPatient(){
+        ApiRepository.getInstance().getConfigurationToThirdForPatient(GlobalConfig.NALI_TID,GlobalConfig.NALI_APPKEY)
+                .compose(((MainActivity) getActivity()).bindUntilEvent(ActivityEvent.DESTROY))
+                .subscribe(new FastLoadingObserver<ConfigurationToThirdForPatientEntity>("请稍后...") {
+                    @Override
+                    public void _onNext(ConfigurationToThirdForPatientEntity entity) {
+                        if (entity == null) {
+                            ToastUtil.show("请检查网络");
+                            return;
+                        }
+                        if (entity.getData().isSuccess()){
+                            loginEmClient(entity.getData().getJsonResponseBean().getBody().getUsername(),entity.getData().getJsonResponseBean().getBody().getUserpwd());
+                        }
+                    }
+                });
+    }
+
+    /**
+     * 专门登录环信
+     */
+    public void loginEmClient(String easemobUserName,String easemobPassword){
+        //登陆 https://docs-im.easemob.com/im/android/sdk/basic
+//        EMClient.getInstance().logout(true);
+        EMCallBack emcallback = new EMCallBack() {//回调
+            @Override
+            public void onSuccess() {
+                EMClient.getInstance().groupManager().loadAllGroups();
+                EMClient.getInstance().chatManager().loadAllConversations();
+                ToastUtil.show("环信登录成功");
+            }
+
+            @Override
+            public void onProgress(int progress, String status) {
+            }
+
+            @Override
+            public void onError(int code, String message) {
+            }
+        };
+        // 防止用户由于特殊原因登出，然后再进来的时候，被提示已经登录
+        EMClient.getInstance().logout(true);
+        EMClient.getInstance().login(easemobUserName, easemobPassword,emcallback );
     }
 
     /**

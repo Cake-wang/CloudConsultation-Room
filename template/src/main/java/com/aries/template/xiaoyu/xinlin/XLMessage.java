@@ -2,7 +2,7 @@ package com.aries.template.xiaoyu.xinlin;
 
 
 import com.ainemo.util.JsonUtil;
-import com.aries.template.xiaoyu.model.RtcStartInvokeEndPoint;
+import com.aries.template.xiaoyu.model.EndPoint;
 import com.aries.template.xiaoyu.model.RtcStartInvokeRequest;
 
 import java.util.HashMap;
@@ -118,7 +118,7 @@ public class XLMessage {
         //{"topic":"TX_RTC_START_INVOKE","endPoint":{"patientUserId":"62933bcbcf8912669abf4b98","doctorUserId":"5f339ceb9cd0500a923af577","patientName":"胡江","remark":"未知","orderId":815463559,"roomId":"910007727377","thirdAppVideoConsult":"xyLink","requestMode":"4"}}
         RtcStartInvokeRequest request = new RtcStartInvokeRequest();
         request.setTopic("TX_RTC_START_INVOKE");
-        RtcStartInvokeEndPoint endPoint = new RtcStartInvokeEndPoint();
+        EndPoint endPoint = new EndPoint();
         endPoint.setPatientUserId(xlPatientUserId);
         endPoint.setPatientName(xlPatientName);
         endPoint.setDoctorUserId(doctorUserId);

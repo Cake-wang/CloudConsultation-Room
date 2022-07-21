@@ -27,6 +27,7 @@ import com.aries.template.entity.GetConsultAndPatientAndDoctorByIdEntity;
 import com.aries.template.entity.GetConsultsAndRecipesResultEntity;
 import com.aries.template.entity.GetMedicalInfoEntity;
 import com.aries.template.entity.GetPatientRecipeByIdEntity;
+import com.aries.template.entity.GetRecipeListByConsultIdEntity;
 import com.aries.template.entity.GetStockInfoEntity;
 import com.aries.template.entity.IsRegisterRequestEntity;
 import com.aries.template.entity.IsRegisterResultEntity;
@@ -543,14 +544,14 @@ public class ApiRepository extends BaseRepository {
 
     /**
      * 确认处方单信息并结算
+     * 处方单支付永远支持 32 支付宝
      */
-    public Observable<CreateOrderResultEntity> createOrder(String recipeId, String payway, String decoctionFlag, String payMode) {
+    public Observable<CreateOrderResultEntity> createOrder(String recipeId) {
         Map<String,String> recipeOrder =new HashMap<>(); //病历数据
-        recipeOrder.put("payway",payway);//支付类型代码 微信：40 卫宁付：111
-        recipeOrder.put("decoctionFlag",decoctionFlag);//是否代煎 1：代煎，0：不代煎
+        recipeOrder.put("payway","32");//支付类型代码 支付宝 32，微信：40 卫宁付：111
+//        recipeOrder.put("decoctionFlag",decoctionFlag);//是否代煎 1：代煎，0：不代煎
 //        recipeOrder.put("gfFeeFlag",String.valueOf(0));//是否收取制作费 1：表示需要制作费，0：不需要
-
-        recipeOrder.put("payMode",payMode);//支付方式代码
+        recipeOrder.put("payMode","1");//支付方式代码
         recipeOrder.put("addressId","");
         recipeOrder.put("decoctionId","");
         recipeOrder.put("depId","");
@@ -600,8 +601,6 @@ public class ApiRepository extends BaseRepository {
 
     /**
      * 查询复诊单的小鱼视频会议室房间号和密码 v
-     *
-     * todo 好像返回的数据格式有问题，拿不到房间号和房间密码
      * @param orderId 复诊单ID
      * @param thirdParty 就是第三方的APP_KEY
      */
@@ -609,7 +608,7 @@ public class ApiRepository extends BaseRepository {
         Map<String, Object> bizContent = new HashMap<>();
         bizContent.put("orderId", orderId); //	复诊单ID
         bizContent.put("thirdParty", thirdParty); //	复诊单ID
-        bizContent.put("appType", "xylink"); //视频的SDK名字 固定xylink
+        bizContent.put("appType", "xyLink"); //视频的SDK名字 固定 xyLink
         bizContent.put("type", "add");//暂时小鱼SDK用不上 固定add
         // 请求的类型 findValidOrganProfessionForRevisit
         RequestBody body = BodyCreate(bizContent, "roomIdInsAuth");
@@ -791,6 +790,19 @@ public class ApiRepository extends BaseRepository {
         return FastTransformer.switchSchedulers(getApiService().getPatientList(body).retryWhen(new FastRetryWhen()));
     }
 
+    /**
+     * 获取处方列表
+     * 支付中，通过复诊单id来查询处方单id
+     */
+    public Observable<GetRecipeListByConsultIdEntity> getRecipeListByConsultId(String consultId) {
+        // 除了公共的数据之外，还有其他的数据请求
+        Map<String,Object> bizContent = new HashMap<>();
+        bizContent.put("consultId", consultId);//复诊单 ID
+
+        // 请求的类型
+        RequestBody body = BodyCreate(bizContent,"getRecipeListByConsultId");
+        return FastTransformer.switchSchedulers(getApiService().getRecipeListByConsultId(body).retryWhen(new FastRetryWhen()));
+    }
 
 
 }

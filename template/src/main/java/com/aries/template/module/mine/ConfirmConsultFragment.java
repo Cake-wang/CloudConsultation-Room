@@ -265,7 +265,7 @@ public class ConfirmConsultFragment extends BaseEventFragment implements Compoun
 //                                    String.valueOf(entity.data.jsonResponseBean.body.doctor.doctorId)));// todo cc
                             start(PayConsultFragment.newInstance(String.valueOf(entity.data.jsonResponseBean.body.consult.consultId),
                                     entity.data.jsonResponseBean.body.patient.patientName,
-                                    String.valueOf(entity.data.jsonResponseBean.body.doctor.doctorId),
+                                    String.valueOf(entity.data.jsonResponseBean.body.doctor.loginId),
                                     entity.data.jsonResponseBean.body.doctor.name));
                         }else{
                             // 如果不能复诊，则检查异常原因

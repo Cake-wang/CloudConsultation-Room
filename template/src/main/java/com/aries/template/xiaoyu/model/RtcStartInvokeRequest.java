@@ -12,7 +12,7 @@ package com.aries.template.xiaoyu.model;
 public class RtcStartInvokeRequest {
 
     private String topic;
-    private RtcStartInvokeEndPoint rtcStartInvokeEndPoint;
+    private EndPoint endPoint;
     public void setTopic(String topic) {
          this.topic = topic;
      }
@@ -20,11 +20,11 @@ public class RtcStartInvokeRequest {
          return topic;
      }
 
-    public void setEndPoint(RtcStartInvokeEndPoint rtcStartInvokeEndPoint) {
-         this.rtcStartInvokeEndPoint = rtcStartInvokeEndPoint;
+    public void setEndPoint(EndPoint endPoint) {
+         this.endPoint = endPoint;
      }
-     public RtcStartInvokeEndPoint getEndPoint() {
-         return rtcStartInvokeEndPoint;
+     public EndPoint getEndPoint() {
+         return endPoint;
      }
 
 }

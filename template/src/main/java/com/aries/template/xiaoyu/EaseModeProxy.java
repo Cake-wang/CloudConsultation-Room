@@ -27,18 +27,20 @@ import com.ainemo.sdk.otf.SimpleNemoSDkListener;
 import com.ainemo.sdk.otf.VideoConfig;
 import com.ainemo.sdk.otf.VideoInfo;
 import com.ainemo.util.JsonUtil;
-import com.aries.library.fast.retrofit.FastLoadingObserver;
+import com.aries.library.fast.retrofit.FastObserver;
 import com.aries.library.fast.util.ToastUtil;
 import com.aries.template.GlobalConfig;
+import com.aries.template.MainActivity;
 import com.aries.template.R;
 import com.aries.template.entity.RoomIdInsAuthEntity;
 import com.aries.template.retrofit.repository.ApiRepository;
+import com.aries.template.utils.DefenceUtil;
 import com.aries.template.xiaoyu.dapinsocket.SocThread;
 import com.aries.template.xiaoyu.meeting.MeetingVideoCell;
 import com.aries.template.xiaoyu.model.RegEndPoint;
 import com.aries.template.xiaoyu.model.RegReponse;
 import com.aries.template.xiaoyu.model.RegRequest;
-import com.aries.template.xiaoyu.model.RtcStartInvokeEndPoint;
+import com.aries.template.xiaoyu.model.EndPoint;
 import com.aries.template.xiaoyu.model.RtcStartInvokeRequest;
 import com.aries.template.xiaoyu.uvc.UVCCameraPresenter;
 import com.hyphenate.EMCallBack;
@@ -47,7 +49,7 @@ import com.hyphenate.chat.EMClient;
 import com.hyphenate.chat.EMMessage;
 import com.hyphenate.chat.EMOptions;
 import com.tbruyelle.rxpermissions2.RxPermissions;
-import com.trello.rxlifecycle3.android.FragmentEvent;
+import com.trello.rxlifecycle3.android.ActivityEvent;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -55,6 +57,7 @@ import java.lang.ref.WeakReference;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -103,7 +106,8 @@ public class EaseModeProxy {
 
     // 信令的配置
     private String xlPatientUserId = "627dd085cc2f202b1d2146f3"; //用户userId getConfigurationToThirdForPatient
-    private final String XL_URL = "ws://172.21.1.95:9090/";
+//    private final String XL_URL = "ws://172.21.1.95:9090/";
+    private final String XL_URL = "wss://app-DEV.ngarihealth.com/";
 
     //------------小鱼的配置
     private static final String xyAppId = "5886885697deb9f4760b3a5e1ab912b9a3b7dfd3"; //小鱼appid 固定
@@ -118,6 +122,22 @@ public class EaseModeProxy {
     private static volatile EaseModeProxy sInstance;
     // 环信 callback
     private EMCallBack emcallback;
+    // 是否已经进入启动视频问诊
+    private boolean isEasemodStarted = false;
+    // 是否监听到了医生发送了消息
+    private boolean isDoctorMessaged = false;
+
+    // 环信监听会执行这个方法，当他在视频外被执行时isEasemodStarted为false，无法打开socket但是会更改参数
+    public void setDoctorMessaged(boolean doctorMessaged) {
+        if (isEasemodStarted) {
+            try {
+                createWebSocketClient();
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
+            }
+        }
+        isDoctorMessaged = doctorMessaged;
+    }
 
     private EaseModeProxy() {
     }
@@ -155,6 +175,10 @@ public class EaseModeProxy {
         //在做打包混淆时，关闭debug模式，避免消耗不必要的资源
         EMClient.getInstance().setDebugMode(true);
 
+        // 用于 EMClient 登录初始化
+        EMClient.getInstance().groupManager().loadAllGroups();
+        EMClient.getInstance().chatManager().loadAllConversations();
+
         //如果没有，则继续初始化
         Settings settings = new Settings(xyAppId);
         settings.setPrivateCloudAddress("cloud.xylink.com");
@@ -165,7 +189,7 @@ public class EaseModeProxy {
         NemoSDK.getInstance().init(context, settings, new NemoSDKInitCallBack() {
             @Override
             public void nemoSdkInitSuccess() {
-                ToastWithLogin("初始化成功，开始登陆");
+//                ToastWithLogin("初始化成功，开始登陆");
             }
 
             @Override
@@ -211,8 +235,126 @@ public class EaseModeProxy {
         }
     }
 
+
+//    /**
+//     * 获取第三方配置信息
+//     */
+//    private void requestConfigurationToThirdForPatient(String inputconsultId,String inputnickname,String inputdoctorUserId){
+//        ApiRepository.getInstance().getConfigurationToThirdForPatient(GlobalConfig.NALI_TID,GlobalConfig.NALI_APPKEY)
+//                .compose(((MainActivity) activity.get()).bindUntilEvent(ActivityEvent.DESTROY))
+//                .subscribe(new FastLoadingObserver<ConfigurationToThirdForPatientEntity>("请稍后...") {
+//                    @Override
+//                    public void _onNext(ConfigurationToThirdForPatientEntity entity) {
+//                        if (entity == null) {
+//                            ToastUtil.show("请检查网络");
+//                            return;
+//                        }
+//                        if (entity.getData().isSuccess()){
+//                            consultId = inputconsultId;
+//                            nickname = nickname;
+//                            doctorUserId = doctorUserId;
+//                            easemobUserName = userName;
+//                            easemobPassword = password;
+//                            this.xlPatientUserId = xlPatientUserId;
+//                            EaseModeProxy.with().easemobStart(activity.get(),
+//                                    consultId,
+//                                    nickname,
+//                                    doctorUserId,
+//                                    entity.getData().getJsonResponseBean().getBody().getUsername(),
+//                                    entity.getData().getJsonResponseBean().getBody().getUserpwd(),
+//                                    entity.getData().getJsonResponseBean().getBody().getUserId());
+//                        }
+//                    }
+//                });
+//    }
+
     /**
-     * 环信登录
+     * 专门登录环信
+     */
+    public void loginEmClient(){
+        //注册监听消息的回调地址 参看：https://docs-im.easemob.com/im/android/basics/message#%E6%8E%A5%E6%94%B6%E6%B6%88%E6%81%AF
+        EMClient.getInstance().chatManager().addMessageListener(new EMMessageListener() {
+            @Override
+            public void onMessageReceived(List<EMMessage> messages) {
+                activity.get().runOnUiThread(() -> {
+                    //接收消息
+                    for (EMMessage message : messages) {
+                        Log.d("main", "onMessageReceived " + message.toString());
+                        Map<String, Object> ext = message.ext();
+                        if (ext == null) {
+                            continue;
+                        }
+                        Object msgTypeObj = ext.get("msgType");
+                        if (msgTypeObj == null) {
+                            continue;
+                        }
+                        String msgType = (String) msgTypeObj;
+                        if (msgType == null || !msgType.equals("26")) {
+                            continue;
+                        }
+                        // 信令请求 socket 没有心跳，返回医生请求状态
+//                        setDoctorMessaged(true);
+                        //todo 提示患者，医生挂断视频
+                        try {
+                            createWebSocketClient();
+                        } catch (URISyntaxException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void onCmdMessageReceived(List<EMMessage> messages) {
+            }
+
+            @Override
+            public void onMessageRead(List<EMMessage> messages) {
+            }
+
+            @Override
+            public void onMessageDelivered(List<EMMessage> messages) {
+            }
+
+            @Override
+            public void onMessageRecalled(List<EMMessage> messages) {
+            }
+        });
+
+        //登陆 https://docs-im.easemob.com/im/android/sdk/basic
+//        EMClient.getInstance().logout(true);
+//        emcallback = new EMCallBack() {//回调
+//            @Override
+//            public void onSuccess() {
+//                EMClient.getInstance().groupManager().loadAllGroups();
+//                EMClient.getInstance().chatManager().loadAllConversations();
+//                ToastWithLogin("登录环信聊天服务器成功");
+//            }
+//
+//            @Override
+//            public void onProgress(int progress, String status) {
+//            }
+//
+//            @Override
+//            public void onError(int code, String message) {
+//                ToastWithLogin("登录环信聊天服务器失败, message:" + message);
+//            }
+//        };
+//        // 防止用户由于特殊原因登出，然后再进来的时候，被提示已经登录
+//        EMClient.getInstance().logout(true);
+//        EMClient.getInstance().login(easemobUserName, easemobPassword,emcallback );
+    }
+
+    /**
+     * 启动视频问诊
+     */
+    public void start(String consultId,String nickname,String doctorUserId){
+        // 获取第三方信息
+//        requestConfigurationToThirdForPatient(consultId, nickname, doctorUserId);
+    }
+
+    /**
+     * 启动视频问诊
      * 如果不初始化，会导致 MeetingVideoCell 崩溃
      * 医生端有消息返回后，才会调用onMessageReceived 否则视作医生无响应。
      * @param consultId 复诊单id
@@ -241,76 +383,17 @@ public class EaseModeProxy {
 
         // 添加 Activity 弱引用
         setActivity(inputAc);
-        //注册监听消息的回调地址 参看：https://docs-im.easemob.com/im/android/basics/message#%E6%8E%A5%E6%94%B6%E6%B6%88%E6%81%AF
-        EMClient.getInstance().chatManager().addMessageListener(new EMMessageListener() {
-            @Override
-            public void onMessageReceived(List<EMMessage> messages) {
-                activity.get().runOnUiThread(() -> {
-                    //接收消息
-                    for (EMMessage message : messages) {
-                        Log.d("main", "onMessageReceived " + message.toString());
-                        Map<String, Object> ext = message.ext();
-                        if (ext == null) {
-                            continue;
-                        }
-                        Object msgTypeObj = ext.get("msgType");
-                        if (msgTypeObj == null) {
-                            continue;
-                        }
-                        String msgType = (String) msgTypeObj;
-                        if (msgType == null || !msgType.equals("26")) {
-                            continue;
-                        }
-                        // 信令请求 socket 没有心跳，返回医生请求状态
-                        try {
-                            createWebSocketClient();
-                        } catch (URISyntaxException e) {
-                            e.printStackTrace();
-                        }
-                        //todo 提示患者，医生挂断视频
-                    }
-                });
-            }
+        isEasemodStarted = true;
 
-            @Override
-            public void onCmdMessageReceived(List<EMMessage> messages) {
-            }
+        loginEmClient();
 
-            @Override
-            public void onMessageRead(List<EMMessage> messages) {
-            }
-
-            @Override
-            public void onMessageDelivered(List<EMMessage> messages) {
-            }
-
-            @Override
-            public void onMessageRecalled(List<EMMessage> messages) {
-            }
-        });
-
-        //登陆 https://docs-im.easemob.com/im/android/sdk/basic
-//        EMClient.getInstance().logout(true);
-        emcallback = new EMCallBack() {//回调
-            @Override
-            public void onSuccess() {
-                EMClient.getInstance().groupManager().loadAllGroups();
-                EMClient.getInstance().chatManager().loadAllConversations();
-                ToastWithLogin("登录环信聊天服务器成功");
-            }
-
-            @Override
-            public void onProgress(int progress, String status) {
-            }
-
-            @Override
-            public void onError(int code, String message) {
-                ToastWithLogin("登录环信聊天服务器失败, message:" + message);
-            }
-        };
-        // 防止用户由于特殊原因登出，然后再进来的时候，被提示已经登录
-        EMClient.getInstance().logout(true);
-        EMClient.getInstance().login(easemobUserName, easemobPassword,emcallback );
+//        if (isDoctorMessaged){
+//            try {
+//                createWebSocketClient();
+//            } catch (URISyntaxException e) {
+//                e.printStackTrace();
+//            }
+//        }
     }
 
     /**
@@ -349,7 +432,7 @@ public class EaseModeProxy {
                     // todo：这里改成用json来解析
                     if (message.contains("REG_SUCCESS")) {
                         onRegSuccess(message);
-                    }else if (message.contains("SUBSCRIBE")){
+                    }else if (message.contains("TX_RTC_SHUTDOWN_RES")){
                         // 医生已经离开
                         // TX_RTC_SHUTDOWN_RES
                         ToastWithLogin("医生已经离开");
@@ -399,29 +482,6 @@ public class EaseModeProxy {
     }
 
     /**
-     * 查询复诊单的小鱼视频会议室房间号和密码
-     */
-    private void requestGetRoomIdInsAuth(String consultId){
-        ApiRepository.getInstance().getRoomIdInsAuth(consultId, GlobalConfig.NALI_APPKEY)
-                .subscribe(new FastLoadingObserver<RoomIdInsAuthEntity>("请稍后...") {
-                    @Override
-                    public void _onNext(RoomIdInsAuthEntity entity) {
-                        if (entity == null) {
-                            ToastUtil.show("请检查网络");
-                            return;
-                        }
-                        if (entity.getData().isSuccess()){
-                            if (entity.getData().getJsonResponseBean().getBody()!=null){
-                                meetingRoomNumber = entity.getData().getJsonResponseBean().getBody().getDetail().getMeetingNumber();
-                                meetingPassword = entity.getData().getJsonResponseBean().getBody().getDetail().getControlPassword();
-                                xyJoinMeeting(meetingRoomNumber, meetingPassword);
-                            }
-                        }
-                    }
-                });
-    }
-
-    /**
      * 小鱼登录启动初始化配置
      * todo 可能需要在这里请求房间号和密码
      */
@@ -442,7 +502,11 @@ public class EaseModeProxy {
 
         // 启动小鱼登录
         // 这个启动要在小鱼 NemoSDK.getInstance().init 执行之后
-        xyThirdPartyLogin(account, nickname);
+        // 反重复提交
+        if (DefenceUtil.checkReSubmit("EaseModeProxy.xyThirdPartyLogin")){
+            xyThirdPartyLogin(account, nickname);
+        }
+//        xyThirdPartyLogin(account, nickname);
     }
 
     /**
@@ -452,10 +516,11 @@ public class EaseModeProxy {
         if (activity==null)
             return;
         activity.get().runOnUiThread(() -> {
+//            NemoSDK.getInstance().logout();
             NemoSDK.getInstance().loginExternalAccount(nickname, account, new ConnectNemoCallback() {
                 @Override
                 public void onFailed(String s) {
-                    ToastWithLogin(s);
+                    ToastWithLogin("登录失败"+s);
                 }
 
                 @Override
@@ -470,6 +535,31 @@ public class EaseModeProxy {
                 }
             });}
         );
+    }
+
+    /**
+     * 查询复诊单的小鱼视频会议室房间号和密码
+     */
+    private void requestGetRoomIdInsAuth(String consultId){
+        ApiRepository.getInstance().getRoomIdInsAuth(consultId, GlobalConfig.NALI_APPKEY)
+                .compose(((MainActivity) activity.get()).bindUntilEvent(ActivityEvent.DESTROY))
+                .subscribe(new FastObserver<RoomIdInsAuthEntity>() {
+                    @Override
+                    public void _onNext(RoomIdInsAuthEntity entity) {
+                        if (entity == null) {
+                            ToastUtil.show("请检查网络");
+                            return;
+                        }
+                        if (entity.getData().isSuccess()){
+                            if (entity.getData().getJsonResponseBean().getBody()!=null){
+                                ToastWithLogin("获取房间信息成功");
+                                meetingRoomNumber = entity.getData().getJsonResponseBean().getBody().getDetail().getMeetingNumber();
+                                meetingPassword = entity.getData().getJsonResponseBean().getBody().getDetail().getControlPassword();
+                                xyJoinMeeting(meetingRoomNumber, meetingPassword);
+                            }
+                        }
+                    }
+                });
     }
 
     /**
@@ -647,14 +737,20 @@ public class EaseModeProxy {
      * 向Docotor的视频端发送用户信息。
      */
     private void sendNotifyDoctorVideoMsg() {
-        if (webSocketClient==null)
-            return;
+        if (webSocketClient==null) {
+            try {
+                createWebSocketClient();
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
+            }
+        }
+        ToastWithLogin("TX_RTC_START_INVOKE");
         //{"topic":"TX_RTC_START_INVOKE","endPoint":{"patientUserId":"62933bcbcf8912669abf4b98","doctorUserId":"5f339ceb9cd0500a923af577","patientName":"胡江","remark":"未知","orderId":815463559,"roomId":"910007727377","thirdAppVideoConsult":"xyLink","requestMode":"4"}}
         RtcStartInvokeRequest request = new RtcStartInvokeRequest();
         request.setTopic("TX_RTC_START_INVOKE");
-        RtcStartInvokeEndPoint endPoint = new RtcStartInvokeEndPoint();
+        EndPoint endPoint = new EndPoint();
         endPoint.setPatientUserId(xlPatientUserId);
-        endPoint.setPatientName("todo改掉名字");
+        endPoint.setPatientName(nickname.trim());
         endPoint.setDoctorUserId(doctorUserId);
         endPoint.setOrderId(consultId);
         endPoint.setRemark("未知");
@@ -664,6 +760,30 @@ public class EaseModeProxy {
 
         request.setEndPoint(endPoint);
         String cmd = JsonUtil.toJson(request);
+
+        webSocketClient.send(cmd);
+    }
+
+    private void sendNotifyPaintLiveMsg(){
+        if (webSocketClient==null) {
+            try {
+                createWebSocketClient();
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
+            }
+        }
+        Map<String, Object> endPoint = new HashMap<>();
+        endPoint.put("doctorUserId",doctorUserId);
+        endPoint.put("patientUserId",xlPatientUserId);
+        endPoint.put("role","patient");
+        endPoint.put("thirdAppVideoConsult","xyLink");
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("topic","TX_RTC_SHUTDOWN");
+        map.put("endPoint",endPoint);
+
+        String cmd = JsonUtil.toJson(endPoint);
+        webSocketClient.send(cmd);
     }
 
     /**
@@ -673,13 +793,19 @@ public class EaseModeProxy {
         // 病人离席
         // todo 向大屏幕socket传递离开信息
         // 释放视频资源
+        if (!NemoSDK.getInstance().inCalling()){
+            releaseProxy();
+        }
         NemoSDK.getInstance().hangup();// 挂断通话
+
     }
 
     /**
      * 释放资源
      */
     private void releaseProxy(){
+        // 告诉医生，你已经离开了
+        sendNotifyPaintLiveMsg();
         // 释放对象资源
         if (uvcCameraPresenter!=null){
             uvcCameraPresenter.onStop();
@@ -713,7 +839,7 @@ public class EaseModeProxy {
      * 打印并提示用户
      */
     private void ToastWithLogin(String msg){
-        if (activity!=null){
+        if (activity!=null && activity.get()!=null){
             Log.d("EaseModeProxy",msg);
             activity.get().runOnUiThread(() -> Toast.makeText(activity.get(), msg, Toast.LENGTH_SHORT).show());
         }

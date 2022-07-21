@@ -19,6 +19,7 @@ import com.aries.template.entity.GetConsultAndPatientAndDoctorByIdEntity;
 import com.aries.template.entity.GetConsultsAndRecipesResultEntity;
 import com.aries.template.entity.GetMedicalInfoEntity;
 import com.aries.template.entity.GetPatientRecipeByIdEntity;
+import com.aries.template.entity.GetRecipeListByConsultIdEntity;
 import com.aries.template.entity.GetStockInfoEntity;
 import com.aries.template.entity.IsRegisterResultEntity;
 import com.aries.template.entity.MachineEntity;
@@ -236,10 +237,19 @@ public interface ApiService {
     Observable<GetPatientRecipeByIdEntity> getPatientRecipeById(@Body RequestBody body);
 
     /**
-     * 处方单详细信息
-     * 可以被用来轮询是否已经支付
+     * 获取病人详细数据 根据 TID
+     * 唯一获得 mpiId 的地方
      */
     @Headers("Content-Type: application/json")
     @POST(ApiConstant.doBaseNgariRequest)
     Observable<PatientListEntity> getPatientList(@Body RequestBody body);
+
+
+    /**
+     * 获取处方列表
+     * 支付中，通过复诊单id来查询处方单id
+     */
+    @Headers("Content-Type: application/json")
+    @POST(ApiConstant.doBaseNgariRequest)
+    Observable<GetRecipeListByConsultIdEntity> getRecipeListByConsultId(@Body RequestBody body);
 }

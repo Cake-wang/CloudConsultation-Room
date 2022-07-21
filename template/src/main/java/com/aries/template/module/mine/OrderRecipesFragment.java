@@ -12,12 +12,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.aries.library.fast.retrofit.FastLoadingObserver;
 import com.aries.library.fast.util.SPUtil;
 import com.aries.library.fast.util.ToastUtil;
-import com.aries.template.FakeDataExample;
 import com.aries.template.GlobalConfig;
 import com.aries.template.R;
 import com.aries.template.entity.GetConsultsAndRecipesResultEntity;
 import com.aries.template.entity.GetStockInfoEntity;
-import com.aries.template.entity.PrescriptionPushEntity;
 import com.aries.template.module.base.BaseEventFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.template.utils.ActivityUtils;
@@ -29,9 +27,7 @@ import com.trello.rxlifecycle3.android.FragmentEvent;
 import com.xuexiang.xaop.annotation.SingleClick;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -138,10 +134,11 @@ public class OrderRecipesFragment extends BaseEventFragment {
         tv_tip_message.setText("您已有处方记录，是否需要支付");
         btn_cancel.setText("取消支付");
         btn_inquiry.setText("去支付");
-        tv_name.setText(SPUtil.get(mContext,"userName","")+""+SPUtil.get(mContext,"sex",""));
-        tv_card.setText(SPUtil.get(mContext,"smkCard","")+"");
-        tv_age_l.setText(SPUtil.get(mContext,"age","")+"");
-//            tv_dept.setText("");
+
+        String sex = GlobalConfig.ssCard.getSex().equals("0")?"女":"男";
+        tv_name.setText(GlobalConfig.ssCard.getName()+"("+sex+")");
+        tv_card.setText(GlobalConfig.ssCard.getCardNum());
+        tv_age.setText(String.valueOf(GlobalConfig.age));
         tv_result.setText(obj.organDiseaseName);
         tv_date.setText(obj.signDate+"");
 
@@ -246,8 +243,6 @@ public class OrderRecipesFragment extends BaseEventFragment {
                             return;
                         }
                         if (entity.isSuccess()){
-                            // 拉到数据了，有库存
-                            // 然后取支付页面请求支付，合并处方单
                             // 启动处方单推送接口
                             // 拉到数据了，有库存
                             // 然后取支付页面请求支付，合并处方单
@@ -258,7 +253,7 @@ public class OrderRecipesFragment extends BaseEventFragment {
                                 recipeCode.add(String.valueOf(item.organDrugCode));
                             }
                             //当处方单产生订单，并且订单有效时取的是订单的真实金额，其他时候取的处方的总金额保留两位小数
-                            start(PayCodeFragment.newInstance(String.valueOf(obj.recipeId),String.valueOf(obj.totalMoney),recipeids,recipeCode,obj));
+                            start(PayRecipeFragment.newInstance(String.valueOf(obj.recipeId),recipeids,recipeCode,obj));
                         }
                     }
                 });

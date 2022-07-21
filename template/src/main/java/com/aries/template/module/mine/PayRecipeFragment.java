@@ -10,11 +10,9 @@ import android.widget.TextView;
 
 import com.aries.library.fast.retrofit.FastLoadingObserver;
 import com.aries.library.fast.util.ToastUtil;
-import com.aries.template.FakeDataExample;
 import com.aries.template.GlobalConfig;
 import com.aries.template.R;
 import com.aries.template.entity.BatchCreateOrderEntity;
-import com.aries.template.entity.GetConsultAndPatientAndDoctorByIdEntity;
 import com.aries.template.entity.GetConsultsAndRecipesResultEntity;
 import com.aries.template.entity.GetPatientRecipeByIdEntity;
 import com.aries.template.entity.PayOrderEntity;
@@ -50,7 +48,7 @@ import io.reactivex.schedulers.Schedulers;
  * @E-Mail: AriesHoo@126.com
  * @Function: 我的
  */
-public class PayCodeFragment extends BaseEventFragment {
+public class PayRecipeFragment extends BaseEventFragment {
     /**
      * 输入显示对象
      */
@@ -61,9 +59,12 @@ public class PayCodeFragment extends BaseEventFragment {
 
     /** 从外部传入的数据  */
     private String recipeId;//处方单ID
-    private String recipeFee;//药品费 当处方单产生订单，并且订单有效时取的是订单的真实金额，其他时候取的处方的总金额保留两位小数
-    private ArrayList<String> recipeIds;//处方ID集合
-    private ArrayList<String> recipeCode;//HIS处方编码集合，可以从处方详情中获取
+    private String patientSex;//处方单ID
+    private String patientName;//处方单ID
+    private String organDiseaseName;//处方单ID
+    private String recipeFee="0.01";//药品费 当处方单产生订单，并且订单有效时取的是订单的真实金额，其他时候取的处方的总金额保留两位小数,总费用用接口获取
+    private ArrayList<String> recipes;//处方ID集合
+    private ArrayList<String> recipeCodes;//HIS处方编码集合，可以从处方详情中获取
 
     /** 传入处理处方单的数据 */
     private GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes obj;
@@ -86,18 +87,16 @@ public class PayCodeFragment extends BaseEventFragment {
     /**
      * 跳转科室，需要带的数据
      * @param recipeId 处方单ID
-     * @param recipeFee 总费用
-     * @param recipeIds 处方ID集合
-     * @param recipeCode 处方编号集合
+     * @param recipes 处方ID集合
+     * @param recipeCodes 处方编号集合
      * @param obj 处方单信息
      */
-    public static PayCodeFragment newInstance(String recipeId ,String recipeFee, ArrayList<String> recipeIds, ArrayList<String> recipeCode,GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes obj) {
-        PayCodeFragment fragment = new PayCodeFragment();
+    public static PayRecipeFragment newInstance(String recipeId, ArrayList<String> recipes, ArrayList<String> recipeCodes, GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes obj) {
+        PayRecipeFragment fragment = new PayRecipeFragment();
         Bundle args = new Bundle();
         args.putString("recipeId", recipeId);
-        args.putString("recipeFee", recipeFee);
-        args.putSerializable("recipeIds", recipeIds);
-        args.putSerializable("recipeCode", recipeCode);
+        args.putSerializable("recipes", recipes);
+        args.putSerializable("recipeCodes", recipeCodes);
         args.putSerializable("obj", obj);
         fragment.setArguments(args);
         return fragment;
@@ -115,9 +114,8 @@ public class PayCodeFragment extends BaseEventFragment {
         Bundle args = getArguments();
         if (args != null) {
             recipeId = args.getString("recipeId");
-            recipeFee = args.getString("recipeFee");
-            recipeIds = ((ArrayList<String>) args.getSerializable("recipeIds"));
-            recipeCode = ((ArrayList<String>) args.getSerializable("recipeCode"));
+            recipes = ((ArrayList<String>) args.getSerializable("recipes"));
+            recipeCodes = ((ArrayList<String>) args.getSerializable("recipeCodes"));
             obj = (GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes) args.getSerializable("obj");
         }
     }
@@ -140,7 +138,7 @@ public class PayCodeFragment extends BaseEventFragment {
 ////                        entity.data.requestId;
 //                    }
 //                });
-        requestBatchCreateOrder(recipeFee,recipeIds,recipeCode);
+        requestBatchCreateOrder(recipeFee, recipes, recipeCodes);
 //        requestPayOrder(String.valueOf(74521));
         timeLoop();
 
@@ -220,11 +218,11 @@ public class PayCodeFragment extends BaseEventFragment {
         ApiRepository.getInstance().prescriptionPush(clinicSn,
                         GlobalConfig.hospitalName,
                         GlobalConfig.ssCard.getSSNum(),
-                        obj.patientSex,
-                        obj.patientName,
-                        obj.organDiseaseName,
-                        String.valueOf(obj.recipeId),
-                        String.valueOf(obj.totalMoney),
+                        patientSex,
+                        patientName,
+                        organDiseaseName,
+                        recipeId,
+                        recipeFee,
                         drugs)
                 .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
                 .subscribe(new FastLoadingObserver<PrescriptionPushEntity>("请稍后...") {
@@ -341,5 +339,22 @@ public class PayCodeFragment extends BaseEventFragment {
             mDisposable.dispose();
             mDisposable = null;
         }
+    }
+
+    /**
+     * 将外部的药品数据转换成内部可以传送的数据
+     * 推送处方单专用
+     */
+    public class Drugs{
+        public String dosageUnit;
+        public String drugCommonName;
+        public String drugTradeName;
+        public String eachDosage;
+        public String itemDays;
+        public String price;
+        public String quantity;
+        public String quantityUnit;
+        public String sku;
+        public String spec;
     }
 }

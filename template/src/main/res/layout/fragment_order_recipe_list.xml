@@ -115,6 +115,18 @@
                 >
 
                 <Button
+                    android:id="@+id/btn_goto_dep"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="跳过"
+                    android:textColor="#999"
+                    android:gravity="center"
+                    android:layout_marginLeft="30dp"
+                    android:layout_marginRight="10dp"
+                    android:background="@drawable/btn_ago_yzs"
+                    />
+
+                <Button
                     android:id="@+id/btn_cancel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

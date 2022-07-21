@@ -4,13 +4,16 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.aries.library.fast.retrofit.FastLoadingObserver;
+import com.aries.library.fast.retrofit.FastObserver;
 import com.aries.library.fast.util.SPUtil;
 import com.aries.library.fast.util.ToastUtil;
 import com.aries.template.GlobalConfig;
@@ -19,6 +22,7 @@ import com.aries.template.entity.CancelregisterResultEntity;
 import com.aries.template.entity.ConfigurationToThirdForPatientEntity;
 import com.aries.template.entity.FindRecipesForPatientAndTabStatusEntity;
 import com.aries.template.entity.GetConsultsAndRecipesResultEntity;
+import com.aries.template.entity.GetRecipeListByConsultIdEntity;
 import com.aries.template.entity.RoomIdInsAuthEntity;
 import com.aries.template.module.base.BaseEventFragment;
 import com.aries.template.module.main.HomeFragment;
@@ -60,6 +64,7 @@ import me.yokeyword.fragmentation.SupportFragment;
 public class VideoConsultFragment extends BaseEventFragment {
 
     private String consultId; //复诊单id 复诊单拿
+    private String recipeId; //处方单id 轮训时拿到
     private String nickname; //复诊人姓名 复诊单拿
     private String doctorUserId; //医生userId 复诊单拿
     private String doctorName; //医生姓名 复诊单拿
@@ -71,6 +76,8 @@ public class VideoConsultFragment extends BaseEventFragment {
     private boolean doctorInRoomFlag=false;// 医生是否进入
 
     private boolean isRecipeCheckedFlag=false;// 医生开出的处方状态是不是1或者不是2，则不能支付。即不能结束问诊
+
+    private List<GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO> currentRecipes;
 
     /**
      * 输入显示对象
@@ -94,6 +101,8 @@ public class VideoConsultFragment extends BaseEventFragment {
     TextView btn_full_screen;// 全屏按钮
     @BindView(R.id.rv_video_tip)
     RecyclerView rv_video_tip;
+    @BindView(R.id.rv_video_wait)
+    LinearLayout rv_video_wait;
     @BindView(R.id.jtjk_video_doctorname)
     TextView jtjk_video_doctorname;
 
@@ -101,7 +110,7 @@ public class VideoConsultFragment extends BaseEventFragment {
      * 跳转科室，需要带的数据
      * @param consultId 复诊单id 复诊单拿
      * @param nickname 复诊人姓名 复诊单拿
-     * @param doctorUserId 医生userId 复诊单拿
+     * @param doctorUserId 医生userId 复诊单拿 是医生里面的loginID
      * @param doctorName 医生姓名
      */
     public static VideoConsultFragment newInstance(String consultId,String nickname, String  doctorUserId, String doctorName) {
@@ -204,6 +213,13 @@ public class VideoConsultFragment extends BaseEventFragment {
             if (doctorInRoomFlag){
                 // 结束问诊，如果有问诊单，则根据这个问诊单进入支付
                 // 在栈内的HomeFragment以SingleTask模式启动（即在其之上的Fragment会出栈）
+                if (isRecipeCheckedFlag){
+                    ToastUtil.show("处方正在被医生确认，请稍后再试");
+                } else{
+                    // 关闭，并释放所有资源
+                    EaseModeProxy.with().closeVideoProxy();
+                    start(ConfirmRecipesFragment.newInstance(recipeId,currentRecipes));
+                }
             }else{
                 // 取消复诊
                 requestPatientFinishGraphicTextConsult(consultId);
@@ -226,9 +242,8 @@ public class VideoConsultFragment extends BaseEventFragment {
                 .map((aLong -> aLong + 1))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(aLong -> requestFindRecipesForPatientAndTabStatus());//getUnreadCount()执行的任务
+                .subscribe(aLong -> requestGetRecipeListByConsultId());//getUnreadCount()执行的任务
     }
-
 
     /**
      * 患者取消复诊服务
@@ -283,60 +298,38 @@ public class VideoConsultFragment extends BaseEventFragment {
                 });
     }
 
-//    /**
-//     * 查询复诊单的小鱼视频会议室房间号和密码
-//     */
-//    private void requestGetRoomIdInsAuth(){
-//        ApiRepository.getInstance().getRoomIdInsAuth(consultId,GlobalConfig.NALI_APPKEY)
-//                .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
-//                .subscribe(new FastLoadingObserver<RoomIdInsAuthEntity>("请稍后...") {
-//                    @Override
-//                    public void _onNext(RoomIdInsAuthEntity entity) {
-//                        if (entity == null) {
-//                            ToastUtil.show("请检查网络");
-//                            return;
-//                        }
-//                        if (entity.getData().isSuccess()){
-//                                    EaseModeProxy.with().easemobStart(getActivity(),
-//                                            consultId,
-//                                            nickname,
-//                                            doctorUserId,
-//                                            username,
-//                                            userpwd,
-//                                            userId,
-//                                            String.valueOf(entity.getData().getJsonResponseBean().getBody().getDetail().getMeetingNumber()),
-//                                            String.valueOf(entity.getData().getJsonResponseBean().getBody().getDetail().getControlPassword())
-//                                            );
-////                            EaseModeProxy.with().xyInit();
-//                        }
-//                    }
-//                });
-//    }
-
     /**
-     * 3.1.3 患者最新待处理处方
+     * 通过复诊单获得处方单
+     * 拿到处方单后，开始轮训
      */
-    private void requestFindRecipesForPatientAndTabStatus(){
-        ApiRepository.getInstance().findRecipesForPatientAndTabStatus()
+    private void requestGetRecipeListByConsultId(){
+        ApiRepository.getInstance().getRecipeListByConsultId(consultId)
                 .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
-                .subscribe(new FastLoadingObserver<FindRecipesForPatientAndTabStatusEntity>("请稍后...") {
+                .subscribe(new FastObserver<GetRecipeListByConsultIdEntity>() {
                     @Override
-                    public void _onNext(FindRecipesForPatientAndTabStatusEntity entity) {
+                    public void _onNext(GetRecipeListByConsultIdEntity entity) {
                         if (entity == null) {
                             ToastUtil.show("请检查网络");
                             return;
                         }
-                        if (entity.getData().isSuccess()){
+                        if (entity.data.success){
                             // todo 刷新 RV 处方单界面
-                            // todo 查看返回的所有处方单的处方信息，状态是不是1或者不是2，则不能支付。即不能结束问诊
-                            // 处理处方信息，并展示
-                            if (rv_video_tip.getVisibility()!=View.VISIBLE)
-                                rv_video_tip.setVisibility(View.VISIBLE);
-//                         reflashRecyclerView(rv_video_tip,entity.getData().getJsonResponseBean().getBody());
+//                            // todo 查看返回的所有处方单的处方信息，状态是不是1或者不是2，则不能支付。即不能结束问诊
+                            // 隐藏显示提示，等待旋转
+                            if (rv_video_wait.getVisibility()==View.VISIBLE)
+                                rv_video_wait.setVisibility(View.GONE);
+
+                            if (entity.data.jsonResponseBean.body.size()<1)
+                                return;
+
+                            recipeId = String.valueOf(entity.data.jsonResponseBean.body.get(0).recipeId);
+                            reflashRecyclerView(rv_video_tip,entity.data.jsonResponseBean.body);
+                            currentRecipes = entity.data.jsonResponseBean.body;
                         }
                     }
                 });
     }
+
 
     /**
      * 获取数据后，显示处方信息列表
@@ -344,32 +337,41 @@ public class VideoConsultFragment extends BaseEventFragment {
      * @param recyclerView 显示对象
      * @param newDatas 传入的数据列
      */
-    protected void reflashRecyclerView(RecyclerView recyclerView, ArrayList<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes> newDatas){
+    protected void reflashRecyclerView(RecyclerView recyclerView, List<GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO> newDatas){
         // 安全检测
         if (newDatas==null)
             return;
-        List<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes.RecipeDetail> allRecipe =new ArrayList<>();
-        for (GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes newData : newDatas) {
-            if (newData.getRecipeDetailBeans()!=null)
-                allRecipe.addAll(newData.getRecipeDetailBeans());
-        }
+        AutoAdaptorProxy<GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO> proxy
+                = new AutoAdaptorProxy<>(recyclerView, R.layout.item_recipes, 1, newDatas, getContext());
 
-        AutoAdaptorProxy<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes.RecipeDetail> proxy
-                = new AutoAdaptorProxy<>(recyclerView, R.layout.item_recipes, 1, allRecipe, getContext());
-
-        proxy.setListener(new AutoAdaptorProxy.IItemListener<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes.RecipeDetail>() {
+        proxy.setListener(new AutoAdaptorProxy.IItemListener<GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO>() {
             @Override
-            public void onItemClick(AutoObjectAdaptor.ViewHolder holder, int position, GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes.RecipeDetail itemData) {
+            public void onItemClick(AutoObjectAdaptor.ViewHolder holder, int position, GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO itemData) {
+
             }
 
             @Override
-            public void onItemViewDraw(AutoObjectAdaptor.ViewHolder holder, int position, GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes.RecipeDetail itemData) {
-                String drugName = (position+1)+"、"+itemData.getDrugName();
-                String wayToUse = "(1天"+itemData.getUseTotalDose()/itemData.getUseDays()+"次，每次"+itemData.getUseDose()+"片)";
-                String[] orders = {"#333333",drugName,"#38ABA0",wayToUse};
-                ((TextView)holder.itemView.findViewById(R.id.tv_useDose)).setText(ActivityUtils.formatTextView(orders));//使用方法
+            public void onItemViewDraw(AutoObjectAdaptor.ViewHolder holder, int position, GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO itemData) {
+//                String drugName = (position+1)+"、"+itemData.getDrugName();
+//                String wayToUse = "(1天"+itemData.getUseTotalDose()/itemData.getUseDays()+"次，每次"+itemData.getUseDose()+"片)";
+//                String[] orders = {"#333333",drugName,"#38ABA0",wayToUse};
+//                ((TextView)holder.itemView.findViewById(R.id.tv_useDose)).setText(ActivityUtils.formatTextView(orders));//使用方法
             }
         });
+
+//        proxy.setListener(new AutoAdaptorProxy.IItemListener<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes.RecipeDetail>() {
+//            @Override
+//            public void onItemClick(AutoObjectAdaptor.ViewHolder holder, int position, GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes.RecipeDetail itemData) {
+//            }
+//
+//            @Override
+//            public void onItemViewDraw(AutoObjectAdaptor.ViewHolder holder, int position, GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes.RecipeDetail itemData) {
+//                String drugName = (position+1)+"、"+itemData.getDrugName();
+//                String wayToUse = "(1天"+itemData.getUseTotalDose()/itemData.getUseDays()+"次，每次"+itemData.getUseDose()+"片)";
+//                String[] orders = {"#333333",drugName,"#38ABA0",wayToUse};
+//                ((TextView)holder.itemView.findViewById(R.id.tv_useDose)).setText(ActivityUtils.formatTextView(orders));//使用方法
+//            }
+//        });
         //刷新
         proxy.notifyDataSetChanged();
     }
@@ -408,6 +410,63 @@ public class VideoConsultFragment extends BaseEventFragment {
         titleBar.setBgColor(Color.WHITE)
                 .setTitleMainText(R.string.mine);
     }
+
+
+//    /**
+//     * 查询复诊单的小鱼视频会议室房间号和密码
+//     */
+//    private void requestGetRoomIdInsAuth(){
+//        ApiRepository.getInstance().getRoomIdInsAuth(consultId,GlobalConfig.NALI_APPKEY)
+//                .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
+//                .subscribe(new FastLoadingObserver<RoomIdInsAuthEntity>("请稍后...") {
+//                    @Override
+//                    public void _onNext(RoomIdInsAuthEntity entity) {
+//                        if (entity == null) {
+//                            ToastUtil.show("请检查网络");
+//                            return;
+//                        }
+//                        if (entity.getData().isSuccess()){
+//                                    EaseModeProxy.with().easemobStart(getActivity(),
+//                                            consultId,
+//                                            nickname,
+//                                            doctorUserId,
+//                                            username,
+//                                            userpwd,
+//                                            userId,
+//                                            String.valueOf(entity.getData().getJsonResponseBean().getBody().getDetail().getMeetingNumber()),
+//                                            String.valueOf(entity.getData().getJsonResponseBean().getBody().getDetail().getControlPassword())
+//                                            );
+////                            EaseModeProxy.with().xyInit();
+//                        }
+//                    }
+//                });
+//    }
+
+//    /**
+//     * 3.1.3 患者最新待处理处方
+//     */
+//    private void requestFindRecipesForPatientAndTabStatus(){
+//        if (TextUtils.isEmpty(recipeId))
+//        ApiRepository.getInstance().findRecipesForPatientAndTabStatus()
+//                .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
+//                .subscribe(new FastLoadingObserver<FindRecipesForPatientAndTabStatusEntity>("请稍后...") {
+//                    @Override
+//                    public void _onNext(FindRecipesForPatientAndTabStatusEntity entity) {
+//                        if (entity == null) {
+//                            ToastUtil.show("请检查网络");
+//                            return;
+//                        }
+//                        if (entity.getData().isSuccess()){
+//                            // todo 刷新 RV 处方单界面
+//                            // todo 查看返回的所有处方单的处方信息，状态是不是1或者不是2，则不能支付。即不能结束问诊
+//                            // 处理处方信息，并展示
+//                            if (rv_video_tip.getVisibility()!=View.VISIBLE)
+//                                rv_video_tip.setVisibility(View.VISIBLE);
+////                         reflashRecyclerView(rv_video_tip,entity.getData().getJsonResponseBean().getBody());
+//                        }
+//                    }
+//                });
+//    }
 
 
 }

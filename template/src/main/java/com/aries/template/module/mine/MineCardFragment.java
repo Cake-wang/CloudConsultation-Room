@@ -22,13 +22,13 @@ import androidx.annotation.Nullable;
  * @Function: 我的
  * @Description:
  */
-public class MineFragment extends BaseEventFragment{
+public class MineCardFragment extends BaseEventFragment{
     private  String tag = "";
     private Handler handler;
 
-    public static MineFragment newInstance(String tag) {
+    public static MineCardFragment newInstance(String tag) {
         Bundle args = new Bundle();
-        MineFragment fragment = new MineFragment();
+        MineCardFragment fragment = new MineCardFragment();
         args.putString("tag",tag);
         fragment.setArguments(args);
         return fragment;

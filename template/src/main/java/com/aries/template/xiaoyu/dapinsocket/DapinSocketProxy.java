@@ -36,6 +36,10 @@ public class DapinSocketProxy {
     public static final String SCREENFLAG_CONTROLSCREEN = "ControlScreen_";
     /** 关闭 FLAG */
     public static final String SCREENFLAG_CLOSESCREEN= "CloseScreen_";
+    /** 开启身体检测 FLAG */
+    public static final String SCREENFLAG_BODYTESTING_OPEN = "bodytesting_open_";
+    /** 关闭身体检测 FLAG */
+    public static final String SCREENFLAG_BODYTESTING_FINISH= "bodytesting_finish_";
 
 
     /**
