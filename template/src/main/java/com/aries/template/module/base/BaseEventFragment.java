@@ -152,6 +152,7 @@ public abstract class BaseEventFragment extends BaseTimerFragment{
             }
             // 显示对象 到时后跳转到主页
             if (timeCount==0){
+                onDismiss();
                 gotoMain();
             }
         }

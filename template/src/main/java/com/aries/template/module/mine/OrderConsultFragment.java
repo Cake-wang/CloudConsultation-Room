@@ -234,13 +234,13 @@ public class OrderConsultFragment extends BaseEventFragment {
                             ToastUtil.show("请检查网络");
                             return;
                         }
-                        if (entity.isSuccess()){
-                            if (entity.getData().isSuccess()){
-                                if (entity.data.jsonResponseBean.body)
-                                    start(ResultFragment.newInstance("cancelConsult"));
-                                else
-                                    ToastUtil.show("取消失败，请重试");
-                            }
+                        if (entity.getData().isSuccess()){
+                            if (entity.data.jsonResponseBean.body)
+                                start(ResultFragment.newInstance("cancelConsult"));
+                            else
+                                ToastUtil.show("取消失败，请重试");
+                        }else {
+                            ToastUtil.showWarning("取消失败: "+entity.data.errorMessage);
                         }
                     }
                 });

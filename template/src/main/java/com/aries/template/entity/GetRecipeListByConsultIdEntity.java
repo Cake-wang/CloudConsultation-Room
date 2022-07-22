@@ -7,6 +7,7 @@ import java.util.List;
  * 主要是 mpiId 这个值
  */
 public class GetRecipeListByConsultIdEntity {
+
     public boolean success;
     public String code;
     public String message;
@@ -74,17 +75,79 @@ public class GetRecipeListByConsultIdEntity {
                 public int checkStatus;
                 public int recipeSourceType;
                 public int recipePayType;
+                public List<RecipeDetailBeanListDTO> recipeDetailBeanList;
                 public int grabOrderStatus;
                 public int checkFlag;
                 public String recipeSupportGiveMode;
                 public int processState;
                 public int subState;
                 public int auditState;
+                public int supportMode;
                 public int targetedDrugType;
                 public int medicalFlag;
                 public int fastRecipeFlag;
                 public int doctorSignState;
                 public int checkerSignState;
+
+                public static class RecipeDetailBeanListDTO {
+                    public int recipeDetailId;
+                    public int recipeId;
+                    public String drugGroup;
+                    public int drugId;
+                    public String organDrugCode;
+                    public String drugName;
+                    public String saleName;
+                    public String drugSpec;
+                    public int pack;
+                    public String drugUnit;
+                    public double useDose;
+                    public double defaultUseDose;
+                    public String useDoseStr;
+                    public String useDoseUnit;
+                    public String dosageUnit;
+                    public String usingRate;
+                    public String usePathways;
+                    public String organUsingRate;
+                    public String organUsePathways;
+                    public String usingRateTextFromHis;
+                    public String usePathwaysTextFromHis;
+                    public double useTotalDose;
+                    public double sendNumber;
+                    public int useDays;
+                    public double drugCost;
+                    public String entrustmentId;
+                    public String memo;
+                    public String createDt;
+                    public String lastModify;
+                    public double salePrice;
+                    public double price;
+                    public String orderNo;
+                    public int status;
+                    public String drugForm;
+                    public String producer;
+                    public String licenseNumber;
+                    public String producerCode;
+                    public String useDaysB;
+                    public String usingRateId;
+                    public String usePathwaysId;
+                    public List<UseDoseAndUnitRelationDTO> useDoseAndUnitRelation;
+                    public String drugUnitdoseAndUnit;
+                    public int pharmacyId;
+                    public String pharmacyName;
+                    public int drugType;
+                    public String drugDisplaySplicedName;
+                    public String drugDisplaySplicedSaleName;
+                    public String superScalarCode;
+                    public String superScalarName;
+                    public int type;
+                    public String drugPic;
+                    public double saleDrugPrice;
+
+                    public static class UseDoseAndUnitRelationDTO {
+                        public String useDoseUnit;
+                        public double realUseDose;
+                    }
+                }
             }
         }
     }

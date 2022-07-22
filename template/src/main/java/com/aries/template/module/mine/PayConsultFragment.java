@@ -159,7 +159,7 @@ public class PayConsultFragment extends BaseEventFragment {
     private void requestPaySuccess() {
         ApiRepository.getInstance().getConsultAndPatientAndDoctorById(consultId)
                 .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
-                .subscribe(new FastLoadingObserver<GetConsultAndPatientAndDoctorByIdEntity>("请等待") {
+                .subscribe(new FastObserver<GetConsultAndPatientAndDoctorByIdEntity>() {
                     @Override
                     public void _onNext(GetConsultAndPatientAndDoctorByIdEntity entity) {
                         if (entity == null) {

@@ -175,9 +175,9 @@ public class EaseModeProxy {
         //在做打包混淆时，关闭debug模式，避免消耗不必要的资源
         EMClient.getInstance().setDebugMode(true);
 
-        // 用于 EMClient 登录初始化
-        EMClient.getInstance().groupManager().loadAllGroups();
-        EMClient.getInstance().chatManager().loadAllConversations();
+//        // 用于 EMClient 登录初始化
+//        EMClient.getInstance().groupManager().loadAllGroups();
+//        EMClient.getInstance().chatManager().loadAllConversations();
 
         //如果没有，则继续初始化
         Settings settings = new Settings(xyAppId);
@@ -323,26 +323,26 @@ public class EaseModeProxy {
 
         //登陆 https://docs-im.easemob.com/im/android/sdk/basic
 //        EMClient.getInstance().logout(true);
-//        emcallback = new EMCallBack() {//回调
-//            @Override
-//            public void onSuccess() {
-//                EMClient.getInstance().groupManager().loadAllGroups();
-//                EMClient.getInstance().chatManager().loadAllConversations();
-//                ToastWithLogin("登录环信聊天服务器成功");
-//            }
-//
-//            @Override
-//            public void onProgress(int progress, String status) {
-//            }
-//
-//            @Override
-//            public void onError(int code, String message) {
-//                ToastWithLogin("登录环信聊天服务器失败, message:" + message);
-//            }
-//        };
-//        // 防止用户由于特殊原因登出，然后再进来的时候，被提示已经登录
-//        EMClient.getInstance().logout(true);
-//        EMClient.getInstance().login(easemobUserName, easemobPassword,emcallback );
+        emcallback = new EMCallBack() {//回调
+            @Override
+            public void onSuccess() {
+                EMClient.getInstance().groupManager().loadAllGroups();
+                EMClient.getInstance().chatManager().loadAllConversations();
+                ToastWithLogin("登录环信聊天服务器成功");
+            }
+
+            @Override
+            public void onProgress(int progress, String status) {
+            }
+
+            @Override
+            public void onError(int code, String message) {
+                ToastWithLogin("登录环信聊天服务器失败, message:" + message);
+            }
+        };
+        // 防止用户由于特殊原因登出，然后再进来的时候，被提示已经登录
+        EMClient.getInstance().logout(true);
+        EMClient.getInstance().login(easemobUserName, easemobPassword,emcallback );
     }
 
     /**

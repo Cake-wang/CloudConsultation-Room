@@ -3,6 +3,7 @@ package com.aries.template.module.mine;
 import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -31,6 +32,7 @@ import me.yokeyword.fragmentation.ISupportFragment;
  */
 public class ResultFragment extends BaseEventFragment implements ISupportFragment {
     private  String result= "";
+    private  String takeCode= ""; // 取药码
 
     @BindView(R.id.tv_result_title)
     TextView tv_result_title;
@@ -49,7 +51,6 @@ public class ResultFragment extends BaseEventFragment implements ISupportFragmen
         Bundle args = new Bundle();
         ResultFragment fragment = new ResultFragment();
         args.putString("result",result);
-
         fragment.setArguments(args);
         return fragment;
     }
@@ -61,6 +62,9 @@ public class ResultFragment extends BaseEventFragment implements ISupportFragmen
         if (args != null) {
             result = args.getString("result");
         }
+        if (result.contains("paySuc"))
+            if (result.contains(":"))
+                takeCode = result.split(":")[1];
     }
 
     @Override
@@ -88,6 +92,7 @@ public class ResultFragment extends BaseEventFragment implements ISupportFragmen
             tv_result_tip.setText("支付成功");
             tv_result_contet.setText("请取走凭条，凭取药码至药柜取药");
             tv_result_code.setVisibility(View.VISIBLE);
+            tv_result_code.setText("取号码"+takeCode);
         }else {
             tv_result_title.setText("支付失败");
             tv_result_bg.setBackgroundResource(R.drawable.bg_fail_yzs);
@@ -121,25 +126,24 @@ public class ResultFragment extends BaseEventFragment implements ISupportFragmen
     @Override
     public void loadData() {
         if (result.contains("paySuc")){
-            //打印机参数设置
-             String setPrint = BasicOper.dc_setprint(0x02, 0x01, 0, 0, 10, 0x00);
-             Log.d("print", "BasicOper.dc_setprint:" + setPrint);
-            // 打印机进纸设置
-             String enter = BasicOper.dc_printenter(50);
-             Log.d("print", "BasicOper.dc_printenter:" + enter);
-
-            String printString = "取药码：888888";
-            try {
-                byte[] strByte = printString.getBytes("GBK");
-                //打印字符
-                 String print_char = BasicOper.dc_printcharacter(strByte);
-                 Log.d("print", "BasicOper.dc_printcharacter:" + print_char);
-            }
-            catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
+            if (!TextUtils.isEmpty(takeCode)){
+                //打印机参数设置
+                String setPrint = BasicOper.dc_setprint(0x02, 0x01, 0, 0, 10, 0x00);
+                Log.d("print", "BasicOper.dc_setprint:" + setPrint);
+                // 打印机进纸设置
+                String enter = BasicOper.dc_printenter(50);
+                Log.d("print", "BasicOper.dc_printenter:" + enter);
+                String printString = "取药码："+takeCode;
+                try {
+                    byte[] strByte = printString.getBytes("GBK");
+                    //打印字符
+                    String print_char = BasicOper.dc_printcharacter(strByte);
+                    Log.d("print", "BasicOper.dc_printcharacter:" + print_char);
+                }
+                catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
-
-
 }

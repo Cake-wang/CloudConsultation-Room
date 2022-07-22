@@ -9,11 +9,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.aries.library.fast.retrofit.FastLoadingObserver;
+import com.aries.library.fast.retrofit.FastObserver;
 import com.aries.library.fast.util.ToastUtil;
 import com.aries.template.GlobalConfig;
 import com.aries.template.R;
 import com.aries.template.entity.BatchCreateOrderEntity;
-import com.aries.template.entity.GetConsultsAndRecipesResultEntity;
 import com.aries.template.entity.GetPatientRecipeByIdEntity;
 import com.aries.template.entity.PayOrderEntity;
 import com.aries.template.entity.PrescriptionPushEntity;
@@ -67,7 +67,7 @@ public class PayRecipeFragment extends BaseEventFragment {
     private ArrayList<String> recipeCodes;//HIS处方编码集合，可以从处方详情中获取
 
     /** 传入处理处方单的数据 */
-    private GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes obj;
+    private  ArrayList<DrugObject> obj;
 
     @BindView(R.id.tv_name)
     TextView tv_name; //患者姓名
@@ -91,7 +91,7 @@ public class PayRecipeFragment extends BaseEventFragment {
      * @param recipeCodes 处方编号集合
      * @param obj 处方单信息
      */
-    public static PayRecipeFragment newInstance(String recipeId, ArrayList<String> recipes, ArrayList<String> recipeCodes, GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes obj) {
+    public static PayRecipeFragment newInstance(String recipeId, ArrayList<String> recipes, ArrayList<String> recipeCodes, ArrayList<DrugObject> obj) {
         PayRecipeFragment fragment = new PayRecipeFragment();
         Bundle args = new Bundle();
         args.putString("recipeId", recipeId);
@@ -116,7 +116,7 @@ public class PayRecipeFragment extends BaseEventFragment {
             recipeId = args.getString("recipeId");
             recipes = ((ArrayList<String>) args.getSerializable("recipes"));
             recipeCodes = ((ArrayList<String>) args.getSerializable("recipeCodes"));
-            obj = (GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes) args.getSerializable("obj");
+            obj = (ArrayList<DrugObject>) args.getSerializable("obj");
         }
     }
 
@@ -125,21 +125,7 @@ public class PayRecipeFragment extends BaseEventFragment {
      */
     @Override
     public void initView(Bundle savedInstanceState) {
-//        int organid = 1;//浙大附属邵逸夫医院
-//        ApiRepository.getInstance().findValidOrganProfessionForRevisit(organid, getContext())
-//                .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
-//                .subscribe(new FastLoadingObserver<FindValidOrganProfessionForRevisitResultEntity>() {
-//                    @Override
-//                    public void _onNext(FindValidOrganProfessionForRevisitResultEntity entity) {
-//                        if (entity == null) {
-//                            ToastUtil.show("请检查网络");
-//                            return;
-//                        }
-////                        entity.data.requestId;
-//                    }
-//                });
         requestBatchCreateOrder(recipeFee, recipes, recipeCodes);
-//        requestPayOrder(String.valueOf(74521));
         timeLoop();
 
         //数据展示
@@ -148,6 +134,7 @@ public class PayRecipeFragment extends BaseEventFragment {
 //        tv_fee_all.setText(recipeFee);
         String[] orders = {"#38ABA0","支付宝·","#333333","扫一扫"};
         jtjk_pay_text.setText(ActivityUtils.formatTextView(orders));
+        tv_fee_type.setText("处方费");
     }
 
     private static final int PERIOD = 5* 1000;
@@ -167,13 +154,13 @@ public class PayRecipeFragment extends BaseEventFragment {
 
     /**
      * 检查当前支付是否完成
-     * 循环任务，没3秒检查一次
+     * 循环任务，每5秒检查一次
      * 检查处方单详情
      */
     private void requestPaySuccess() {
         ApiRepository.getInstance().getPatientRecipeById(recipeId)
                 .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
-                .subscribe(new FastLoadingObserver<GetPatientRecipeByIdEntity>("请稍后...") {
+                .subscribe(new FastObserver<GetPatientRecipeByIdEntity>() {
                     @Override
                     public void _onNext(GetPatientRecipeByIdEntity entity) {
                         if (entity == null) {
@@ -182,7 +169,8 @@ public class PayRecipeFragment extends BaseEventFragment {
                         }
                         // 检查 payFlag 如果是 1 就是支付成功
                         if (entity.isSuccess()){
-                            if (entity.getData().getJsonResponseBean().getBody().getRecipe().getPayFlag()==1){
+                            if (entity.getData().getJsonResponseBean().getBody()!=null &&
+                                    entity.getData().getJsonResponseBean().getBody().getRecipe().getPayFlag()==1){
                                 // 4.1.4 处方药品推送接口
                                 requestPrescriptionPush(GlobalConfig.cabinetId);
                             }
@@ -198,23 +186,38 @@ public class PayRecipeFragment extends BaseEventFragment {
      * 支付的基础是创建一个可以支付的处方单。里面有很多处方。
      */
     public void requestPrescriptionPush(String clinicSn){
-        // 生成处方单药物集
+        // 生成处方单药物集，遍历生成数据，准备输入
         ArrayList<Map> drugs = new ArrayList<>();
-        for (GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes.RecipeDetail item : obj.recipeDetailBeans) {
+        for (DrugObject item : obj) {
             Map<String, Object> drug= new HashMap<>();
             //            drugs.put("direction","口服");
-            drug.put("dosageUnit",item.drugUnit);
-            drug.put("drugCommonName",item.drugName);
-            drug.put("drugTradeName",item.drugName);
-            drug.put("eachDosage",item.defaultUseDose);
-            drug.put("itemDays",item.dosageUnit);
-            drug.put("price",item.drugCost);
-            drug.put("quantity",item.sendNumber);
-            drug.put("quantityUnit",item.drugUnit);
-            drug.put("sku",item.organDrugCode);
-            drug.put("spec",item.pack);
+            drug.put("dosageUnit",item.dosageUnit);
+            drug.put("drugCommonName",item.drugCommonName);
+            drug.put("drugTradeName",item.drugTradeName);
+            drug.put("eachDosage",item.eachDosage);
+            drug.put("itemDays",item.itemDays);
+            drug.put("price",item.price);
+            drug.put("quantity",item.quantity);
+            drug.put("quantityUnit",item.quantityUnit);
+            drug.put("sku",item.sku);
+            drug.put("spec",item.spec);
             drugs.add(drug);
         }
+//        for (GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes.RecipeDetail item : obj.recipeDetailBeans) {
+//            Map<String, Object> drug= new HashMap<>();
+//            //            drugs.put("direction","口服");
+//            drug.put("dosageUnit",item.drugUnit);
+//            drug.put("drugCommonName",item.drugName);
+//            drug.put("drugTradeName",item.drugName);
+//            drug.put("eachDosage",item.defaultUseDose);
+//            drug.put("itemDays",item.dosageUnit);
+//            drug.put("price",item.drugCost);
+//            drug.put("quantity",item.sendNumber);
+//            drug.put("quantityUnit",item.drugUnit);
+//            drug.put("sku",item.organDrugCode);
+//            drug.put("spec",item.pack);
+//            drugs.add(drug);
+//        }
         ApiRepository.getInstance().prescriptionPush(clinicSn,
                         GlobalConfig.hospitalName,
                         GlobalConfig.ssCard.getSSNum(),
@@ -232,8 +235,10 @@ public class PayRecipeFragment extends BaseEventFragment {
                             ToastUtil.show("请检查网络，返回首页后重试");
                             return;
                         }
-                        if (entity.isSuccess()){
+                        if (entity.getData().isSuccess()){
                             // todo 打印取药单
+                            if (entity.getData().getTakeCode()!=null)
+                                start(ResultFragment.newInstance("paySuc:"+entity.getData().getTakeCode()));
                             // 释放资源
                             onDismiss();
                         }
@@ -275,10 +280,12 @@ public class PayRecipeFragment extends BaseEventFragment {
                             ToastUtil.show("请检查网络");
                             return;
                         }
-                        if (entity.isSuccess()){
+                        if (entity.getData().isSuccess()){
                             String busId = String.valueOf(entity.getData().getJsonResponseBean().getBody());
                             if (!busId.equals("0"))
                                 requestPayOrder(busId);
+                        }else{
+                            ToastUtil.show("合并订单失败");
                         }
                     }
                 });
@@ -298,12 +305,14 @@ public class PayRecipeFragment extends BaseEventFragment {
                             ToastUtil.show("请检查网络");
                             return;
                         }
-                        if (entity.isSuccess()){
+                        if (entity.getData().isSuccess()){
                             // 显示二维码
                            String qrStr = entity.getData().getJsonResponseBean().getBody().qr_code;
                             Resources res = getActivity().getResources();
                             Bitmap bmp= BitmapFactory.decodeResource(res, R.drawable.pay_alilogo);
                             showQRCode(XQRCode.createQRCodeWithLogo(qrStr, 400, 400, bmp));
+                        }else{
+                            ToastUtil.show("获取支付宝二维码失败");
                         }
                     }
                 });
@@ -345,7 +354,7 @@ public class PayRecipeFragment extends BaseEventFragment {
      * 将外部的药品数据转换成内部可以传送的数据
      * 推送处方单专用
      */
-    public class Drugs{
+    public static class DrugObject {
         public String dosageUnit;
         public String drugCommonName;
         public String drugTradeName;

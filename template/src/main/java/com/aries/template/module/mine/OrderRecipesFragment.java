@@ -136,7 +136,7 @@ public class OrderRecipesFragment extends BaseEventFragment {
         btn_inquiry.setText("去支付");
 
         String sex = GlobalConfig.ssCard.getSex().equals("0")?"女":"男";
-        tv_name.setText(GlobalConfig.ssCard.getName()+"("+sex+")");
+        tv_name.setText(GlobalConfig.ssCard.getName().trim()+"("+sex+")");
         tv_card.setText(GlobalConfig.ssCard.getCardNum());
         tv_age.setText(String.valueOf(GlobalConfig.age));
         tv_result.setText(obj.organDiseaseName);
@@ -196,10 +196,6 @@ public class OrderRecipesFragment extends BaseEventFragment {
      */
     protected void reflashRecyclerView(RecyclerView recyclerView, GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes newDatas){
         List<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes.RecipeDetail> allRecipe =new ArrayList<>();
-//        for (GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes newData : newDatas) {
-//            if (newData.getRecipeDetailBeans()!=null)
-//                allRecipe.addAll(newData.getRecipeDetailBeans());
-//        }
         allRecipe.addAll(newDatas.getRecipeDetailBeans());
 
         AutoAdaptorProxy<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes.RecipeDetail> proxy
@@ -212,8 +208,10 @@ public class OrderRecipesFragment extends BaseEventFragment {
 
            @Override
            public void onItemViewDraw(AutoObjectAdaptor.ViewHolder holder, int position, GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes.RecipeDetail itemData) {
+               int perDayUse = itemData.getUseDose().intValue();
+
                String drugName = (position+1)+"、"+itemData.getDrugName();
-               String wayToUse = "(1天"+itemData.getUseTotalDose()/itemData.getUseDays()+"次，每次"+itemData.getUseDose()+"片)";
+               String wayToUse = "(1天"+itemData.getUseTotalDose()/itemData.getUseDays()+"次，每次"+perDayUse+"片)";
                String[] orders = {"#333333",drugName,"#38ABA0",wayToUse};
                ((TextView)holder.itemView.findViewById(R.id.tv_useDose)).setText(ActivityUtils.formatTextView(orders));//使用方法
            }
@@ -242,18 +240,34 @@ public class OrderRecipesFragment extends BaseEventFragment {
                             ToastUtil.show("请检查网络，返回首页后重试");
                             return;
                         }
-                        if (entity.isSuccess()){
+                        if (entity.getData().isSuccess()){
                             // 启动处方单推送接口
                             // 拉到数据了，有库存
                             // 然后取支付页面请求支付，合并处方单
                             ArrayList<String> recipeids = new ArrayList<>();
                             ArrayList<String> recipeCode = new ArrayList<>();
+                            ArrayList<PayRecipeFragment.DrugObject> drugs = new ArrayList<>();
                             for (GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes.RecipeDetail item : obj.recipeDetailBeans) {
+                                PayRecipeFragment.DrugObject drug= new PayRecipeFragment.DrugObject();
+                                //            drugs.put("direction","口服");
+                                drug.dosageUnit = item.drugUnit;
+                                drug.drugCommonName = item.drugName;
+                                drug.drugTradeName = item.drugName;
+                                drug.eachDosage = String.valueOf(item.defaultUseDose);
+                                drug.itemDays = String.valueOf(item.useDays);
+                                drug.price = String.valueOf(item.drugCost);
+                                drug.quantity =String.valueOf( item.sendNumber);
+                                drug.quantityUnit = item.drugUnit;
+                                drug.sku = item.organDrugCode;
+                                drug.spec =String.valueOf( item.drugSpec);
+                                drugs.add(drug);
                                 recipeids.add(String.valueOf(item.recipeId));
                                 recipeCode.add(String.valueOf(item.organDrugCode));
                             }
                             //当处方单产生订单，并且订单有效时取的是订单的真实金额，其他时候取的处方的总金额保留两位小数
-                            start(PayRecipeFragment.newInstance(String.valueOf(obj.recipeId),recipeids,recipeCode,obj));
+                            start(PayRecipeFragment.newInstance(String.valueOf(obj.recipeId),recipeids,recipeCode,drugs));
+                        }else {
+                            ToastUtil.show("药品查询失败");
                         }
                     }
                 });

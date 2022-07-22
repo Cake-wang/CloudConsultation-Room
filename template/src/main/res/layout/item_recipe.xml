@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
+    android:orientation="horizontal"
     android:layout_height="wrap_content">
 
     <LinearLayout
@@ -9,14 +10,36 @@
         android:gravity="top"
         android:visibility="visible"
         android:orientation="horizontal"
-        android:paddingHorizontal="16dp"
-        android:paddingVertical="8dp"
+        android:paddingHorizontal="30dp"
+        android:paddingVertical="16dp"
+        android:background="@drawable/bg_left_board"
         >
 
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
+            android:layout_weight="0.35"
+            android:orientation="vertical"
+            >
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingVertical="8dp"
+                android:textSize="16dp"
+                android:text="诊断结果:"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingVertical="8dp"
+                android:textSize="16dp"
+                android:text="金额:"
+                />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.65"
             android:orientation="vertical"
             >
             <TextView
@@ -24,14 +47,17 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingVertical="8dp"
-                android:text="诊断结果:肥胖"
+                android:textSize="16dp"
+                android:textStyle="bold"
+                android:text="肥胖"
                 />
             <TextView
                 android:id="@+id/jtjk_recipe_totoalpayment"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingVertical="8dp"
-                android:text="金额: 200.15 元"
+                android:textSize="16dp"
+                android:text="200.15 元"
                 />
         </LinearLayout>
         <LinearLayout
@@ -45,6 +71,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingVertical="8dp"
+                android:textSize="16dp"
                 android:text="开放时间 2022-07-01"
                 />
             <TextView
@@ -52,6 +79,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingVertical="8dp"
+                android:textSize="16dp"
                 android:text="失效时间 2022-07-01"
                 />
         </LinearLayout>

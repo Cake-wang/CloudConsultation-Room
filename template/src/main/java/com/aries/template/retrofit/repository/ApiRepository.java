@@ -704,6 +704,7 @@ public class ApiRepository extends BaseRepository {
         bizContent.put("giveMode","2");//2 暂定
         bizContent.put("payway", "32");//32 支付宝
         bizContent.put("recipeFee", recipeFee);//挂号费
+        bizContent.put("busType", "recipe");//业务类型字符串 处方:recipe,复诊：revisit
         bizContent.put("recipeIds", JTJSONUtils.pressJsonArray(recipeIds));//处方ID集合
         bizContent.put("recipeCode", JTJSONUtils.pressJsonArray(recipeCode));//HIS处方编码集合，可以从处方详情中获取
 
@@ -791,7 +792,7 @@ public class ApiRepository extends BaseRepository {
     }
 
     /**
-     * 获取处方列表
+     * 获取处方列表，根据复诊单
      * 支付中，通过复诊单id来查询处方单id
      */
     public Observable<GetRecipeListByConsultIdEntity> getRecipeListByConsultId(String consultId) {

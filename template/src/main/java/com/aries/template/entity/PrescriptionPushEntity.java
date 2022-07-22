@@ -56,6 +56,7 @@ public class PrescriptionPushEntity {
         private String status;
         private String message;
         private String data;
+        private String takeCode;
         private boolean success;
 
         public String getCode() {
@@ -96,6 +97,14 @@ public class PrescriptionPushEntity {
 
         public void setSuccess(boolean success) {
             this.success = success;
+        }
+
+        public String getTakeCode() {
+            return takeCode;
+        }
+
+        public void setTakeCode(String takeCode) {
+            this.takeCode = takeCode;
         }
     }
 }

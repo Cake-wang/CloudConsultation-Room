@@ -213,7 +213,7 @@ public class VideoConsultFragment extends BaseEventFragment {
             if (doctorInRoomFlag){
                 // 结束问诊，如果有问诊单，则根据这个问诊单进入支付
                 // 在栈内的HomeFragment以SingleTask模式启动（即在其之上的Fragment会出栈）
-                if (isRecipeCheckedFlag){
+                if (!isRecipeCheckedFlag){
                     ToastUtil.show("处方正在被医生确认，请稍后再试");
                 } else{
                     // 关闭，并释放所有资源
@@ -313,18 +313,27 @@ public class VideoConsultFragment extends BaseEventFragment {
                             return;
                         }
                         if (entity.data.success){
-                            // todo 刷新 RV 处方单界面
-//                            // todo 查看返回的所有处方单的处方信息，状态是不是1或者不是2，则不能支付。即不能结束问诊
                             // 隐藏显示提示，等待旋转
                             if (rv_video_wait.getVisibility()==View.VISIBLE)
                                 rv_video_wait.setVisibility(View.GONE);
+                            if (rv_video_tip.getVisibility()==View.GONE)
+                                rv_video_tip.setVisibility(View.VISIBLE);
 
                             if (entity.data.jsonResponseBean.body.size()<1)
                                 return;
 
+                            //刷新 RV 处方单界面
                             recipeId = String.valueOf(entity.data.jsonResponseBean.body.get(0).recipeId);
                             reflashRecyclerView(rv_video_tip,entity.data.jsonResponseBean.body);
                             currentRecipes = entity.data.jsonResponseBean.body;
+
+                            //查看返回的所有处方单的处方信息，状态是不是1或者不是2，则不能支付。即不能结束问诊
+                            isRecipeCheckedFlag = true;
+                            for (GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO currentRecipe : currentRecipes) {
+                                if (currentRecipe.status!=1 && currentRecipe.status!=2){
+                                    isRecipeCheckedFlag = false;
+                                }
+                            }
                         }
                     }
                 });
@@ -347,31 +356,19 @@ public class VideoConsultFragment extends BaseEventFragment {
         proxy.setListener(new AutoAdaptorProxy.IItemListener<GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO>() {
             @Override
             public void onItemClick(AutoObjectAdaptor.ViewHolder holder, int position, GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO itemData) {
-
             }
 
             @Override
             public void onItemViewDraw(AutoObjectAdaptor.ViewHolder holder, int position, GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO itemData) {
-//                String drugName = (position+1)+"、"+itemData.getDrugName();
-//                String wayToUse = "(1天"+itemData.getUseTotalDose()/itemData.getUseDays()+"次，每次"+itemData.getUseDose()+"片)";
-//                String[] orders = {"#333333",drugName,"#38ABA0",wayToUse};
-//                ((TextView)holder.itemView.findViewById(R.id.tv_useDose)).setText(ActivityUtils.formatTextView(orders));//使用方法
+                GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO.RecipeDetailBeanListDTO vo = itemData.recipeDetailBeanList.get(0);
+                int perDayUse = ((Double) vo.useDose).intValue();
+
+                String drugName = (position+1)+"、"+vo.drugName;
+                String wayToUse = "(1天"+vo.useTotalDose/vo.useDays+"次，每次"+perDayUse+"片)";
+                String[] orders = {"#333333",drugName,"#38ABA0",wayToUse};
+                ((TextView)holder.itemView.findViewById(R.id.tv_useDose)).setText(ActivityUtils.formatTextView(orders));//使用方法
             }
         });
-
-//        proxy.setListener(new AutoAdaptorProxy.IItemListener<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes.RecipeDetail>() {
-//            @Override
-//            public void onItemClick(AutoObjectAdaptor.ViewHolder holder, int position, GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes.RecipeDetail itemData) {
-//            }
-//
-//            @Override
-//            public void onItemViewDraw(AutoObjectAdaptor.ViewHolder holder, int position, GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes.RecipeDetail itemData) {
-//                String drugName = (position+1)+"、"+itemData.getDrugName();
-//                String wayToUse = "(1天"+itemData.getUseTotalDose()/itemData.getUseDays()+"次，每次"+itemData.getUseDose()+"片)";
-//                String[] orders = {"#333333",drugName,"#38ABA0",wayToUse};
-//                ((TextView)holder.itemView.findViewById(R.id.tv_useDose)).setText(ActivityUtils.formatTextView(orders));//使用方法
-//            }
-//        });
         //刷新
         proxy.notifyDataSetChanged();
     }

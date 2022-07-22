@@ -47,7 +47,7 @@ public class DateUtils {
 
     /**
      * 输入一个生日时间，计算出现在的年龄
-     * @return
+     * @param birthday 是一个yyyyMMdd 格式的日期
      */
     public static int getAge(String birthday){
         try {
@@ -68,18 +68,35 @@ public class DateUtils {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-
         return 0;
-//
-//        Calendar currentCalendar = Calendar.getInstance();//实例化calendar
-//        currentCalendar.setTimeInMillis(System.currentTimeMillis());//调用setTimeInMillis方法和System.currentTimeMillis()获取当前时间
-//        Calendar targetCalendar = Calendar.getInstance();
-//        targetCalendar.setTimeInMillis(birthday);//这个解析传进来的时间戳
-//        if (currentCalendar.get(Calendar.MONTH) >= targetCalendar.get(Calendar.MONTH)) {//如果现在的月份大于生日的月份
-//            return currentCalendar.get(Calendar.YEAR) - targetCalendar.get(Calendar.YEAR);//那就直接减,因为现在的年月都大于生日的年月
-//        } else {
-//            return currentCalendar.get(Calendar.YEAR) - targetCalendar.get(Calendar.YEAR) - 1;//否则,减掉一年
-//        }
     }
+
+    /**
+     * 在规定的日期添加分钟来获得添加后的日期
+     * 因为小时有可能是小数
+     * @return 格式化后的结果，根据 format，所以输入和输出的格式必须一致
+     */
+    public static String addHour(String date,String format,int minute){
+        String returnStr = "";
+        try {
+            // 获取开始时间
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format);
+            Calendar birthdayCalendar = Calendar.getInstance();
+            birthdayCalendar.setTime(simpleDateFormat.parse(date));
+            birthdayCalendar.setTimeZone(TimeZone.getTimeZone("GMT+8:00"));
+            //输出结果计算结果
+            birthdayCalendar.add(Calendar.MINUTE,minute);
+            Date dt = birthdayCalendar.getTime();
+            returnStr = simpleDateFormat.format(dt);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return returnStr;
+    }
+
+
+
+
+
 
 }

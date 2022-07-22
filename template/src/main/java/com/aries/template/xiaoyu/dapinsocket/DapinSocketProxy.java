@@ -49,7 +49,6 @@ public class DapinSocketProxy {
     public DapinSocketProxy(Activity activity, String ip) {
         this.activity = activity;
         address = AddressSettingSharedPreference.getAddrs(this.activity,AddressSettingSharedPreference.ADDRESS);
-
         this.ip = ip;
     }
 
@@ -157,7 +156,6 @@ public class DapinSocketProxy {
     private void startSocket(String flag){
         if (activity==null)
             return;
-
         currentFlag = flag;
 
         if (!TextUtils.isEmpty(address) && address.contains(":")){

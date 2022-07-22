@@ -424,6 +424,8 @@
                     android:layout_marginLeft="120dp"
                     android:visibility="visible"
                     android:orientation="vertical"
+                    android:paddingHorizontal="40dp"
+                    android:paddingVertical="20dp"
                     >
 
                     <TextView
@@ -450,8 +452,8 @@
                         android:layout_height="wrap_content"
                         android:background="@drawable/bg_pay_w_yzs"
                         android:layout_marginTop="10dp"
-                        android:minWidth="180dp"
-                        android:minHeight="180dp"
+                        android:minWidth="120dp"
+                        android:minHeight="120dp"
                         android:scaleType="fitXY" />
 
                 </LinearLayout>

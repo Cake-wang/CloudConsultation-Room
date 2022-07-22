@@ -20,6 +20,7 @@ import com.aries.template.entity.GetConsultsAndRecipesResultEntity;
 import com.aries.template.module.base.BaseEventFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.template.utils.ActivityUtils;
+import com.aries.template.utils.DateUtils;
 import com.aries.template.widget.autoadopter.AutoAdaptorProxy;
 import com.aries.template.widget.autoadopter.AutoObjectAdaptor;
 import com.aries.template.widget.autoadopter.DefenceAutoAdaptorProxy;
@@ -64,6 +65,8 @@ public class OrderRecipesListFragment extends BaseEventFragment {
     Button btn_cancel;// 上一页按钮
     @BindView(R.id.btn_inquiry)
     Button btn_inquiry;// 下一页按钮
+    @BindView(R.id.btn_goto_dep)
+    Button btn_goto_dep;// 下一页按钮
     @BindView(R.id.jtjk_recipe_fragment_rv)
     RecyclerView recyclerView;// 网格显示
     @BindView(R.id.jtjk_fz_fragment_title)
@@ -118,13 +121,16 @@ public class OrderRecipesListFragment extends BaseEventFragment {
                         });
 
                         // 添加文字
-                        ((TextView)holder.itemView.findViewById(R.id.jtjk_recipe_disastname)).setText("诊断结果: "+itemData.organDiseaseName);
-//                        ((TextView)holder.itemView.findViewById(R.id.jtjk_recipe_totoalpayment)).setText("金额: "+itemData.totalMoney);
-                        ((TextView)holder.itemView.findViewById(R.id.jtjk_recipe_optime)).setText("开放时间: "+itemData.signDate);
-                        ((TextView)holder.itemView.findViewById(R.id.jtjk_recipe_closetime)).setText("失效时间: "+itemData.recipeSurplusHours);
+                        int minute = ((Float)(Float.valueOf(itemData.recipeSurplusHours)*60)).intValue();
+                        String openTime = itemData.signDate.split(" ")[0];
+                        ((TextView)holder.itemView.findViewById(R.id.jtjk_recipe_disastname)).setText(itemData.organDiseaseName);
+                        ((TextView)holder.itemView.findViewById(R.id.jtjk_recipe_optime)).setText("开方时间:  "+openTime);
+                        ((TextView)holder.itemView.findViewById(R.id.jtjk_recipe_closetime)).setText("失效时间:  "+DateUtils.addHour(openTime,"yyyy-MM-dd",minute));
+
+
 
                         // 添加金额样式
-                        String[] orders = {"#333333","金额:    ","#38ABA0",itemData.totalMoney.toString(),"#333333","元"};
+                        String[] orders = {"#38ABA0",itemData.totalMoney.toString(),"#333333","元"};
                         ((TextView)holder.itemView.findViewById(R.id.jtjk_recipe_totoalpayment)).setText(ActivityUtils.formatTextView(orders));//使用方法
                     }
                 });
@@ -160,11 +166,16 @@ public class OrderRecipesListFragment extends BaseEventFragment {
         btn_inquiry.setOnClickListener(v -> {upDownProxy.doNextReFlash();});
         // 点击下一页
         btn_cancel.setOnClickListener(v -> {upDownProxy.doProReFlash();});
+        // 点击跳过
+        btn_goto_dep.setOnClickListener(v->{start(DepartmentFragment.newInstance());});
+
+
         title.setText("未支付的处方单");
 
         upDownProxy.setParamMaxNumber(2);
         upDownProxy.setTotalDatas(obj);
         upDownProxy.doStartReFlash();
+
     }
 
 

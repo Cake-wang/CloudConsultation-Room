@@ -280,6 +280,7 @@
                     android:layout_marginTop="20dp"
                     android:layout_weight="1"
                     android:background="@drawable/bg_redio_yzs"
+                    android:padding="20dp"
                     android:gravity="center"
                     android:visibility="visible">
 

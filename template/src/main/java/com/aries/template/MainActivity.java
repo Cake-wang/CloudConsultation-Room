@@ -412,6 +412,7 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                                     int status = item.getConsults().getStatus();
                                    if ( item.getConsults().getPayflag()==1 &&
                                            (status==1 || status ==2 || status == 3 || status == 4)){
+                                       // todo 4 要去掉
                                        //status=4 问诊中
                                        isDepartTag = false;
                                        // 挂号
@@ -431,6 +432,7 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                                 // 每一个处方单中，都有一个处方信息，这个处方信息是需要合并的
                                 ArrayList<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes> recipes = new ArrayList();
                                 for (GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes item : entity.data.recipes) {
+                                    // 1 待审核, 2 待处理, 3 待取药
                                     if (item.statusCode==2){
                                         recipes.add(item);
                                     }
@@ -447,7 +449,9 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                                 start(DepartmentFragment.newInstance());
                             }
                         }else {
-                            ToastUtil.show(entity.getMessage());
+//                            ToastUtil.show("获取未支付失败，请稍后重试"+entity.getMessage());
+                            ToastUtil.show("获取未支付失败，请稍后重试");
+                            start(HomeFragment.newInstance(), SupportFragment.SINGLETASK);
                         }
                         isReadCardProcessing = false;
                     }

@@ -151,9 +151,14 @@ public class ConfirmRecipesFragment extends BaseEventFragment {
         tv_tip_message.setVisibility(View.GONE);
         btn_cancel.setText("取消");
         btn_inquiry.setText("确认结算");
-        tv_name.setText(SPUtil.get(mContext,"userName","")+""+SPUtil.get(mContext,"sex",""));
-        tv_card.setText(SPUtil.get(mContext,"smkCard","")+"");
-        tv_age_l.setText(SPUtil.get(mContext,"age","")+"");
+        String sex = GlobalConfig.ssCard.getSex().equals("0")?"女":"男";
+        tv_name.setText(GlobalConfig.ssCard.getName().trim()+"("+sex+")");
+        tv_card.setText(GlobalConfig.ssCard.getCardNum());
+        tv_age_l.setText(String.valueOf(GlobalConfig.age));
+        tv_dept.setText(currentRecipes.get(0).appointDepartName);
+        tv_result.setText(currentRecipes.get(0).organDiseaseName);
+        tv_date.setText(currentRecipes.get(0).createDate);
+
         // 处理处方信息，并展示
         reflashRecyclerView(rv_contentFastLib,currentRecipes);
     }
@@ -189,27 +194,32 @@ public class ConfirmRecipesFragment extends BaseEventFragment {
      * 确定处方单
      */
     public void requestCreateOrder(){
-        ApiRepository.getInstance().createOrder(recipeId)
-                .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
-                .subscribe(new FastLoadingObserver<CreateOrderResultEntity>() {
-                    @Override
-                    public void _onNext(CreateOrderResultEntity entity) {
-                        if (entity == null) {
-                            ToastUtil.show("请检查网络");
-                            return;
-                        }
-                        if (entity.isSuccess()){
-                            ArrayList<String> list = new ArrayList<>();
-                            for (GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO currentRecipe : currentRecipes) {
-                               // todo 这里需要药品机构代码  organDrugCode
-                                list.add(currentRecipe.recipeCode);
-                            }
-                            requestGetStockInfo(GlobalConfig.cabinetId,list);
-                        }else{
-                            ToastUtil.show(entity.message);
-                        }
-                    }
-                });
+        ArrayList<String> list = new ArrayList<>();
+        for (GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO currentRecipe : currentRecipes) {
+            list.add(currentRecipe.recipeDetailBeanList.get(0).organDrugCode);
+        }
+        requestGetStockInfo(GlobalConfig.cabinetId,list);
+
+//        ApiRepository.getInstance().createOrder(recipeId)
+//                .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
+//                .subscribe(new FastLoadingObserver<CreateOrderResultEntity>() {
+//                    @Override
+//                    public void _onNext(CreateOrderResultEntity entity) {
+//                        if (entity == null) {
+//                            ToastUtil.show("请检查网络");
+//                            return;
+//                        }
+//                        if (entity.isSuccess()){
+//                            ArrayList<String> list = new ArrayList<>();
+//                            for (GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO currentRecipe : currentRecipes) {
+//                                list.add(currentRecipe.recipeDetailBeanList.get(0).organDrugCode);
+//                            }
+//                            requestGetStockInfo(GlobalConfig.cabinetId,list);
+//                        }else{
+//                            ToastUtil.show(entity.message);
+//                        }
+//                    }
+//                });
     }
 
     /**
@@ -228,17 +238,34 @@ public class ConfirmRecipesFragment extends BaseEventFragment {
                             return;
                         }
                         if (entity.isSuccess()){
-                            //todo 数据结构格式化 pay的推送 Drugs 类
-//                            // 拉到数据了，有库存
-//                            // 然后取支付页面请求支付，合并处方单
-//                            ArrayList<String> recipeids = new ArrayList<>();
-//                            ArrayList<String> recipeCode = new ArrayList<>();
-//                            for (GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes.RecipeDetail item : obj.recipeDetailBeans) {
-//                                recipeids.add(String.valueOf(item.recipeId));
-//                                recipeCode.add(String.valueOf(item.organDrugCode));
-//                            }
-//                            //当处方单产生订单，并且订单有效时取的是订单的真实金额，其他时候取的处方的总金额保留两位小数
-//                            start(PayRecipeFragment.newInstance(recipeId,recipeids,recipeCode,obj));
+                            // 启动处方单推送接口
+                            // 拉到数据了，有库存
+                            // 然后取支付页面请求支付，合并处方单
+                            ArrayList<String> recipeids = new ArrayList<>();
+                            ArrayList<String> recipeCode = new ArrayList<>();
+                            ArrayList<PayRecipeFragment.DrugObject> drugs = new ArrayList<>();
+                            for (GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO currentRecipe : currentRecipes) {
+                                GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO.RecipeDetailBeanListDTO vo = currentRecipe.recipeDetailBeanList.get(0);
+                                PayRecipeFragment.DrugObject drug= new PayRecipeFragment.DrugObject();
+                                //            drugs.put("direction","口服");
+                                drug.dosageUnit = vo.drugUnit;
+                                drug.drugCommonName = vo.drugName;
+                                drug.drugTradeName = vo.drugName;
+                                drug.eachDosage = String.valueOf(vo.defaultUseDose);
+                                drug.itemDays = String.valueOf(vo.useDays);
+                                drug.price = String.valueOf(vo.drugCost);
+                                drug.quantity =String.valueOf( vo.sendNumber);
+                                drug.quantityUnit = vo.drugUnit;
+                                drug.sku = vo.organDrugCode;
+                                drug.spec =String.valueOf( vo.drugSpec);
+                                drugs.add(drug);
+                                recipeids.add(String.valueOf(vo.recipeId));
+                                recipeCode.add(String.valueOf(vo.organDrugCode));
+                            }
+                            // 拉到数据了，有库存
+                            // 然后取支付页面请求支付，合并处方单
+                            //当处方单产生订单，并且订单有效时取的是订单的真实金额，其他时候取的处方的总金额保留两位小数
+                            start(PayRecipeFragment.newInstance(recipeId,recipeids,recipeCode,drugs));
                         }
                     }
                 });
@@ -281,26 +308,16 @@ public class ConfirmRecipesFragment extends BaseEventFragment {
 
             @Override
             public void onItemViewDraw(AutoObjectAdaptor.ViewHolder holder, int position, GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO itemData) {
-//                String drugName = (position+1)+"、"+itemData.getDrugName();
-//                String wayToUse = "(1天"+itemData.getUseTotalDose()/itemData.getUseDays()+"次，每次"+itemData.getUseDose()+"片)";
-//                String[] orders = {"#333333",drugName,"#38ABA0",wayToUse};
-//                ((TextView)holder.itemView.findViewById(R.id.tv_useDose)).setText(ActivityUtils.formatTextView(orders));//使用方法
+                GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO.RecipeDetailBeanListDTO vo = itemData.recipeDetailBeanList.get(0);
+                int perDayUse = ((Double) vo.useDose).intValue();
+
+                String drugName = (position+1)+"、"+vo.drugName;
+                String wayToUse = "(1天"+vo.useTotalDose/vo.useDays+"次，每次"+perDayUse+"片)";
+                String[] orders = {"#333333",drugName,"#38ABA0",wayToUse};
+                ((TextView)holder.itemView.findViewById(R.id.tv_useDose)).setText(ActivityUtils.formatTextView(orders));//使用方法
             }
         });
 
-//        proxy.setListener(new AutoAdaptorProxy.IItemListener<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes.RecipeDetail>() {
-//            @Override
-//            public void onItemClick(AutoObjectAdaptor.ViewHolder holder, int position, GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes.RecipeDetail itemData) {
-//            }
-//
-//            @Override
-//            public void onItemViewDraw(AutoObjectAdaptor.ViewHolder holder, int position, GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes.RecipeDetail itemData) {
-//                String drugName = (position+1)+"、"+itemData.getDrugName();
-//                String wayToUse = "(1天"+itemData.getUseTotalDose()/itemData.getUseDays()+"次，每次"+itemData.getUseDose()+"片)";
-//                String[] orders = {"#333333",drugName,"#38ABA0",wayToUse};
-//                ((TextView)holder.itemView.findViewById(R.id.tv_useDose)).setText(ActivityUtils.formatTextView(orders));//使用方法
-//            }
-//        });
         //刷新
         proxy.notifyDataSetChanged();
     }
