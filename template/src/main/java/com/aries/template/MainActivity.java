@@ -293,15 +293,6 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
      */
     public static int getAge(long birthday) {
         return DateUtils.getAge(String.valueOf(birthday));
-//        Calendar currentCalendar = Calendar.getInstance();//实例化calendar
-//        currentCalendar.setTimeInMillis(System.currentTimeMillis());//调用setTimeInMillis方法和System.currentTimeMillis()获取当前时间
-//        Calendar targetCalendar = Calendar.getInstance();
-//        targetCalendar.setTimeInMillis(birthday);//这个解析传进来的时间戳
-//        if (currentCalendar.get(Calendar.MONTH) >= targetCalendar.get(Calendar.MONTH)) {//如果现在的月份大于生日的月份
-//            return currentCalendar.get(Calendar.YEAR) - targetCalendar.get(Calendar.YEAR);//那就直接减,因为现在的年月都大于生日的年月
-//        } else {
-//            return currentCalendar.get(Calendar.YEAR) - targetCalendar.get(Calendar.YEAR) - 1;//否则,减掉一年
-//        }
     }
 
     /**
@@ -412,7 +403,6 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                                     int status = item.getConsults().getStatus();
                                    if ( item.getConsults().getPayflag()==1 &&
                                            (status==1 || status ==2 || status == 3 || status == 4)){
-                                       // todo 4 要去掉
                                        //status=4 问诊中
                                        isDepartTag = false;
                                        // 挂号
@@ -433,7 +423,7 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                                 ArrayList<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes> recipes = new ArrayList();
                                 for (GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes item : entity.data.recipes) {
                                     // 1 待审核, 2 待处理, 3 待取药
-                                    if (item.statusCode==2){
+                                    if (item.status==2){
                                         recipes.add(item);
                                     }
                                 }

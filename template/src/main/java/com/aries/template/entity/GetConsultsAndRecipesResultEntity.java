@@ -1057,6 +1057,7 @@ public class GetConsultsAndRecipesResultEntity {
             public Double totalMoney;
             public String statusText;
             public Integer statusCode;
+            public Integer status;
             public String recipeSurplusHours;
             public Integer recipeType;
             public List<RecipeDetail> recipeDetailBeans;
@@ -1123,6 +1124,14 @@ public class GetConsultsAndRecipesResultEntity {
 
             public void setStatusCode(Integer statusCode) {
                 this.statusCode = statusCode;
+            }
+
+            public Integer getStatus() {
+                return status;
+            }
+
+            public void setStatus(Integer status) {
+                this.status = status;
             }
 
             public String getRecipeSurplusHours() {

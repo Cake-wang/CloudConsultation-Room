@@ -43,6 +43,7 @@ import com.aries.template.xiaoyu.model.RegRequest;
 import com.aries.template.xiaoyu.model.EndPoint;
 import com.aries.template.xiaoyu.model.RtcStartInvokeRequest;
 import com.aries.template.xiaoyu.uvc.UVCCameraPresenter;
+import com.aries.template.xiaoyu.xinlin.XLMessage;
 import com.hyphenate.EMCallBack;
 import com.hyphenate.EMMessageListener;
 import com.hyphenate.chat.EMClient;
@@ -87,6 +88,7 @@ public class EaseModeProxy {
     // 是否关闭画面
     private boolean muteVideo=false;
 
+
     // 信令 Socket 对象, 这个socket 不需要设置心跳包
     private WebSocketClient webSocketClient;
     // 向大屏进行通讯的socket，不需要设置心跳包
@@ -112,9 +114,7 @@ public class EaseModeProxy {
     //------------小鱼的配置
     private static final String xyAppId = "5886885697deb9f4760b3a5e1ab912b9a3b7dfd3"; //小鱼appid 固定
     private String account = "8827"; //患者小鱼id，实际上是从信令获取到的
-    //    private static final String meetingRoomNumber = "910007543093"; //会议室房间号,从接口获取到的
     private String meetingRoomNumber = "9038284649"; //会议室房间号,从接口获取到的 还没有
-    //    private static final String meetingPassword = "383164"; //会议室密码，从接口获取到的
     private String meetingPassword = "348642"; //会议室密码，从接口获取到的 还没有
 
 
@@ -126,6 +126,10 @@ public class EaseModeProxy {
     private boolean isEasemodStarted = false;
     // 是否监听到了医生发送了消息
     private boolean isDoctorMessaged = false;
+    // 医生是否进入过
+//    private boolean isDoctorEnterRoom=false;
+    // 信令专用信息传送器
+    private XLMessage xlMessage;
 
     // 环信监听会执行这个方法，当他在视频外被执行时isEasemodStarted为false，无法打开socket但是会更改参数
     public void setDoctorMessaged(boolean doctorMessaged) {
@@ -236,37 +240,6 @@ public class EaseModeProxy {
     }
 
 
-//    /**
-//     * 获取第三方配置信息
-//     */
-//    private void requestConfigurationToThirdForPatient(String inputconsultId,String inputnickname,String inputdoctorUserId){
-//        ApiRepository.getInstance().getConfigurationToThirdForPatient(GlobalConfig.NALI_TID,GlobalConfig.NALI_APPKEY)
-//                .compose(((MainActivity) activity.get()).bindUntilEvent(ActivityEvent.DESTROY))
-//                .subscribe(new FastLoadingObserver<ConfigurationToThirdForPatientEntity>("请稍后...") {
-//                    @Override
-//                    public void _onNext(ConfigurationToThirdForPatientEntity entity) {
-//                        if (entity == null) {
-//                            ToastUtil.show("请检查网络");
-//                            return;
-//                        }
-//                        if (entity.getData().isSuccess()){
-//                            consultId = inputconsultId;
-//                            nickname = nickname;
-//                            doctorUserId = doctorUserId;
-//                            easemobUserName = userName;
-//                            easemobPassword = password;
-//                            this.xlPatientUserId = xlPatientUserId;
-//                            EaseModeProxy.with().easemobStart(activity.get(),
-//                                    consultId,
-//                                    nickname,
-//                                    doctorUserId,
-//                                    entity.getData().getJsonResponseBean().getBody().getUsername(),
-//                                    entity.getData().getJsonResponseBean().getBody().getUserpwd(),
-//                                    entity.getData().getJsonResponseBean().getBody().getUserId());
-//                        }
-//                    }
-//                });
-//    }
 
     /**
      * 专门登录环信
@@ -296,6 +269,7 @@ public class EaseModeProxy {
 //                        setDoctorMessaged(true);
                         //todo 提示患者，医生挂断视频
                         try {
+//                            xlMessage = new XLMessage(xlPatientUserId,XL_URL,activity.get());
                             createWebSocketClient();
                         } catch (URISyntaxException e) {
                             e.printStackTrace();
@@ -595,7 +569,7 @@ public class EaseModeProxy {
 
                                 @Override
                                 public void onCallFail(String s, String s1) {
-                                    ToastWithLogin(s + " " + s1);
+                                    ToastWithLogin("参会不成功"+s + " " + s1);
                                 }
                             });
                         } else {
@@ -723,11 +697,19 @@ public class EaseModeProxy {
             @Override
             public void onVideoDataSourceChange(List<VideoInfo> videoInfos, boolean hasVideoContent) {
                     if (videoInfos.size()>0){
-                            if (videoCell !=null)
+                        if (videoCell !=null)
                                 videoCell.setVideoInfo(videoInfos.get(0));
                         if (listener!=null)
                             listener.onDoctorInRoom();
+//                        isDoctorEnterRoom = true;
                     }
+//                    else if (videoInfos.size()==0){
+//                        // 现在的房间没有其他人了
+//                        if (isDoctorEnterRoom){
+//                            // 医生曾进入过
+//                            ToastUtil.show("医生已经离开");
+//                        }
+//                    }
             }
         });
     }
@@ -764,6 +746,9 @@ public class EaseModeProxy {
         webSocketClient.send(cmd);
     }
 
+    /**
+     * 用户已经离开，进入支付
+     */
     private void sendNotifyPaintLiveMsg(){
         if (webSocketClient==null) {
             try {
@@ -771,6 +756,8 @@ public class EaseModeProxy {
             } catch (URISyntaxException e) {
                 e.printStackTrace();
             }
+        }else{
+            webSocketClient.connect();
         }
         Map<String, Object> endPoint = new HashMap<>();
         endPoint.put("doctorUserId",doctorUserId);
@@ -792,12 +779,12 @@ public class EaseModeProxy {
     public void closeVideoProxy(){
         // 病人离席
         // todo 向大屏幕socket传递离开信息
-        // 释放视频资源
+        // 如果医生没有进入房间
         if (!NemoSDK.getInstance().inCalling()){
             releaseProxy();
         }
+        // 如果医生已经进入房间
         NemoSDK.getInstance().hangup();// 挂断通话
-
     }
 
     /**
@@ -926,4 +913,37 @@ public class EaseModeProxy {
         default void onVideoSuccessLinked(){};// 入会成功
         default void onDoctorInRoom(){};//医生进入的时候，将医生的 video Info 给予外部
     }
+
+
+//    /**
+//     * 获取第三方配置信息
+//     */
+//    private void requestConfigurationToThirdForPatient(String inputconsultId,String inputnickname,String inputdoctorUserId){
+//        ApiRepository.getInstance().getConfigurationToThirdForPatient(GlobalConfig.NALI_TID,GlobalConfig.NALI_APPKEY)
+//                .compose(((MainActivity) activity.get()).bindUntilEvent(ActivityEvent.DESTROY))
+//                .subscribe(new FastLoadingObserver<ConfigurationToThirdForPatientEntity>("请稍后...") {
+//                    @Override
+//                    public void _onNext(ConfigurationToThirdForPatientEntity entity) {
+//                        if (entity == null) {
+//                            ToastUtil.show("请检查网络");
+//                            return;
+//                        }
+//                        if (entity.getData().isSuccess()){
+//                            consultId = inputconsultId;
+//                            nickname = nickname;
+//                            doctorUserId = doctorUserId;
+//                            easemobUserName = userName;
+//                            easemobPassword = password;
+//                            this.xlPatientUserId = xlPatientUserId;
+//                            EaseModeProxy.with().easemobStart(activity.get(),
+//                                    consultId,
+//                                    nickname,
+//                                    doctorUserId,
+//                                    entity.getData().getJsonResponseBean().getBody().getUsername(),
+//                                    entity.getData().getJsonResponseBean().getBody().getUserpwd(),
+//                                    entity.getData().getJsonResponseBean().getBody().getUserId());
+//                        }
+//                    }
+//                });
+//    }
 }

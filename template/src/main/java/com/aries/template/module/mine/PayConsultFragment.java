@@ -5,6 +5,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -79,6 +81,8 @@ public class PayConsultFragment extends BaseEventFragment {
     ImageView mIvQrcode;// 二维码
     @BindView(R.id.jtjk_pay_text)
     TextView jtjk_pay_text;
+    @BindView(R.id.jtjk_pay_reflash_tip)
+    TextView jtjk_pay_reflash_tip;
 
     /**
      * 跳转科室，需要带的数据
@@ -133,6 +137,10 @@ public class PayConsultFragment extends BaseEventFragment {
 
         String[] orders = {"#38ABA0","支付宝·","#333333","扫一扫"};
         jtjk_pay_text.setText(ActivityUtils.formatTextView(orders));
+
+        jtjk_pay_reflash_tip.setOnClickListener(v -> {
+            requestPayOrder(consultId);
+        });
     }
 
     private static final int PERIOD = 5* 1000;
@@ -215,12 +223,15 @@ public class PayConsultFragment extends BaseEventFragment {
                             ToastUtil.show("请检查网络");
                             return;
                         }
-                        if (entity.isSuccess()){
+                        if (entity.getData().isSuccess()){
                             // 显示二维码
                            String qrStr = entity.getData().getJsonResponseBean().getBody().qr_code;
                            Resources res = getActivity().getResources();
                            Bitmap bmp= BitmapFactory.decodeResource(res, R.drawable.pay_alilogo);
                            showQRCode(XQRCode.createQRCodeWithLogo(qrStr, 400, 400, bmp));
+                            jtjk_pay_reflash_tip.setVisibility(View.GONE);
+                        }else {
+                            jtjk_pay_reflash_tip.setVisibility(View.VISIBLE);
                         }
                     }
                 });

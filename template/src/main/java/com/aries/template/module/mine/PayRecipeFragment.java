@@ -5,9 +5,12 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.alibaba.fastjson.JSON;
 import com.aries.library.fast.retrofit.FastLoadingObserver;
 import com.aries.library.fast.retrofit.FastObserver;
 import com.aries.library.fast.util.ToastUtil;
@@ -59,9 +62,10 @@ public class PayRecipeFragment extends BaseEventFragment {
 
     /** 从外部传入的数据  */
     private String recipeId;//处方单ID
-    private String patientSex;//处方单ID
-    private String patientName;//处方单ID
-    private String organDiseaseName;//处方单ID
+    private String patientSex;//性别
+    private String patientName;//姓名
+    private String organDiseaseName;//疾病名称
+    private String busId;//合并订单号，如果有，则刷新二维码，如果没有，就再次尝试合并订单
     private String recipeFee="0.01";//药品费 当处方单产生订单，并且订单有效时取的是订单的真实金额，其他时候取的处方的总金额保留两位小数,总费用用接口获取
     private ArrayList<String> recipes;//处方ID集合
     private ArrayList<String> recipeCodes;//HIS处方编码集合，可以从处方详情中获取
@@ -83,6 +87,8 @@ public class PayRecipeFragment extends BaseEventFragment {
     ImageView mIvQrcode;// 二维码
     @BindView(R.id.jtjk_pay_text)
     TextView jtjk_pay_text;
+    @BindView(R.id.jtjk_pay_reflash_tip)
+    TextView jtjk_pay_reflash_tip;
 
     /**
      * 跳转科室，需要带的数据
@@ -132,9 +138,18 @@ public class PayRecipeFragment extends BaseEventFragment {
         if (GlobalConfig.ssCard!=null)
             tv_name.setText(GlobalConfig.ssCard.getName());
 //        tv_fee_all.setText(recipeFee);
+        // 支付提示
         String[] orders = {"#38ABA0","支付宝·","#333333","扫一扫"};
         jtjk_pay_text.setText(ActivityUtils.formatTextView(orders));
+        // 支付类型
         tv_fee_type.setText("处方费");
+        // 支付二维码刷新
+        jtjk_pay_reflash_tip.setOnClickListener(v -> {
+            if (TextUtils.isEmpty(busId))
+                requestBatchCreateOrder(recipeFee, recipes, recipeCodes);
+            else
+                requestPayOrder(busId);
+        });
     }
 
     private static final int PERIOD = 5* 1000;
@@ -167,8 +182,8 @@ public class PayRecipeFragment extends BaseEventFragment {
                             ToastUtil.show("请检查网络");
                             return;
                         }
-                        // 检查 payFlag 如果是 1 就是支付成功
-                        if (entity.isSuccess()){
+                        // 检查 payFlag 如果是 3 就是支付成功
+                        if (entity.getData().isSuccess()){
                             if (entity.getData().getJsonResponseBean().getBody()!=null &&
                                     entity.getData().getJsonResponseBean().getBody().getRecipe().getPayFlag()==1){
                                 // 4.1.4 处方药品推送接口
@@ -186,9 +201,19 @@ public class PayRecipeFragment extends BaseEventFragment {
      * 支付的基础是创建一个可以支付的处方单。里面有很多处方。
      */
     public void requestPrescriptionPush(String clinicSn){
+
+
         // 生成处方单药物集，遍历生成数据，准备输入
         ArrayList<Map> drugs = new ArrayList<>();
         for (DrugObject item : obj) {
+            // 药品发放数量必须是整型
+            item.sku = "packing-bag";//todo cc
+            int quantityInt = (Double.valueOf(item.quantity)).intValue();
+            // 药品发放数量不小于1
+            if (quantityInt<=0)quantityInt=1;
+            // 价格必须是整型，单位是分
+            int priceInt = ((Double)(Double.valueOf(item.price)*100)).intValue();
+            // 组织药品数据
             Map<String, Object> drug= new HashMap<>();
             //            drugs.put("direction","口服");
             drug.put("dosageUnit",item.dosageUnit);
@@ -196,8 +221,8 @@ public class PayRecipeFragment extends BaseEventFragment {
             drug.put("drugTradeName",item.drugTradeName);
             drug.put("eachDosage",item.eachDosage);
             drug.put("itemDays",item.itemDays);
-            drug.put("price",item.price);
-            drug.put("quantity",item.quantity);
+            drug.put("price",String.valueOf(priceInt));
+            drug.put("quantity",String.valueOf(quantityInt));
             drug.put("quantityUnit",item.quantityUnit);
             drug.put("sku",item.sku);
             drug.put("spec",item.spec);
@@ -218,6 +243,7 @@ public class PayRecipeFragment extends BaseEventFragment {
 //            drug.put("spec",item.pack);
 //            drugs.add(drug);
 //        }
+        int recipeFeeTrans = (((Float) (Float.valueOf(recipeFee) * 100)).intValue());
         ApiRepository.getInstance().prescriptionPush(clinicSn,
                         GlobalConfig.hospitalName,
                         GlobalConfig.ssCard.getSSNum(),
@@ -225,7 +251,7 @@ public class PayRecipeFragment extends BaseEventFragment {
                         patientName,
                         organDiseaseName,
                         recipeId,
-                        recipeFee,
+                        String.valueOf(recipeFeeTrans),
                         drugs)
                 .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
                 .subscribe(new FastLoadingObserver<PrescriptionPushEntity>("请稍后...") {
@@ -235,12 +261,17 @@ public class PayRecipeFragment extends BaseEventFragment {
                             ToastUtil.show("请检查网络，返回首页后重试");
                             return;
                         }
+                        // 释放资源。只要进入到这里，就结束请求支付轮训
+                        onDismiss();
+                        // 获取打药单
                         if (entity.getData().isSuccess()){
                             // todo 打印取药单
-                            if (entity.getData().getTakeCode()!=null)
-                                start(ResultFragment.newInstance("paySuc:"+entity.getData().getTakeCode()));
-                            // 释放资源
-                            onDismiss();
+                            //"data": "{\"orderNo\":\"\",\"takeCode\":\"34811555\"}",
+                            // 判定药品是否还有库存
+                            // data 的返回类型 {\"1\":0,\"2\":0}
+                            Map<String,Object> objectMap = (Map<String, Object>) JSON.parse(entity.getData().getData());
+                            if (!TextUtils.isEmpty(objectMap.get("takeCode").toString()))
+                                start(ResultFragment.newInstance("paySuc:"+objectMap.get("takeCode")));
                         }
                     }
                 });
@@ -281,9 +312,11 @@ public class PayRecipeFragment extends BaseEventFragment {
                             return;
                         }
                         if (entity.getData().isSuccess()){
-                            String busId = String.valueOf(entity.getData().getJsonResponseBean().getBody());
-                            if (!busId.equals("0"))
+                            String inputPusId = String.valueOf(entity.getData().getJsonResponseBean().getBody());
+                            if (!TextUtils.isEmpty(inputPusId)){
+                                busId = inputPusId;
                                 requestPayOrder(busId);
+                            }
                         }else{
                             ToastUtil.show("合并订单失败");
                         }
@@ -307,11 +340,13 @@ public class PayRecipeFragment extends BaseEventFragment {
                         }
                         if (entity.getData().isSuccess()){
                             // 显示二维码
-                           String qrStr = entity.getData().getJsonResponseBean().getBody().qr_code;
+                            jtjk_pay_reflash_tip.setVisibility(View.GONE);
+                            String qrStr = entity.getData().getJsonResponseBean().getBody().qr_code;
                             Resources res = getActivity().getResources();
                             Bitmap bmp= BitmapFactory.decodeResource(res, R.drawable.pay_alilogo);
                             showQRCode(XQRCode.createQRCodeWithLogo(qrStr, 400, 400, bmp));
                         }else{
+                            jtjk_pay_reflash_tip.setVisibility(View.VISIBLE);
                             ToastUtil.show("获取支付宝二维码失败");
                         }
                     }

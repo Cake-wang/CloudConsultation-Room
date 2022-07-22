@@ -192,14 +192,18 @@ public class ConfirmConsultFragment extends BaseEventFragment implements Compoun
      * 日期选择框 显示
      */
     public void showDatePickerDialog(Context context, int themeResId, final TextView tv, Calendar calendar) {
-        new DatePickerDialog(context
+        DatePickerDialog dialog = new DatePickerDialog(context
                 , themeResId
                 , (view, year, monthOfYear, dayOfMonth) -> tv.setText(String.format("%d-%d-%d", year, (monthOfYear + 1), dayOfMonth))
                 // 设置初始日期
                 , calendar.get(Calendar.YEAR)
                 , calendar.get(Calendar.MONTH)
-                , calendar.get(Calendar.DAY_OF_MONTH))
-                .show();
+                , calendar.get(Calendar.DAY_OF_MONTH));
+        dialog.show();
+        if (dialog.getButton(DatePickerDialog.BUTTON_POSITIVE)!=null){
+            dialog.getButton(DatePickerDialog.BUTTON_POSITIVE).setTextColor(Color.parseColor("#38ABA0"));
+            dialog.getButton(DatePickerDialog.BUTTON_NEGATIVE).setTextColor(Color.parseColor("#38ABA0"));
+        }
     }
 
     /**
@@ -260,9 +264,6 @@ public class ConfirmConsultFragment extends BaseEventFragment implements Compoun
                             // 通过确诊单，进入到复诊单支付
 //                            start(PayConsultFragment.newInstance());
                             // 医生 确认复诊，并进入复诊阶段
-//                            start(VideoConsultFragment.newInstance(String.valueOf(entity.data.jsonResponseBean.body.consult.consultId),
-//                                    entity.data.jsonResponseBean.body.patient.patientName,
-//                                    String.valueOf(entity.data.jsonResponseBean.body.doctor.doctorId)));// todo cc
                             start(PayConsultFragment.newInstance(String.valueOf(entity.data.jsonResponseBean.body.consult.consultId),
                                     entity.data.jsonResponseBean.body.patient.patientName,
                                     String.valueOf(entity.data.jsonResponseBean.body.doctor.loginId),

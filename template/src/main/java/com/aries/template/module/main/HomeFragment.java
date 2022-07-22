@@ -1,10 +1,12 @@
 package com.aries.template.module.main;
 
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.alibaba.fastjson.JSON;
 import com.aries.library.fast.retrofit.FastLoadingObserver;
 import com.aries.library.fast.util.SPUtil;
 import com.aries.library.fast.util.ToastUtil;
@@ -15,6 +17,7 @@ import com.aries.template.entity.ConfigurationToThirdForPatientEntity;
 import com.aries.template.entity.MachineEntity;
 import com.aries.template.module.base.BaseEventFragment;
 import com.aries.template.module.mine.MineCardFragment;
+import com.aries.template.module.mine.ResultFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.template.xiaoyu.EaseModeProxy;
 import com.aries.ui.view.title.TitleBarView;
@@ -86,6 +89,13 @@ public class HomeFragment extends BaseEventFragment{
 //                start(VideoConsultFragment.newInstance(FakeDataExample.consultId,FakeDataExample.nickname,FakeDataExample.doctorUserId));// todo cc
 //                start(PayCodeFragment.newInstance(FakeDataExample.recipeFee,FakeDataExample.recipeIds,FakeDataExample.recipeCode));// todo cc
 //            startActivity(new Intent(getActivity(), MeetingActivity.class));//todo cc
+
+//            String str = "{\"orderNo\":\"\",\"takeCode\":\"56480083\"}";
+//            // 判定药品是否还有库存
+//            // data 的返回类型 {\"1\":0,\"2\":0}
+//            Map<String,Object> objectMap = (Map<String, Object>) JSON.parse(str);
+//            if (!TextUtils.isEmpty(objectMap.get("takeCode").toString()))
+//                start(ResultFragment.newInstance("paySuc:"+objectMap.get("takeCode")));
         });
 
         // 点击复诊

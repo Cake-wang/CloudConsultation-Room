@@ -9,6 +9,7 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.alibaba.fastjson.JSON;
 import com.aries.library.fast.retrofit.FastLoadingObserver;
 import com.aries.library.fast.util.SPUtil;
 import com.aries.library.fast.util.ToastUtil;
@@ -237,7 +238,19 @@ public class ConfirmRecipesFragment extends BaseEventFragment {
                             ToastUtil.show("请检查网络，返回首页后重试");
                             return;
                         }
-                        if (entity.isSuccess()){
+                        if (entity.getData().isSuccess()){
+                            // 判定药品是否还有库存
+                            // data 的返回类型 {\"1\":0,\"2\":0}
+//                            Map<String,Object> objectMap = (Map<String, Object>) JSON.parse(entity.getData().getData());
+//                            for (String key : objectMap.keySet()) {
+//                                if (String.valueOf(objectMap.get(key)).equals("0")){
+//                                    // 药品编码 的 这个药没有，提示用户
+////                                ToastUtil.show("药品库存不够");
+//                                    start(ResultFragment.newInstance("stockFail"));
+//                                    return;
+//                                }
+//                            }
+
                             // 启动处方单推送接口
                             // 拉到数据了，有库存
                             // 然后取支付页面请求支付，合并处方单

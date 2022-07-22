@@ -1,37 +1,26 @@
 package com.aries.template.module.mine;
 
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
-import android.view.View;
+import android.text.TextUtils;
 import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.aries.library.fast.retrofit.FastLoadingObserver;
-import com.aries.library.fast.util.ToastUtil;
-import com.aries.template.GlobalConfig;
 import com.aries.template.R;
-import com.aries.template.entity.FindValidOrganProfessionForRevisitResultEntity;
 import com.aries.template.entity.GetConsultsAndRecipesResultEntity;
 import com.aries.template.module.base.BaseEventFragment;
-import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.template.utils.ActivityUtils;
 import com.aries.template.utils.DateUtils;
 import com.aries.template.widget.autoadopter.AutoAdaptorProxy;
 import com.aries.template.widget.autoadopter.AutoObjectAdaptor;
 import com.aries.template.widget.autoadopter.DefenceAutoAdaptorProxy;
-import com.aries.template.widget.updownbtn.DefenceUpDownProxy;
 import com.aries.template.widget.updownbtn.UpDownProxy;
 import com.aries.ui.view.title.TitleBarView;
-import com.trello.rxlifecycle3.android.FragmentEvent;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 import butterknife.BindView;
 
@@ -59,7 +48,7 @@ public class OrderRecipesListFragment extends BaseEventFragment {
     }
 
     /** 上一页，下一页管理器 */
-    private DefenceUpDownProxy<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes> upDownProxy;
+    private UpDownProxy<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes> upDownProxy;
 
     @BindView(R.id.btn_cancel)
     Button btn_cancel;// 上一页按钮
@@ -101,7 +90,7 @@ public class OrderRecipesListFragment extends BaseEventFragment {
 
 
         // 创建 上一页，下一页管理器
-        upDownProxy = new DefenceUpDownProxy<>();
+        upDownProxy = new UpDownProxy<>();
         upDownProxy.setOnEventListener(new UpDownProxy.EventListener<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes>() {
             @Override
             public void reFlashRV(ArrayList<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes> newDatas) {
@@ -121,15 +110,17 @@ public class OrderRecipesListFragment extends BaseEventFragment {
                         });
 
                         // 添加文字
-                        int minute = ((Float)(Float.valueOf(itemData.recipeSurplusHours)*60)).intValue();
+                        int minute = 0;
+                        if (!TextUtils.isEmpty(itemData.recipeSurplusHours)){
+                            minute = ((Float)(Float.valueOf(itemData.recipeSurplusHours)*60)).intValue();
+                        }
                         String openTime = itemData.signDate.split(" ")[0];
                         ((TextView)holder.itemView.findViewById(R.id.jtjk_recipe_disastname)).setText(itemData.organDiseaseName);
                         ((TextView)holder.itemView.findViewById(R.id.jtjk_recipe_optime)).setText("开方时间:  "+openTime);
                         ((TextView)holder.itemView.findViewById(R.id.jtjk_recipe_closetime)).setText("失效时间:  "+DateUtils.addHour(openTime,"yyyy-MM-dd",minute));
 
-
-
                         // 添加金额样式
+                        if (itemData.totalMoney==null)itemData.totalMoney = 0.0d;
                         String[] orders = {"#38ABA0",itemData.totalMoney.toString(),"#333333","元"};
                         ((TextView)holder.itemView.findViewById(R.id.jtjk_recipe_totoalpayment)).setText(ActivityUtils.formatTextView(orders));//使用方法
                     }

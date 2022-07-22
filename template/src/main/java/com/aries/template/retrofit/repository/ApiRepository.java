@@ -618,6 +618,7 @@ public class ApiRepository extends BaseRepository {
     /**
      * 4.1.4 处方药品推送接口
      * todo 处方单里面没有医生和科室信息？
+     * @param totalAmount 这里的价格单位是分，所以输入的时候，要乘以100
      */
     public Observable<PrescriptionPushEntity> prescriptionPush(String  clinicSN,
                                                                String  hospitalName,

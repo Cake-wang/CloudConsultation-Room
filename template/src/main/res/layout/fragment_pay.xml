@@ -417,46 +417,67 @@
 
                 </LinearLayout>
 
-                <LinearLayout
+                <RelativeLayout
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:gravity="center"
                     android:layout_marginLeft="120dp"
                     android:visibility="visible"
-                    android:orientation="vertical"
                     android:paddingHorizontal="40dp"
                     android:paddingVertical="20dp"
                     >
 
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:visibility="visible"
+                        android:orientation="vertical"
+                        >
+
+                        <TextView
+                            android:id="@+id/jtjk_pay_text"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#333333"
+                            android:layout_marginTop="16dp"
+                            android:textSize="22dp"
+                            android:gravity="left"
+                            android:text="支付宝·扫一扫" />
+
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/bg_pay_w_yzs"
+                            android:visibility="gone"
+                            />
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/iv_qrcode"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/bg_pay_w_yzs"
+                            android:layout_marginTop="10dp"
+                            android:minWidth="120dp"
+                            android:minHeight="120dp"
+                            android:scaleType="fitXY" />
+
+                    </LinearLayout>
+
                     <TextView
-                        android:id="@+id/jtjk_pay_text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="#333333"
-                        android:layout_marginTop="16dp"
+                        android:id="@+id/jtjk_pay_reflash_tip"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:text="请点击刷新"
                         android:textSize="22dp"
-                        android:gravity="left"
-                        android:text="支付宝·扫一扫" />
-
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:src="@drawable/bg_pay_w_yzs"
-                        android:visibility="gone"
+                        android:textColor="#38ABA0"
                         />
 
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/iv_qrcode"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/bg_pay_w_yzs"
-                        android:layout_marginTop="10dp"
-                        android:minWidth="120dp"
-                        android:minHeight="120dp"
-                        android:scaleType="fitXY" />
+                </RelativeLayout>
 
-                </LinearLayout>
+
             </LinearLayout>
 
 
