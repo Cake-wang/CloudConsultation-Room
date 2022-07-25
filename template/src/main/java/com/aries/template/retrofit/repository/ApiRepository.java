@@ -32,6 +32,7 @@ import com.aries.template.entity.GetStockInfoEntity;
 import com.aries.template.entity.IsRegisterRequestEntity;
 import com.aries.template.entity.IsRegisterResultEntity;
 import com.aries.template.entity.MachineEntity;
+import com.aries.template.entity.PatientFinishGraphicTextConsultEntity;
 import com.aries.template.entity.PatientListEntity;
 import com.aries.template.entity.PayOrderEntity;
 import com.aries.template.entity.PrescriptionPushEntity;
@@ -804,6 +805,20 @@ public class ApiRepository extends BaseRepository {
         // 请求的类型
         RequestBody body = BodyCreate(bizContent,"getRecipeListByConsultId");
         return FastTransformer.switchSchedulers(getApiService().getRecipeListByConsultId(body).retryWhen(new FastRetryWhen()));
+    }
+
+    /**
+     * 结束问诊
+     * 纳里结束问诊的接口
+     */
+    public Observable<PatientFinishGraphicTextConsultEntity> patientFinishGraphicTextConsult(String consultId) {
+        // 除了公共的数据之外，还有其他的数据请求
+        Map<String,Object> bizContent = new HashMap<>();
+        bizContent.put("consultId", consultId);//复诊单 ID
+
+        // 请求的类型
+        RequestBody body = BodyCreate(bizContent,"patientFinishGraphicTextConsult");
+        return FastTransformer.switchSchedulers(getApiService().patientFinishGraphicTextConsult(body).retryWhen(new FastRetryWhen()));
     }
 
 

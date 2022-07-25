@@ -23,6 +23,7 @@ import com.aries.template.entity.ConfigurationToThirdForPatientEntity;
 import com.aries.template.entity.FindRecipesForPatientAndTabStatusEntity;
 import com.aries.template.entity.GetConsultsAndRecipesResultEntity;
 import com.aries.template.entity.GetRecipeListByConsultIdEntity;
+import com.aries.template.entity.PatientFinishGraphicTextConsultEntity;
 import com.aries.template.entity.RoomIdInsAuthEntity;
 import com.aries.template.module.base.BaseEventFragment;
 import com.aries.template.module.main.HomeFragment;
@@ -32,6 +33,7 @@ import com.aries.template.view.ShineButtonDialog;
 import com.aries.template.widget.autoadopter.AutoAdaptorProxy;
 import com.aries.template.widget.autoadopter.AutoObjectAdaptor;
 import com.aries.template.xiaoyu.EaseModeProxy;
+import com.aries.template.xiaoyu.dapinsocket.DapinSocketProxy;
 import com.aries.ui.view.title.TitleBarView;
 import com.trello.rxlifecycle3.android.FragmentEvent;
 import com.xuexiang.xaop.annotation.SingleClick;
@@ -77,7 +79,11 @@ public class VideoConsultFragment extends BaseEventFragment {
 
     private boolean isRecipeCheckedFlag=false;// 医生开出的处方状态是不是1或者不是2，则不能支付。即不能结束问诊
 
-    private List<GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO> currentRecipes;
+    private List<GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO> currentRecipes;// 从后端传入的数据
+
+    private DapinSocketProxy dapinSocketProxy;// 大屏的通信代理
+
+    private boolean isBodyTestingFlag;// 是否从身体检测回来，如果曾经出过身体检测，则为true
 
     /**
      * 输入显示对象
@@ -88,9 +94,9 @@ public class VideoConsultFragment extends BaseEventFragment {
     }
 
     @BindView(R.id.btn_stjc)
-    Button btn_stjc;// 上一页按钮
+    Button btn_stjc;
     @BindView(R.id.btn_finish)
-    Button btn_finish;// 下一页按钮
+    Button btn_finish;
     @BindView(R.id.jtjk_video_content)
     RelativeLayout video_content;// 全屏视频容器
     @BindView(R.id.jtjk_video_content_parent)
@@ -147,6 +153,7 @@ public class VideoConsultFragment extends BaseEventFragment {
     @Override
     public void onStart() {
         super.onStart();
+        // 创建视频处理器
         ViewGroup viewGroup = getActivity().findViewById(R.id.videoContent);
         EaseModeProxy.with().initView(getActivity(),viewGroup).onStartVideo();
         EaseModeProxy.with().setListener(new EaseModeProxy.ProxyEventListener() {
@@ -157,10 +164,22 @@ public class VideoConsultFragment extends BaseEventFragment {
 
             @Override
             public void onVideoSuccessLinked() {
+                //入会成功
+                // 大屏接口，启动大屏
+                dapinSocketProxy.startSocket(DapinSocketProxy.SCREENFLAG_CONTROLSCREEN);
                 //入会成功, 启动轮训处方单状态
                 timeLoop();
             }
         });
+        // 创建大屏代理
+        if (dapinSocketProxy==null)
+            dapinSocketProxy = new DapinSocketProxy(getActivity(),GlobalConfig.machineIp);
+
+        // 从外部身体检测应用回来，大屏接口，身体检测结束
+        if (isBodyTestingFlag){
+            isBodyTestingFlag = false;
+            dapinSocketProxy.startSocket(DapinSocketProxy.SCREENFLAG_BODYTESTING_FINISH);
+        }
     }
 
     /**
@@ -176,6 +195,11 @@ public class VideoConsultFragment extends BaseEventFragment {
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.btn_stjc:
+                // 向大屏通信，告知跳转视频
+                dapinSocketProxy.startSocket(DapinSocketProxy.SCREENFLAG_BODYTESTING_OPEN);
+                // 跳向身体检测，则更新flag准备回来
+                isBodyTestingFlag = true;
+                // 跳向身体检测
                 Intent intent = new Intent(Intent.ACTION_MAIN);
                 /**知道要跳转应用的包命与目标Activity*/
                 ComponentName componentName = new ComponentName("com.garea.launcher", "com.garea.launcher.login.LauncherLogin");
@@ -218,6 +242,11 @@ public class VideoConsultFragment extends BaseEventFragment {
                 } else{
                     // 关闭，并释放所有资源
                     EaseModeProxy.with().closeVideoProxy();
+                    // 关闭问诊接口
+                    requestPatientFinishGraphicTextConsult();
+                    // 大屏接口，病人离席
+                    dapinSocketProxy.startSocket(DapinSocketProxy.SCREENFLAG_CLOSESCREEN);
+                    // 启动确定处方单
                     start(ConfirmRecipesFragment.newInstance(recipeId,currentRecipes));
                 }
             }else{
@@ -335,6 +364,28 @@ public class VideoConsultFragment extends BaseEventFragment {
                                 }
                             }
                         }
+                    }
+                });
+    }
+
+    /**
+     * 结束问诊
+     * 纳达接口
+     * 在确定结束问诊的按钮时才触发，返回首页不算
+     */
+    private void requestPatientFinishGraphicTextConsult(){
+        ApiRepository.getInstance().patientFinishGraphicTextConsult(consultId)
+                .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
+                .subscribe(new FastObserver<PatientFinishGraphicTextConsultEntity>() {
+                    @Override
+                    public void _onNext(PatientFinishGraphicTextConsultEntity entity) {
+                        if (entity == null) {
+                            ToastUtil.show("请检查网络");
+                            return;
+                        }
+//                        if (entity.data.success){
+//
+//                        }
                     }
                 });
     }

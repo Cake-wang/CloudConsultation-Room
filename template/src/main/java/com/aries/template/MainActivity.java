@@ -401,11 +401,14 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                             if(entity.getData().getConsults().size()>0){
                                 for (GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Consults item : entity.getData().getConsults()) {
                                     int status = item.getConsults().getStatus();
+                                    if (item.getConsults().getConsultOrgan() == GlobalConfig.organId)
+                                        // 如果不是同一家机构，则跳过不处理
+                                        break;
                                    if ( item.getConsults().getPayflag()==1 &&
                                            (status==1 || status ==2 || status == 3 || status == 4)){
                                        //status=4 问诊中
                                        isDepartTag = false;
-                                       // 挂号
+                                       // 去往挂号
                                       start(OrderConsultFragment.newInstance(item));
                                    }
                                     //  如果挂号单有多余的无效单，批量进行取消。
@@ -414,7 +417,6 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                                         ApiRepository.getInstance().patientCancelGraphicTextConsult(String.valueOf(item.getConsults().getConsultId())).subscribe();
                                     }
                                 }
-
                             }
 //                            ArrayList<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes> recipes = new ArrayList<>();
                             // 查看处方单是否多余1条处方
@@ -422,6 +424,9 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                                 // 每一个处方单中，都有一个处方信息，这个处方信息是需要合并的
                                 ArrayList<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes> recipes = new ArrayList();
                                 for (GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes item : entity.data.recipes) {
+//                                    if (item.getConsults().getConsultOrgan() == GlobalConfig.organId)
+//                                        // todo 如果不是同一家机构，则跳过不处理
+//                                        break;
                                     // 1 待审核, 2 待处理, 3 待取药
                                     if (item.status==2){
                                         recipes.add(item);

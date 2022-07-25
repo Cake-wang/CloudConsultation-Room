@@ -127,7 +127,7 @@ public class EaseModeProxy {
     // 是否监听到了医生发送了消息
     private boolean isDoctorMessaged = false;
     // 医生是否进入过
-//    private boolean isDoctorEnterRoom=false;
+    private boolean isDoctorEnterRoom=false;
     // 信令专用信息传送器
     private XLMessage xlMessage;
 
@@ -178,10 +178,6 @@ public class EaseModeProxy {
         EMClient.getInstance().init(context, options);
         //在做打包混淆时，关闭debug模式，避免消耗不必要的资源
         EMClient.getInstance().setDebugMode(true);
-
-//        // 用于 EMClient 登录初始化
-//        EMClient.getInstance().groupManager().loadAllGroups();
-//        EMClient.getInstance().chatManager().loadAllConversations();
 
         //如果没有，则继续初始化
         Settings settings = new Settings(xyAppId);
@@ -267,13 +263,14 @@ public class EaseModeProxy {
                         }
                         // 信令请求 socket 没有心跳，返回医生请求状态
 //                        setDoctorMessaged(true);
-                        //todo 提示患者，医生挂断视频
-                        try {
-//                            xlMessage = new XLMessage(xlPatientUserId,XL_URL,activity.get());
-                            createWebSocketClient();
-                        } catch (URISyntaxException e) {
-                            e.printStackTrace();
-                        }
+                        // 提示患者，医生挂断视频
+                        xlMessage = new XLMessage(xlPatientUserId,XL_URL,activity.get());
+                        xlMessage.login(msg -> onRegSuccess(msg));
+//                        try {
+//                            createWebSocketClient();
+//                        } catch (URISyntaxException e) {
+//                            e.printStackTrace();
+//                        }
                     }
                 });
             }
@@ -661,6 +658,8 @@ public class EaseModeProxy {
                         listener.onVideoSuccessLinked();
                 } else if (state == CallState.DISCONNECTED) {
 //                        ToastWithLogin("退出会议: " + reason);
+                    // 告诉医生，你已经离开
+                    sendNotifyPaintLiveMsg();
                     // 释放资源一定要写在退出会议的后面
                     releaseProxy();
                 }
@@ -701,15 +700,15 @@ public class EaseModeProxy {
                                 videoCell.setVideoInfo(videoInfos.get(0));
                         if (listener!=null)
                             listener.onDoctorInRoom();
-//                        isDoctorEnterRoom = true;
+                        isDoctorEnterRoom = true;
                     }
-//                    else if (videoInfos.size()==0){
-//                        // 现在的房间没有其他人了
-//                        if (isDoctorEnterRoom){
-//                            // 医生曾进入过
-//                            ToastUtil.show("医生已经离开");
-//                        }
-//                    }
+                    else if (videoInfos.size()==0){
+                        // 现在的房间没有其他人了
+                        if (isDoctorEnterRoom){
+                            // 医生曾进入过
+                            ToastUtil.show("医生已经离开");
+                        }
+                    }
             }
         });
     }
@@ -719,58 +718,69 @@ public class EaseModeProxy {
      * 向Docotor的视频端发送用户信息。
      */
     private void sendNotifyDoctorVideoMsg() {
-        if (webSocketClient==null) {
-            try {
-                createWebSocketClient();
-            } catch (URISyntaxException e) {
-                e.printStackTrace();
-            }
-        }
-        ToastWithLogin("TX_RTC_START_INVOKE");
-        //{"topic":"TX_RTC_START_INVOKE","endPoint":{"patientUserId":"62933bcbcf8912669abf4b98","doctorUserId":"5f339ceb9cd0500a923af577","patientName":"胡江","remark":"未知","orderId":815463559,"roomId":"910007727377","thirdAppVideoConsult":"xyLink","requestMode":"4"}}
-        RtcStartInvokeRequest request = new RtcStartInvokeRequest();
-        request.setTopic("TX_RTC_START_INVOKE");
-        EndPoint endPoint = new EndPoint();
-        endPoint.setPatientUserId(xlPatientUserId);
-        endPoint.setPatientName(nickname.trim());
-        endPoint.setDoctorUserId(doctorUserId);
-        endPoint.setOrderId(consultId);
-        endPoint.setRemark("未知");
-        endPoint.setRoomId(meetingRoomNumber);
-        endPoint.setThirdAppVideoConsult("xyLink");
-        endPoint.setRequestMode("4");
-
-        request.setEndPoint(endPoint);
-        String cmd = JsonUtil.toJson(request);
-
-        webSocketClient.send(cmd);
+        if (xlMessage!=null)
+        xlMessage.send(xlMessage.getDoctorMsg(xlPatientUserId, nickname.trim(), doctorUserId, consultId, meetingRoomNumber),
+                message -> {
+                    ToastWithLogin("TX_RTC_START_INVOKE");
+                });
+//        if (webSocketClient==null) {
+//            try {
+//                createWebSocketClient();
+//            } catch (URISyntaxException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//        ToastWithLogin("TX_RTC_START_INVOKE");
+//        //{"topic":"TX_RTC_START_INVOKE","endPoint":{"patientUserId":"62933bcbcf8912669abf4b98","doctorUserId":"5f339ceb9cd0500a923af577","patientName":"胡江","remark":"未知","orderId":815463559,"roomId":"910007727377","thirdAppVideoConsult":"xyLink","requestMode":"4"}}
+//        RtcStartInvokeRequest request = new RtcStartInvokeRequest();
+//        request.setTopic("TX_RTC_START_INVOKE");
+//        EndPoint endPoint = new EndPoint();
+//        endPoint.setPatientUserId(xlPatientUserId);
+//        endPoint.setPatientName(nickname.trim());
+//        endPoint.setDoctorUserId(doctorUserId);
+//        endPoint.setOrderId(consultId);
+//        endPoint.setRemark("未知");
+//        endPoint.setRoomId(meetingRoomNumber);
+//        endPoint.setThirdAppVideoConsult("xyLink");
+//        endPoint.setRequestMode("4");
+//
+//        request.setEndPoint(endPoint);
+//        String cmd = JsonUtil.toJson(request);
+//
+//        webSocketClient.send(cmd);
     }
 
     /**
-     * 用户已经离开，进入支付
+     * 提示医生病人已经离开
      */
     private void sendNotifyPaintLiveMsg(){
-        if (webSocketClient==null) {
-            try {
-                createWebSocketClient();
-            } catch (URISyntaxException e) {
-                e.printStackTrace();
-            }
-        }else{
-            webSocketClient.connect();
-        }
-        Map<String, Object> endPoint = new HashMap<>();
-        endPoint.put("doctorUserId",doctorUserId);
-        endPoint.put("patientUserId",xlPatientUserId);
-        endPoint.put("role","patient");
-        endPoint.put("thirdAppVideoConsult","xyLink");
+        if (xlMessage!=null)
+        xlMessage.send(xlMessage.getPatientLeaveMsg(doctorUserId,xlPatientUserId),
+                message -> {
+                    ToastWithLogin("病人离开");
+                });
 
-        Map<String, Object> map = new HashMap<>();
-        map.put("topic","TX_RTC_SHUTDOWN");
-        map.put("endPoint",endPoint);
-
-        String cmd = JsonUtil.toJson(endPoint);
-        webSocketClient.send(cmd);
+//        if (webSocketClient==null) {
+//            try {
+//                createWebSocketClient();
+//            } catch (URISyntaxException e) {
+//                e.printStackTrace();
+//            }
+//        }else{
+//            webSocketClient.connect();
+//        }
+//        Map<String, Object> endPoint = new HashMap<>();
+//        endPoint.put("doctorUserId",doctorUserId);
+//        endPoint.put("patientUserId",xlPatientUserId);
+//        endPoint.put("role","patient");
+//        endPoint.put("thirdAppVideoConsult","xyLink");
+//
+//        Map<String, Object> map = new HashMap<>();
+//        map.put("topic","TX_RTC_SHUTDOWN");
+//        map.put("endPoint",endPoint);
+//
+//        String cmd = JsonUtil.toJson(endPoint);
+//        webSocketClient.send(cmd);
     }
 
     /**
@@ -791,9 +801,11 @@ public class EaseModeProxy {
      * 释放资源
      */
     private void releaseProxy(){
-        // 告诉医生，你已经离开了
-        sendNotifyPaintLiveMsg();
+        // 重置全局数据
+        isDoctorEnterRoom = false;
         // 释放对象资源
+        if (xlMessage!=null)
+            xlMessage = null;
         if (uvcCameraPresenter!=null){
             uvcCameraPresenter.onStop();
             uvcCameraPresenter.onDestroy();

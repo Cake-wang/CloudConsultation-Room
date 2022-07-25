@@ -472,6 +472,7 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/btn_back_yzs"
                 android:gravity="center"
+                android:visibility="gone"
                 android:text="返回"
                 android:textColor="#38ABA0" />
 
@@ -482,6 +483,7 @@
                 android:layout_marginLeft="15dp"
                 android:background="@drawable/btn_main_yzs"
                 android:gravity="center"
+                android:visibility="gone"
                 android:text="首页"
                 android:textColor="#fff" />
         </LinearLayout>

@@ -23,6 +23,7 @@ import com.aries.template.entity.GetRecipeListByConsultIdEntity;
 import com.aries.template.entity.GetStockInfoEntity;
 import com.aries.template.entity.IsRegisterResultEntity;
 import com.aries.template.entity.MachineEntity;
+import com.aries.template.entity.PatientFinishGraphicTextConsultEntity;
 import com.aries.template.entity.PatientListEntity;
 import com.aries.template.entity.PayOrderEntity;
 import com.aries.template.entity.PrescriptionPushEntity;
@@ -252,4 +253,12 @@ public interface ApiService {
     @Headers("Content-Type: application/json")
     @POST(ApiConstant.doBaseNgariRequest)
     Observable<GetRecipeListByConsultIdEntity> getRecipeListByConsultId(@Body RequestBody body);
+
+    /**
+     * 结束问诊
+     * 纳里的接口
+     */
+    @Headers("Content-Type: application/json")
+    @POST(ApiConstant.doBaseNgariRequest)
+    Observable<PatientFinishGraphicTextConsultEntity> patientFinishGraphicTextConsult(@Body RequestBody body);
 }

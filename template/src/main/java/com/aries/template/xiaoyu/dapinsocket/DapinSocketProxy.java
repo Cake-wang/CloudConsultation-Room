@@ -32,9 +32,9 @@ public class DapinSocketProxy {
     // 网络的IP地址
     private String ip;
 
-    /** 开启socket的 FLAG */
+    /** 开启 大屏视频流socket的 FLAG */
     public static final String SCREENFLAG_CONTROLSCREEN = "ControlScreen_";
-    /** 关闭 FLAG */
+    /** 关闭 大屏视频流socket的 FLAG */
     public static final String SCREENFLAG_CLOSESCREEN= "CloseScreen_";
     /** 开启身体检测 FLAG */
     public static final String SCREENFLAG_BODYTESTING_OPEN = "bodytesting_open_";
@@ -153,7 +153,7 @@ public class DapinSocketProxy {
      * SCREENFLAG_CONTROLSCREEN 或者 SCREENFLAG_CLOSESCREEN
      * @StringRes{SCREENFLAG_CONTROLSCREEN,SCREENFLAG_CLOSESCREEN}
      */
-    private void startSocket(String flag){
+    public void startSocket(String flag){
         if (activity==null)
             return;
         currentFlag = flag;
