@@ -100,6 +100,8 @@ public class ConfirmRecipesFragment extends BaseEventFragment {
     TextView tv_tip_message;
     @BindView(R.id.btn_cancel)
     Button btn_cancel;
+    @BindView(R.id.btn_back)
+    Button btn_back;
     @BindView(R.id.btn_inquiry)
     Button btn_inquiry;
     @BindView(R.id.rv_contentFastLib)
@@ -150,6 +152,7 @@ public class ConfirmRecipesFragment extends BaseEventFragment {
         ll_order_r.setVisibility(View.GONE);
         ll_prescription.setVisibility(View.VISIBLE);
         tv_tip_message.setVisibility(View.GONE);
+        btn_back.setVisibility(View.GONE);// 不显示返回
         btn_cancel.setText("取消");
         btn_inquiry.setText("确认结算");
         String sex = GlobalConfig.ssCard.getSex().equals("0")?"女":"男";

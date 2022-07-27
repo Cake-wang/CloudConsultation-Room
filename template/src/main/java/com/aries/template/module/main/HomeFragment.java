@@ -11,6 +11,7 @@ import com.aries.library.fast.retrofit.FastLoadingObserver;
 import com.aries.library.fast.retrofit.FastObserver;
 import com.aries.library.fast.util.SPUtil;
 import com.aries.library.fast.util.ToastUtil;
+import com.aries.template.FakeDataExample;
 import com.aries.template.GlobalConfig;
 import com.aries.template.MainActivity;
 import com.aries.template.R;
@@ -20,6 +21,7 @@ import com.aries.template.entity.PatientFinishGraphicTextConsultEntity;
 import com.aries.template.module.base.BaseEventFragment;
 import com.aries.template.module.mine.MineCardFragment;
 import com.aries.template.module.mine.ResultFragment;
+import com.aries.template.module.mine.VideoConsultFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.template.xiaoyu.EaseModeProxy;
 import com.aries.ui.view.title.TitleBarView;
@@ -88,7 +90,7 @@ public class HomeFragment extends BaseEventFragment{
 //                start(ResultFragment.newInstance("cancelConsult"));//todo ccss
 //                start(ConfirmRecipesFragment.newInstance(null));// todo cc
 //                start(PayCodeFragment.newInstance(new Object()));// todo cc
-//                start(VideoConsultFragment.newInstance(FakeDataExample.consultId,FakeDataExample.nickname,FakeDataExample.doctorUserId));// todo cc
+//                start(VideoConsultFragment.newInstance(FakeDataExample.consultId,FakeDataExample.nickname,FakeDataExample.doctorUserId,FakeDataExample.doctorName));// todo cc
 //                start(PayCodeFragment.newInstance(FakeDataExample.recipeFee,FakeDataExample.recipeIds,FakeDataExample.recipeCode));// todo cc
 //            startActivity(new Intent(getActivity(), MeetingActivity.class));//todo cc
         });

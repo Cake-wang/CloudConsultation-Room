@@ -133,8 +133,6 @@ dependencies {
     api(name: 'android_xysdk_3.3.1_20220524', ext: 'aar') {
         transitive = false
     }
-    // uvc 默认支持USB外接摄像头 不需要的请自行移除
-    implementation(name:'UvcCamera-release', ext: 'aar');
 
     // 必须SDK需要依赖这些库, 库版本尽量保持一致, 否则有冲突自行解决
     implementation 'com.google.code.gson:gson:2.8.5'
@@ -146,4 +144,7 @@ dependencies {
 
     //---- 大屏幕 socket
     implementation 'com.alibaba:fastjson:1.1.72.android'
+
+    // uvc
+    implementation 'com.herohan:UVCAndroid:1.0.4'
 }

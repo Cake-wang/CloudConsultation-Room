@@ -1056,6 +1056,7 @@ public class GetConsultsAndRecipesResultEntity implements Serializable{
             public String signDate;
             public Double totalMoney;
             public String statusText;
+            public Integer organId;
             public Integer statusCode;
             public Integer status;
             public String recipeSurplusHours;
@@ -1116,6 +1117,14 @@ public class GetConsultsAndRecipesResultEntity implements Serializable{
 
             public void setStatusText(String statusText) {
                 this.statusText = statusText;
+            }
+
+            public Integer getOrganId() {
+                return organId;
+            }
+
+            public void setOrganId(Integer organId) {
+                this.organId = organId;
             }
 
             public Integer getStatusCode() {

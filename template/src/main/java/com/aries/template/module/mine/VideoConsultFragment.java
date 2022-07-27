@@ -4,7 +4,7 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -20,11 +20,8 @@ import com.aries.template.GlobalConfig;
 import com.aries.template.R;
 import com.aries.template.entity.CancelregisterResultEntity;
 import com.aries.template.entity.ConfigurationToThirdForPatientEntity;
-import com.aries.template.entity.FindRecipesForPatientAndTabStatusEntity;
-import com.aries.template.entity.GetConsultsAndRecipesResultEntity;
 import com.aries.template.entity.GetRecipeListByConsultIdEntity;
 import com.aries.template.entity.PatientFinishGraphicTextConsultEntity;
-import com.aries.template.entity.RoomIdInsAuthEntity;
 import com.aries.template.module.base.BaseEventFragment;
 import com.aries.template.module.main.HomeFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
@@ -41,9 +38,6 @@ import com.xuexiang.xaop.annotation.SingleClick;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
-import org.w3c.dom.Text;
-
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -241,17 +235,18 @@ public class VideoConsultFragment extends BaseEventFragment {
                     ToastUtil.show("处方正在被医生确认，请稍后再试");
                 } else{
                     // 关闭，并释放所有资源
+                    // 包括向医生端发送socket消息
                     EaseModeProxy.with().closeVideoProxy();
-                    // 关闭问诊接口
-                    requestPatientFinishGraphicTextConsult();
                     // 大屏接口，病人离席
                     dapinSocketProxy.startSocket(DapinSocketProxy.SCREENFLAG_CLOSESCREEN);
-                    // 启动确定处方单
-                    start(ConfirmRecipesFragment.newInstance(recipeId,currentRecipes));
+                    // 结束问诊接口
+                    // 成功后，跳转确认复诊单
+                    requestPatientFinishGraphicTextConsult(consultId);
                 }
             }else{
+                // 医生不曾进入
                 // 取消复诊
-                requestPatientFinishGraphicTextConsult(consultId);
+                requestPatientCancelGraphicTextConsult(consultId);
             }
         });
         dialog.btn_cancel.setOnClickListener(v -> dialog.dismiss());
@@ -275,10 +270,10 @@ public class VideoConsultFragment extends BaseEventFragment {
     }
 
     /**
-     * 患者取消复诊服务
+     * 患者取消复诊单 服务
      * @param consultId 复诊单号
      */
-    private void requestPatientFinishGraphicTextConsult(String consultId) {
+    private void requestPatientCancelGraphicTextConsult(String consultId) {
         ApiRepository.getInstance().patientCancelGraphicTextConsult(consultId)
                 .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
                 .subscribe(new FastLoadingObserver<CancelregisterResultEntity>("请稍后...") {
@@ -290,6 +285,7 @@ public class VideoConsultFragment extends BaseEventFragment {
                         }
                         if (entity.isSuccess()){
                             if (entity.getData().isSuccess()){
+                                Log.d("JTJK","患者取消复诊服务");
                                 // 医生不曾进入到视频中
                                 start(HomeFragment.newInstance(), SupportFragment.SINGLETASK);
                             }
@@ -299,7 +295,7 @@ public class VideoConsultFragment extends BaseEventFragment {
     }
 
     /**
-     * 获取第三方配置信息
+     * 获取第三方配置信息，视频信息
      */
     private void requestConfigurationToThirdForPatient(){
         ApiRepository.getInstance().getConfigurationToThirdForPatient(GlobalConfig.NALI_TID,GlobalConfig.NALI_APPKEY)
@@ -373,7 +369,7 @@ public class VideoConsultFragment extends BaseEventFragment {
      * 纳达接口
      * 在确定结束问诊的按钮时才触发，返回首页不算
      */
-    private void requestPatientFinishGraphicTextConsult(){
+    private void requestPatientFinishGraphicTextConsult(String consultId){
         ApiRepository.getInstance().patientFinishGraphicTextConsult(consultId)
                 .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
                 .subscribe(new FastObserver<PatientFinishGraphicTextConsultEntity>() {
@@ -383,9 +379,12 @@ public class VideoConsultFragment extends BaseEventFragment {
                             ToastUtil.show("请检查网络");
                             return;
                         }
-//                        if (entity.data.success){
-//
-//                        }
+                        if (entity.data.success){
+                            Log.d("JTJK","结束问诊");
+                            // 跳转
+                            // 启动确定处方单
+                            start(ConfirmRecipesFragment.newInstance(recipeId,currentRecipes));
+                        }
                     }
                 });
     }

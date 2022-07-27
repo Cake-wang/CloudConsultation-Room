@@ -215,6 +215,7 @@ public class XLMessage {
      * 病人离开会议室
      */
     public String getPatientLeaveMsg(String doctorUserId, String patientUserId){
+        // 数据结构
 //      if (socket != null) {
 //        let msgObj = {
 //                topic: `TX_RTC_SHUTDOWN`,
@@ -238,7 +239,7 @@ public class XLMessage {
         map.put("topic","TX_RTC_SHUTDOWN");
         map.put("endPoint",endPoint);
 
-        String cmd = JsonUtil.toJson(endPoint);
+        String cmd = JsonUtil.toJson(map);
         return cmd;
     }
 
@@ -259,6 +260,15 @@ public class XLMessage {
     public interface XLEventListener {
         // 消息已经发送 比如 医生进入的时候，将医生的 video Info 给予外部
         void sended(String message);
+    }
+
+    /**
+     * 释放所有资源
+     */
+    public void release(){
+        webSocketClient = null;
+        listener = null;
+        activity=null;
     }
 
 
