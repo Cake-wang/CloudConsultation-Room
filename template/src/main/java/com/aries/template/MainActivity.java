@@ -401,7 +401,7 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                             if(entity.getData().getConsults().size()>0){
                                 for (GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Consults item : entity.getData().getConsults()) {
                                     int status = item.getConsults().getStatus();
-                                    if (item.getConsults().getConsultOrgan() == GlobalConfig.organId)
+                                    if (item.getConsults().getConsultOrgan() != GlobalConfig.organId)
                                         // 如果不是同一家机构，则跳过不处理
                                         break;
                                    if ( item.getConsults().getPayflag()==1 &&

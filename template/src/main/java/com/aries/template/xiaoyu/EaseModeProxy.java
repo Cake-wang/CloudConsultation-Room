@@ -313,7 +313,7 @@ public class EaseModeProxy {
         };
         // 防止用户由于特殊原因登出，然后再进来的时候，被提示已经登录
         EMClient.getInstance().logout(true);
-        EMClient.getInstance().login(easemobUserName, easemobPassword,emcallback );
+        EMClient.getInstance().login(easemobUserName, easemobPassword,emcallback);
     }
 
     /**
@@ -652,6 +652,7 @@ public class EaseModeProxy {
                 //1.监听会议状态
                 if (state == CallState.CONNECTED) {
 //                        ToastWithLogin("入会成功: ");
+                    // 入会成功
                     Log.e("TAG", "onCallStateChange: 入会成功");
                     // 可能会造成多次入会成功
                     if (listener!=null)

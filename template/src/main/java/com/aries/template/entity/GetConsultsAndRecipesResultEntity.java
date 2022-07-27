@@ -1,16 +1,16 @@
 package com.aries.template.entity;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.List;
 
 /**
+ * 注意，跳转到身体检测的时候，所有的类都要序列化，不然会报错
  * @Author: AriesHoo on 2018/11/19 14:17
  * @E-Mail: AriesHoo@126.com
  * @Function: 检查新版本实体
  * @Description:
  */
-public class GetConsultsAndRecipesResultEntity {
+public class GetConsultsAndRecipesResultEntity implements Serializable{
 
     /**
      * versionCode : 230
@@ -72,7 +72,7 @@ public class GetConsultsAndRecipesResultEntity {
         this.data = data;
     }
 
-    public class QueryArrearsSummary{
+    public class QueryArrearsSummary implements Serializable{
 
 //        public Integer statusCode;
 //        public String requestId;
@@ -149,7 +149,7 @@ public class GetConsultsAndRecipesResultEntity {
             this.recipes = recipes;
         }
 
-        public class JsonResponseBean {
+        public class JsonResponseBean implements Serializable{
 
             public Integer code;
 
@@ -190,7 +190,7 @@ public class GetConsultsAndRecipesResultEntity {
                 this.body = body;
             }
 
-            public class Msg {
+            public class Msg implements Serializable{
 
                 public Integer status;
                 public Integer cid;
@@ -234,7 +234,7 @@ public class GetConsultsAndRecipesResultEntity {
                 return this.doctor;
             }
 
-            public class Doctor
+            public class Doctor implements Serializable
             {
                 private String name;
 
@@ -461,14 +461,14 @@ public class GetConsultsAndRecipesResultEntity {
                     return this.userTypeText;
                 }
 
-                public class ExtendParam
+                public class ExtendParam implements Serializable
                 {
                 }
 
 
             }
 
-            public class Consultss
+            public class Consultss implements Serializable
             {
                 private int consultId;
 
@@ -975,7 +975,7 @@ public class GetConsultsAndRecipesResultEntity {
                     return this.workTypeText;
                 }
 
-                public class Questionnaire
+                public class Questionnaire implements Serializable
                 {
                     private int questionnaireId;
 
@@ -1158,7 +1158,7 @@ public class GetConsultsAndRecipesResultEntity {
                 this.recipeDetailBeans = recipeDetailBeans;
             }
 
-            public class RecipeDetail {
+            public class RecipeDetail implements Serializable{
                 public Integer recipeDetailId;
                 public Integer recipeId;
                 public String drugSpec;

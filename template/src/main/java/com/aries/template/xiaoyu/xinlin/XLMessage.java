@@ -37,6 +37,8 @@ public class XLMessage {
     private WebSocketClient webSocketClient;
     //弱应用 activity
     private WeakReference<Activity> activity;
+    // 信令的监听对象
+    private XLEventListener listener;
 
     /**
      * 初始化配置文件
@@ -61,9 +63,9 @@ public class XLMessage {
      * 获取房间信息，房间 account
      * @param msg 这个消息可以是已经组织好的消息，getDoctorMsg，getPatientLeaveMsg 都可以。
      *            如果这个值为空，则仅仅登录。
-     * @param listener 如果消息发送，则返回这个监听
+     * @param inputlistener 如果消息发送，则返回这个监听
      */
-    public void send(String msg, XLEventListener listener){
+    public void send(String msg, XLEventListener inputlistener){
         URI uri = null;
         try {
             uri = new URI(XL_URL);
@@ -74,6 +76,7 @@ public class XLMessage {
         if (uri == null)
             return;
 
+        listener = inputlistener;
         // 如果已经关闭了socket，则进行重建
         if (webSocketClient==null){
             webSocketClient = new WebSocketClient(uri) {
@@ -150,10 +153,14 @@ public class XLMessage {
             webSocketClient.enableAutomaticReconnection(3000);
             // socket 开始链接
             webSocketClient.connect();
+        }else {
+            // 如果 webSocketClient 续存，则直接发消息出去
+            // 如果消息是空的，则单纯的只是登录，不需要进行send
+            if (!TextUtils.isEmpty(msg))
+                webSocketClient.send(msg);
+//            else
+//                webSocketClient.send(getLoginMsg());
         }
-
-        // 如果 webSocketClient 续存，则直接发消息出去
-        webSocketClient.send(msg);
     }
 
     /**
