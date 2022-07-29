@@ -68,6 +68,8 @@ public class DepartmentFragment extends BaseEventFragment {
     RecyclerView recyclerView;// 网格显示
     @BindView(R.id.jtjk_fz_fragment_title)
     TextView title;// 网格显示
+    @BindView(R.id.jtjk_recipe_name)
+    TextView jtjk_recipe_name;// 病人名称
 
     /**
      * 跳转科室，需要带的数据
@@ -153,6 +155,9 @@ public class DepartmentFragment extends BaseEventFragment {
         btn_inquiry.setOnClickListener(v -> {upDownProxy.doNextReFlash();});
         // 点击下一页
         btn_cancel.setOnClickListener(v -> {upDownProxy.doProReFlash();});
+        // 显示名称
+        jtjk_recipe_name.setText(GlobalConfig.ssCard.getName()+"，您好");
+        // 设置标题
         title.setText("请选择一级科室");
         // 请求一级科室
         requestLevelOne();

@@ -140,7 +140,7 @@ public class OrderRecipesFragment extends BaseEventFragment {
         String sex = GlobalConfig.ssCard.getSex().equals("0")?"女":"男";
         tv_name.setText(GlobalConfig.ssCard.getName().trim()+"("+sex+")");
         tv_card.setText(GlobalConfig.ssCard.getCardNum());
-        tv_age.setText(String.valueOf(GlobalConfig.age));
+        tv_age_l.setText(String.valueOf(GlobalConfig.age));
         tv_result.setText(obj.organDiseaseName);
         tv_date.setText(obj.signDate+"");
 
@@ -197,6 +197,10 @@ public class OrderRecipesFragment extends BaseEventFragment {
      * @param newDatas 传入的数据列
      */
     protected void reflashRecyclerView(RecyclerView recyclerView, GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes newDatas){
+        // 没有可以显示的数据
+        if (newDatas==null || newDatas.getRecipeDetailBeans()==null)
+            return;
+
         List<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes.RecipeDetail> allRecipe =new ArrayList<>();
         allRecipe.addAll(newDatas.getRecipeDetailBeans());
 
@@ -233,6 +237,7 @@ public class OrderRecipesFragment extends BaseEventFragment {
      * @param skus 药品编码 列表
      */
     public void requestGetStockInfo(String clinicSn, ArrayList<String> skus){
+        skus = new ArrayList<String>(){{add("6901339924484");}};//todo cc
         ApiRepository.getInstance().getStockInfo(clinicSn,skus)
                 .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
                 .subscribe(new FastLoadingObserver<GetStockInfoEntity>("请稍后...") {

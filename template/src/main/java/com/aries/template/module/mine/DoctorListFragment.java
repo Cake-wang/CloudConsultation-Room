@@ -85,6 +85,8 @@ public class DoctorListFragment extends BaseEventFragment {
     RecyclerView recyclerView;// 网格显示
     @BindView(R.id.jtjk_fz_fragment_title)
     TextView title;// 网格显示
+    @BindView(R.id.jtjk_recipe_name)
+    TextView jtjk_recipe_name;
 
     /**
      * 跳转科室，需要带的数据
@@ -163,6 +165,8 @@ public class DoctorListFragment extends BaseEventFragment {
         // 事件
         btn_inquiry.setOnClickListener(v -> {upDownProxy.doNextReFlash();});
         btn_cancel.setOnClickListener(v -> {upDownProxy.doProReFlash();});
+        // 显示名称
+        jtjk_recipe_name.setText(GlobalConfig.ssCard.getName()+"，您好");
         title.setText("请选择就诊医生");
         // 请求一级科室
         requestDoctorInfo();
@@ -223,7 +227,6 @@ public class DoctorListFragment extends BaseEventFragment {
                             start(ConfirmConsultFragment.newInstance("ok"));
                         }else{
                             // 医生不可以进行复诊
-
                             // 如果不能复诊，则检查异常原因
                             errorCheck(entity.data.jsonResponseBean.msg,entity.data.jsonResponseBean.code);
                         }

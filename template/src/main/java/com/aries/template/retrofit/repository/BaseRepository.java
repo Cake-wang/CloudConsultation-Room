@@ -8,7 +8,6 @@ import com.aries.library.fast.retrofit.FastTransformer;
 import com.aries.template.FakeDataExample;
 import com.aries.template.GlobalConfig;
 import com.aries.template.utility.ConvertJavaBean;
-import com.aries.template.utility.JTJKRsaUtil;
 import com.aries.template.utility.JTJSONUtils;
 import com.aries.template.utility.RSASignature;
 import com.aries.template.utility.RSAUtil;
@@ -108,18 +107,27 @@ public abstract class BaseRepository {
 //            e.printStackTrace();
 //        }
 
-        //签名
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            //将最外层参数中除sign字段外的所有字段按照按字母序排序，键和值用=号连接，键值对之间用&符号分隔
-            try {
-                String noSgin = JTJSONUtils.translateSign2(params);
-                String sgin = RSAUtil.sign(noSgin,GlobalConfig.PRIVATE_KEY);
-                if (sgin!=null)
-                    params.put("sign",sgin);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        try {
+            String noSgin = JTJSONUtils.translateSign2(params);
+            String sgin = RSAUtil.sign(noSgin,GlobalConfig.PRIVATE_KEY);
+            if (sgin!=null)
+                params.put("sign",sgin);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+
+//        //签名
+//        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+//            //将最外层参数中除sign字段外的所有字段按照按字母序排序，键和值用=号连接，键值对之间用&符号分隔
+//            try {
+//                String noSgin = JTJSONUtils.translateSign2(params);
+//                String sgin = RSAUtil.sign(noSgin,GlobalConfig.PRIVATE_KEY);
+//                if (sgin!=null)
+//                    params.put("sign",sgin);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        }
         String strEntity = ConvertJavaBean.converJavaBeanToJsonNew(params);
         RequestBody body = RequestBody.create(okhttp3.MediaType.parse("Content-Type:application/json;charset=UTF-8"),strEntity);
         return body;

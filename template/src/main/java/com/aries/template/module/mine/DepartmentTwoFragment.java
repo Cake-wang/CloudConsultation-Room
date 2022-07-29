@@ -70,6 +70,8 @@ public class DepartmentTwoFragment extends BaseEventFragment {
     RecyclerView recyclerView;// 网格显示
     @BindView(R.id.jtjk_fz_fragment_title)
     TextView title;// 网格显示
+    @BindView(R.id.jtjk_recipe_name)
+    TextView jtjk_recipe_name;//病人名称
 
     /**
      * 跳转科室，需要带的数据
@@ -163,6 +165,8 @@ public class DepartmentTwoFragment extends BaseEventFragment {
         btn_inquiry.setOnClickListener(v -> {upDownProxy.doNextReFlash();});
         btn_cancel.setOnClickListener(v -> {upDownProxy.doProReFlash();});
         title.setText("请选择二级科室");
+        // 显示名称
+        jtjk_recipe_name.setText(GlobalConfig.ssCard.getName()+"，您好");
         // 请求一级科室
         if (inputObj!=null)
             requestLevelTwo(inputObj);

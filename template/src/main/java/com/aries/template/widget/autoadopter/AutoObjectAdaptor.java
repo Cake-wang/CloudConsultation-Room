@@ -67,7 +67,7 @@ public class AutoObjectAdaptor extends RecyclerView.Adapter<AutoObjectAdaptor.Vi
         holder.itemView.setOnClickListener(v -> {
             listener.onItemClick(holder,position,data.get(position));
             this.currentClickPosition = position;
-            this.notifyDataSetChanged();// 强制刷新所有按钮的状态。比如样式修改等操作。
+//            this.notifyDataSetChanged();// 强制刷新所有按钮的状态。比如样式修改等操作。
         });
     }
 

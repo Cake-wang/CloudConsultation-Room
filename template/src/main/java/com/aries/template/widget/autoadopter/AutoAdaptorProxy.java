@@ -3,12 +3,10 @@ package com.aries.template.widget.autoadopter;
 import android.content.Context;
 
 import androidx.annotation.LayoutRes;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /******
  * 快速RV适配器
@@ -111,6 +109,15 @@ public class AutoAdaptorProxy<T>{
      */
     public void notifyDataSetChanged() {
         adaptor.notifyDataSetChanged();
+    }
+
+    /**
+     * 通过更新直接数据来刷新整个RV
+     * @param inputData 数据源
+     */
+    public void flashData(ArrayList<Object> inputData){
+        adaptor.data = inputData;
+        notifyDataSetChanged();
     }
 
     /**

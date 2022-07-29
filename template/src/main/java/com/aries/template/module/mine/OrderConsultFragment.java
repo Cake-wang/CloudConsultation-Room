@@ -171,7 +171,7 @@ public class OrderConsultFragment extends BaseEventFragment {
                         }
                         // 检查 payFlag 如果是 1 就是支付成功
                         if (entity.isSuccess()){
-                            patientName = GlobalConfig.ssCard.getName();
+                            patientName = GlobalConfig.ssCard.getName().trim();
                             doctorId=String.valueOf(entity.getData().getJsonResponseBean().getBody().getDoctor().getLoginId());
                             doctorName=String.valueOf(entity.getData().getJsonResponseBean().getBody().getDoctor().getName());
                         }

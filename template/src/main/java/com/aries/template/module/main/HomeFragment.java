@@ -19,6 +19,7 @@ import com.aries.template.entity.ConfigurationToThirdForPatientEntity;
 import com.aries.template.entity.MachineEntity;
 import com.aries.template.entity.PatientFinishGraphicTextConsultEntity;
 import com.aries.template.module.base.BaseEventFragment;
+import com.aries.template.module.mine.ConfirmRecipesFragment;
 import com.aries.template.module.mine.MineCardFragment;
 import com.aries.template.module.mine.ResultFragment;
 import com.aries.template.module.mine.VideoConsultFragment;

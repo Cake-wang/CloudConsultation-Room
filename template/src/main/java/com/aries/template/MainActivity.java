@@ -139,6 +139,9 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
         }
     }
 
+    /**
+     * 给医保卡读卡器上电
+     */
     public void openSerialport() {
         Log.d("111111MODEL", Build.MODEL);
         Log.d("111111MODEL", getTopFragment()+"");
@@ -217,16 +220,18 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                     Log.d("EgAPP_SI_ReadSSCardInfo",ssCard.toString());
                     // 向全局填写当前社保卡信息
                     GlobalConfig.ssCard = ssCard;
-                    GlobalConfig.age = getAge(Long.parseLong(ssCard.getBirthday()));
+                    // 由于病人的名字是带空格的，必须去掉
+                    GlobalConfig.ssCard.setName(ssCard.getName().trim());
+                    GlobalConfig.age = getAge(ssCard.getSSNum());
 
                     SPUtil.put(mContext,"smkCard",ssCard.getCardNum());
-                    SPUtil.put(mContext,"age",getAge(Long.parseLong(ssCard.getBirthday())));
+                    SPUtil.put(mContext,"age",getAge(ssCard.getSSNum()));
                     SPUtil.put(mContext,"userName",ssCard.getName());
                     SPUtil.put(mContext,"sex",ssCard.getSex());
                     SPUtil.put(mContext,"idCard",ssCard.getSSNum());
 
                     // 获取信息后，直接请求用户数据
-                    runOnUiThread(() -> requestFindUser(ssCard.getSSNum(),ssCard.getName(),ssCard.getCardNum()));
+                    runOnUiThread(() -> requestFindUser(GlobalConfig.ssCard.getSSNum(),GlobalConfig.ssCard.getName(),GlobalConfig.ssCard.getCardNum()));
 //                    requestFindUser(ssCard.getSSNum(),ssCard.getName(),ssCard.getCardNum());
 
 
@@ -239,6 +244,7 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                 }else{
                     if (mDisposable != null) {mDisposable.dispose();}
                     BasicOper.dc_exit();
+                    ToastUtil.show("读取社保卡信息失败，请重试");
                     Log.d("EgAPP_SI_ReadSSCardInfo","读取社保卡信息失败");
                 }
             }
@@ -289,10 +295,11 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
 
     /**
      * 通过生日返回年龄
-     * @param birthday 生日
+     * @param cardNumber 身份证号
      */
-    public static int getAge(long birthday) {
-        return DateUtils.getAge(String.valueOf(birthday));
+    public static int getAge(String cardNumber) {
+        String birthday = cardNumber.substring(6,14);
+        return DateUtils.getAge(birthday);
     }
 
     /**
@@ -355,13 +362,13 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                                             isReadCardProcessing = false;
                                         }else {
                                             // 如果没有注册，跳转到手机注册页面
-                                            start(PhoneRegisterFragment.newInstance( idCard, name, smkcard));
+                                            start(PhoneRegisterFragment.newInstance( idCard, name.trim(), smkcard));
                                         }
                                     }
                                 }else {
                                     ToastUtil.show(entity.getMessage());
                                     if (Objects.equals(entity.code, "2100"))// 如果没有注册，跳转到手机注册页面
-                                        start(PhoneRegisterFragment.newInstance( idCard, name, smkcard));
+                                        start(PhoneRegisterFragment.newInstance( idCard, name.trim(), smkcard));
                                     isReadCardProcessing = false;
                                 }
                             }
@@ -409,6 +416,7 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                                        isDepartTag = false;
                                        // 去往复诊单挂号
                                       start(OrderConsultFragment.newInstance(item));
+                                      return;
                                    }
                                     //  如果复诊单挂单有多余的无效单，批量进行取消。
                                     if (item.getConsults().getPayflag()==0 && status!=8){
@@ -435,6 +443,7 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                                 if (recipes.size()>0){
                                     isDepartTag = false;
                                     start(OrderRecipesListFragment.newInstance(recipes));
+                                    return;
                                 }
                             }
                             // 如果即没有未支付处方单，也没有未支付复诊单

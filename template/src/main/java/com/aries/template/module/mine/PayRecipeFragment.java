@@ -201,13 +201,11 @@ public class PayRecipeFragment extends BaseEventFragment {
      * 支付的基础是创建一个可以支付的处方单。里面有很多处方。
      */
     public void requestPrescriptionPush(String clinicSn){
-
-
         // 生成处方单药物集，遍历生成数据，准备输入
         ArrayList<Map> drugs = new ArrayList<>();
         for (DrugObject item : obj) {
             // 药品发放数量必须是整型
-            item.sku = "packing-bag";//todo cc
+            item.sku = "6901339924484";//todo cc
             int quantityInt = (Double.valueOf(item.quantity)).intValue();
             // 药品发放数量不小于1
             if (quantityInt<=0)quantityInt=1;

@@ -107,6 +107,7 @@ public class ConfirmRecipesFragment extends BaseEventFragment {
     @BindView(R.id.rv_contentFastLib)
     RecyclerView rv_contentFastLib; // 藏的很深的RV对象，显示处方信息
 
+    private AutoAdaptorProxy<GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO> proxy; //处方显示对象
 
     @Override
     public int getContentLayout() {
@@ -232,6 +233,7 @@ public class ConfirmRecipesFragment extends BaseEventFragment {
      * @param skus 药品编码 列表
      */
     public void requestGetStockInfo(String clinicSn, ArrayList<String> skus){
+        skus = new ArrayList<String>(){{add("6901339924484");}};//todo cc
         ApiRepository.getInstance().getStockInfo(clinicSn,skus)
                 .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
                 .subscribe(new FastLoadingObserver<GetStockInfoEntity>("请稍后...") {
@@ -313,29 +315,28 @@ public class ConfirmRecipesFragment extends BaseEventFragment {
         // 安全检测
         if (newDatas==null)
             return;
-        AutoAdaptorProxy<GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO> proxy
-                = new AutoAdaptorProxy<>(recyclerView, R.layout.item_recipes, 1, newDatas, getContext());
 
-        proxy.setListener(new AutoAdaptorProxy.IItemListener<GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO>() {
-            @Override
-            public void onItemClick(AutoObjectAdaptor.ViewHolder holder, int position, GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO itemData) {
+        if (proxy==null){
+            proxy = new AutoAdaptorProxy<>(recyclerView, R.layout.item_recipes, 1, newDatas, getContext());
+            proxy.setListener(new AutoAdaptorProxy.IItemListener<GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO>() {
+                @Override
+                public void onItemClick(AutoObjectAdaptor.ViewHolder holder, int position, GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO itemData) {
 
-            }
+                }
 
-            @Override
-            public void onItemViewDraw(AutoObjectAdaptor.ViewHolder holder, int position, GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO itemData) {
-                GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO.RecipeDetailBeanListDTO vo = itemData.recipeDetailBeanList.get(0);
-                int perDayUse = ((Double) vo.useDose).intValue();
+                @Override
+                public void onItemViewDraw(AutoObjectAdaptor.ViewHolder holder, int position, GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO itemData) {
+                    GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO.RecipeDetailBeanListDTO vo = itemData.recipeDetailBeanList.get(0);
+                    int perDayUse = ((Double) vo.useDose).intValue();
 
-                String drugName = (position+1)+"、"+vo.drugName;
-                String wayToUse = "(1天"+vo.useTotalDose/vo.useDays+"次，每次"+perDayUse+"片)";
-                String[] orders = {"#333333",drugName,"#38ABA0",wayToUse};
-                ((TextView)holder.itemView.findViewById(R.id.tv_useDose)).setText(ActivityUtils.formatTextView(orders));//使用方法
-            }
-        });
-
+                    String drugName = (position+1)+"、"+vo.drugName;
+                    String wayToUse = "(1天"+vo.useTotalDose/vo.useDays+"次，每次"+perDayUse+"片)";
+                    String[] orders = {"#333333",drugName,"#38ABA0",wayToUse};
+                    ((TextView)holder.itemView.findViewById(R.id.tv_useDose)).setText(ActivityUtils.formatTextView(orders));//使用方法
+                } });
+        }
         //刷新
-        proxy.notifyDataSetChanged();
+        proxy.flashData(new ArrayList<>(newDatas));
     }
 
     @Override

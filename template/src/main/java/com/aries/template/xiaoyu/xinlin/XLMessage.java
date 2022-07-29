@@ -150,7 +150,7 @@ public class XLMessage {
             // socket 获取数据超时
             webSocketClient.setReadTimeout(60000);
             // socket 重新链接延时
-            webSocketClient.enableAutomaticReconnection(3000);
+            webSocketClient.enableAutomaticReconnection(6000);
             // socket 开始链接
             webSocketClient.connect();
         }else {

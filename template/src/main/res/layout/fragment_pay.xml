@@ -92,7 +92,6 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-
                 android:gravity="center_vertical"
                 android:layout_marginLeft="20dp"
                 android:orientation="horizontal"
@@ -187,9 +186,9 @@
                     android:gravity="center_vertical"
                     android:paddingTop="10dp"
                     android:paddingBottom="10dp"
-
                     android:layout_marginRight="10dp"
                     android:orientation="vertical"
+                    android:minWidth="200dp"
                     >
 
                     <TextView
@@ -203,7 +202,7 @@
                         android:textSize="22dp"
                         android:gravity="left"
                         android:layout_marginBottom="20dp"
-                        android:text="王二二（男）" />
+                        android:text="王二" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -455,8 +454,8 @@
 
                         <androidx.appcompat.widget.AppCompatImageView
                             android:id="@+id/iv_qrcode"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                            android:layout_width="300dp"
+                            android:layout_height="300dp"
                             android:background="@drawable/bg_pay_w_yzs"
                             android:layout_marginTop="10dp"
                             android:minWidth="120dp"

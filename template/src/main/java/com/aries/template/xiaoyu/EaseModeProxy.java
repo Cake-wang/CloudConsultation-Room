@@ -217,8 +217,6 @@ public class EaseModeProxy {
         }
     }
 
-
-
     /**
      * 专门登录环信
      */
@@ -334,11 +332,16 @@ public class EaseModeProxy {
     private void onRegSuccess(String regResponseMsg) {
         //{"topic":"REG_SUCCESS","payload":70893}
         //注册成功后，获取于用户在小鱼的第三方账号
-        RegReponse regReponse = JsonUtil.toObject(regResponseMsg, RegReponse.class);
-        Integer payLoad = regReponse.getPayload();
-        account = String.valueOf(payLoad);
-        // 启动小鱼
-        xyInit();
+        try{
+            RegReponse regReponse = JsonUtil.toObject(regResponseMsg, RegReponse.class);
+            Integer payLoad = regReponse.getPayload();
+            account = String.valueOf(payLoad);
+            // 启动小鱼
+            xyInit();
+        }catch (Exception e){
+            e.printStackTrace();
+            Log.d("JTJK", "onRegSuccess: "+e.getMessage());
+        }
     }
 
     /**
@@ -616,7 +619,8 @@ public class EaseModeProxy {
             return;
         if (videoCell!=null && videoCell.getParent()!=null)
             ((ViewGroup) videoCell.getParent()).removeView(videoCell);
-        viewGroup.addView(videoCell);
+        if (videoCell!=null)
+            viewGroup.addView(videoCell);
     }
 
     /**
@@ -626,7 +630,8 @@ public class EaseModeProxy {
     public void doNotFullScreen(){
         if (videoCell!=null && videoCell.getParent()!=null)
             ((ViewGroup) videoCell.getParent()).removeView(videoCell);
-        contentLayout.addView(videoCell);
+        if (videoCell!=null)
+            contentLayout.addView(videoCell);
     }
 
     /**

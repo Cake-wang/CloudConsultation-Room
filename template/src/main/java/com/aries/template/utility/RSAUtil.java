@@ -1,6 +1,7 @@
 package com.aries.template.utility;
 
 import android.os.Build;
+import android.util.Base64;
 
 import androidx.annotation.RequiresApi;
 
@@ -11,10 +12,10 @@ import javax.crypto.NoSuchPaddingException;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.Base64;
 import java.util.TreeMap;
 
 public class RSAUtil {
@@ -25,7 +26,6 @@ public class RSAUtil {
      * @param keyValue
      * @return PrivateKey
      */
-    @RequiresApi(api = Build.VERSION_CODES.O)
     public static PrivateKey getPrivateKey(String keyValue) {
         return getPrivateKey(keyValue.getBytes());
     }
@@ -87,7 +87,8 @@ public class RSAUtil {
      */
     @RequiresApi(api = Build.VERSION_CODES.O)
     private static PublicKey getPublicKey(byte[] keyValueBase64) {
-        byte[] bytesPublic = Base64.getDecoder().decode(keyValueBase64);
+        byte[] bytesPublic = Base64.decode(keyValueBase64,Base64.NO_WRAP);
+//        byte[] bytesPublic = Base64.getDecoder().decode(keyValueBase64);
         X509EncodedKeySpec keySpec = new X509EncodedKeySpec(bytesPublic);
         try {
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
@@ -116,10 +117,10 @@ public class RSAUtil {
      * @param keyValueBase64 keyValueBase64
      * @return PrivateKey
      */
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    @SuppressWarnings("unchecked")
+//    @RequiresApi(api = Build.VERSION_CODES.O)
+//    @SuppressWarnings("unchecked")
     private static PrivateKey getPrivateKey(byte[] keyValueBase64) {
-        byte[] bytesPrivate = Base64.getDecoder().decode(keyValueBase64);
+        byte[] bytesPrivate = Base64.decode(keyValueBase64,Base64.NO_WRAP);
         PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(bytesPrivate);
         try {
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
@@ -144,7 +145,7 @@ public class RSAUtil {
             Cipher cipher = Cipher.getInstance("RSA");
             cipher.init(Cipher.ENCRYPT_MODE, publicKey);
             byte[] bytesEncrypt = cipher.doFinal(originData.getBytes());
-            byte[] bytesEncryptBase64 = Base64.getEncoder().encode(bytesEncrypt);
+            byte[] bytesEncryptBase64 = Base64.encode(bytesEncrypt,Base64.NO_WRAP);
             return new String(bytesEncryptBase64);
         } catch (Exception e) {
             e.printStackTrace();
@@ -162,7 +163,7 @@ public class RSAUtil {
     @RequiresApi(api = Build.VERSION_CODES.O)
     public static String decodeData(PrivateKey privateKey, String encodeData) {
         try {
-            byte[] bytesEncrypt = Base64.getDecoder().decode(encodeData);
+            byte[] bytesEncrypt = Base64.decode(encodeData,Base64.NO_WRAP);
             Cipher cipher = Cipher.getInstance("RSA");
             cipher.init(Cipher.DECRYPT_MODE, privateKey);
             byte[] bytesDecrypt = cipher.doFinal(bytesEncrypt);
@@ -184,13 +185,12 @@ public class RSAUtil {
      * @throws InvalidKeyException          ex
      * @throws UnsupportedEncodingException ex
      */
-    @RequiresApi(api = Build.VERSION_CODES.O)
     public static String sign(String data, PrivateKey privateKey) throws NoSuchAlgorithmException, InvalidKeyException, UnsupportedEncodingException, SignatureException {
         Signature signature = Signature.getInstance("Sha1WithRSA");
         signature.initSign(privateKey);
         signature.update(data.getBytes("UTF-8"));
         byte[] signed = signature.sign();
-        return new String(Base64.getEncoder().encode(signed));
+        return new String(Base64.encode(signed,Base64.NO_WRAP));
     }
 
     /**bizContent={"list":[{"hospType":"6","serviceAddress":"http://111.0.83.240:8062/","telephone":"0571-89710576","hospState":"0","hospId":"MA2CF6M4233010315D1202","hospName":"孙泰和国医国药馆","hospImgUrl":"http://111.0.83.240:8089/static/57172.jpg","locationCode":"330102","hospLevelCode":"00"}]}&interfaceMethod=10001&logTraceId=80eebff54a2940a6b110b8fa94205985&merchantId=2021042296
@@ -204,7 +204,6 @@ public class RSAUtil {
      * @throws InvalidKeyException          ex
      * @throws UnsupportedEncodingException ex
      */
-    @RequiresApi(api = Build.VERSION_CODES.O)
     public static String sign(String data, String privateKey) throws SignatureException, NoSuchAlgorithmException, InvalidKeyException, UnsupportedEncodingException {
         return sign(data, getPrivateKey(privateKey));
     }
@@ -227,7 +226,7 @@ public class RSAUtil {
         Signature signature = Signature.getInstance("Sha1WithRSA");
         signature.initVerify(publicKey);
         signature.update(originData.getBytes("UTF-8"));
-        return signature.verify(Base64.getDecoder().decode(signedData.getBytes("UTF-8")));
+        return signature.verify( Base64.decode(signedData.getBytes(StandardCharsets.UTF_8),Base64.NO_WRAP));
     }
 
     /**

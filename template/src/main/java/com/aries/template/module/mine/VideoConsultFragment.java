@@ -38,6 +38,7 @@ import com.xuexiang.xaop.annotation.SingleClick;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -78,6 +79,8 @@ public class VideoConsultFragment extends BaseEventFragment {
     private DapinSocketProxy dapinSocketProxy;// 大屏的通信代理
 
     private boolean isBodyTestingFlag;// 是否从身体检测回来，如果曾经出过身体检测，则为true
+
+    private AutoAdaptorProxy<GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO> proxy; //处方显示对象
 
     /**
      * 输入显示对象
@@ -147,6 +150,8 @@ public class VideoConsultFragment extends BaseEventFragment {
     @Override
     public void onStart() {
         super.onStart();
+        //启动轮训处方单状态
+//        timeLoop();
         // 创建视频处理器
         ViewGroup viewGroup = getActivity().findViewById(R.id.videoContent);
         EaseModeProxy.with().initView(getActivity(),viewGroup).onStartVideo();
@@ -161,7 +166,9 @@ public class VideoConsultFragment extends BaseEventFragment {
                 //入会成功
                 // 大屏接口，启动大屏
                 dapinSocketProxy.startSocket(DapinSocketProxy.SCREENFLAG_CONTROLSCREEN);
-                //入会成功, 启动轮训处方单状态
+                // 启动全屏展示
+//                btn_full_screen.setVisibility(View.VISIBLE);
+                //启动轮训处方单状态
                 timeLoop();
             }
         });
@@ -182,6 +189,7 @@ public class VideoConsultFragment extends BaseEventFragment {
     @Override
     public void initView(Bundle savedInstanceState) {
         jtjk_video_doctorname.setText("复诊医生: " +doctorName);
+//        btn_full_screen.setVisibility(View.GONE);
     }
 
     @SingleClick
@@ -232,7 +240,11 @@ public class VideoConsultFragment extends BaseEventFragment {
                 // 结束问诊，如果有问诊单，则根据这个问诊单进入支付
                 // 在栈内的HomeFragment以SingleTask模式启动（即在其之上的Fragment会出栈）
                 if (!isRecipeCheckedFlag){
-                    ToastUtil.show("处方正在被医生确认，请稍后再试");
+                    // 患者进入视频后，医生没有开处方, 则回到首页
+                    if (currentRecipes.size()==0)
+                        start(HomeFragment.newInstance(), SupportFragment.SINGLETASK);
+                    else
+                        ToastUtil.show("处方正在被医生确认，请稍后再试");
                 } else{
                     // 关闭，并释放所有资源
                     // 包括向医生端发送socket消息
@@ -254,7 +266,7 @@ public class VideoConsultFragment extends BaseEventFragment {
         dialog.show();
     }
 
-    private static final int PERIOD = 5* 1000;
+    private static final int PERIOD = 6* 1000;
     private static final int DELAY = 100;
     private Disposable mDisposable;
     /**
@@ -384,11 +396,12 @@ public class VideoConsultFragment extends BaseEventFragment {
                             // 跳转
                             // 启动确定处方单
                             start(ConfirmRecipesFragment.newInstance(recipeId,currentRecipes));
+                        }else{
+                            ToastUtil.show(entity.message);
                         }
                     }
                 });
     }
-
 
     /**
      * 获取数据后，显示处方信息列表
@@ -400,27 +413,31 @@ public class VideoConsultFragment extends BaseEventFragment {
         // 安全检测
         if (newDatas==null)
             return;
-        AutoAdaptorProxy<GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO> proxy
-                = new AutoAdaptorProxy<>(recyclerView, R.layout.item_recipes, 1, newDatas, getContext());
 
-        proxy.setListener(new AutoAdaptorProxy.IItemListener<GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO>() {
-            @Override
-            public void onItemClick(AutoObjectAdaptor.ViewHolder holder, int position, GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO itemData) {
-            }
+        if (recyclerView.getVisibility()==View.GONE)
+            recyclerView.setVisibility(View.VISIBLE);
 
-            @Override
-            public void onItemViewDraw(AutoObjectAdaptor.ViewHolder holder, int position, GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO itemData) {
-                GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO.RecipeDetailBeanListDTO vo = itemData.recipeDetailBeanList.get(0);
-                int perDayUse = ((Double) vo.useDose).intValue();
+        if (proxy==null){
+            proxy = new AutoAdaptorProxy<>(recyclerView, R.layout.item_recipes, 1, newDatas, getContext());
+            proxy.setListener(new AutoAdaptorProxy.IItemListener<GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO>() {
+                @Override
+                public void onItemClick(AutoObjectAdaptor.ViewHolder holder, int position, GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO itemData) {
+                }
 
-                String drugName = (position+1)+"、"+vo.drugName;
-                String wayToUse = "(1天"+vo.useTotalDose/vo.useDays+"次，每次"+perDayUse+"片)";
-                String[] orders = {"#333333",drugName,"#38ABA0",wayToUse};
-                ((TextView)holder.itemView.findViewById(R.id.tv_useDose)).setText(ActivityUtils.formatTextView(orders));//使用方法
-            }
-        });
+                @Override
+                public void onItemViewDraw(AutoObjectAdaptor.ViewHolder holder, int position, GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO itemData) {
+                    GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO.RecipeDetailBeanListDTO vo = itemData.recipeDetailBeanList.get(0);
+                    int perDayUse = ((Double) vo.useDose).intValue();
+
+                    String drugName = (position+1)+"、"+vo.drugName;
+                    String wayToUse = "(1天"+vo.useTotalDose/vo.useDays+"次，每次"+perDayUse+"片)";
+                    String[] orders = {"#333333",drugName,"#38ABA0",wayToUse};
+                    ((TextView)holder.itemView.findViewById(R.id.tv_useDose)).setText(ActivityUtils.formatTextView(orders));//使用方法
+                }
+            });
+        }
         //刷新
-        proxy.notifyDataSetChanged();
+        proxy.flashData(new ArrayList<>(newDatas));
     }
 
     @Override

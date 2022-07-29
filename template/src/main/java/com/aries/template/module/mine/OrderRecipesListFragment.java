@@ -9,6 +9,7 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.aries.template.GlobalConfig;
 import com.aries.template.R;
 import com.aries.template.entity.GetConsultsAndRecipesResultEntity;
 import com.aries.template.module.base.BaseEventFragment;
@@ -60,6 +61,8 @@ public class OrderRecipesListFragment extends BaseEventFragment {
     RecyclerView recyclerView;// 网格显示
     @BindView(R.id.jtjk_fz_fragment_title)
     TextView title;// 网格显示
+    @BindView(R.id.jtjk_recipe_name)
+    TextView jtjk_recipe_name;
 
 
     /**
@@ -159,6 +162,8 @@ public class OrderRecipesListFragment extends BaseEventFragment {
         btn_cancel.setOnClickListener(v -> {upDownProxy.doProReFlash();});
         // 点击跳过
         btn_goto_dep.setOnClickListener(v->{start(DepartmentFragment.newInstance());});
+        // 显示名称
+        jtjk_recipe_name.setText(GlobalConfig.ssCard.getName()+"，您好");
 
 
         title.setText("未支付的处方单");
