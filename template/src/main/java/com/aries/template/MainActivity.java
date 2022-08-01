@@ -498,6 +498,8 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // 优先将设备号输入进来
+        GlobalConfig.machineId = ApiRepository.getDeviceId();
         mDelegate.onCreate(savedInstanceState);
         if (findFragment(HomeFragment.class) == null) {
             loadRootFragment(R.id.fLayout_containerFastMain, HomeFragment.newInstance());  // 加载根Fragment

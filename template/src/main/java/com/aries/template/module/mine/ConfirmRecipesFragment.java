@@ -246,15 +246,15 @@ public class ConfirmRecipesFragment extends BaseEventFragment {
                         if (entity.getData().isSuccess()){
                             // 判定药品是否还有库存
                             // data 的返回类型 {\"1\":0,\"2\":0}
-//                            Map<String,Object> objectMap = (Map<String, Object>) JSON.parse(entity.getData().getData());
-//                            for (String key : objectMap.keySet()) {
-//                                if (String.valueOf(objectMap.get(key)).equals("0")){
-//                                    // 药品编码 的 这个药没有，提示用户
-////                                ToastUtil.show("药品库存不够");
-//                                    start(ResultFragment.newInstance("stockFail"));
-//                                    return;
-//                                }
-//                            }
+                            Map<String,Object> objectMap = (Map<String, Object>) JSON.parse(entity.getData().getData());
+                            for (String key : objectMap.keySet()) {
+                                if (String.valueOf(objectMap.get(key)).equals("0")){
+                                    // 药品编码 的 这个药没有，提示用户
+//                                ToastUtil.show("药品库存不够");
+                                    start(ResultFragment.newInstance("stockFail"));
+                                    return;
+                                }
+                            }
 
                             // 启动处方单推送接口
                             // 拉到数据了，有库存

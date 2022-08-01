@@ -1,6 +1,7 @@
 package com.aries.template;
 
 import com.aries.template.entity.SearchDoctorListByBusTypeV2ResultEntity;
+import com.aries.template.retrofit.repository.ApiRepository;
 import com.decard.entitys.SSCard;
 
 /******
@@ -31,10 +32,12 @@ public class GlobalConfig {
     public static String NALI_TID = "tid_eric_1";
 
     /**
-     *  机器编号 从获取机构编号，组织代码，机器编号的接口一并返回
+     *  机器编号
+     *  从获取机构编号，组织代码，机器编号 的请求接口一并返回，请求时，该参数应该用唯一设备号填充
+     *  如果机器编号没有从后台返回，则使用 唯一设备号，在MainActivity启动时赋值一次
      *  不可以被清空或重置
      *  */
-    public static String machineId = "SY0001";
+    public static String machineId = "";
 
     /**
      * 商户ID

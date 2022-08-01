@@ -164,12 +164,9 @@ public class HomeFragment extends BaseEventFragment{
      * 通过机器编号，获得全局的数据
      * 并保存在全局
      */
-    /**
-     * 通过机器编号，获得全局的数据
-     * 并保存在全局
-     */
     public void requestMachineInfo(){
         String deviceId = ApiRepository.getDeviceId();
+        GlobalConfig.machineId = deviceId;
         ApiRepository.getInstance().findByMachineId(deviceId)
             .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
             .subscribe(new FastLoadingObserver<MachineEntity>("请稍后...") {
@@ -180,6 +177,10 @@ public class HomeFragment extends BaseEventFragment{
                         return;
                     }
                     if (entity.success){
+                        if (entity.data==null){
+                            ToastUtil.show("机器号没有配置");
+                            return;
+                        }
                         GlobalConfig.machineId = entity.data.machineId;
                         GlobalConfig.cabinetId = entity.data.cabinetId;
                         GlobalConfig.hospitalName = entity.data.hospitalName;
