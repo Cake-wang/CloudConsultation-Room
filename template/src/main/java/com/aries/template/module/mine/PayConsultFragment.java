@@ -181,7 +181,8 @@ public class PayConsultFragment extends BaseEventFragment {
                                 start(VideoConsultFragment.newInstance(consultId,
                                         patientName,
                                         doctorId,
-                                        doctorName));
+                                        doctorName,
+                                        false));
                                 // 释放对象资源
                                 onDismiss();
                             }

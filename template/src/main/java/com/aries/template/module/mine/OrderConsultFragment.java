@@ -193,7 +193,8 @@ public class OrderConsultFragment extends BaseEventFragment {
                     start(VideoConsultFragment.newInstance(consultId,
                             patientName,
                             doctorId,
-                            doctorName));
+                            doctorName,
+                            true));
                 break;
             default:
                 break;

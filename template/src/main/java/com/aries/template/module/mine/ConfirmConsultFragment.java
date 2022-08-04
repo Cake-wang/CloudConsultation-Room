@@ -79,6 +79,12 @@ public class ConfirmConsultFragment extends BaseEventFragment implements Compoun
     AppCompatCheckBox cb_protocol_tw;
     @BindView(R.id.cb_protocol_tr)
     AppCompatCheckBox cb_protocol_tr;
+    @BindView(R.id.cb_protocol_tx_o)
+    TextView cb_protoco_txl_o;
+    @BindView(R.id.cb_protocol_tx_tw)
+    TextView cb_protocol_tx_tw;
+    @BindView(R.id.cb_protocol_tx_tr)
+    TextView cb_protocol_tx_tr;
 
     Integer returnVisitStatus = 0,alleric =  0,haveReaction =0;
 
@@ -116,6 +122,9 @@ public class ConfirmConsultFragment extends BaseEventFragment implements Compoun
         cb_protocol_o.setOnCheckedChangeListener(this);
         cb_protocol_tw.setOnCheckedChangeListener(this);
         cb_protocol_tr.setOnCheckedChangeListener(this);
+        cb_protocol_o.setEnabled(false);
+        cb_protocol_tw.setEnabled(false);
+        cb_protocol_tr.setEnabled(false);
     }
 
 
@@ -173,7 +182,8 @@ public class ConfirmConsultFragment extends BaseEventFragment implements Compoun
      * 按钮 行为 集合
      */
     @SingleClick
-    @OnClick({R.id.btn_back, R.id.btn_main, R.id.btn_cancel, R.id.btn_inquiry, R.id.tv_date})
+    @OnClick({R.id.btn_back, R.id.btn_main, R.id.btn_cancel, R.id.btn_inquiry, R.id.tv_date,
+            R.id.cb_protocol_tx_o, R.id.cb_protocol_tx_tr, R.id.cb_protocol_tx_tw})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.tv_date:
@@ -182,6 +192,15 @@ public class ConfirmConsultFragment extends BaseEventFragment implements Compoun
             case R.id.btn_inquiry:
                 // 确认，发起复诊请求
                 requestGetPatientList();
+                break;
+            case R.id.cb_protocol_tx_o:
+                cb_protocol_o.setChecked(true);
+                break;
+            case R.id.cb_protocol_tx_tw:
+                cb_protocol_tw.setChecked(true);
+                break;
+            case R.id.cb_protocol_tx_tr:
+                cb_protocol_tr.setChecked(true);
                 break;
             default:
                 break;

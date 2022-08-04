@@ -2,42 +2,29 @@ package com.aries.template.module.main;
 
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.alibaba.fastjson.JSON;
 import com.aries.library.fast.retrofit.FastLoadingObserver;
-import com.aries.library.fast.retrofit.FastObserver;
 import com.aries.library.fast.util.SPUtil;
 import com.aries.library.fast.util.ToastUtil;
-import com.aries.template.FakeDataExample;
 import com.aries.template.GlobalConfig;
 import com.aries.template.MainActivity;
 import com.aries.template.R;
 import com.aries.template.entity.ConfigurationToThirdForPatientEntity;
 import com.aries.template.entity.MachineEntity;
-import com.aries.template.entity.PatientFinishGraphicTextConsultEntity;
 import com.aries.template.module.base.BaseEventFragment;
-import com.aries.template.module.mine.ConfirmRecipesFragment;
 import com.aries.template.module.mine.MineCardFragment;
-import com.aries.template.module.mine.ResultFragment;
-import com.aries.template.module.mine.VideoConsultFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
-import com.aries.template.xiaoyu.EaseModeProxy;
+import com.aries.template.thridapp.JTJKThirdAppUtil;
+import com.aries.template.utils.DefenceUtil;
 import com.aries.ui.view.title.TitleBarView;
 import com.hyphenate.EMCallBack;
-import com.hyphenate.EMMessageListener;
 import com.hyphenate.chat.EMClient;
-import com.hyphenate.chat.EMMessage;
 import com.trello.rxlifecycle3.android.ActivityEvent;
 import com.trello.rxlifecycle3.android.FragmentEvent;
 
 import androidx.annotation.Nullable;
-
-import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Map;
 
 import butterknife.BindView;
 
@@ -165,6 +152,10 @@ public class HomeFragment extends BaseEventFragment{
      * 并保存在全局
      */
     public void requestMachineInfo(){
+        // 防止重复提交
+        if (!DefenceUtil.checkReSubmit("HomeFragment.requestMachineInfo")){
+            return;
+        }
         String deviceId = ApiRepository.getDeviceId();
         GlobalConfig.machineId = deviceId;
         ApiRepository.getInstance().findByMachineId(deviceId)
@@ -184,9 +175,12 @@ public class HomeFragment extends BaseEventFragment{
                         GlobalConfig.machineId = entity.data.machineId;
                         GlobalConfig.cabinetId = entity.data.cabinetId;
                         GlobalConfig.hospitalName = entity.data.hospitalName;
-//                             GlobalConfig.machineId = entity.data.machineStatus;// 暂定
                         GlobalConfig.organId = Integer.valueOf(entity.data.hospitalNo);
-                        GlobalConfig.machineIp = entity.data.machineIp;
+                        GlobalConfig.machineIp = entity.data.machineIp + ":"+GlobalConfig.machinePort;// 端口是写死的，传入的只有ip
+                        GlobalConfig.thirdFactory = entity.data.thirdFactory;
+//                        GlobalConfig.thirdMachineId = entity.data.thirdMachineId;// 暂定不赋予
+                        GlobalConfig.factoryResource = entity.data.factoryResource;
+                        GlobalConfig.factoryMainPage = entity.data.factoryMainPage;
                         if (jtjk_hospital!=null)
                             jtjk_hospital.setText(GlobalConfig.hospitalName);
                         if (jtjk_machine!=null)

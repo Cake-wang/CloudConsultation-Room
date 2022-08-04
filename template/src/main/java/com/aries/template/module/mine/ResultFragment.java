@@ -128,38 +128,61 @@ public class ResultFragment extends BaseEventFragment implements ISupportFragmen
      * 先打开设备，上电
      * 再打印
      */
-    public void printCode(){
+    public void printCode(String printContent){
         Log.d("111111MODEL", Build.MODEL);
         //打开端口，usb模式，打开之前必须确保已经获取到USB权限，返回值为设备句柄号。
         int devHandle = BasicOper.dc_open("AUSB",getActivity(),"",0);
         Log.d("111111MODEL", devHandle+"");
         if(devHandle>0){
             Log.d("open","dc_open success devHandle = "+devHandle);
-            if (result.contains("paySuc")){
-                if (!TextUtils.isEmpty(takeCode)){
-                    //打印机参数设置
-                    String setPrint = BasicOper.dc_setprint(0x02, 0x01, 0, 0, 10, 0x00);
-                    Log.d("print", "BasicOper.dc_setprint:" + setPrint);
-                    // 打印机进纸设置
-                    String enter = BasicOper.dc_printenter(50);
-                    Log.d("print", "BasicOper.dc_printenter:" + enter);
-                    String printString = "取药码："+takeCode;
-                    try {
-                        byte[] strByte = printString.getBytes("GBK");
-                        //打印字符
-                        String print_char = BasicOper.dc_printcharacter(strByte);
-                        Log.d("print", "BasicOper.dc_printcharacter:" + print_char);
-                    }
-                    catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
-                    }
+            if (!TextUtils.isEmpty(printContent)){
+                //打印机参数设置
+                String setPrint = BasicOper.dc_setprint(0x02, 0x01, 0, 0, 10, 0x00);
+                Log.d("print", "BasicOper.dc_setprint:" + setPrint);
+                // 打印机进纸设置
+                String enter = BasicOper.dc_printenter(50);
+                Log.d("print", "BasicOper.dc_printenter:" + enter);
+
+                // 取药码
+                String printString = "取药码："+printContent;
+                try {
+                    byte[] strByte = printString.getBytes("GBK");
+                    //打印字符
+                    String print_char = BasicOper.dc_printcharacter(strByte);
+                    Log.d("print", "BasicOper.dc_printcharacter:" + print_char);
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+
+                // 一维码
+                //打印机参数设置
+//                String setPrint = BasicOper.dc_setprint(0x02, 0x02, 0, 0, 10, 0x00);
+//                Log.d("print", "BasicOper.dc_setprint:" + setPrint);
+                //打印机进纸设置
+//                String enter = BasicOper.dc_printenter(50);
+//                Log.d("print", "BasicOper.dc_printenter:" + enter);
+
+                //一维码内容
+                String strTemp = printContent;
+                try {
+                    byte[] byteTemp = strTemp.getBytes("GBK");
+                    //打印一维码
+                    String temp = BasicOper.dc_printOnedimensional(50, 0x01, 0x01, byteTemp);
+                    Log.d("print", "PrintLineByLinePicture:" + temp);
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
                 }
             }
+
         }
     }
 
     @Override
     public void loadData() {
-        printCode();
+        // 如果从处方单支付过来
+        if (result.contains("paySuc")){
+            // 打印 取药码 一维码
+            printCode(takeCode);
+        }
     }
 }

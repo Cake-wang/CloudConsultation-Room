@@ -223,9 +223,11 @@ public class UVCAndroidCameraPresenter {
             if (usbdevice != null) {
                 if (11785 == usbdevice.getVendorId() && 48 == usbdevice.getProductId()) {
                 } else {
-                    if (!mUSBMonitor.hasPermission(usbdevice)){
-                        mUSBMonitor.requestPermission(usbdevice);
-                    }
+                    try {
+                        if (!mUSBMonitor.hasPermission(usbdevice)){
+                            mUSBMonitor.requestPermission(usbdevice);
+                        }
+                    }catch (Exception e){e.printStackTrace();}
                 }
             }
         }

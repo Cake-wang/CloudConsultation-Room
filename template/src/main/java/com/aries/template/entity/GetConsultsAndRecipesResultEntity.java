@@ -1061,6 +1061,7 @@ public class GetConsultsAndRecipesResultEntity implements Serializable{
             public Integer status;
             public String recipeSurplusHours;
             public Integer recipeType;
+            public Integer orderId;
             public List<RecipeDetail> recipeDetailBeans;
 
             public Integer getRecipeId() {
@@ -1157,6 +1158,14 @@ public class GetConsultsAndRecipesResultEntity implements Serializable{
 
             public void setRecipeType(Integer recipeType) {
                 this.recipeType = recipeType;
+            }
+
+            public Integer getOrderId() {
+                return orderId;
+            }
+
+            public void setOrderId(Integer orderId) {
+                this.orderId = orderId;
             }
 
             public List<RecipeDetail> getRecipeDetailBeans() {

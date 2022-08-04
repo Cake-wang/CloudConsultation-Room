@@ -5,6 +5,8 @@ package com.aries.template.entity;
  * 调用地址：/cloudHospital/machineRelation/findByMachineId
  */
 public class MachineEntity {
+
+
     public boolean success;
     public String code;
     public String message;
@@ -13,11 +15,15 @@ public class MachineEntity {
 
     public static class DataDTO {
         public String machineId;
+        public String thirdMachineId;
+        public String thirdFactory;
         public String cabinetId;
         public String hospitalNo;
         public String hospitalName;
         public int machineStatus;
         public String machineIp;
+        public String factoryResource;
+        public String factoryMainPage;
         public String createTime;
         public String updateTime;
     }

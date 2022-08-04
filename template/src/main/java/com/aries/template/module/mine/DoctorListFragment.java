@@ -75,7 +75,7 @@ public class DoctorListFragment extends BaseEventFragment {
     /** 网络获取的全一级科室数据 */
     private ArrayList<Map> totalDatas;
     /** 上一页，下一页管理器 */
-    private DefenceUpDownProxy<Map> upDownProxy;
+    private UpDownProxy<Map> upDownProxy;
 
     @BindView(R.id.btn_cancel)
     Button btn_cancel;// 上一页按钮
@@ -113,7 +113,7 @@ public class DoctorListFragment extends BaseEventFragment {
         departmentId = getArguments().getString(KEK_BUNDLE_DEPARTMENTID);
         profession = getArguments().getString(KEK_BUNDLE_PROFESSION);
         // 创建 上一页，下一页管理器
-        upDownProxy = new DefenceUpDownProxy<>();
+        upDownProxy = new UpDownProxy<>();
         upDownProxy.setOnEventListener(new UpDownProxy.EventListener<Map>() {
             @Override
             public void reFlashRV(ArrayList<Map> newDatas) {

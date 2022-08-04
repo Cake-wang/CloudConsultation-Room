@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.xuexiang.xaop' //引用xaop插件
+apply plugin: 'com.didiglobal.booster'// booster 插件
 
 android {
     compileSdkVersion rootProject.compileSdkVersion
@@ -26,10 +27,10 @@ android {
     }
     signingConfigs {
         release {
-            storeFile file('../fast.jks')
-            storePassword 'fast123#@!'
-            keyAlias 'fast'
-            keyPassword 'fast123#@!'
+            storeFile file('../HZJKT_Android_Key.jks')
+            storePassword '123456'
+            keyAlias 'hzjkt'
+            keyPassword '123456'
         }
     }
 //    忽略打包资源错误
@@ -48,7 +49,7 @@ android {
             signingConfig signingConfigs.release
         }
         release {
-            debuggable true
+            debuggable false
             zipAlignEnabled true //是否支持Zip Align
             shrinkResources true //是否清理无用资源
             minifyEnabled true //是否启动混淆

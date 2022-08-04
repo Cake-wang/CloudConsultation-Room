@@ -67,7 +67,7 @@ public class SocThread {
         }
         isConnecting = true;
         try {
-            initdate();
+//            initdate();
             Log.i(TAG, "连接中……");
             if (client != null && client.isConnected()){
                 client.close();

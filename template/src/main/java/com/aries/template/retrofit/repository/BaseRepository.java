@@ -85,6 +85,8 @@ public abstract class BaseRepository {
         // 创建body
         ApiRepository.common.getInstance().machineId = GlobalConfig.machineId;
         ApiRepository.common.getInstance().userId = GlobalConfig.NALI_TID;
+        ApiRepository.common.getInstance().thirdMachineId = GlobalConfig.thirdMachineId;
+        ApiRepository.common.getInstance().thirdFactory = GlobalConfig.thirdFactory;
 
         //  由于加密要求，必须要按照字母顺序排列
         final Map<String, Object> params = new HashMap<>(4);

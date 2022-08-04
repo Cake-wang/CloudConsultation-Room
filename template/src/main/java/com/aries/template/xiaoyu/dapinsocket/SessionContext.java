@@ -49,6 +49,21 @@ public class SessionContext {
 		}
 	}
 
+	/**
+	 * 是否有监听
+	 */
+	public boolean isHaveContextChangedListener(){
+		boolean back = mListeners!=null && mListeners.size()>0;
+		return back;
+	}
+
+	/**
+	 * 释放所有监听
+	 */
+	public void removeAll(){
+		mListeners = new ArrayList<OnContextChangedListener>();
+	}
+
 
 	/**
 	 * 发送数据

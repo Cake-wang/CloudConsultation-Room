@@ -190,6 +190,8 @@ public class ApiRepository extends BaseRepository {
     public static class common {
         public String machineId;
         public String userId;
+        public String thirdMachineId;
+        public String thirdFactory;
         private static volatile common instance;
         private ApiService mApiService;
 //        private common() {
@@ -221,6 +223,22 @@ public class ApiRepository extends BaseRepository {
 
         public void setUserId(String userId) {
             this.userId = userId;
+        }
+
+        public String getThirdMachineId() {
+            return thirdMachineId;
+        }
+
+        public void setThirdMachineId(String thirdMachineId) {
+            this.thirdMachineId = thirdMachineId;
+        }
+
+        public String getThirdFactory() {
+            return thirdFactory;
+        }
+
+        public void setThirdFactory(String thirdFactory) {
+            this.thirdFactory = thirdFactory;
         }
     }
 
@@ -579,8 +597,8 @@ public class ApiRepository extends BaseRepository {
         Map<String,String> bizContent = new HashMap<>();
         bizContent.put("startPage","0");//复诊分页开始标记(默认每页十条，从0开始)
         bizContent.put("requestMode","4");//复诊类型,固定为4
-//        bizContent.put("tabStatus","ongoing");//状态标志位,ongoing进行中tab，isover已完成tab
-        bizContent.put("tabStatus","onready");//状态标志位,ongoing进行中tab，isover已完成tab，onready待处理
+        bizContent.put("tabStatus","ongoing");//状态标志位,ongoing进行中tab，isover已完成tab
+//        bizContent.put("tabStatus","onready");//状态标志位,ongoing进行中tab，isover已完成tab，onready待处理
         bizContent.put("recipeIndex","0");//处方分页起始位置
         bizContent.put("recipeLimit","20");//处方每页查询量(最大不超过20)
         // 请求的类型

@@ -1,21 +1,22 @@
 package com.aries.template.module.mine;
 
-import android.content.ComponentName;
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 
 import com.aries.library.fast.retrofit.FastLoadingObserver;
 import com.aries.library.fast.util.SPUtil;
 import com.aries.library.fast.util.ToastUtil;
+import com.aries.template.GlobalConfig;
 import com.aries.template.R;
 import com.aries.template.entity.AuthCodeResultEntity;
 import com.aries.template.entity.RegisterResultEntity;
 import com.aries.template.module.base.BaseEventFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
+import com.aries.template.thridapp.JTJKThirdAppUtil;
 import com.aries.template.utils.DefenceUtil;
 import com.aries.ui.view.title.TitleBarView;
 import com.trello.rxlifecycle3.android.FragmentEvent;
@@ -297,20 +298,31 @@ public class PhoneRegisterFragment extends BaseEventFragment implements ISupport
                                     // 向全局注入数据
                                     String tag = (String) SPUtil.get(mContext,"tag","fzpy");
                                     SPUtil.put(mContext,"mobile",mobile);
+                                    GlobalConfig.mobile = mobile;
                                     if(tag.contains("stjc")){
-                                            Intent intent = new Intent(Intent.ACTION_MAIN);
-                                            /**知道要跳转应用的包命与目标Activity*/
-                                            ComponentName componentName = new ComponentName("com.garea.launcher", "com.garea.launcher.login.LauncherLogin");
-                                            intent.setComponent(componentName);
-                                            intent.putExtra("userName", name);//这里Intent传值
-                                            intent.putExtra("idCard", idCard);
-                                            intent.putExtra("mobile",mobile);
-                                            startActivity(intent);
+                                        // 启动第三方跳转
+                                        if (!TextUtils.isEmpty(GlobalConfig.factoryResource)){
+                                            new JTJKThirdAppUtil().gotoBodyTesting(getActivity(),
+                                                    GlobalConfig.factoryResource,
+                                                    GlobalConfig.factoryMainPage,
+                                                    name,
+                                                    idCard,
+                                                    mobile);
+                                        }else {
+                                            ToastUtil.show("没有第三方应用信息，无法跳转");
+                                        }
+//                                            Intent intent = new Intent(Intent.ACTION_MAIN);
+//                                            /**知道要跳转应用的包命与目标Activity*/
+//                                            ComponentName componentName = new ComponentName("com.garea.launcher", "com.garea.launcher.login.LauncherLogin");
+//                                            intent.setComponent(componentName);
+//                                            intent.putExtra("userName", name);//这里Intent传值
+//                                            intent.putExtra("idCard", idCard);
+//                                            intent.putExtra("mobile",mobile);
+//                                            startActivity(intent);
                                     }else {
                                         //判断有挂号或处方
                                         // 返回读卡，重新返回 tid 数据
                                         start(MineCardFragment.newInstance("fzpy"));
-//                                        start(DepartmentFragment.newInstance());
                                     }
                                 }else {
                                     ToastUtil.show(entity.message);

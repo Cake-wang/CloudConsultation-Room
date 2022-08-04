@@ -237,7 +237,8 @@ public class OrderRecipesFragment extends BaseEventFragment {
      * @param skus 药品编码 列表
      */
     public void requestGetStockInfo(String clinicSn, ArrayList<String> skus){
-        skus = new ArrayList<String>(){{add("6901339924484");}};//todo cc
+//        skus = new ArrayList<String>(){{add("6901339924484");}};//todo cc
+        skus = new ArrayList<String>(){{add("4895013208569");}};//todo cc
         ApiRepository.getInstance().getStockInfo(clinicSn,skus)
                 .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
                 .subscribe(new FastLoadingObserver<GetStockInfoEntity>("请稍后...") {
@@ -284,7 +285,7 @@ public class OrderRecipesFragment extends BaseEventFragment {
                                 recipeCode.add(String.valueOf(item.organDrugCode));
                             }
                             //当处方单产生订单，并且订单有效时取的是订单的真实金额，其他时候取的处方的总金额保留两位小数
-                            start(PayRecipeFragment.newInstance(String.valueOf(obj.recipeId),recipeids,recipeCode,drugs));
+                            start(PayRecipeFragment.newInstance(String.valueOf(obj.recipeId),recipeids,recipeCode,drugs,String.valueOf(obj.orderId)));
                         }else {
                             ToastUtil.show("药品查询失败");
                         }

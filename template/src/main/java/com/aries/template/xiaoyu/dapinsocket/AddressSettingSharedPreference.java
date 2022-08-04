@@ -10,6 +10,7 @@ public class AddressSettingSharedPreference {
 
     private final static String TAG = "AddressSettingSharedPreference";
     public final static String ADDRESS = "address";
+    public final static String IP = "ip";
 
 
 

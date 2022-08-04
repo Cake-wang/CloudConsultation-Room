@@ -62,9 +62,8 @@ public class PayRecipeFragment extends BaseEventFragment {
 
     /** 从外部传入的数据  */
     private String recipeId;//处方单ID
-    private String patientSex;//性别
-    private String patientName;//姓名
     private String organDiseaseName;//疾病名称
+    private String orderid;//订单号，如果是从未支付进来的，那么进来后，不需要合并订单，直接用orderid来获取支付二维码
     private String busId;//合并订单号，如果有，则刷新二维码，如果没有，就再次尝试合并订单
     private String recipeFee="0.01";//药品费 当处方单产生订单，并且订单有效时取的是订单的真实金额，其他时候取的处方的总金额保留两位小数,总费用用接口获取
     private ArrayList<String> recipes;//处方ID集合
@@ -96,14 +95,23 @@ public class PayRecipeFragment extends BaseEventFragment {
      * @param recipes 处方ID集合
      * @param recipeCodes 处方编号集合
      * @param obj 处方单信息
+     * @param orderid 订单号，如果是从未支付进来的，那么进来后，
+     *                不需要合并订单，直接用orderid来获取支付二维码，如果从确认进来的，则使用空字符
      */
-    public static PayRecipeFragment newInstance(String recipeId, ArrayList<String> recipes, ArrayList<String> recipeCodes, ArrayList<DrugObject> obj) {
+    public static PayRecipeFragment newInstance(String recipeId,
+                                                ArrayList<String> recipes,
+                                                ArrayList<String> recipeCodes,
+                                                ArrayList<DrugObject> obj,
+                                                String orderid) {
         PayRecipeFragment fragment = new PayRecipeFragment();
         Bundle args = new Bundle();
         args.putString("recipeId", recipeId);
         args.putSerializable("recipes", recipes);
         args.putSerializable("recipeCodes", recipeCodes);
         args.putSerializable("obj", obj);
+        if (orderid==null)
+            orderid = "";
+        args.putSerializable("orderid", orderid);
         fragment.setArguments(args);
         return fragment;
     }
@@ -123,6 +131,7 @@ public class PayRecipeFragment extends BaseEventFragment {
             recipes = ((ArrayList<String>) args.getSerializable("recipes"));
             recipeCodes = ((ArrayList<String>) args.getSerializable("recipeCodes"));
             obj = (ArrayList<DrugObject>) args.getSerializable("obj");
+            orderid = args.getString("orderid");
         }
     }
 
@@ -205,7 +214,8 @@ public class PayRecipeFragment extends BaseEventFragment {
         ArrayList<Map> drugs = new ArrayList<>();
         for (DrugObject item : obj) {
             // 药品发放数量必须是整型
-            item.sku = "6901339924484";//todo cc
+//            item.sku = "6901339924484";//todo cc
+            item.sku = "4895013208569";//todo cc
             int quantityInt = (Double.valueOf(item.quantity)).intValue();
             // 药品发放数量不小于1
             if (quantityInt<=0)quantityInt=1;
@@ -245,8 +255,8 @@ public class PayRecipeFragment extends BaseEventFragment {
         ApiRepository.getInstance().prescriptionPush(clinicSn,
                         GlobalConfig.hospitalName,
                         GlobalConfig.ssCard.getSSNum(),
-                        patientSex,
-                        patientName,
+                        GlobalConfig.ssCard.getSex(),
+                        GlobalConfig.ssCard.getName(),
                         organDiseaseName,
                         recipeId,
                         String.valueOf(recipeFeeTrans),
@@ -297,9 +307,13 @@ public class PayRecipeFragment extends BaseEventFragment {
     /**
      * 处方合并生成订单接口
      * 这个接口的返回是3.12.	支付请求接口的输入
-     * todo 返回的数据没有通
      */
     private void requestBatchCreateOrder(String recipeFee, ArrayList<String> recipeIds, ArrayList<String> recipeCode){
+        // 如果已经有订单了
+        if (!TextUtils.isEmpty(orderid)){
+            requestPayOrder(orderid);
+            return;
+        }
         ApiRepository.getInstance().batchCreateOrder(recipeFee, recipeIds, recipeCode)
                 .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
                 .subscribe(new FastLoadingObserver<BatchCreateOrderEntity>("请稍后...") {
@@ -312,8 +326,7 @@ public class PayRecipeFragment extends BaseEventFragment {
                         if (entity.getData().isSuccess()){
                             String inputPusId = String.valueOf(entity.getData().getJsonResponseBean().getBody());
                             if (!TextUtils.isEmpty(inputPusId)){
-                                busId = inputPusId;
-                                requestPayOrder(busId);
+                                requestPayOrder(inputPusId);
                             }
                         }else{
                             ToastUtil.show("合并订单失败");
@@ -327,6 +340,12 @@ public class PayRecipeFragment extends BaseEventFragment {
      * @param busId 订单号
      */
     private void requestPayOrder(String busId){
+        if (TextUtils.isEmpty(busId)){
+            ToastUtil.show("订单号为空，无法获取支付二维码");
+            return;
+        }
+        // 注入数据
+        this.busId = busId;
         ApiRepository.getInstance().payOrder(busId,"recipe")
                 .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
                 .subscribe(new FastLoadingObserver<PayOrderEntity>("请稍后...") {

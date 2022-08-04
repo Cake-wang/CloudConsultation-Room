@@ -48,7 +48,8 @@ public class ApiConstant {
     public static final String doBaseGareaRequest =  "garea/doBaseGareaRequest";
 
     /** 调用机器全部初始信息 */
-    public static final String machineRelationByMachineId =  "machineRelation/findByMachineId";
+//    public static final String machineRelationByMachineId =  "machineRelation/findByMachineId";
+    public static final String machineRelationByMachineId =  "machineRelation/findByThird";
 
     /** 复诊单和挂号单 */
     public static final String getConsultsAndRecipes  =  "ngari/revisit/getConsultsAndRecipes";

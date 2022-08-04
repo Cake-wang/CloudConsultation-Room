@@ -426,6 +426,7 @@
                     >
 
                     <TextView
+                        android:id="@+id/cb_protocol_tx_o"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="#333333"
@@ -437,6 +438,7 @@
                         android:text="本院同医生复诊" />
 
                     <TextView
+                        android:id="@+id/cb_protocol_tx_tw"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="#333333"
@@ -448,6 +450,7 @@
                         android:text="本院非同医生复诊" />
 
                     <TextView
+                        android:id="@+id/cb_protocol_tx_tr"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="#333333"

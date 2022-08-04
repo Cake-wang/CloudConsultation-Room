@@ -113,8 +113,6 @@ public class EaseModeProxy {
     private String meetingPassword = "348642"; //会议室密码，从接口获取到的 还没有
 
 
-    //单例
-    private static volatile EaseModeProxy sInstance;
     // 环信 callback
     private EMCallBack emcallback;
     // 是否已经进入启动视频问诊
@@ -125,6 +123,8 @@ public class EaseModeProxy {
     // 需要释放
     private XLMessage xlMessage;
 
+    //单例
+    private static volatile EaseModeProxy sInstance;
     private EaseModeProxy() {
     }
     public static EaseModeProxy with() {
@@ -199,20 +199,11 @@ public class EaseModeProxy {
      * @param inputAc 初始化 activity对象，全局使用
      * @param layout 初始化 存储显示对象容器
      */
-    public EaseModeProxy initView(Activity inputAc, ViewGroup layout){
+    public void onStart(Activity inputAc, ViewGroup layout){
         setActivity(inputAc);
         contentLayout = layout;
-        uvcCameraPresenter = new UVCAndroidCameraPresenter(activity.get());
-        return this;
-    }
-
-    /**
-     * 启动摄像头
-     * 在Fragement的 onstart 上面执行，和init 一起执行
-     * EaseModeProxy.with().init(getActivity(),viewGroup).onStartVideo();
-     */
-    public void onStartVideo(){
-        if (uvcCameraPresenter!=null){
+        if (uvcCameraPresenter==null){
+            uvcCameraPresenter = new UVCAndroidCameraPresenter(activity.get());
             uvcCameraPresenter.onStart();
         }
     }
@@ -573,6 +564,7 @@ public class EaseModeProxy {
             xlMessage = null;
         if (uvcCameraPresenter!=null){
             uvcCameraPresenter.onDestroy();
+            uvcCameraPresenter = null;
             Log.e("TAG", "releaseProxy: done" );
         }
         // 释放在这里为保证这个对象被释放了，如果在监听里面，可能没有被释放该怎么办？

@@ -1,7 +1,5 @@
 package com.aries.template;
 
-import android.content.ComponentName;
-import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -27,8 +25,10 @@ import com.aries.template.module.mine.OrderRecipesListFragment;
 import com.aries.template.module.mine.PhoneRegisterFragment;
 import com.aries.template.module.mine.VideoConsultFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
+import com.aries.template.thridapp.JTJKThirdAppUtil;
 import com.aries.template.utils.ActivityUtils;
 import com.aries.template.utils.DateUtils;
+import com.aries.template.xiaoyu.dapinsocket.DapinSocketProxy;
 import com.aries.ui.view.tab.CommonTabLayout;
 import com.decard.NDKMethod.BasicOper;
 import com.decard.NDKMethod.EGovernment;
@@ -165,16 +165,26 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
      * 每3秒检测一次
      */
     public void timeLoop() {
-        if (mDisposable == null){
-            mDisposable = Observable.interval(DELAY, PERIOD, TimeUnit.MILLISECONDS)
-                    .map((aLong -> aLong + 1))
+        mDisposable = null;
+        mDisposable = Observable.interval(DELAY, PERIOD, TimeUnit.MILLISECONDS)
+                .map((aLong -> aLong + 1))
 //                    .delay(PERIOD, TimeUnit.MILLISECONDS, true)       // 设置delayError为true，表示出现错误的时候也需要延迟5s进行通知，达到无论是请求正常还是请求失败，都是5s后重新订阅，即重新请求。
-                    .subscribeOn(Schedulers.io())
-                    .repeat()   // repeat保证请求成功后能够重新订阅。
-                    .retry()    // retry保证请求失败后能重新订阅
-                    .observeOn(Schedulers.newThread())
-                    .subscribe(aLong ->readCardNew());//getUnreadCount()执行的任务
-        }
+                .subscribeOn(Schedulers.io())
+                .repeat()   // repeat保证请求成功后能够重新订阅。
+                .retry()    // retry保证请求失败后能重新订阅
+                .observeOn(Schedulers.newThread())
+                .subscribe(aLong ->readCardNew());//getUnreadCount()执行的任务
+
+//        if (mDisposable == null){
+//            mDisposable = Observable.interval(DELAY, PERIOD, TimeUnit.MILLISECONDS)
+//                    .map((aLong -> aLong + 1))
+////                    .delay(PERIOD, TimeUnit.MILLISECONDS, true)       // 设置delayError为true，表示出现错误的时候也需要延迟5s进行通知，达到无论是请求正常还是请求失败，都是5s后重新订阅，即重新请求。
+//                    .subscribeOn(Schedulers.io())
+//                    .repeat()   // repeat保证请求成功后能够重新订阅。
+//                    .retry()    // retry保证请求失败后能重新订阅
+//                    .observeOn(Schedulers.newThread())
+//                    .subscribe(aLong ->readCardNew());//getUnreadCount()执行的任务
+//        }
     }
 
     /**
@@ -226,7 +236,7 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
 
                     SPUtil.put(mContext,"smkCard",ssCard.getCardNum());
                     SPUtil.put(mContext,"age",getAge(ssCard.getSSNum()));
-                    SPUtil.put(mContext,"userName",ssCard.getName());
+                    SPUtil.put(mContext,"userName",ssCard.getName().trim());
                     SPUtil.put(mContext,"sex",ssCard.getSex());
                     SPUtil.put(mContext,"idCard",ssCard.getSSNum());
 
@@ -247,6 +257,8 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                     ToastUtil.show("读取社保卡信息失败，请重试");
                     Log.d("EgAPP_SI_ReadSSCardInfo","读取社保卡信息失败");
                 }
+            }else {
+                ToastUtil.show("读卡失败，请重新插入卡片");
             }
             //社保卡下电
             if(bCardPowerOn){
@@ -334,10 +346,11 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                                     if (entity.getData()!=null){
                                         GlobalConfig.isFindUserDone = true;
                                         GlobalConfig.NALI_TID = entity.getData().getUserId();
+                                        GlobalConfig.mobile = entity.getData().getMobile();
                                         SPUtil.put(mContext,"tid",entity.getData().getUserId());
                                         SPUtil.put(mContext,"mobile",entity.getData().getMobile());
                                         if(tag.contains("stjc")){
-                                            Intent intent = new Intent(Intent.ACTION_MAIN);
+//                                            Intent intent = new Intent(Intent.ACTION_MAIN);
                                             /**知道要跳转应用的包命与目标Activity*/
                                             // 启动身体检查系统
                                            SPUtil.put(mContext,"tag","backMain");
@@ -346,12 +359,25 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                                                 mDisposable=null;
                                             }
                                             BasicOper.dc_exit();
-                                            ComponentName componentName = new ComponentName("com.garea.launcher", "com.garea.launcher.login.LauncherLogin");
-                                            intent.setComponent(componentName);
-                                            intent.putExtra("userName", entity.getData().getName());//这里Intent传值
-                                            intent.putExtra("idCard", entity.getData().getIdcard());
-                                            intent.putExtra("mobile", entity.getData().getMobile());
-                                            startActivity(intent);
+
+                                            // 启动第三方跳转
+                                            if (!TextUtils.isEmpty(GlobalConfig.factoryResource)){
+                                                new JTJKThirdAppUtil().gotoBodyTesting(MainActivity.this,
+                                                        GlobalConfig.factoryResource,
+                                                        GlobalConfig.factoryMainPage,
+                                                        entity.getData().getName(),
+                                                        entity.getData().getIdcard(),
+                                                        entity.getData().getMobile());
+                                                pop();
+                                            }else {
+                                                ToastUtil.show("没有第三方应用信息，无法跳转");
+                                            }
+//                                            ComponentName componentName = new ComponentName("com.garea.launcher", "com.garea.launcher.login.LauncherLogin");
+//                                            intent.setComponent(componentName);
+//                                            intent.putExtra("userName", entity.getData().getName());//这里Intent传值
+//                                            intent.putExtra("idCard", entity.getData().getIdcard());
+//                                            intent.putExtra("mobile", entity.getData().getMobile());
+//                                            startActivity(intent);
                                         }else {
                                             //判断是否有挂号或处方，如果没有，跳转一级部门选择。
                                             requestConsultsAndRecipes();
@@ -500,6 +526,7 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
         super.onCreate(savedInstanceState);
         // 优先将设备号输入进来
         GlobalConfig.machineId = ApiRepository.getDeviceId();
+        GlobalConfig.thirdMachineId = ApiRepository.getDeviceId();
         mDelegate.onCreate(savedInstanceState);
         if (findFragment(HomeFragment.class) == null) {
             loadRootFragment(R.id.fLayout_containerFastMain, HomeFragment.newInstance());  // 加载根Fragment
@@ -511,6 +538,8 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
         super.onStart();
         ActivityUtils.fullScreen(getWindow(),false);
         ActivityUtils.lightOnScreen(getWindow());
+        // 从身体检测返回测试，如果返回了，则启动返回socket
+        new JTJKThirdAppUtil().backFromBodyTesting(MainActivity.this);
     }
 
     @Override

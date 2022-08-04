@@ -1,9 +1,8 @@
 package com.aries.template.module.mine;
 
-import android.content.ComponentName;
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +13,6 @@ import android.widget.TextView;
 
 import com.aries.library.fast.retrofit.FastLoadingObserver;
 import com.aries.library.fast.retrofit.FastObserver;
-import com.aries.library.fast.util.SPUtil;
 import com.aries.library.fast.util.ToastUtil;
 import com.aries.template.GlobalConfig;
 import com.aries.template.R;
@@ -25,7 +23,9 @@ import com.aries.template.entity.PatientFinishGraphicTextConsultEntity;
 import com.aries.template.module.base.BaseEventFragment;
 import com.aries.template.module.main.HomeFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
+import com.aries.template.thridapp.JTJKThirdAppUtil;
 import com.aries.template.utils.ActivityUtils;
+import com.aries.template.utils.DefenceUtil;
 import com.aries.template.view.ShineButtonDialog;
 import com.aries.template.widget.autoadopter.AutoAdaptorProxy;
 import com.aries.template.widget.autoadopter.AutoObjectAdaptor;
@@ -52,7 +52,12 @@ import me.yokeyword.fragmentation.SupportFragment;
 
 /**
  * 视频问诊
- * 用于显示一级部门，二级部门
+ *
+ * 视频业务逻辑
+ * 如果医生没有进入，不论是否有处方：返回首页【取消复诊单】
+ * 如果医生进入，如果没有开处方：返回首页【结束问诊接口】
+ * 如果医生进入，如果开了处方：进入确认处方单【结束问诊接口】
+ *
  * @author louisluo
  * @Author: AriesHoo on 2018/7/13 17:09
  * @E-Mail: AriesHoo@126.com
@@ -71,12 +76,12 @@ public class VideoConsultFragment extends BaseEventFragment {
     private String userId; //医生userId 复诊单拿
 
     private boolean doctorInRoomFlag=false;// 医生是否进入
-
+    // 是否从未支付处方单进来的，true为是，
+    // 如果是，那么结束问诊时，直接使用结束问诊接口，而不是取消复诊单
+    private boolean isBackFromOrder=false;
     private boolean isRecipeCheckedFlag=false;// 医生开出的处方状态是不是1或者不是2，则不能支付。即不能结束问诊
 
-    private List<GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO> currentRecipes;// 从后端传入的数据
-
-    private DapinSocketProxy dapinSocketProxy;// 大屏的通信代理
+    private List<GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO> currentRecipes=new ArrayList<>();// 从后端传入的数据
 
     private boolean isBodyTestingFlag;// 是否从身体检测回来，如果曾经出过身体检测，则为true
 
@@ -115,8 +120,13 @@ public class VideoConsultFragment extends BaseEventFragment {
      * @param nickname 复诊人姓名 复诊单拿
      * @param doctorUserId 医生userId 复诊单拿 是医生里面的loginID
      * @param doctorName 医生姓名
+     * @param isBackFromOrder 是否是从未支付进来的，true 为是。如果是从未支付进来的，那么医生进来后，结束问诊，返回首页。
      */
-    public static VideoConsultFragment newInstance(String consultId,String nickname, String  doctorUserId, String doctorName) {
+    public static VideoConsultFragment newInstance(String consultId,
+                                                   String nickname,
+                                                   String  doctorUserId,
+                                                   String doctorName,
+                                                   boolean isBackFromOrder) {
         // 复诊单的配置
         VideoConsultFragment fragment = new VideoConsultFragment();
         Bundle args = new Bundle();
@@ -124,6 +134,7 @@ public class VideoConsultFragment extends BaseEventFragment {
         args.putString("nickname",nickname);
         args.putString("doctorUserId",doctorUserId);
         args.putString("doctorName",doctorName);
+        args.putBoolean("isBackFromOrder",isBackFromOrder);
         fragment.setArguments(args);
         return fragment;
     }
@@ -143,6 +154,7 @@ public class VideoConsultFragment extends BaseEventFragment {
         nickname = args.getString("nickname");
         doctorUserId = args.getString("doctorUserId");
         doctorName = args.getString("doctorName");
+        isBackFromOrder = args.getBoolean("isBackFromOrder");
         // 启动请求
         requestConfigurationToThirdForPatient();
     }
@@ -150,11 +162,19 @@ public class VideoConsultFragment extends BaseEventFragment {
     @Override
     public void onStart() {
         super.onStart();
-        //启动轮训处方单状态
+//        // 从外部身体检测应用回来，大屏接口，身体检测结束
+//        if (isBodyTestingFlag){
+//            isBodyTestingFlag = false;
+//            dapinSocketProxy.startSocket(DapinSocketProxy.SCREENFLAG_BODYTESTING_FINISH);
+//        }
+
+        // 启动视频
+        // 启动轮训处方单状态
 //        timeLoop();
         // 创建视频处理器
+
         ViewGroup viewGroup = getActivity().findViewById(R.id.videoContent);
-        EaseModeProxy.with().initView(getActivity(),viewGroup).onStartVideo();
+        EaseModeProxy.with().onStart(getActivity(),viewGroup);
         EaseModeProxy.with().setListener(new EaseModeProxy.ProxyEventListener() {
             @Override
             public void onDoctorInRoom() {
@@ -165,22 +185,16 @@ public class VideoConsultFragment extends BaseEventFragment {
             public void onVideoSuccessLinked() {
                 //入会成功
                 // 大屏接口，启动大屏
-                dapinSocketProxy.startSocket(DapinSocketProxy.SCREENFLAG_CONTROLSCREEN);
+                DapinSocketProxy.with()
+                        .clearListener()
+                        .initWithOld(getActivity(),GlobalConfig.machineIp,DapinSocketProxy.FLAG_SCREENFLAG_CONTROLSCREEN)
+                        .startSocket();
                 // 启动全屏展示
 //                btn_full_screen.setVisibility(View.VISIBLE);
                 //启动轮训处方单状态
                 timeLoop();
             }
         });
-        // 创建大屏代理
-        if (dapinSocketProxy==null)
-            dapinSocketProxy = new DapinSocketProxy(getActivity(),GlobalConfig.machineIp);
-
-        // 从外部身体检测应用回来，大屏接口，身体检测结束
-        if (isBodyTestingFlag){
-            isBodyTestingFlag = false;
-            dapinSocketProxy.startSocket(DapinSocketProxy.SCREENFLAG_BODYTESTING_FINISH);
-        }
     }
 
     /**
@@ -197,19 +211,30 @@ public class VideoConsultFragment extends BaseEventFragment {
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.btn_stjc:
-                // 向大屏通信，告知跳转视频
-                dapinSocketProxy.startSocket(DapinSocketProxy.SCREENFLAG_BODYTESTING_OPEN);
                 // 跳向身体检测，则更新flag准备回来
                 isBodyTestingFlag = true;
                 // 跳向身体检测
-                Intent intent = new Intent(Intent.ACTION_MAIN);
-                /**知道要跳转应用的包命与目标Activity*/
-                ComponentName componentName = new ComponentName("com.garea.launcher", "com.garea.launcher.login.LauncherLogin");
-                intent.setComponent(componentName);
-                intent.putExtra("userName", SPUtil.get(mContext,"userName","")+"");//这里Intent传值
-                intent.putExtra("idCard", SPUtil.get(mContext,"idCard","")+"");
-                intent.putExtra("mobile", SPUtil.get(mContext,"mobile","")+"");
-                startActivity(intent);
+                // 启动第三方跳转
+                // 并告知大屏，启动身体检测，大屏的通信代理 在里面
+                if (!TextUtils.isEmpty(GlobalConfig.factoryResource)){
+                    new JTJKThirdAppUtil().gotoBodyTesting(getActivity(),
+                            GlobalConfig.factoryResource,
+                            GlobalConfig.factoryMainPage,
+                            GlobalConfig.ssCard.getName(),
+                            GlobalConfig.ssCard.getSSNum(),
+                            GlobalConfig.mobile);
+                }else {
+                    ToastUtil.show("没有第三方应用信息，无法跳转");
+                }
+
+//                Intent intent = new Intent(Intent.ACTION_MAIN);
+//                /**知道要跳转应用的包命与目标Activity*/
+//                ComponentName componentName = new ComponentName("com.garea.launcher", "com.garea.launcher.login.LauncherLogin");
+//                intent.setComponent(componentName);
+//                intent.putExtra("userName", SPUtil.get(mContext,"userName","")+"");//这里Intent传值
+//                intent.putExtra("idCard", SPUtil.get(mContext,"idCard","")+"");
+//                intent.putExtra("mobile", SPUtil.get(mContext,"mobile","")+"");
+//                startActivity(intent);
                 break;
             case R.id.btn_finish:
                 showSimpleConfirmDialog();
@@ -229,36 +254,49 @@ public class VideoConsultFragment extends BaseEventFragment {
 
     /**
      * 显示对话框
+     * 如果医生没有进入，不论是否有处方：返回首页【取消复诊单】
+     * 如果医生进入，如果没有开处方：返回首页【结束问诊接口】
+     * 如果医生进入，如果开了处方：进入确认处方单【结束问诊接口】
      */
     private void showSimpleConfirmDialog() {
         ShineButtonDialog dialog = new ShineButtonDialog(this.mContext);
         dialog.tv_title_tip.setText("结束问诊");
         dialog.tv_content_tip.setText("是否结束问诊");
         dialog.btn_inquiry.setOnClickListener(v -> {
+            // 防御代码
+            if (!DefenceUtil.checkReSubmit("VideoConsultFragment.showSimpleConfirmDialog"))
+                return;
+
             dialog.dismiss();
             if (doctorInRoomFlag){
                 // 结束问诊，如果有问诊单，则根据这个问诊单进入支付
                 // 在栈内的HomeFragment以SingleTask模式启动（即在其之上的Fragment会出栈）
                 if (!isRecipeCheckedFlag){
                     // 患者进入视频后，医生没有开处方, 则回到首页
-                    if (currentRecipes.size()==0)
-                        start(HomeFragment.newInstance(), SupportFragment.SINGLETASK);
+                    if (currentRecipes!=null && currentRecipes.size()==0){
+                        // 结束问诊
+                        // 成功后，跳转到首页
+                        requestPatientFinishGraphicTextConsult(consultId,false);
+                    }
                     else
                         ToastUtil.show("处方正在被医生确认，请稍后再试");
                 } else{
-                    // 关闭，并释放所有资源
-                    // 包括向医生端发送socket消息
-                    EaseModeProxy.with().closeVideoProxy();
-                    // 大屏接口，病人离席
-                    dapinSocketProxy.startSocket(DapinSocketProxy.SCREENFLAG_CLOSESCREEN);
                     // 结束问诊接口
                     // 成功后，跳转确认复诊单
-                    requestPatientFinishGraphicTextConsult(consultId);
+                    requestPatientFinishGraphicTextConsult(consultId,true);
                 }
             }else{
-                // 医生不曾进入
-                // 取消复诊
-                requestPatientCancelGraphicTextConsult(consultId);
+                if (isBackFromOrder)
+                    // 如果是从未支付进来的
+                    // 医生没有进入视频
+                    // 没有处方单
+                    // 那么结束问诊
+                    requestPatientFinishGraphicTextConsult(consultId,false);
+                else
+                    // 医生不曾进入
+                    // 取消复诊单
+                    // 成功后，跳转到首页
+                    requestPatientCancelGraphicTextConsult(consultId);
             }
         });
         dialog.btn_cancel.setOnClickListener(v -> dialog.dismiss());
@@ -298,6 +336,8 @@ public class VideoConsultFragment extends BaseEventFragment {
                         if (entity.isSuccess()){
                             if (entity.getData().isSuccess()){
                                 Log.d("JTJK","患者取消复诊服务");
+                                // 清理
+                                onDismiss();
                                 // 医生不曾进入到视频中
                                 start(HomeFragment.newInstance(), SupportFragment.SINGLETASK);
                             }
@@ -380,8 +420,9 @@ public class VideoConsultFragment extends BaseEventFragment {
      * 结束问诊
      * 纳达接口
      * 在确定结束问诊的按钮时才触发，返回首页不算
+     * @param isHaveRecipe 医生是否开过处方单 true 开过，这个标志会最后跳转到确认处方单处
      */
-    private void requestPatientFinishGraphicTextConsult(String consultId){
+    private void requestPatientFinishGraphicTextConsult(String consultId, boolean isHaveRecipe){
         ApiRepository.getInstance().patientFinishGraphicTextConsult(consultId)
                 .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
                 .subscribe(new FastObserver<PatientFinishGraphicTextConsultEntity>() {
@@ -394,8 +435,17 @@ public class VideoConsultFragment extends BaseEventFragment {
                         if (entity.data.success){
                             Log.d("JTJK","结束问诊");
                             // 跳转
-                            // 启动确定处方单
-                            start(ConfirmRecipesFragment.newInstance(recipeId,currentRecipes));
+                            if (isHaveRecipe){
+                                // 启动确定处方单
+                                start(ConfirmRecipesFragment.newInstance(recipeId,currentRecipes));
+                                // 清理
+                                onDismiss();
+                            }else {
+                                // 启动返回首页
+                                start(HomeFragment.newInstance(), SupportFragment.SINGLETASK);
+                                // 清理
+                                onDismiss();
+                            }
                         }else{
                             ToastUtil.show(entity.message);
                         }
@@ -444,12 +494,20 @@ public class VideoConsultFragment extends BaseEventFragment {
     public void onDismiss() {
         super.onDismiss();
         // 关闭，并释放所有资源
+        // 包括向医生端发送socket消息
         EaseModeProxy.with().closeVideoProxy();
+        // 大屏接口，病人离席
+        DapinSocketProxy.with()
+                .clearListener()
+                .initWithOld(getActivity(),GlobalConfig.machineIp,DapinSocketProxy.FLAG_SCREENFLAG_CLOSESCREEN)
+                .startSocket();
         //清除mDisposable不再进行验证
         if (mDisposable != null) {
             mDisposable.dispose();
             mDisposable = null;
         }
+        // 清理大屏socket
+        DapinSocketProxy.with().clearListener().Destroy();
     }
 
     @Override
