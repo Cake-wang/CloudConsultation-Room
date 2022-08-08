@@ -75,6 +75,11 @@ public class GlobalConfig {
     public static final String machinePort = "12333";
 
     /**
+     * 最后一次执行大屏的命令是什么
+     */
+    public static String lastDapinSocketStr = "";
+
+    /**
      * todo 身体检测厂家包名
      * 在requestMachineInfo里面获取 找machineRelation/findByMachineId
      * 获取后跳转时通过这个包名，来启动第三方身体检测供应商。

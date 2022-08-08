@@ -268,6 +268,8 @@ public class OrderRecipesFragment extends BaseEventFragment {
                             ArrayList<String> recipeCode = new ArrayList<>();
                             ArrayList<PayRecipeFragment.DrugObject> drugs = new ArrayList<>();
                             for (GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes.RecipeDetail item : obj.recipeDetailBeans) {
+                                // 用量
+                                String howToUse = "(1天"+item.getUseTotalDose()/item.getUseDays()+"次，每次"+ item.getUseDose().intValue()+"片)";
                                 PayRecipeFragment.DrugObject drug= new PayRecipeFragment.DrugObject();
                                 //            drugs.put("direction","口服");
                                 drug.dosageUnit = item.drugUnit;
@@ -280,6 +282,7 @@ public class OrderRecipesFragment extends BaseEventFragment {
                                 drug.quantityUnit = item.drugUnit;
                                 drug.sku = item.organDrugCode;
                                 drug.spec =String.valueOf( item.drugSpec);
+                                drug.howToUse =howToUse;// 用量
                                 drugs.add(drug);
                                 recipeids.add(String.valueOf(item.recipeId));
                                 recipeCode.add(String.valueOf(item.organDrugCode));

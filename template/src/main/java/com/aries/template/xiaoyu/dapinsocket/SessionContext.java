@@ -95,5 +95,15 @@ public class SessionContext {
 		}
 	}
 
+	/**
+	 * 接收数据
+	 * @param receiveData
+	 */
+	public void onReceiveData(String receiveData) {
+		for (int i = 0; i < mListeners.size(); i++) {
+			mListeners.get(i).onReceiveData(receiveData);
+		}
+	}
+
 
 }

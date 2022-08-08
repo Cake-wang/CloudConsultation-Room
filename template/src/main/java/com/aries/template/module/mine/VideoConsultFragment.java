@@ -31,6 +31,7 @@ import com.aries.template.widget.autoadopter.AutoAdaptorProxy;
 import com.aries.template.widget.autoadopter.AutoObjectAdaptor;
 import com.aries.template.xiaoyu.EaseModeProxy;
 import com.aries.template.xiaoyu.dapinsocket.DapinSocketProxy;
+import com.aries.template.xiaoyu.xinlin.XLMessage;
 import com.aries.ui.view.title.TitleBarView;
 import com.trello.rxlifecycle3.android.FragmentEvent;
 import com.xuexiang.xaop.annotation.SingleClick;
@@ -75,7 +76,7 @@ public class VideoConsultFragment extends BaseEventFragment {
     private String userpwd; //医生userId 复诊单拿
     private String userId; //医生userId 复诊单拿
 
-    private boolean doctorInRoomFlag=false;// 医生是否进入
+    private boolean isDoctorInRoomFlag =false;// 医生是否进入
     // 是否从未支付处方单进来的，true为是，
     // 如果是，那么结束问诊时，直接使用结束问诊接口，而不是取消复诊单
     private boolean isBackFromOrder=false;
@@ -167,28 +168,29 @@ public class VideoConsultFragment extends BaseEventFragment {
 //            isBodyTestingFlag = false;
 //            dapinSocketProxy.startSocket(DapinSocketProxy.SCREENFLAG_BODYTESTING_FINISH);
 //        }
-
         // 启动视频
         // 启动轮训处方单状态
 //        timeLoop();
         // 创建视频处理器
-
         ViewGroup viewGroup = getActivity().findViewById(R.id.videoContent);
         EaseModeProxy.with().onStart(getActivity(),viewGroup);
         EaseModeProxy.with().setListener(new EaseModeProxy.ProxyEventListener() {
             @Override
             public void onDoctorInRoom() {
-                doctorInRoomFlag = true;
-            }
-
-            @Override
-            public void onVideoSuccessLinked() {
-                //入会成功
+                // 医生进入的TAG
+                isDoctorInRoomFlag = true;
+                // 如果医生进入了，则直接释放XL的socket
+                XLMessage.with().destroy();
                 // 大屏接口，启动大屏
                 DapinSocketProxy.with()
                         .clearListener()
                         .initWithOld(getActivity(),GlobalConfig.machineIp,DapinSocketProxy.FLAG_SCREENFLAG_CONTROLSCREEN)
                         .startSocket();
+            }
+
+            @Override
+            public void onVideoSuccessLinked() {
+                //入会成功
                 // 启动全屏展示
 //                btn_full_screen.setVisibility(View.VISIBLE);
                 //启动轮训处方单状态
@@ -267,8 +269,14 @@ public class VideoConsultFragment extends BaseEventFragment {
             if (!DefenceUtil.checkReSubmit("VideoConsultFragment.showSimpleConfirmDialog"))
                 return;
 
+            // 关闭对话框
             dialog.dismiss();
-            if (doctorInRoomFlag){
+
+            // 启动倒计时
+            timeStart();
+
+            // 启动业务
+            if (isDoctorInRoomFlag){
                 // 结束问诊，如果有问诊单，则根据这个问诊单进入支付
                 // 在栈内的HomeFragment以SingleTask模式启动（即在其之上的Fragment会出栈）
                 if (!isRecipeCheckedFlag){
@@ -309,14 +317,22 @@ public class VideoConsultFragment extends BaseEventFragment {
     private Disposable mDisposable;
     /**
      * 定时循环任务
-     * 5秒循环查询新的待处理处方信息
+     * 入会成功后执行
+     * - 5秒循环查询新的待处理处方信息
+     * - 5秒用于信令，医生端接口反馈循环
      */
     private void timeLoop() {
         mDisposable = Observable.interval(DELAY, PERIOD, TimeUnit.MILLISECONDS)
                 .map((aLong -> aLong + 1))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(aLong -> requestGetRecipeListByConsultId());//getUnreadCount()执行的任务
+                .subscribe(aLong -> {requestGetRecipeListByConsultId();
+                    if (!isDoctorInRoomFlag)
+                        // 启动向医生发送消息
+                        // 如果医生没有进入房间，则不停的继续call
+                        // 如果医生进入房间 onDoctorInRoom 的时候会被释放 XLMessage
+                        EaseModeProxy.with().sendNotifyDoctorVideoMsg();
+                });//getUnreadCount()执行的任务
     }
 
     /**
@@ -496,7 +512,7 @@ public class VideoConsultFragment extends BaseEventFragment {
         // 关闭，并释放所有资源
         // 包括向医生端发送socket消息
         EaseModeProxy.with().closeVideoProxy();
-        // 大屏接口，病人离席
+        // 大屏接口，病人离席，关闭大屏视频
         DapinSocketProxy.with()
                 .clearListener()
                 .initWithOld(getActivity(),GlobalConfig.machineIp,DapinSocketProxy.FLAG_SCREENFLAG_CLOSESCREEN)
@@ -507,7 +523,7 @@ public class VideoConsultFragment extends BaseEventFragment {
             mDisposable = null;
         }
         // 清理大屏socket
-        DapinSocketProxy.with().clearListener().Destroy();
+        DapinSocketProxy.with().clearListener().destroy();
     }
 
     @Override

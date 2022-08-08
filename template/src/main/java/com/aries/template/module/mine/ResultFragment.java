@@ -24,6 +24,7 @@ import me.yokeyword.fragmentation.ISupportFragment;
  * 显示结果页
  * 根据传入的信息，变化各种文字和图片信息的结果页
  *
+ * 注意，打印不能使用 换行符 \n。 可能出现无限打印的情况, 必须使用 \r\n
  * @author louisluo
  * @Author: AriesHoo on 2018/7/13 17:09
  * @E-Mail: AriesHoo@126.com
@@ -33,6 +34,7 @@ import me.yokeyword.fragmentation.ISupportFragment;
 public class ResultFragment extends BaseEventFragment implements ISupportFragment {
     private  String result= "";
     private  String takeCode= ""; // 取药码
+    private  String stuckUse= ""; // 药物用量
 
     @BindView(R.id.tv_result_title)
     TextView tv_result_title;
@@ -63,8 +65,17 @@ public class ResultFragment extends BaseEventFragment implements ISupportFragmen
             result = args.getString("result");
         }
         if (result.contains("paySuc"))
-            if (result.contains(":"))
-                takeCode = result.split(":")[1];
+            // "data": "{\"orderNo\":\"\",\"takeCode\":\"34811555\"}" 案例
+            try {
+                if (result.contains(":")){
+                    String[] ss = result.split(":");
+                    takeCode = ss[1];
+                    stuckUse = ss[2];
+//                    stuckUse = ss[2].replace("&&","\r\n");
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+            }
     }
 
     @Override
@@ -154,14 +165,6 @@ public class ResultFragment extends BaseEventFragment implements ISupportFragmen
                     e.printStackTrace();
                 }
 
-                // 一维码
-                //打印机参数设置
-//                String setPrint = BasicOper.dc_setprint(0x02, 0x02, 0, 0, 10, 0x00);
-//                Log.d("print", "BasicOper.dc_setprint:" + setPrint);
-                //打印机进纸设置
-//                String enter = BasicOper.dc_printenter(50);
-//                Log.d("print", "BasicOper.dc_printenter:" + enter);
-
                 //一维码内容
                 String strTemp = printContent;
                 try {
@@ -172,8 +175,20 @@ public class ResultFragment extends BaseEventFragment implements ISupportFragmen
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }
-            }
 
+                // 用量
+                String[] split = stuckUse.split("&&");
+                for (String str : split) {
+                    try {
+                        byte[] strByte = str.getBytes("GBK");
+                        //打印字符
+                    String print_char = BasicOper.dc_printcharacter(strByte);
+                    Log.d("print", "BasicOper.dc_printcharacter:" + print_char);
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
         }
     }
 

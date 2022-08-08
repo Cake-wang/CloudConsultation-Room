@@ -29,9 +29,13 @@ public class AddressSettingSharedPreference {
     }
 
     public static void setAddrs(Context context, String key, String addrs) {
-        if (shared == null) {
-            shared = context.getSharedPreferences(WARNING_CONF, Context.MODE_PRIVATE);
+        try{
+            if (shared == null) {
+                shared = context.getSharedPreferences(WARNING_CONF, Context.MODE_PRIVATE);
+            }
+            shared.edit().putString(key, addrs).commit();
+        }catch (Exception e){
+            e.printStackTrace();
         }
-        shared.edit().putString(key, addrs).commit();
     }
 }

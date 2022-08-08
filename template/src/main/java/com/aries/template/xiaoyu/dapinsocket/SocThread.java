@@ -78,8 +78,9 @@ public class SocThread {
             client.connect(new InetSocketAddress(ip,port),timeout);
             Log.e(TAG, "连接成功");
             isConnected = true;
-            in = new BufferedReader(new InputStreamReader(
-                    client.getInputStream()));
+//            in = new BufferedReader(new InputStreamReader(
+//                    client.getInputStream()));
+            in= new BufferedReader(new InputStreamReader(client.getInputStream(), "gb2312"));
             outputStream = client.getOutputStream();
             isRun = true;
             Log.i(TAG, "输入输出流获取成功");
@@ -114,30 +115,34 @@ public class SocThread {
         Log.i(TAG, "获取到ip端口:" + ip + ";" + port);
     }
 
+    /**
+     * 读取数据
+     */
     private void read() {
         String line = "";
         while (isRun) {
             try {
-                byte[] all = null;
+                byte[] all = new byte[]{};
                 if (client != null) {
                     //Log.i(TAG, "2.检测数据");
                     while ((line = in.readLine()) != null) {
-                        byte[] bytes = line.getBytes();
+//                        byte[] bytes = line.getBytes();
                         /*for (int i = 0; i < bytes.length; i++) {
                             Log.e("TAG","parse--> " + bytes[i]);
                         }*/
-                        //判断起始位，作为一个新数据
-                        if (bytes[0] == 65 && bytes[1] == 65){
-                            all = new byte[]{};
-                        }
-                        if (all != null){
-                            all = NumberUtil.concat(all,bytes);
-                        }
-                        //判断结束符
-                        if (all != null && all[all.length - 1] == 68 && all[all.length - 2] == 68){
-                            SessionContext.getSessiontContext().onReceiveData(all);
-                            //parse(all);
-                        }
+//                        //判断起始位，作为一个新数据
+//                        if (bytes[0] == 65 && bytes[1] == 65){
+//                            all = new byte[]{};
+//                        }
+//                        if (all != null){
+//                            all = NumberUtil.concat(all,bytes);
+//                        }
+//                        //判断结束符
+//                        if (all != null && all[all.length - 1] == 68 && all[all.length - 2] == 68){
+//                            SessionContext.getSessiontContext().onReceiveData(all);
+//                            //parse(all);
+//                        }
+                        SessionContext.getSessiontContext().onReceiveData(line);
                         Log.i(TAG, " len=" + line.length());
                         //Log.i(TAG, "4.start set Message");
                     }

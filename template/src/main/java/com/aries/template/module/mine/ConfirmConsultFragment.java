@@ -80,11 +80,11 @@ public class ConfirmConsultFragment extends BaseEventFragment implements Compoun
     @BindView(R.id.cb_protocol_tr)
     AppCompatCheckBox cb_protocol_tr;
     @BindView(R.id.cb_protocol_tx_o)
-    TextView cb_protoco_txl_o;
+    View cb_protocol_tx_o;
     @BindView(R.id.cb_protocol_tx_tw)
-    TextView cb_protocol_tx_tw;
+    View cb_protocol_tx_tw;
     @BindView(R.id.cb_protocol_tx_tr)
-    TextView cb_protocol_tx_tr;
+    View cb_protocol_tx_tr;
 
     Integer returnVisitStatus = 0,alleric =  0,haveReaction =0;
 
@@ -299,7 +299,7 @@ public class ConfirmConsultFragment extends BaseEventFragment implements Compoun
      * 复诊 异常情况处理
      */
     public void errorCheck(String msg, int code) {
-        String toastTip = "复诊单异常"; //默认提示
+        String toastTip = "复诊单异常: "+msg; //默认提示
         String cid = "0";// 默认是0
         try {
             switch (code){

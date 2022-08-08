@@ -579,10 +579,11 @@
             >
             <TextView
                 android:id="@+id/jtjk_video_close_full"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_margin="16dp"
-                android:text="关闭"
+                android:background="@drawable/btn_next_yzs"
+                android:text="关闭全屏"
                 android:textSize="24dp"
                 android:gravity="center"
                 android:textColor="@color/white"

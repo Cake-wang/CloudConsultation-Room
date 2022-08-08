@@ -265,6 +265,8 @@ public class ConfirmRecipesFragment extends BaseEventFragment {
                             ArrayList<PayRecipeFragment.DrugObject> drugs = new ArrayList<>();
                             for (GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO currentRecipe : currentRecipes) {
                                 GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO.RecipeDetailBeanListDTO vo = currentRecipe.recipeDetailBeanList.get(0);
+                                // 用量
+                                String howToUse = "(1天"+vo.useTotalDose/vo.useDays+"次，每次"+((Double) vo.useDose).intValue()+"片)";
                                 PayRecipeFragment.DrugObject drug= new PayRecipeFragment.DrugObject();
                                 //            drugs.put("direction","口服");
                                 drug.dosageUnit = vo.drugUnit;
@@ -277,6 +279,7 @@ public class ConfirmRecipesFragment extends BaseEventFragment {
                                 drug.quantityUnit = vo.drugUnit;
                                 drug.sku = vo.organDrugCode;
                                 drug.spec =String.valueOf( vo.drugSpec);
+                                drug.howToUse =howToUse; // 用量
                                 drugs.add(drug);
                                 recipeids.add(String.valueOf(vo.recipeId));
                                 recipeCode.add(String.valueOf(vo.organDrugCode));

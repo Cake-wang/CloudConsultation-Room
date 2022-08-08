@@ -143,6 +143,17 @@ public class PayConsultFragment extends BaseEventFragment {
         });
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        // 覆盖返回监听
+        // 返回直接回首页
+        getView().findViewById(R.id.btn_back).setOnClickListener(view -> {
+            onDismiss();
+            gotoMain();
+        });
+    }
+
     private static final int PERIOD = 5* 1000;
     private static final int DELAY = 100;
     private Disposable mDisposable;

@@ -13,11 +13,9 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
-import androidx.annotation.StringRes;
-
 import com.alibaba.fastjson.JSON;
 import com.aries.library.fast.util.ToastUtil;
-import com.aries.template.xiaoyu.EaseModeProxy;
+import com.aries.template.GlobalConfig;
 
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
@@ -25,10 +23,14 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Objects;
 
 /**
  * 大屏socket 代理类
+ * 这个类有心跳包，
+ * 发送消息后，只有在数据正确返回的时候才会释放自己，否则会一直请求
+ * 如果网络不畅，也会一直请求
+ * 需要在特定的位置释放这个单例资源
+ * 延迟释放：会在成功发送或失败发送后立刻销毁自己
  * @author louisluo
  */
 public class DapinSocketProxy {
@@ -40,6 +42,10 @@ public class DapinSocketProxy {
     private String address;
     // 是否可以发送
     private boolean sendEnable = false;
+    // 延迟释放，后续接口只要成功或者失败一次，即释放
+    private boolean delayDestroy = false;
+
+    private boolean unUseAble = false;
     //  activity
     private Activity activityObj;
     // 当前的启动 标志 SCREENFLAG_CONTROLSCREEN 或者 SCREENFLAG_CLOSESCREEN
@@ -74,62 +80,63 @@ public class DapinSocketProxy {
     }
 
 
-    /**
-     * 启动socket
-     * @param activity 可视化对象
-     * @param address 大屏socket地址
-     * @param flag 大屏FLAG
-     */
-    public DapinSocketProxy init(Activity activity, String address, String flag) {
-        this.activityObj = activity;
-        this.address = address;
-
-        // 必须有，否则会崩溃，由于这个SP不存在
-        AddressSettingSharedPreference.getAddrs(activity,AddressSettingSharedPreference.ADDRESS);
-        // 监听
-        OnContextChangedListener onContextChangedListener = new OnContextChangedListener() {
-            @Override
-            public void onSendData(byte[] sendData) {
-                if (socketThread != null) {
-                    socketThread.send(sendData);
-                }
-            }
-
-            @Override
-            public void onSendData(String sendData) {
-                //给dlna设备发信息
-            }
-
-            @Override
-            public void onReceiveData(byte[] receiveData) {
-                Message msg = mhandler.obtainMessage();
-                msg.obj = SocThread.getDataBean(receiveData);
-                mhandler.sendMessage(msg);// 结果返回给UI处理
-            }
-
-            @Override
-            public void onReceiveData(String receiveData) {
-                //Log.e("dawei","receiveData="+receiveData);
-                //接收dlna发送的JSON string
-                Message msg = mhandler.obtainMessage();
-                try {
-                    msg.obj = JSON.parseObject(receiveData,DataBean.class);
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
-                mhandler.sendMessage(msg);// 结果返回给UI处理
-            }
-        };
-        SessionContext.getSessiontContext().addOnContextChangedListener(onContextChangedListener);
-
-        // 设置ip
-        ipSetting(activityObj);
-
-        // 设置Flag
-        currentFlag = flag;
-
-        return this;
-    }
+//    /**
+//     * 启动socket
+//     * 强制新建
+//     * @param activity 可视化对象
+//     * @param address 大屏socket地址
+//     * @param flag 大屏FLAG
+//     */
+//    public DapinSocketProxy init(Activity activity, String address, String flag) {
+//        this.activityObj = activity;
+//        this.address = address;
+//
+//        // 必须有，否则会崩溃，由于这个SP不存在
+//        AddressSettingSharedPreference.getAddrs(activity,AddressSettingSharedPreference.ADDRESS);
+//        // 监听
+//        OnContextChangedListener onContextChangedListener = new OnContextChangedListener() {
+//            @Override
+//            public void onSendData(byte[] sendData) {
+//                if (socketThread != null) {
+//                    socketThread.send(sendData);
+//                }
+//            }
+//
+//            @Override
+//            public void onSendData(String sendData) {
+//                //给dlna设备发信息
+//            }
+//
+//            @Override
+//            public void onReceiveData(byte[] receiveData) {
+//                Message msg = mhandler.obtainMessage();
+//                msg.obj = SocThread.getDataBean(receiveData);
+//                mhandler.sendMessage(msg);// 结果返回给UI处理
+//            }
+//
+//            @Override
+//            public void onReceiveData(String receiveData) {
+//                //Log.e("dawei","receiveData="+receiveData);
+//                //接收dlna发送的JSON string
+//                Message msg = mhandler.obtainMessage();
+//                try {
+//                    msg.obj = JSON.parseObject(receiveData,DataBean.class);
+//                }catch (Exception e){
+//                    e.printStackTrace();
+//                }
+//                mhandler.sendMessage(msg);// 结果返回给UI处理
+//            }
+//        };
+//        SessionContext.getSessiontContext().addOnContextChangedListener(onContextChangedListener);
+//
+//        // 设置ip
+//        ipSetting(activityObj);
+//
+//        // 设置Flag
+//        currentFlag = flag;
+//
+//        return this;
+//    }
 
     /**
      * 初始化
@@ -138,12 +145,13 @@ public class DapinSocketProxy {
      *  SCREENFLAG_CONTROLSCREEN 或者 SCREENFLAG_CLOSESCREEN
      *      * @StringRes{SCREENFLAG_CONTROLSCREEN,SCREENFLAG_CLOSESCREEN}
      */
-    public DapinSocketProxy initWithOld(Activity activity, String address, String flag){
-        if (activity!=null)
-            this.activityObj = activity;
+    public DapinSocketProxy initWithOld(Activity _activity, String _address, String _flag){
+        GlobalConfig.lastDapinSocketStr = _flag;
+        if (activityObj==null)
+            this.activityObj = _activity;
         if (TextUtils.isEmpty(address))
-            this.address = address;
-        if (SessionContext.getSessiontContext().isHaveContextChangedListener()){
+            this.address = _address;
+        if (!SessionContext.getSessiontContext().isHaveContextChangedListener()){
             OnContextChangedListener onContextChangedListener = new OnContextChangedListener() {
                 @Override
                 public void onSendData(byte[] sendData) {
@@ -158,30 +166,31 @@ public class DapinSocketProxy {
                 }
 
                 @Override
-                public void onReceiveData(byte[] receiveData) {
-                    Message msg = mhandler.obtainMessage();
-                    msg.obj = SocThread.getDataBean(receiveData);
-                    mhandler.sendMessage(msg);// 结果返回给UI处理
-                }
-
-                @Override
                 public void onReceiveData(String receiveData) {
-                    //Log.e("dawei","receiveData="+receiveData);
-                    //接收dlna发送的JSON string
-                    Message msg = mhandler.obtainMessage();
+                    Log.e("JTJK","receiveData="+receiveData);
                     try {
-                        msg.obj = JSON.parseObject(receiveData,DataBean.class);
+                        //接收dlna发送的JSON string
+                        // 有可能获取到正确数据后 mhandler 会空对象
+                        // 如果为空，就表示成功了，不需要再进行其他操作了。
+                        // 空了就停下来
+                        if (mhandler!=null){
+                            Message msg = mhandler.obtainMessage();
+                            DataBean bean = new DataBean();
+                            bean.body = receiveData;
+                            bean.dataType = 1;
+                            msg.obj = bean;
+                            mhandler.sendMessage(msg);// 结果返回给UI处理
+                        }
                     }catch (Exception e){
                         e.printStackTrace();
                     }
-                    mhandler.sendMessage(msg);// 结果返回给UI处理
                 }
             };
             SessionContext.getSessiontContext().addOnContextChangedListener(onContextChangedListener);
         }
         if (TextUtils.isEmpty(ip))
             ipSetting(activityObj);
-        currentFlag = flag;
+        currentFlag = _flag;
         return this;
     }
 
@@ -193,7 +202,7 @@ public class DapinSocketProxy {
         return this;
     }
 
-    // 出去的信息
+    // 反馈信息
     @SuppressLint("HandlerLeak")
     Handler mhandler= new Handler() {
         @Override
@@ -201,6 +210,7 @@ public class DapinSocketProxy {
             if(TextUtils.isEmpty(currentFlag))
                 return;
             if (msg.what == HeartBeat.BREAK_WHAT){
+                Log.d("JTJK", "DapinSocketProxy: 断开了");
                 //断开了
                 return;
             }
@@ -216,33 +226,50 @@ public class DapinSocketProxy {
                     if (socketThread != null) {
                         // 链接后发送
                         // 发送成功
-                        String s = currentFlag+ip;
+                        String send = currentFlag+ip;
                         try {
-                            socketThread.sendNew(s.getBytes("utf-8"));
+                            socketThread.sendNew(send.getBytes("utf-8"));
                         } catch (UnsupportedEncodingException e) {
                             e.printStackTrace();
                         }
-                        ToastUtil.show("发送成功："+s);
+                        Log.d("JTJK", "DapinSocketProxy: 发送成功"+send);
+                        ToastUtil.show("发送成功："+send);
                         // 成功后释放资源
-                        closeSocket();
+                        if (delayDestroy){
+                            delayDestroy = false;
+                            destroy();
+                        }
                     }
                 }
                 return;
             }
             if (msg.what == SocThread.CONNECT_FAIL){
                 sendEnable = false;
+                Log.d("JTJK", "DapinSocketProxy: 连接失败");
                 // 连接失败
                 // 链接失败后，不释放资源，让他继续向大屏请求
+                // 如果延迟释放，则立即释放该内容
+                if (delayDestroy){
+                    delayDestroy = false;
+                    destroy();
+                }
                 return;
             }
+            // 获取后台反馈数据数据
             try {
                 if (msg.obj != null) {
                     DataBean bean = (DataBean) msg.obj;
+                    Log.d("JTJK", "handleMessage: "+bean.body);
                     if (bean.getDataType() == 3){
                         //心跳
                         heartBeat.refreshTime();
                     }else if (bean.getDataType() == 1){
-                        //根据需求进行操作
+                        // 获取后台反馈数据数据，格式化
+                        if (bean.body.contains("MessageReturn")){
+                            // 发送成功
+                            // 释放资源
+                            destroy();
+                        }
                     }
                 }
             } catch (Exception ee) {
@@ -324,28 +351,21 @@ public class DapinSocketProxy {
             }else {
                 Toast.makeText(activityObj,"地址格式错误,请联系管理员",Toast.LENGTH_SHORT).show();
             }
-        }
-
-        if (socketThread.client.isClosed()){
-            // 如果 socketThread 被释放了，则重新链接
-            socketThread.executeConn();
         }else {
-            // 如果 socketThread 没有被释放，则直接使用他来发送消息
-            String s = currentFlag+ip;
-            try {
-                socketThread.sendNew(s.getBytes("utf-8"));
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
+            // 如果已经有 socket 了
+            if (socketThread.client.isClosed()){
+                // 如果 socketThread 被释放了，则重新链接
+                socketThread.executeConn();
+            }else {
+                // 如果 socketThread 没有被释放，则直接使用他来发送消息
+                String s = currentFlag+ip;
+                try {
+                    socketThread.sendNew(s.getBytes("utf-8"));
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
             }
         }
-    }
-
-    /**
-     * 启动socket 完成后释放这个 socket 的资源
-     * todo 通过返回信息确认，然后启动释放资源
-     */
-    public void startSocketWithEnd(){
-        startSocket();
     }
 
     /**
@@ -364,18 +384,35 @@ public class DapinSocketProxy {
     }
 
     /**
+     * 启动socket 完成后释放这个 socket 的资源
+     * todo 通过返回信息确认，然后启动释放资源
+     * 通过关闭TAG，在心跳包检测或者链接失败的时候，执行自我关闭的任务。
+     * 成功或者失败，只要传输过一次即关闭
+     */
+    public void delayDestroy(){
+        delayDestroy = true;
+    }
+
+    /**
      * 释放所有资源
      */
-    public void Destroy(){
+    public void destroy(){
         // 释放连接
         closeSocket();
+        // 释放监听
+//        clearListener();
         // 释放handler
-        mhandlerSend.removeCallbacksAndMessages(null);
-        mhandlerSend = null;
-        mhandler.removeCallbacksAndMessages(null);
-        mhandler = null;
-        // 释放自己
-        sInstance = null;
+        if (mhandlerSend!=null){
+            mhandlerSend.removeCallbacksAndMessages(null);
+            mhandlerSend = null;
+        }
+        if (mhandler!=null){
+            mhandler.removeCallbacksAndMessages(null);
+            mhandler = null;
+        }
+        if (sInstance!=null)
+            // 释放自己
+            sInstance = null;
     }
 
     /**

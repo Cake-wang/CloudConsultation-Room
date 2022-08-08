@@ -161,6 +161,17 @@ public class PayRecipeFragment extends BaseEventFragment {
         });
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        // 覆盖返回监听
+        // 返回直接回首页
+        getView().findViewById(R.id.btn_back).setOnClickListener(view -> {
+            onDismiss();
+            gotoMain();
+        });
+    }
+
     private static final int PERIOD = 5* 1000;
     private static final int DELAY = 100;
     private Disposable mDisposable;
@@ -273,13 +284,19 @@ public class PayRecipeFragment extends BaseEventFragment {
                         onDismiss();
                         // 获取打药单
                         if (entity.getData().isSuccess()){
-                            // todo 打印取药单
+                            // 打印取药单
                             //"data": "{\"orderNo\":\"\",\"takeCode\":\"34811555\"}",
                             // 判定药品是否还有库存
                             // data 的返回类型 {\"1\":0,\"2\":0}
                             Map<String,Object> objectMap = (Map<String, Object>) JSON.parse(entity.getData().getData());
+                            String drug = "";
                             if (!TextUtils.isEmpty(objectMap.get("takeCode").toString()))
-                                start(ResultFragment.newInstance("paySuc:"+objectMap.get("takeCode")));
+                                // 格式化打印数据
+                                // 药物用量
+                                for (DrugObject drugObject : obj) {
+                                    drug += drugObject.drugTradeName +" "+ drugObject.howToUse+"&&";
+                                }
+                                start(ResultFragment.newInstance("paySuc:"+objectMap.get("takeCode")+":"+drug));
                         }
                     }
                 });
@@ -417,5 +434,6 @@ public class PayRecipeFragment extends BaseEventFragment {
         public String quantityUnit;
         public String sku;
         public String spec;
+        public String howToUse;
     }
 }

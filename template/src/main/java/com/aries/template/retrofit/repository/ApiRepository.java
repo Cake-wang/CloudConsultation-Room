@@ -590,14 +590,15 @@ public class ApiRepository extends BaseRepository {
      * 获取复诊和处方列表
      * 获取处方单 10 页
      * 获取挂号单 10 页
-     * todo 会不会获取的单号过小，找不到待支付。
+     * @param tabStatus 状态标志位 ,ongoing 进行中，isover 已完成tab，onready 待处理。
+     *                  目前未支付需要查询2次，一次ongoing，一次onready，然后合并结果。
      */
-    public Observable<GetConsultsAndRecipesResultEntity> getConsultsAndRecipes() {
+    public Observable<GetConsultsAndRecipesResultEntity> getConsultsAndRecipes(String tabStatus) {
         // 除了公共的数据之外，还有其他的数据请求
         Map<String,String> bizContent = new HashMap<>();
         bizContent.put("startPage","0");//复诊分页开始标记(默认每页十条，从0开始)
         bizContent.put("requestMode","4");//复诊类型,固定为4
-        bizContent.put("tabStatus","ongoing");//状态标志位,ongoing进行中tab，isover已完成tab
+        bizContent.put("tabStatus",tabStatus);//状态标志位,ongoing进行中tab，isover已完成tab
 //        bizContent.put("tabStatus","onready");//状态标志位,ongoing进行中tab，isover已完成tab，onready待处理
         bizContent.put("recipeIndex","0");//处方分页起始位置
         bizContent.put("recipeLimit","20");//处方每页查询量(最大不超过20)

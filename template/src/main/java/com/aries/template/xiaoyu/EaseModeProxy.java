@@ -18,7 +18,6 @@ import com.ainemo.sdk.otf.LoginResponseData;
 import com.ainemo.sdk.otf.MakeCallResponse;
 import com.ainemo.sdk.otf.NemoSDK;
 import com.ainemo.sdk.otf.NemoSDKInitCallBack;
-import com.ainemo.sdk.otf.Orientation;
 import com.ainemo.sdk.otf.ResolutionRatio;
 import com.ainemo.sdk.otf.Roster;
 import com.ainemo.sdk.otf.RosterWrapper;
@@ -35,13 +34,11 @@ import com.aries.template.R;
 import com.aries.template.entity.RoomIdInsAuthEntity;
 import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.template.utils.DefenceUtil;
-import com.aries.template.xiaoyu.dapinsocket.SocThread;
 import com.aries.template.xiaoyu.meeting.MeetingVideoCell;
-import com.aries.template.xiaoyu.model.RegEndPoint;
 import com.aries.template.xiaoyu.model.RegReponse;
-import com.aries.template.xiaoyu.model.RegRequest;
 import com.aries.template.xiaoyu.uvc.UVCAndroidCameraPresenter;
 import com.aries.template.xiaoyu.xinlin.XLMessage;
+import com.aries.template.xiaoyu.xinlin.XLSend;
 import com.hyphenate.EMCallBack;
 import com.hyphenate.EMMessageListener;
 import com.hyphenate.chat.EMClient;
@@ -53,13 +50,9 @@ import com.trello.rxlifecycle3.android.ActivityEvent;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.ref.WeakReference;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import tech.gusavila92.websocketclient.WebSocketClient;
 
 /******
  * 环信 + 信令 + 小鱼
@@ -119,9 +112,6 @@ public class EaseModeProxy {
     private boolean isEasemodStarted = false;
     // 医生是否进入过
     private boolean isDoctorEnterRoom=false;
-    // 信令专用信息传送器
-    // 需要释放
-    private XLMessage xlMessage;
 
     //单例
     private static volatile EaseModeProxy sInstance;
@@ -235,8 +225,10 @@ public class EaseModeProxy {
                         // 信令请求 socket 没有心跳，返回医生请求状态
 //                        setDoctorMessaged(true);
                         // 提示患者，医生挂断视频
-                        xlMessage = new XLMessage(xlPatientUserId,XL_URL,activity.get());
-                        xlMessage.login(msg -> onRegSuccess(msg));
+                        XLMessage.with().init(xlPatientUserId,XL_URL,activity.get()).send(new XLSend().getLoginMsg(xlPatientUserId),
+                                msg -> onRegSuccess(msg));
+//                        xlMessage = new XLMessage(xlPatientUserId,XL_URL,activity.get());
+//                        xlMessage.login(msg -> onRegSuccess(msg));
                     }
                 });
             }
@@ -502,11 +494,15 @@ public class EaseModeProxy {
             @Override
             public void onVideoDataSourceChange(List<VideoInfo> videoInfos, boolean hasVideoContent) {
                     if (videoInfos.size()>0){
-                        if (videoCell !=null)
+                        // 如果医生没有进来过，那么就执行
+                        // 如果医生已经进来过了，就不再执行
+                        if (!isDoctorEnterRoom){
+                            if (videoCell !=null)
                                 videoCell.setVideoInfo(videoInfos.get(0));
-                        if (listener!=null)
-                            listener.onDoctorInRoom();
-                        isDoctorEnterRoom = true;
+                            if (listener!=null)
+                                listener.onDoctorInRoom();
+                            isDoctorEnterRoom = true;
+                        }
                     }
                     else if (videoInfos.size()==0){
                         // 现在的房间没有其他人了
@@ -522,21 +518,26 @@ public class EaseModeProxy {
     /**
      * 信令 通信
      * 向Docotor的视频端发送用户信息。
+     * 这个任务特别重要，需要持续保持监控医生是否进入房间，如果没有进入房间，则继续监听
      */
-    private void sendNotifyDoctorVideoMsg() {
-        if (xlMessage!=null)
-        xlMessage.send(xlMessage.getDoctorMsg(xlPatientUserId, nickname.trim(), doctorUserId, consultId, meetingRoomNumber),
-                message -> ToastWithLogin("xlMessage: TX_RTC_START_INVOKE"));
+    public void sendNotifyDoctorVideoMsg() {
+        XLMessage.with().init(xlPatientUserId,XL_URL,activity.get()).send(new XLSend().getDoctorMsg(xlPatientUserId, nickname.trim(), doctorUserId, consultId, meetingRoomNumber),
+                msg -> ToastWithLogin("xlMessage: 向医生端发送信息 开始视频"));
+//        if (xlMessage!=null)
+//        xlMessage.send(new XLSend().getDoctorMsg(xlPatientUserId, nickname.trim(), doctorUserId, consultId, meetingRoomNumber),
+//                message -> ToastWithLogin("xlMessage: TX_RTC_START_INVOKE"));
     }
 
     /**
      * 提示医生病人已经离开
      */
-    private void sendNotifyPaintLiveMsg(){
-        if (xlMessage!=null)
-        xlMessage.send(xlMessage.getPatientLeaveMsg(doctorUserId,xlPatientUserId),
-                message -> {ToastWithLogin("xlMessage :病人离开");
-        });
+    public void sendNotifyPaintLiveMsg(){
+        XLMessage.with().init(xlPatientUserId,XL_URL,activity.get()).send(new XLSend().getPatientLeaveMsg(doctorUserId,xlPatientUserId),
+                msg -> ToastWithLogin("xlMessage: 向医生端发送信息 病人离开"));
+//        if (xlMessage!=null)
+//        xlMessage.send(new XLSend() .getPatientLeaveMsg(doctorUserId,xlPatientUserId),
+//                message -> {ToastWithLogin("xlMessage :病人离开");
+//        });
     }
 
     /**
@@ -560,18 +561,13 @@ public class EaseModeProxy {
         // 重置全局数据
         isDoctorEnterRoom = false;
         // 释放对象资源
-        if (xlMessage!=null)
-            xlMessage = null;
         if (uvcCameraPresenter!=null){
             uvcCameraPresenter.onDestroy();
             uvcCameraPresenter = null;
             Log.e("TAG", "releaseProxy: done" );
         }
         // 释放在这里为保证这个对象被释放了，如果在监听里面，可能没有被释放该怎么办？
-        if (xlMessage!=null){
-            xlMessage.release();
-            xlMessage=null;
-        }
+        XLMessage.with().destroy();
         if (activity!=null)
             activity = null;
         if (contentLayout !=null)

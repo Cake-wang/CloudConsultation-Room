@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.alibaba.fastjson.JSON;
 import com.aries.library.fast.retrofit.FastLoadingObserver;
 import com.aries.library.fast.util.SPUtil;
 import com.aries.library.fast.util.ToastUtil;
@@ -15,9 +16,12 @@ import com.aries.template.entity.ConfigurationToThirdForPatientEntity;
 import com.aries.template.entity.MachineEntity;
 import com.aries.template.module.base.BaseEventFragment;
 import com.aries.template.module.mine.MineCardFragment;
+import com.aries.template.module.mine.PayRecipeFragment;
+import com.aries.template.module.mine.ResultFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
-import com.aries.template.thridapp.JTJKThirdAppUtil;
 import com.aries.template.utils.DefenceUtil;
+import com.aries.template.xiaoyu.dapinsocket.DapinSocketProxy;
+import com.aries.template.xiaoyu.xinlin.XLMessage;
 import com.aries.ui.view.title.TitleBarView;
 import com.hyphenate.EMCallBack;
 import com.hyphenate.chat.EMClient;
@@ -25,6 +29,8 @@ import com.trello.rxlifecycle3.android.ActivityEvent;
 import com.trello.rxlifecycle3.android.FragmentEvent;
 
 import androidx.annotation.Nullable;
+
+import java.util.Map;
 
 import butterknife.BindView;
 
@@ -81,6 +87,17 @@ public class HomeFragment extends BaseEventFragment{
 //                start(VideoConsultFragment.newInstance(FakeDataExample.consultId,FakeDataExample.nickname,FakeDataExample.doctorUserId,FakeDataExample.doctorName));// todo cc
 //                start(PayCodeFragment.newInstance(FakeDataExample.recipeFee,FakeDataExample.recipeIds,FakeDataExample.recipeCode));// todo cc
 //            startActivity(new Intent(getActivity(), MeetingActivity.class));//todo cc
+
+
+            // 打印取药单
+            //"data": "{\"orderNo\":\"\",\"takeCode\":\"34811555\"}",
+//            String drug = "";
+//                // 格式化打印数据
+//                // 药物用量
+//                for (int i = 0; i < 3; i++) {
+//                    drug += "测试用药" + " " + "药量"+"&&";
+//                }
+//            start(ResultFragment.newInstance("paySuc:"+"34811555"+":"+drug));
         });
 
         // 点击复诊
@@ -196,7 +213,18 @@ public class HomeFragment extends BaseEventFragment{
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
         if (!hidden){
+            // 返回到首页
+            // 清理全局变量
             GlobalConfig.clear();
+            // 清理全局单例
+            DapinSocketProxy.with().delayDestroy();
+            XLMessage.with().destroy();
+            // 如果最后一次大屏的通信是启动身体检测，则回来不打开视频
+            if (!GlobalConfig.lastDapinSocketStr.equals(DapinSocketProxy.FLAG_SCREENFLAG_BODYTESTING_OPEN))
+                DapinSocketProxy.with()
+                        .clearListener()
+                        .initWithOld(getActivity(),GlobalConfig.machineIp,DapinSocketProxy.FLAG_SCREENFLAG_BODYTESTING_FINISH)
+                        .startSocket();
         }
     }
 }

@@ -416,7 +416,15 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
      * 如果复诊单挂号有多余的无效单，批量进行取消。
      */
     public void requestConsultsAndRecipes() {
-        ApiRepository.getInstance().getConsultsAndRecipes()
+        // 需要将 ongoing 和 onready 合并
+        // 所有复诊单集合
+        final List<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Consults> allConsult = new ArrayList<>();
+        // 所有处方单
+        final ArrayList<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes> allRecipes = new ArrayList<>();
+
+
+
+        ApiRepository.getInstance().getConsultsAndRecipes("ongoing")
                 .compose(this.bindUntilEvent(ActivityEvent.DESTROY))
                 .subscribe(new FastLoadingObserver<GetConsultsAndRecipesResultEntity>("请稍后...") {
                     @Override
@@ -426,62 +434,91 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                             return;
                         }
                         if (entity.isSuccess()){
-                            // 如果2个都不满足则跳转科室
-                            boolean isDepartTag = true;
-                            // 复诊单挂号和处方单不会同时出现，如果同时出现，则需要调整逻辑
-                            // 查看挂号是否多余1条
-                            if(entity.getData().getConsults().size()>0){
-                                for (GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Consults item : entity.getData().getConsults()) {
-                                    int status = item.getConsults().getStatus();
-                                    if (item.getConsults().getConsultOrgan() != GlobalConfig.organId)
-                                        // 如果不是同一家机构，则跳过不处理
-                                        break;
-                                   if ( item.getConsults().getPayflag()==1 &&
-                                           (status==1 || status ==2 || status == 3 || status == 4)){
-                                       //status=4 问诊中
-                                       isDepartTag = false;
-                                       // 去往复诊单挂号
-                                      start(OrderConsultFragment.newInstance(item));
-                                      return;
-                                   }
-                                    //  如果复诊单挂单有多余的无效单，批量进行取消。
-                                    if (item.getConsults().getPayflag()==0 && status!=8){
-                                        // 取消复诊单 status = 8 已经取消
-                                        ApiRepository.getInstance().patientCancelGraphicTextConsult(String.valueOf(item.getConsults().getConsultId())).subscribe();
-                                    }
-                                }
-                            }
-//                            ArrayList<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes> recipes = new ArrayList<>();
-                            // 查看处方单是否多余1条处方
-                            if (entity.getData().getRecipes().size()>0){
-                                // 每一个处方单中，都有一个处方信息，这个处方信息是需要合并的
-                                ArrayList<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes> recipes = new ArrayList();
-                                for (GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes item : entity.data.recipes) {
-                                    if (item.getOrganId() != GlobalConfig.organId)
-                                        // 如果不是同一家机构，则跳过不处理
-                                        break;
-                                    // 1 待审核, 2 待处理, 3 待取药
-                                    if (item.status==2){
-                                        recipes.add(item);
-                                    }
-                                }
-                                // 如果未支付处方单有，则进入批量处理界面
-                                if (recipes.size()>0){
-                                    isDepartTag = false;
-                                    start(OrderRecipesListFragment.newInstance(recipes));
-                                    return;
-                                }
-                            }
-                            // 如果即没有未支付处方单，也没有未支付复诊单
-                            if (isDepartTag){
-                                // 如果2个都不满足则跳转科室
-                                start(DepartmentFragment.newInstance());
-                            }
-                        }else {
-                            ToastUtil.show("获取未支付失败，请稍后重试");
-                            start(HomeFragment.newInstance(), SupportFragment.SINGLETASK);
+                            // 这里只收集数据，并不做处理
+                            allConsult.addAll(entity.data.getConsults());
+                            allRecipes.addAll(entity.data.recipes);
+
+                            // 请求 onready
+                            ApiRepository.getInstance().getConsultsAndRecipes("onready")
+                                    .compose(MainActivity.this.bindUntilEvent(ActivityEvent.DESTROY))
+                                    .subscribe(new FastLoadingObserver<GetConsultsAndRecipesResultEntity>("请稍后...") {
+                                        @Override
+                                        public void _onNext(@io.reactivex.annotations.NonNull GetConsultsAndRecipesResultEntity entity) {
+                                            if (entity == null) {
+                                                ToastUtil.show("请检查网络，返回首页后重试");
+                                                return;
+                                            }
+                                            if (entity.isSuccess()){
+                                                // 这里只收集数据，并不做处理
+                                                allConsult.addAll(entity.data.getConsults());
+                                                allRecipes.addAll(entity.data.recipes);
+
+                                                // 如果2个都不满足则跳转科室
+                                                boolean isDepartTag = true;
+                                                // 复诊单挂号和处方单不会同时出现，如果同时出现，则需要调整逻辑
+                                                // 查看挂号是否多余1条
+                                                if(entity.getData().getConsults().size()>0){
+                                                    for (GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Consults item : allConsult) {
+                                                        int status = item.getConsults().getStatus();
+                                                        if (item.getConsults().getConsultOrgan() != GlobalConfig.organId)
+                                                            // 如果不是同一家机构，则跳过不处理
+                                                            break;
+                                                        if ( item.getConsults().getPayflag()==1 &&
+                                                                (status==1 || status ==2 || status == 3 || status == 4)){
+                                                            //status=4 问诊中
+                                                            isDepartTag = false;
+                                                            // 去往复诊单挂号
+                                                            start(OrderConsultFragment.newInstance(item));
+                                                            return;
+                                                        }
+                                                        //  如果复诊单挂单有多余的无效单，批量进行取消。
+                                                        if (item.getConsults().getPayflag()==0 && status!=8){
+                                                            // 取消复诊单 status = 8 已经取消
+                                                            ApiRepository.getInstance().patientCancelGraphicTextConsult(String.valueOf(item.getConsults().getConsultId())).subscribe();
+                                                        }
+                                                    }
+                                                }
+                                                // 查看处方单是否多余1条处方
+                                                if (entity.getData().getRecipes().size()>0){
+                                                    // 每一个处方单中，都有一个处方信息，这个处方信息是需要合并的
+                                                    ArrayList<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes> recipes = new ArrayList();
+                                                    for (GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes item : allRecipes) {
+                                                        if (item.getOrganId() != GlobalConfig.organId)
+                                                            // 如果不是同一家机构，则跳过不处理
+                                                            break;
+                                                        // 1 待审核, 2 待处理, 3 待取药
+                                                        if (item.status==2){
+                                                            recipes.add(item);
+                                                        }
+                                                    }
+                                                    // 如果未支付处方单有，则进入批量处理界面
+                                                    if (recipes.size()>0){
+                                                        isDepartTag = false;
+                                                        start(OrderRecipesListFragment.newInstance(recipes));
+                                                        return;
+                                                    }
+                                                }
+                                                // 如果即没有未支付处方单，也没有未支付复诊单
+                                                if (isDepartTag){
+                                                    // 如果2个都不满足则跳转科室
+                                                    start(DepartmentFragment.newInstance());
+                                                }
+                                            }else {
+                                                ToastUtil.show("获取未支付失败，请稍后重试");
+                                                start(HomeFragment.newInstance(), SupportFragment.SINGLETASK);
+                                            }
+                                            isReadCardProcessing = false;
+                                        }
+
+                                        @Override
+                                        public void _onError(Throwable e) {
+                                            super._onError(e);
+                                            ToastUtil.show("网络问题，返回首页后重试");
+                                            start(HomeFragment.newInstance(), SupportFragment.SINGLETASK);
+                                            isReadCardProcessing = false;
+                                        }
+                                    });
                         }
-                        isReadCardProcessing = false;
                     }
 
                        @Override
@@ -492,10 +529,7 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                            isReadCardProcessing = false;
                        }
                    });
-
     }
-
-
 
     @Override
     public void onTabSelect(int position) {
@@ -533,6 +567,9 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
         }
     }
 
+    /**
+     * 第一次启动 或 从其他应用返回
+     */
     @Override
     protected void onStart() {
         super.onStart();
