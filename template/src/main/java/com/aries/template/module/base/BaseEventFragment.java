@@ -47,9 +47,6 @@ public abstract class BaseEventFragment extends BaseTimerFragment{
     protected TextView versionCode;
     /** 120  秒倒计时间 */
     protected int timeCount = 120;
-    /** 是否关闭倒计时显示对象 true 关闭*/
-    private boolean dismissCountTimeTag;
-
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -126,14 +123,6 @@ public abstract class BaseEventFragment extends BaseTimerFragment{
         super.timeStop();
         if (tvShowTimer != null)
             tvShowTimer.setText("");
-    }
-
-    /**
-     * 关闭倒计时显示
-     * 不显示倒计时，不进行倒计时计算
-     */
-    protected void dismissCountTimeStop(){
-        dismissCountTimeTag = true;
     }
 
     /**

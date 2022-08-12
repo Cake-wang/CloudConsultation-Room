@@ -155,7 +155,7 @@ public class EaseModeProxy {
         Settings settings = new Settings(xyAppId);
         settings.setPrivateCloudAddress("cloud.xylink.com");
         settings.setVideoMaxResolutionTx(VideoConfig.VD_1280x720);
-        settings.setDefaultCameraId(1);
+        settings.setDefaultCameraId(0);
 
         // 初始化 NEmoSDK
         NemoSDK.getInstance().init(context, settings, new NemoSDKInitCallBack() {
@@ -195,6 +195,15 @@ public class EaseModeProxy {
         if (uvcCameraPresenter==null){
             uvcCameraPresenter = new UVCAndroidCameraPresenter(activity.get());
             uvcCameraPresenter.onStart();
+        }
+    }
+
+    /**
+     * 释放
+     */
+    public void onStop(){
+        if (uvcCameraPresenter!=null){
+            uvcCameraPresenter.USBUnregister();
         }
     }
 
@@ -504,13 +513,15 @@ public class EaseModeProxy {
                             isDoctorEnterRoom = true;
                         }
                     }
-                    else if (videoInfos.size()==0){
-                        // 现在的房间没有其他人了
-                        if (isDoctorEnterRoom){
-                            // 医生曾进入过
-                            ToastUtil.show("医生已经离开");
-                        }
-                    }
+//                    else if (videoInfos.size()==0){
+//                        // 现在的房间没有其他人了
+//                        if (isDoctorEnterRoom){
+//                            // 医生曾进入过
+////                            ToastUtil.show("医生已经离开");
+//                            if (listener!=null)
+//                                listener.onDoctorOutRoom();
+//                        }
+//                    }
             }
         });
     }
@@ -549,9 +560,10 @@ public class EaseModeProxy {
         // 如果医生没有进入房间
         if (!NemoSDK.getInstance().inCalling()){
             releaseProxy();
+        }else {
+            // 如果医生已经进入房间
+            NemoSDK.getInstance().hangup();// 挂断通话
         }
-        // 如果医生已经进入房间
-        NemoSDK.getInstance().hangup();// 挂断通话
     }
 
     /**
@@ -560,14 +572,16 @@ public class EaseModeProxy {
     private void releaseProxy(){
         // 重置全局数据
         isDoctorEnterRoom = false;
+        Log.e("JTJK", "releaseProxy: start" );
         // 释放对象资源
         if (uvcCameraPresenter!=null){
             uvcCameraPresenter.onDestroy();
             uvcCameraPresenter = null;
-            Log.e("TAG", "releaseProxy: done" );
+            Log.e("JTJK", "uvcCameraPresenter: done" );
         }
         // 释放在这里为保证这个对象被释放了，如果在监听里面，可能没有被释放该怎么办？
-        XLMessage.with().destroy();
+        XLMessage.with().delayDestroy();
+        Log.e("JTJK", "XLMessage: done" );
         if (activity!=null)
             activity = null;
         if (contentLayout !=null)
@@ -575,15 +589,18 @@ public class EaseModeProxy {
         if (videoCell !=null){
             videoCell = null;
         }
+        Log.e("JTJK", "failed: done" );
         // 释放 环信
         if (emcallback!=null)
             EMClient.getInstance().logout(true,emcallback);
 
+        Log.e("JTJK", "EMClient: done" );
         // 释放小鱼
         NemoSDK.getInstance().setNemoSDKListener(null);
         NemoSDK.getInstance().releaseLayout();
         NemoSDK.getInstance().releaseCamera();
         NemoSDK.getInstance().releaseAudioMic();
+        Log.e("JTJK", "NemoSDK: done" );
     }
 
     /**
@@ -677,6 +694,7 @@ public class EaseModeProxy {
      */
     public interface ProxyEventListener{
         default void onVideoSuccessLinked(){};// 入会成功
-        default void onDoctorInRoom(){};//医生进入的时候，将医生的 video Info 给予外部
+        default void onDoctorInRoom(){};
+        default void onDoctorOutRoom(){};//医生进入的时候，将医生的 video Info 给予外部
     }
 }

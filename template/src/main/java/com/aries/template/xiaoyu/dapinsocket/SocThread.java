@@ -26,6 +26,10 @@ public class SocThread {
     private String TAG = "socket====> ";
     private int timeout = 10000;
 
+    // 外部调用的存储对象，如果这个值为 true 可以被外部删除
+    // 这个属性仅由外部处理，外部输入，外部输入，
+    public boolean isCanBeFinished = false;
+
     public Socket client = null;
     BufferedReader in;
     public boolean isRun = false;
@@ -102,7 +106,8 @@ public class SocThread {
         } catch (Exception e) {
             isConnecting = false;
             isRun = false;
-            inHandler.sendEmptyMessage(CONNECT_FAIL);
+            if (inHandler!=null)
+                inHandler.sendEmptyMessage(CONNECT_FAIL);
             Log.i(TAG, "连接服务器错误Exception" + e.getMessage());
             e.printStackTrace();
         }

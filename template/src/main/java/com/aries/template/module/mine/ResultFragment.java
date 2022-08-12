@@ -9,12 +9,16 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.aries.library.fast.util.ToastUtil;
+import com.aries.template.GlobalConfig;
 import com.aries.template.R;
 import com.aries.template.module.base.BaseEventFragment;
+import com.aries.template.utils.JTJKLogUtils;
 import com.aries.ui.view.title.TitleBarView;
 import com.decard.NDKMethod.BasicOper;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 
 import androidx.annotation.Nullable;
 import butterknife.BindView;
@@ -154,6 +158,24 @@ public class ResultFragment extends BaseEventFragment implements ISupportFragmen
                 String enter = BasicOper.dc_printenter(50);
                 Log.d("print", "BasicOper.dc_printenter:" + enter);
 
+                // 打印基础信息
+                // 姓名
+                // 卡号
+                // 机器编号
+                try {
+                    String name = "姓名："+GlobalConfig.ssCard.getName()+System.getProperty("line.separator");
+                    String cardNum= "卡号："+GlobalConfig.ssCard.getCardNum()+System.getProperty("line.separator");
+                    String machineId= "设备号："+GlobalConfig.machineId+System.getProperty("line.separator");
+//                    byte[] strByte = printString.getBytes("GBK");
+                    //打印字符
+                    BasicOper.dc_printcharacter(name.getBytes("GBK"));
+                    BasicOper.dc_printcharacter(cardNum.getBytes("GBK"));
+                    BasicOper.dc_printcharacter(machineId.getBytes("GBK"));
+                    Log.d("print", "BasicOper.dc_printcharacter:" + name);
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+
                 // 取药码
                 String printString = "取药码："+printContent;
                 try {
@@ -176,8 +198,13 @@ public class ResultFragment extends BaseEventFragment implements ISupportFragmen
                     e.printStackTrace();
                 }
 
-                // 用量
+                // 处方用量
                 String[] split = stuckUse.split("&&");
+                try {
+                    BasicOper.dc_printcharacter("处方信息：".getBytes("GBK"));
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
                 for (String str : split) {
                     try {
                         byte[] strByte = str.getBytes("GBK");
@@ -187,6 +214,20 @@ public class ResultFragment extends BaseEventFragment implements ISupportFragmen
                     } catch (UnsupportedEncodingException e) {
                         e.printStackTrace();
                     }
+                }
+
+                //打印空白
+                try {
+                    // 使用系统换行符
+                    String strBlank = System.getProperty("line.separator");
+                    byte[] byteTemp = strBlank.getBytes("GBK");
+                    //打印一维码
+                    BasicOper.dc_printcharacter(byteTemp);
+                    BasicOper.dc_printcharacter(byteTemp);
+                    BasicOper.dc_printcharacter(byteTemp);
+                    Log.d("print", "PrintLineByLinePicture:" + byteTemp);
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
                 }
             }
         }

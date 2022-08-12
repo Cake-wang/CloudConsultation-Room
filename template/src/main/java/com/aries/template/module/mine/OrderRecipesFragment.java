@@ -37,6 +37,7 @@ import butterknife.OnClick;
 /******
  * 待支付处方单 界面
  * 前置必须有一个请求处方单信息请求查询，然后把结果输入进来，如果请求成功则跳入该接口
+ * 由于取消的 处方单 是不会存在的，所以不需要判断9，取消订单的问题
  * @author  ::: louis luo
  * Date ::: 2022/6/16 4:54 PM
  */
@@ -237,8 +238,8 @@ public class OrderRecipesFragment extends BaseEventFragment {
      * @param skus 药品编码 列表
      */
     public void requestGetStockInfo(String clinicSn, ArrayList<String> skus){
-//        skus = new ArrayList<String>(){{add("6901339924484");}};//todo cc
-        skus = new ArrayList<String>(){{add("4895013208569");}};//todo cc
+        skus = new ArrayList<String>(){{add("6901339924484");}};//todo cc
+//        skus = new ArrayList<String>(){{add("4895013208569");}};//todo cc
         ApiRepository.getInstance().getStockInfo(clinicSn,skus)
                 .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
                 .subscribe(new FastLoadingObserver<GetStockInfoEntity>("请稍后...") {
@@ -265,9 +266,10 @@ public class OrderRecipesFragment extends BaseEventFragment {
                             // 拉到数据了，有库存
                             // 然后取支付页面请求支付，合并处方单
                             ArrayList<String> recipeids = new ArrayList<>();
-                            ArrayList<String> recipeCode = new ArrayList<>();
+                            ArrayList<String> recipeCodes = new ArrayList<>();
                             ArrayList<PayRecipeFragment.DrugObject> drugs = new ArrayList<>();
                             for (GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes.RecipeDetail item : obj.recipeDetailBeans) {
+                                // 由于取消的 处方单 是不会存在的，所以不需要判断9，取消订单的问题
                                 // 用量
                                 String howToUse = "(1天"+item.getUseTotalDose()/item.getUseDays()+"次，每次"+ item.getUseDose().intValue()+"片)";
                                 PayRecipeFragment.DrugObject drug= new PayRecipeFragment.DrugObject();
@@ -285,10 +287,11 @@ public class OrderRecipesFragment extends BaseEventFragment {
                                 drug.howToUse =howToUse;// 用量
                                 drugs.add(drug);
                                 recipeids.add(String.valueOf(item.recipeId));
-                                recipeCode.add(String.valueOf(item.organDrugCode));
+                                recipeCodes.add(String.valueOf(item.organDrugCode));
                             }
                             //当处方单产生订单，并且订单有效时取的是订单的真实金额，其他时候取的处方的总金额保留两位小数
-                            start(PayRecipeFragment.newInstance(String.valueOf(obj.recipeId),recipeids,recipeCode,drugs,String.valueOf(obj.orderId)));
+                            String orderId = obj.orderId==null?"":String.valueOf(obj.orderId);
+                            start(PayRecipeFragment.newInstance(recipeids,recipeCodes,drugs,orderId));
                         }else {
                             ToastUtil.show("药品查询失败");
                         }

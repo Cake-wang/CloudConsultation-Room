@@ -13,7 +13,6 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.alibaba.fastjson.JSON;
 import com.aries.library.fast.util.ToastUtil;
 import com.aries.template.GlobalConfig;
 
@@ -21,12 +20,15 @@ import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * 大屏socket 代理类
- * 这个类有心跳包，
+ * 这个类有心跳包，不能有心跳包，有时候他会阻碍信息发送接收。
+ * 所以这个类是使用一次就丢弃的。
  * 发送消息后，只有在数据正确返回的时候才会释放自己，否则会一直请求
  * 如果网络不畅，也会一直请求
  * 需要在特定的位置释放这个单例资源
@@ -41,11 +43,17 @@ public class DapinSocketProxy {
     // socket 地址
     private String address;
     // 是否可以发送
-    private boolean sendEnable = false;
+    private boolean isSendEnable = false;
     // 延迟释放，后续接口只要成功或者失败一次，即释放
-    private boolean delayDestroy = false;
+    private boolean isDelayDestroy = false;
+    // 延迟释放，如果出现错误，立刻回收资源
+    private boolean isFailDestroy = false;
+    // 现在正在执行请求
+    private boolean isSending = false;
+    // 现有的执行中的socket 列队
+    private List<SocThread> socketThreads = new ArrayList<>();
 
-    private boolean unUseAble = false;
+    private boolean isUnUseAble = false;
     //  activity
     private Activity activityObj;
     // 当前的启动 标志 SCREENFLAG_CONTROLSCREEN 或者 SCREENFLAG_CLOSESCREEN
@@ -67,6 +75,8 @@ public class DapinSocketProxy {
      */
     //单例
     private static volatile DapinSocketProxy sInstance;
+
+
     private DapinSocketProxy() {
     }
     public static DapinSocketProxy with() {
@@ -216,13 +226,13 @@ public class DapinSocketProxy {
             }
             if (msg.what == SocThread.CONNECT_SUCCESS){
                 //连接成功
-                sendEnable = true;
+                isSendEnable = true;
                 AddressSettingSharedPreference.setAddrs(activityObj,AddressSettingSharedPreference.ADDRESS,address);
                 if (!TextUtils.isEmpty(ip))
                     AddressSettingSharedPreference.setAddrs(activityObj,AddressSettingSharedPreference.IP,ip);
                 else
                     ipSetting(activityObj);
-                if(sendEnable) {
+                if(isSendEnable) {
                     if (socketThread != null) {
                         // 链接后发送
                         // 发送成功
@@ -235,8 +245,8 @@ public class DapinSocketProxy {
                         Log.d("JTJK", "DapinSocketProxy: 发送成功"+send);
                         ToastUtil.show("发送成功："+send);
                         // 成功后释放资源
-                        if (delayDestroy){
-                            delayDestroy = false;
+                        if (isDelayDestroy){
+                            isDelayDestroy = false;
                             destroy();
                         }
                     }
@@ -244,14 +254,20 @@ public class DapinSocketProxy {
                 return;
             }
             if (msg.what == SocThread.CONNECT_FAIL){
-                sendEnable = false;
+                isSendEnable = false;
                 Log.d("JTJK", "DapinSocketProxy: 连接失败");
                 // 连接失败
                 // 链接失败后，不释放资源，让他继续向大屏请求
                 // 如果延迟释放，则立即释放该内容
-                if (delayDestroy){
-                    delayDestroy = false;
+                if (isDelayDestroy){
+                    isDelayDestroy = false;
                     destroy();
+                    return;
+                }
+                if (isFailDestroy){
+                    isFailDestroy = false;
+                    destroy();
+                    return;
                 }
                 return;
             }
@@ -262,13 +278,16 @@ public class DapinSocketProxy {
                     Log.d("JTJK", "handleMessage: "+bean.body);
                     if (bean.getDataType() == 3){
                         //心跳
-                        heartBeat.refreshTime();
+//                        heartBeat.refreshTime();
                     }else if (bean.getDataType() == 1){
                         // 获取后台反馈数据数据，格式化
                         if (bean.body.contains("MessageReturn")){
-                            // 发送成功
+                            // 发送成功后返回的信息，统一带MessageReturn字样
                             // 释放资源
-                            destroy();
+                            socketThread.isCanBeFinished = true;
+                            // 通过调整 socketThreads 来destory 执行
+                            //  destory 需要添加  socketThreads 的操作
+                            loopDestroy();
                         }
                     }
                 }
@@ -314,21 +333,24 @@ public class DapinSocketProxy {
                 }
             }
         }
-
-
-
 //		}
     };
 
 
     /**
      * 启动socket
+     * 这里不能使用destroy会出现null的问题
+     * socketThread 永远新建
      */
     public void startSocket(){
         if (activityObj==null)
             return;
 
-        if (socketThread==null){
+        if (socketThreads==null){
+            socketThreads = new ArrayList<>();
+        }
+        if (true){
+//        if (socketThread==null){
             if (!TextUtils.isEmpty(address) && address.contains(":")){
                 closeSocket();
 //			if (heartBeat != null){
@@ -343,13 +365,19 @@ public class DapinSocketProxy {
                     }
                     socketThread.setIport(split[0], Integer.parseInt(split[1]));
                     socketThread.executeConn();
+                    // 将新建的thread加进来
+                    socketThreads.add(socketThread);
                     // 启动心跳
-                    heartBeat = new HeartBeat(socketThread,mhandler);
+//                    heartBeat = new HeartBeat(socketThread,mhandler);
                 }catch (Exception e){
                     e.printStackTrace();
                 }
             }else {
-                Toast.makeText(activityObj,"地址格式错误,请联系管理员",Toast.LENGTH_SHORT).show();
+                try{
+                    Toast.makeText(activityObj,"地址格式错误,请联系管理员",Toast.LENGTH_SHORT).show();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
             }
         }else {
             // 如果已经有 socket 了
@@ -379,18 +407,47 @@ public class DapinSocketProxy {
             socketThread.close();
             socketThread = null;
         }
-        if (activityObj!=null)
-            activityObj = null;
+    }
+
+    /**
+     * 循环关闭
+     * 循环目前所有的
+     */
+    private void loopDestroy(){
+        if (socketThreads.size()>0) {
+            final int len = socketThreads.size();
+            for (int i = 0; i <len; i++) {
+                SocThread thread = socketThreads.get(0);
+                thread.close();
+                thread = null;
+                socketThreads.remove(0);
+            }
+            // todo 是不是还要添加一个超时删除
+            if (socketThreads.size()<=0){
+                // 释放监听，由于socketThreads已经全部出栈，监听已经不重要了。
+                clearListener();
+                // 释放资源
+                destroy();
+            }
+        }
     }
 
     /**
      * 启动socket 完成后释放这个 socket 的资源
-     * todo 通过返回信息确认，然后启动释放资源
+     * 通过返回信息确认，然后启动释放资源
      * 通过关闭TAG，在心跳包检测或者链接失败的时候，执行自我关闭的任务。
      * 成功或者失败，只要传输过一次即关闭
      */
     public void delayDestroy(){
-        delayDestroy = true;
+        isDelayDestroy = true;
+    }
+
+    /**
+     * 如果遇到错误就释放资源
+     * 不会处理成功的释放，因为业务逻辑中会添加如果成功收到反馈就释放的代码
+     */
+    public void failDestroy(){
+        isFailDestroy = true;
     }
 
     /**
@@ -399,8 +456,6 @@ public class DapinSocketProxy {
     public void destroy(){
         // 释放连接
         closeSocket();
-        // 释放监听
-//        clearListener();
         // 释放handler
         if (mhandlerSend!=null){
             mhandlerSend.removeCallbacksAndMessages(null);
@@ -409,6 +464,22 @@ public class DapinSocketProxy {
         if (mhandler!=null){
             mhandler.removeCallbacksAndMessages(null);
             mhandler = null;
+        }
+        // 释放长续存对象
+        if (activityObj!=null)
+            activityObj = null;
+        // 释放 thread 栈
+        if (socketThreads!=null){
+            if (socketThreads.size()>0){
+                final int len = socketThreads.size();
+                for (int i = 0; i <len; i++) {
+                    SocThread thread = socketThreads.get(0);
+                    thread.close();
+                    thread = null;
+                    socketThreads.remove(0);
+                }
+            }
+            socketThreads = null;
         }
         if (sInstance!=null)
             // 释放自己

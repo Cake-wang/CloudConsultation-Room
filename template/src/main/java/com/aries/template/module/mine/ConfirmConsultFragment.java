@@ -127,14 +127,13 @@ public class ConfirmConsultFragment extends BaseEventFragment implements Compoun
         cb_protocol_tr.setEnabled(false);
     }
 
-
     private void initSingleFlowTagLayouto() {
         FlowTagAdapter tagAdapter = new FlowTagAdapter(getContext());
         flowlayout_single_select_o.setAdapter(tagAdapter);
         flowlayout_single_select_o.setTagCheckedMode(FlowTagLayout.FLOW_TAG_CHECKED_SINGLE);
         flowlayout_single_select_o.setOnTagSelectListener((parent, position, selectedList) -> alleric =position);
         tagAdapter.addTags(ResUtils.getStringArray(R.array.tags_values));
-        tagAdapter.setSelectedPositions(0);
+//        tagAdapter.setSelectedPositions(0); // 不选择
 
     }
 
@@ -144,7 +143,7 @@ public class ConfirmConsultFragment extends BaseEventFragment implements Compoun
         flowlayout_single_select_t.setTagCheckedMode(FlowTagLayout.FLOW_TAG_CHECKED_SINGLE);
         flowlayout_single_select_t.setOnTagSelectListener((parent, position, selectedList) ->  haveReaction =position);
         tagAdapter.addTags(ResUtils.getStringArray(R.array.tags_values));
-        tagAdapter.setSelectedPositions(0);
+//        tagAdapter.setSelectedPositions(0); //不选择
     }
 
     @Override
@@ -177,7 +176,6 @@ public class ConfirmConsultFragment extends BaseEventFragment implements Compoun
         }
     }
 
-
     /**
      * 按钮 行为 集合
      */
@@ -191,7 +189,9 @@ public class ConfirmConsultFragment extends BaseEventFragment implements Compoun
                 break;
             case R.id.btn_inquiry:
                 // 确认，发起复诊请求
-                requestGetPatientList();
+                // 审查输入完整性
+                if (inputCheck())
+                    requestGetPatientList();
                 break;
             case R.id.cb_protocol_tx_o:
                 cb_protocol_o.setChecked(true);
@@ -239,8 +239,12 @@ public class ConfirmConsultFragment extends BaseEventFragment implements Compoun
                             ToastUtil.show("请检查网络");
                             return;
                         }
-                        if (entity.data.success){
-                            requestConsultAndCdrOtherdoc(entity.data.jsonResponseBean.body.patient.mpiId);
+                        try {
+                            if (entity.data.success){
+                                requestConsultAndCdrOtherdoc(entity.data.jsonResponseBean.body.patient.mpiId);
+                            }
+                        }catch (Exception e){
+                            e.printStackTrace();
                         }
                     }
                 });
@@ -279,17 +283,21 @@ public class ConfirmConsultFragment extends BaseEventFragment implements Compoun
                             ToastUtil.show("请检查网络");
                             return;
                         }
-                        if (entity.data.success){
-                            // 通过确诊单，进入到复诊单支付
+                        try {
+                            if (entity.data.success){
+                                // 通过确诊单，进入到复诊单支付
 //                            start(PayConsultFragment.newInstance());
-                            // 医生 确认复诊，并进入复诊阶段
-                            start(PayConsultFragment.newInstance(String.valueOf(entity.data.jsonResponseBean.body.consult.consultId),
-                                    entity.data.jsonResponseBean.body.patient.patientName,
-                                    String.valueOf(entity.data.jsonResponseBean.body.doctor.loginId),
-                                    entity.data.jsonResponseBean.body.doctor.name));
-                        }else{
-                            // 如果不能复诊，则检查异常原因
-                            errorCheck(entity.data.jsonResponseBean.msg,entity.data.jsonResponseBean.code);
+                                // 医生 确认复诊，并进入复诊阶段
+                                start(PayConsultFragment.newInstance(String.valueOf(entity.data.jsonResponseBean.body.consult.consultId),
+                                        entity.data.jsonResponseBean.body.patient.patientName,
+                                        String.valueOf(entity.data.jsonResponseBean.body.doctor.loginId),
+                                        entity.data.jsonResponseBean.body.doctor.name));
+                            }else{
+                                // 如果不能复诊，则检查异常原因
+                                errorCheck(entity.data.jsonResponseBean.msg,entity.data.jsonResponseBean.code);
+                            }
+                        }catch (Exception e){
+                            e.printStackTrace();
                         }
                     }
                 });
@@ -327,6 +335,32 @@ public class ConfirmConsultFragment extends BaseEventFragment implements Compoun
         }catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    /**
+     *  确认输入合法性和完整性
+     *  true 合法，可以继续执行
+     */
+    public boolean inputCheck(){
+        boolean protocolChecked = false;
+        if (cb_protocol_o.isChecked()) protocolChecked =true;
+        if (cb_protocol_tw.isChecked())protocolChecked=true;
+        if (cb_protocol_tr.isChecked())protocolChecked=true;
+        if (!protocolChecked){
+            ToastUtil.show("请选择本次复诊情况");
+            return false;
+        }
+        // 没有选中则为 -1
+        if (flowlayout_single_select_o.getSelectedIndex()<0){
+            ToastUtil.show("请选择过敏情况");
+            return false;
+        }
+        // 没有选中则为 -1
+        if (flowlayout_single_select_t.getSelectedIndex()<0){
+            ToastUtil.show("请选择不良反应情况");
+            return false;
+        }
+        return true;
     }
 
     /**

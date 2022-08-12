@@ -12,6 +12,7 @@ import android.util.Log;
 import com.ainemo.sdk.otf.NemoSDK;
 import com.ainemo.sdk.otf.Orientation;
 import com.aries.template.R;
+import com.aries.template.utils.JTJKLogUtils;
 import com.serenegiant.usb.DeviceFilter;
 import com.serenegiant.usb.IFrameCallback;
 import com.serenegiant.usb.IStatusCallback;
@@ -57,7 +58,7 @@ public class UVCAndroidCameraPresenter {
         this.mContext = context;
         // fallback to YUV mode
         mUSBMonitor = new USBMonitor(context, mOnDeviceConnectListener);
-        mUSBMonitor.register();
+//        mUSBMonitor.register();
         // 如果有USB摄像头，就用他
         isUvcCamera = hasUvcCamera();
         // 初始化 mSurfaceTexture
@@ -245,13 +246,20 @@ public class UVCAndroidCameraPresenter {
      * 切换摄像头为前置摄像头
      */
     public void useFrontCamera() {
-        NemoSDK.getInstance().releaseCamera();
-        releaseCamera();
-        // 设置小鱼摄像头方向
-        // 设置摄像头方向
-        NemoSDK.getInstance().setOrientation(Orientation.LANDSCAPE);
-        // 如果没有，则启动前置
-        NemoSDK.getInstance().switchCamera(0);
+        // todo 如果前置摄像头不启动，提示用户，并退回到首页
+        try{
+            NemoSDK.getInstance().releaseCamera();
+            releaseCamera();
+            // 设置小鱼摄像头方向
+            // 设置摄像头方向
+            NemoSDK.getInstance().setOrientation(Orientation.LANDSCAPE);
+            // 如果没有，则启动前置
+            NemoSDK.getInstance().switchCamera(0);
+        }catch (Exception e){
+            e.printStackTrace();
+            JTJKLogUtils.message(e.toString());
+        }
+
 //        switch (currentCamera) {
 //            case 0:
 //                releaseCamera();
@@ -297,7 +305,12 @@ public class UVCAndroidCameraPresenter {
      */
     public void onStart() {
         if (mUSBMonitor != null) {
-            mUSBMonitor.register();
+            try{
+                mUSBMonitor.hasPermission(null);
+                mUSBMonitor.register();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         }
         synchronized (mSync) {
             //如果有USB摄像头，则启动
@@ -321,7 +334,15 @@ public class UVCAndroidCameraPresenter {
     private synchronized void releaseUsbMonitor() {
         try{
             if (mUSBMonitor != null) {
-                mUSBMonitor.destroy();
+                try {
+                    Log.d("JTJK","releaseUsbMonitor b");
+                    // 由于 hasPermission 有崩溃，所以必须要在 destroy 之前，先判断
+                    mUSBMonitor.hasPermission(null);
+                    mUSBMonitor.destroy();
+                    Log.d("JTJK","releaseUsbMonitor e");
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
                 mUSBMonitor = null;
             }
         }catch (Exception e){e.printStackTrace();};
@@ -349,6 +370,23 @@ public class UVCAndroidCameraPresenter {
         synchronized (mSync) {
             if (mUSBMonitor != null) {
                 mUSBMonitor.unregister();
+            }
+        }
+    }
+
+    /**
+     * 注销 USB
+     */
+    public void USBUnregister(){
+        synchronized (mSync) {
+            try {
+                Log.d("JTJK","releaseUsbMonitor b");
+                // 由于 hasPermission 有崩溃，所以必须要在 destroy 之前，先判断
+                mUSBMonitor.hasPermission(null);
+                mUSBMonitor.unregister();
+                Log.d("JTJK","releaseUsbMonitor e");
+            }catch (Exception e){
+                e.printStackTrace();
             }
         }
     }

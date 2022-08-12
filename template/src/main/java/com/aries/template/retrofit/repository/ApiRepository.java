@@ -601,7 +601,9 @@ public class ApiRepository extends BaseRepository {
         bizContent.put("tabStatus",tabStatus);//状态标志位,ongoing进行中tab，isover已完成tab
 //        bizContent.put("tabStatus","onready");//状态标志位,ongoing进行中tab，isover已完成tab，onready待处理
         bizContent.put("recipeIndex","0");//处方分页起始位置
+        bizContent.put("index","0");//处方分页起始位置
         bizContent.put("recipeLimit","20");//处方每页查询量(最大不超过20)
+        bizContent.put("limit","20");//处方每页查询量(最大不超过20)
         // 请求的类型
         RequestBody body = BodyCreate(bizContent,"",false);
         return FastTransformer.switchSchedulers(getApiService().getConsultsAndRecipes(body).retryWhen(new FastRetryWhen()));

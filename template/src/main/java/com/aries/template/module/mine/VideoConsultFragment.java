@@ -26,6 +26,7 @@ import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.template.thridapp.JTJKThirdAppUtil;
 import com.aries.template.utils.ActivityUtils;
 import com.aries.template.utils.DefenceUtil;
+import com.aries.template.utils.JTJKLogUtils;
 import com.aries.template.view.ShineButtonDialog;
 import com.aries.template.widget.autoadopter.AutoAdaptorProxy;
 import com.aries.template.widget.autoadopter.AutoObjectAdaptor;
@@ -80,7 +81,7 @@ public class VideoConsultFragment extends BaseEventFragment {
     // 是否从未支付处方单进来的，true为是，
     // 如果是，那么结束问诊时，直接使用结束问诊接口，而不是取消复诊单
     private boolean isBackFromOrder=false;
-    private boolean isRecipeCheckedFlag=false;// 医生开出的处方状态是不是1或者不是2，则不能支付。即不能结束问诊
+    private boolean isRecipeCheckedFlag=false;// 医生开出的处方状态是不是1或者不是2，则不能支付。即不能结束问诊.true 可以结束问诊
 
     private List<GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO> currentRecipes=new ArrayList<>();// 从后端传入的数据
 
@@ -163,40 +164,60 @@ public class VideoConsultFragment extends BaseEventFragment {
     @Override
     public void onStart() {
         super.onStart();
-//        // 从外部身体检测应用回来，大屏接口，身体检测结束
-//        if (isBodyTestingFlag){
-//            isBodyTestingFlag = false;
-//            dapinSocketProxy.startSocket(DapinSocketProxy.SCREENFLAG_BODYTESTING_FINISH);
-//        }
-        // 启动视频
-        // 启动轮训处方单状态
+        // 从外部身体检测应用回来，大屏接口，身体检测结束
+        if (isBodyTestingFlag){
+            isBodyTestingFlag = false;
+            // 重新启动视频问诊投屏
+            DapinSocketProxy.with()
+                    .initWithOld(getActivity(),GlobalConfig.machineIp,DapinSocketProxy.FLAG_SCREENFLAG_CONTROLSCREEN)
+                    .startSocket();
+        }else{
+            // 启动视频
+            // 启动轮训处方单状态
 //        timeLoop();
-        // 创建视频处理器
-        ViewGroup viewGroup = getActivity().findViewById(R.id.videoContent);
-        EaseModeProxy.with().onStart(getActivity(),viewGroup);
-        EaseModeProxy.with().setListener(new EaseModeProxy.ProxyEventListener() {
-            @Override
-            public void onDoctorInRoom() {
-                // 医生进入的TAG
-                isDoctorInRoomFlag = true;
-                // 如果医生进入了，则直接释放XL的socket
-                XLMessage.with().destroy();
-                // 大屏接口，启动大屏
-                DapinSocketProxy.with()
-                        .clearListener()
-                        .initWithOld(getActivity(),GlobalConfig.machineIp,DapinSocketProxy.FLAG_SCREENFLAG_CONTROLSCREEN)
-                        .startSocket();
-            }
+            // 创建视频处理器
+            ViewGroup viewGroup = getActivity().findViewById(R.id.videoContent);
+            EaseModeProxy.with().onStart(getActivity(),viewGroup);
+            EaseModeProxy.with().setListener(new EaseModeProxy.ProxyEventListener() {
+                @Override
+                public void onDoctorInRoom() {
+                    // 医生进入的TAG
+                    isDoctorInRoomFlag = true;
+                    // 如果医生进入了，则直接释放XL的socket
+                    XLMessage.with().destroy();
+                    // 大屏接口，启动大屏
+                    DapinSocketProxy.with()
+                            .initWithOld(getActivity(),GlobalConfig.machineIp,DapinSocketProxy.FLAG_SCREENFLAG_CONTROLSCREEN)
+                            .startSocket();
+                }
 
-            @Override
-            public void onVideoSuccessLinked() {
-                //入会成功
-                // 启动全屏展示
+                @Override
+                public void onDoctorOutRoom() {
+                    // 启动倒计时
+                    // 启动后，如果没有正常的处方单，则不可以结束
+//                    if (isRecipeCheckedFlag){
+//                        // todo 时间用尽后，执行结束问诊
+//                        getActivity().runOnUiThread(() -> getView().findViewById(R.id.jtjk_fz_fragment_timer).setVisibility(View.VISIBLE));
+//                        timeStart();
+//                    }
+                }
+
+                @Override
+                public void onVideoSuccessLinked() {
+                    //入会成功
+                    // 启动全屏展示
 //                btn_full_screen.setVisibility(View.VISIBLE);
-                //启动轮训处方单状态
-                timeLoop();
-            }
-        });
+                    //启动轮训处方单状态
+                    timeLoop();
+                }
+            });
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        EaseModeProxy.with().onStop();
     }
 
     /**
@@ -225,6 +246,11 @@ public class VideoConsultFragment extends BaseEventFragment {
                             GlobalConfig.ssCard.getName(),
                             GlobalConfig.ssCard.getSSNum(),
                             GlobalConfig.mobile);
+
+                    // 关闭视频问诊投屏
+                    DapinSocketProxy.with()
+                            .initWithOld(getActivity(),GlobalConfig.machineIp,DapinSocketProxy.FLAG_SCREENFLAG_CLOSESCREEN)
+                            .startSocket();
                 }else {
                     ToastUtil.show("没有第三方应用信息，无法跳转");
                 }
@@ -271,9 +297,6 @@ public class VideoConsultFragment extends BaseEventFragment {
 
             // 关闭对话框
             dialog.dismiss();
-
-            // 启动倒计时
-            timeStart();
 
             // 启动业务
             if (isDoctorInRoomFlag){
@@ -349,14 +372,19 @@ public class VideoConsultFragment extends BaseEventFragment {
                             ToastUtil.show("请检查网络");
                             return;
                         }
-                        if (entity.isSuccess()){
-                            if (entity.getData().isSuccess()){
-                                Log.d("JTJK","患者取消复诊服务");
-                                // 清理
-                                onDismiss();
-                                // 医生不曾进入到视频中
-                                start(HomeFragment.newInstance(), SupportFragment.SINGLETASK);
+                        try {
+                            if (entity.isSuccess()){
+                                if (entity.getData().isSuccess()){
+                                    Log.d("JTJK","患者取消复诊服务");
+                                    // 清理
+                                    onDismiss();
+                                    // 医生不曾进入到视频中
+                                    start(HomeFragment.newInstance(), SupportFragment.SINGLETASK);
+                                }
                             }
+                        }catch (Exception e){
+                            e.printStackTrace();
+                            JTJKLogUtils.message(e.toString());
                         }
                     }
                 });
@@ -375,20 +403,26 @@ public class VideoConsultFragment extends BaseEventFragment {
                             ToastUtil.show("请检查网络");
                             return;
                         }
-                        if (entity.getData().isSuccess()){
-                            username = entity.getData().getJsonResponseBean().getBody().getUsername();
-                            userpwd = entity.getData().getJsonResponseBean().getBody().getUserpwd();
-                            userId = entity.getData().getJsonResponseBean().getBody().getUserId();
-                            EaseModeProxy.with().easemobStart(getActivity(),
-                                    consultId,
-                                    nickname,
-                                    doctorUserId,
-                                    username,
-                                    userpwd,
-                                    userId);
+                        try {
+                            if (entity.getData().isSuccess()){
+                                username = entity.getData().getJsonResponseBean().getBody().getUsername();
+                                userpwd = entity.getData().getJsonResponseBean().getBody().getUserpwd();
+                                userId = entity.getData().getJsonResponseBean().getBody().getUserId();
+                                EaseModeProxy.with().easemobStart(getActivity(),
+                                        consultId,
+                                        nickname,
+                                        doctorUserId,
+                                        username,
+                                        userpwd,
+                                        userId);
                             }
+                        }catch (Exception e){
+                            e.printStackTrace();
+                            JTJKLogUtils.message(e.toString());
                         }
+                    }
                 });
+
     }
 
     /**
@@ -405,28 +439,42 @@ public class VideoConsultFragment extends BaseEventFragment {
                             ToastUtil.show("请检查网络");
                             return;
                         }
-                        if (entity.data.success){
-                            // 隐藏显示提示，等待旋转
-                            if (rv_video_wait.getVisibility()==View.VISIBLE)
-                                rv_video_wait.setVisibility(View.GONE);
-                            if (rv_video_tip.getVisibility()==View.GONE)
-                                rv_video_tip.setVisibility(View.VISIBLE);
+                        try {
+                            if (entity.data.success){
+                                // 隐藏显示提示，等待旋转
+                                if (rv_video_wait.getVisibility()==View.VISIBLE)
+                                    rv_video_wait.setVisibility(View.GONE);
+                                if (rv_video_tip.getVisibility()==View.GONE)
+                                    rv_video_tip.setVisibility(View.VISIBLE);
 
-                            if (entity.data.jsonResponseBean.body.size()<1)
-                                return;
+                                if (entity.data.jsonResponseBean.body.size()<1)
+                                    return;
 
-                            //刷新 RV 处方单界面
-                            recipeId = String.valueOf(entity.data.jsonResponseBean.body.get(0).recipeId);
-                            reflashRecyclerView(rv_video_tip,entity.data.jsonResponseBean.body);
-                            currentRecipes = entity.data.jsonResponseBean.body;
+                                // 筛选处方
+                                // 去掉被取消的处方
+                                ArrayList<GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO> newData = new ArrayList<>();
+                                for (GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO item : entity.data.jsonResponseBean.body) {
+                                    // 9 是取消处方
+                                    if (item.status != 9)
+                                        newData.add(item);
+                                }
+                                //刷新 RV 处方单界面
+                                recipeId = String.valueOf(entity.data.jsonResponseBean.body.get(0).recipeId);
+                                reflashRecyclerView(rv_video_tip,newData);
+                                currentRecipes = entity.data.jsonResponseBean.body;
 
-                            //查看返回的所有处方单的处方信息，状态是不是1或者不是2，则不能支付。即不能结束问诊
-                            isRecipeCheckedFlag = true;
-                            for (GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO currentRecipe : currentRecipes) {
-                                if (currentRecipe.status!=1 && currentRecipe.status!=2){
-                                    isRecipeCheckedFlag = false;
+                                //查看返回的所有处方单的处方信息，状态是不是1或者不是2，则不能支付。即不能结束问诊
+                                // 9 是取消处方
+                                isRecipeCheckedFlag = true;
+                                for (GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO currentRecipe : currentRecipes) {
+                                    if (currentRecipe.status!=1 && currentRecipe.status!=2 && currentRecipe.status!=9){
+                                        isRecipeCheckedFlag = false;
+                                    }
                                 }
                             }
+                        }catch (Exception e){
+                            e.printStackTrace();
+                            JTJKLogUtils.message(e.toString());
                         }
                     }
                 });
@@ -441,29 +489,34 @@ public class VideoConsultFragment extends BaseEventFragment {
     private void requestPatientFinishGraphicTextConsult(String consultId, boolean isHaveRecipe){
         ApiRepository.getInstance().patientFinishGraphicTextConsult(consultId)
                 .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
-                .subscribe(new FastObserver<PatientFinishGraphicTextConsultEntity>() {
+                .subscribe(new FastLoadingObserver<PatientFinishGraphicTextConsultEntity>("请稍后...") {
                     @Override
                     public void _onNext(PatientFinishGraphicTextConsultEntity entity) {
                         if (entity == null) {
                             ToastUtil.show("请检查网络");
                             return;
                         }
-                        if (entity.data.success){
-                            Log.d("JTJK","结束问诊");
-                            // 跳转
-                            if (isHaveRecipe){
-                                // 启动确定处方单
-                                start(ConfirmRecipesFragment.newInstance(recipeId,currentRecipes));
-                                // 清理
-                                onDismiss();
-                            }else {
-                                // 启动返回首页
-                                start(HomeFragment.newInstance(), SupportFragment.SINGLETASK);
-                                // 清理
-                                onDismiss();
+                        try {
+                            if (entity.data.success){
+                                Log.d("JTJK","结束问诊");
+                                // 跳转
+                                if (isHaveRecipe){
+                                    // 启动确定处方单
+                                    start(ConfirmRecipesFragment.newInstance(recipeId,currentRecipes));
+                                    // 清理
+                                    onDismiss();
+                                }else {
+                                    // 启动返回首页
+                                    start(HomeFragment.newInstance(), SupportFragment.SINGLETASK);
+                                    // 清理
+                                    onDismiss();
+                                }
+                            }else{
+                                ToastUtil.show(entity.message);
                             }
-                        }else{
-                            ToastUtil.show(entity.message);
+                        }catch (Exception e){
+                            e.printStackTrace();
+                            JTJKLogUtils.message(e.toString());
                         }
                     }
                 });
@@ -514,7 +567,6 @@ public class VideoConsultFragment extends BaseEventFragment {
         EaseModeProxy.with().closeVideoProxy();
         // 大屏接口，病人离席，关闭大屏视频
         DapinSocketProxy.with()
-                .clearListener()
                 .initWithOld(getActivity(),GlobalConfig.machineIp,DapinSocketProxy.FLAG_SCREENFLAG_CLOSESCREEN)
                 .startSocket();
         //清除mDisposable不再进行验证
@@ -523,7 +575,9 @@ public class VideoConsultFragment extends BaseEventFragment {
             mDisposable = null;
         }
         // 清理大屏socket
-        DapinSocketProxy.with().clearListener().destroy();
+        DapinSocketProxy.with().failDestroy();
+        // 释放自己，让onCreate 下次进来的时候有效
+        pop();
     }
 
     @Override
@@ -536,7 +590,7 @@ public class VideoConsultFragment extends BaseEventFragment {
             }
         } else {
             // 启动请求
-            requestConfigurationToThirdForPatient();
+//            requestConfigurationToThirdForPatient();
         }
     }
 

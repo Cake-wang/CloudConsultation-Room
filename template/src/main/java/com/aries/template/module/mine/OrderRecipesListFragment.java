@@ -33,6 +33,9 @@ import butterknife.BindView;
  * 视频问诊已经完成，但是没有完成处方单支付
  *
  * 先处理处方单的列表，然后进入处方单详细页处理未支付
+ *
+ * 如果视频问诊里面开了3个处方单，那么，这3个单子会分开开。不会有取消的单子。要合并需要联合开方。
+ *
  * @author louisluo
  */
 public class OrderRecipesListFragment extends BaseEventFragment {
@@ -113,14 +116,15 @@ public class OrderRecipesListFragment extends BaseEventFragment {
                         });
 
                         // 添加文字
-                        int minute = 0;
-                        if (!TextUtils.isEmpty(itemData.recipeSurplusHours)){
-                            minute = ((Float)(Float.valueOf(itemData.recipeSurplusHours)*60)).intValue();
-                        }
+//                        int minute = 0;
+//                        if (!TextUtils.isEmpty(itemData.recipeSurplusHours)){
+//                            minute = ((Float)(Float.valueOf(itemData.recipeSurplusHours)*60)).intValue();
+//                        }
                         String openTime = itemData.signDate.split(" ")[0];
+                        String endTime = itemData.recipeSurplusHours.split(" ")[0];
                         ((TextView)holder.itemView.findViewById(R.id.jtjk_recipe_disastname)).setText(itemData.organDiseaseName);
                         ((TextView)holder.itemView.findViewById(R.id.jtjk_recipe_optime)).setText("开方时间:  "+openTime);
-                        ((TextView)holder.itemView.findViewById(R.id.jtjk_recipe_closetime)).setText("失效时间:  "+DateUtils.addHour(openTime,"yyyy-MM-dd",minute));
+                        ((TextView)holder.itemView.findViewById(R.id.jtjk_recipe_closetime)).setText("失效时间:  "+endTime);
 
                         // 添加金额样式
                         if (itemData.totalMoney==null)itemData.totalMoney = 0.0d;
@@ -171,7 +175,6 @@ public class OrderRecipesListFragment extends BaseEventFragment {
         upDownProxy.setParamMaxNumber(2);
         upDownProxy.setTotalDatas(obj);
         upDownProxy.doStartReFlash();
-
     }
 
 

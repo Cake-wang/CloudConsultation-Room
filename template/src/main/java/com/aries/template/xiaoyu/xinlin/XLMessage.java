@@ -50,6 +50,8 @@ public class XLMessage {
     private WeakReference<Activity> activity;
     // 信令的监听对象
     private XLEventListener listener;
+    // 延迟结束，成功或者失败1次后，结束
+    private boolean isDelayDestroy;
 
     /**
      * 初始化配置文件
@@ -104,7 +106,7 @@ public class XLMessage {
                     @Override
                     public void onOpen() {
                         // 握手成功
-                        Log.i("WebSocket", "Session is starting");
+//                        Log.i("WebSocket", "Session is starting");
                         //连接成功服务器后必须要注册
                         webSocketClient.send(new XLSend().getLoginMsg(xlPatientUserId));
                     }
@@ -118,16 +120,16 @@ public class XLMessage {
                             if (message.contains("REG_SUCCESS")) {
                                 // 登录成功
                                 if (!msg.equals(new XLSend().getLoginMsg(xlPatientUserId))){
-                                    // 如果不是登录，则继续发送消息
+                                    // 如果不只是登录，则登录成功后，继续发送消息
                                     webSocketClient.send(msg);
                                 }else{
-                                    // 如果是登录，则直接返回结果
+                                    // 如果只是登录，则直接返回结果
                                     if (listener!=null)
                                         listener.sended(message);
                                     // 释放监听
                                     destroy();
                                 }
-                                ToastWithLogin("登录成功");
+//                                ToastWithLogin("xl登录成功");
                             }else{
                                 // 如果返回的不是登录
                                 if (message.contains("TX_RTC_SHUTDOWN_RES")) {
@@ -135,18 +137,18 @@ public class XLMessage {
                                     ToastWithLogin("医生已经离开");
                                     if (listener != null)
                                         listener.sended(message);
-                                    // 释放监听
-                                    destroy();
                                 }else if (message.contains("SUCCESS")){
                                     // 其他各种返回成功了
                                     if (listener!=null)
                                         listener.sended(message);
-                                    // 释放监听
-//                                    destroy();
+                                    if (isDelayDestroy)
+                                        destroy();
                                 } else{
                                     // 如果是其他不知道的返回
                                     if (listener!=null)
                                         listener.sended(message);
+                                    if (isDelayDestroy)
+                                        destroy();
                                 }
                             }
                         });
@@ -167,14 +169,17 @@ public class XLMessage {
                     @Override
                     public void onException(Exception e) {
                         System.out.println(e.getMessage());
+                        destroy();
                     }
 
                     @Override
                     public void onCloseReceived() {
                         // socket 关闭
                         // 关闭后，webSocketClient 会被置空
-                        Log.i("WebSocket", "Closed ");
+//                        Log.i("WebSocket", "Closed ");
                         System.out.println("onCloseReceived");
+                        if (isDelayDestroy)
+                            destroy();
                     }
                 };
 
@@ -203,9 +208,13 @@ public class XLMessage {
      * 打印并提示用户
      */
     private void ToastWithLogin(String msg){
-        if (activity!=null && activity.get()!=null){
-            Log.d("EaseModeProxy",msg);
-            activity.get().runOnUiThread(() -> Toast.makeText(activity.get(), msg, Toast.LENGTH_SHORT).show());
+        try {
+            if (activity!=null && activity.get()!=null){
+//                Log.d("EaseModeProxy",msg);
+                activity.get().runOnUiThread(() -> Toast.makeText(activity.get(), msg, Toast.LENGTH_SHORT).show());
+            }
+        }catch (Exception e){
+            e.printStackTrace();
         }
     }
 
@@ -215,6 +224,14 @@ public class XLMessage {
     public interface XLEventListener {
         // 消息已经发送 比如 医生进入的时候，将医生的 video Info 给予外部
         void sended(String message);
+    }
+
+    /**
+     * 延迟结束
+     * 成功或者失败一次后，才会执行释放
+     */
+    public void delayDestroy(){
+        isDelayDestroy = true;
     }
 
     /**

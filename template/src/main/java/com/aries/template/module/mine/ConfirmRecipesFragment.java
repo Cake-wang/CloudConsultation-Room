@@ -164,10 +164,22 @@ public class ConfirmRecipesFragment extends BaseEventFragment {
         tv_result.setText(currentRecipes.get(0).organDiseaseName);
         tv_date.setText(currentRecipes.get(0).createDate);
 
+        // 将数据里面的 9 去除掉，是取消的处方单
+        final List<GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO> no9Recipes = new ArrayList<>();
+        for (GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO currentRecipe : currentRecipes) {
+            // 去除 9 的 取消单
+            if (currentRecipe.status!=9)
+                no9Recipes.add(currentRecipe);
+        }
+
         // 处理处方信息，并展示
-        reflashRecyclerView(rv_contentFastLib,currentRecipes);
+        reflashRecyclerView(rv_contentFastLib,no9Recipes);
     }
 
+    @Override
+    public void loadData() {
+        super.loadData();
+    }
 
     /**
      * 处理按钮
@@ -233,8 +245,8 @@ public class ConfirmRecipesFragment extends BaseEventFragment {
      * @param skus 药品编码 列表
      */
     public void requestGetStockInfo(String clinicSn, ArrayList<String> skus){
-//        skus = new ArrayList<String>(){{add("6901339924484");}};//todo cc
-        skus = new ArrayList<String>(){{add("4895013208569");}};//todo cc
+        skus = new ArrayList<String>(){{add("6901339924484");}};//todo cc
+//        skus = new ArrayList<String>(){{add("4895013208569");}};//todo cc
         ApiRepository.getInstance().getStockInfo(clinicSn,skus)
                 .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
                 .subscribe(new FastLoadingObserver<GetStockInfoEntity>("请稍后...") {
@@ -261,9 +273,13 @@ public class ConfirmRecipesFragment extends BaseEventFragment {
                             // 拉到数据了，有库存
                             // 然后取支付页面请求支付，合并处方单
                             ArrayList<String> recipeids = new ArrayList<>();
-                            ArrayList<String> recipeCode = new ArrayList<>();
+                            ArrayList<String> recipeCodes = new ArrayList<>();
                             ArrayList<PayRecipeFragment.DrugObject> drugs = new ArrayList<>();
                             for (GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO currentRecipe : currentRecipes) {
+                                // 9 是取消
+                                if (currentRecipe.status==9)
+                                    continue;
+
                                 GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO.RecipeDetailBeanListDTO vo = currentRecipe.recipeDetailBeanList.get(0);
                                 // 用量
                                 String howToUse = "(1天"+vo.useTotalDose/vo.useDays+"次，每次"+((Double) vo.useDose).intValue()+"片)";
@@ -282,12 +298,12 @@ public class ConfirmRecipesFragment extends BaseEventFragment {
                                 drug.howToUse =howToUse; // 用量
                                 drugs.add(drug);
                                 recipeids.add(String.valueOf(vo.recipeId));
-                                recipeCode.add(String.valueOf(vo.organDrugCode));
+                                recipeCodes.add(String.valueOf(vo.organDrugCode));
                             }
                             // 拉到数据了，有库存
                             // 然后取支付页面请求支付，合并处方单
                             //当处方单产生订单，并且订单有效时取的是订单的真实金额，其他时候取的处方的总金额保留两位小数
-                            start(PayRecipeFragment.newInstance(recipeId,recipeids,recipeCode,drugs,null));
+                            start(PayRecipeFragment.newInstance(recipeids,recipeCodes,drugs,null));
                         }
                     }
                 });

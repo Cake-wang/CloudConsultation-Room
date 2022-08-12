@@ -19,7 +19,9 @@ import com.aries.template.module.mine.MineCardFragment;
 import com.aries.template.module.mine.PayRecipeFragment;
 import com.aries.template.module.mine.ResultFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
+import com.aries.template.thridapp.JTJKThirdAppUtil;
 import com.aries.template.utils.DefenceUtil;
+import com.aries.template.utils.JTJKLogUtils;
 import com.aries.template.xiaoyu.dapinsocket.DapinSocketProxy;
 import com.aries.template.xiaoyu.xinlin.XLMessage;
 import com.aries.ui.view.title.TitleBarView;
@@ -37,6 +39,8 @@ import butterknife.BindView;
 /**
  * 首页
  * 返回首页后，需要清空一些全局数据
+ *
+ * 首页启动大屏 必须跟在获取全局信息之后
  *
  * @Author: AriesHoo on 2018/8/10 12:22
  * @E-Mail: AriesHoo@126.com
@@ -88,9 +92,8 @@ public class HomeFragment extends BaseEventFragment{
 //                start(PayCodeFragment.newInstance(FakeDataExample.recipeFee,FakeDataExample.recipeIds,FakeDataExample.recipeCode));// todo cc
 //            startActivity(new Intent(getActivity(), MeetingActivity.class));//todo cc
 
-
-            // 打印取药单
-            //"data": "{\"orderNo\":\"\",\"takeCode\":\"34811555\"}",
+//            // 打印取药单
+//            //"data": "{\"orderNo\":\"\",\"takeCode\":\"34811555\"}",
 //            String drug = "";
 //                // 格式化打印数据
 //                // 药物用量
@@ -202,6 +205,10 @@ public class HomeFragment extends BaseEventFragment{
                             jtjk_hospital.setText(GlobalConfig.hospitalName);
                         if (jtjk_machine!=null)
                             jtjk_machine.setText("机器编号:"+GlobalConfig.machineId);
+
+                        // 必须跟在获取全局信息之后
+                        // 启动大屏显示
+                        new JTJKThirdAppUtil().backFromBodyTestingForce(getActivity());
                     }else {
                         ToastUtil.show(entity.message);
                     }
@@ -216,15 +223,15 @@ public class HomeFragment extends BaseEventFragment{
             // 返回到首页
             // 清理全局变量
             GlobalConfig.clear();
-            // 清理全局单例
-            DapinSocketProxy.with().delayDestroy();
+            // 清理 信令
             XLMessage.with().destroy();
             // 如果最后一次大屏的通信是启动身体检测，则回来不打开视频
-            if (!GlobalConfig.lastDapinSocketStr.equals(DapinSocketProxy.FLAG_SCREENFLAG_BODYTESTING_OPEN))
-                DapinSocketProxy.with()
-                        .clearListener()
-                        .initWithOld(getActivity(),GlobalConfig.machineIp,DapinSocketProxy.FLAG_SCREENFLAG_BODYTESTING_FINISH)
-                        .startSocket();
+            if (!GlobalConfig.lastDapinSocketStr.equals(DapinSocketProxy.FLAG_SCREENFLAG_BODYTESTING_OPEN)){
+                new JTJKThirdAppUtil().onScreen(getActivity());
+            }else {
+                // 清理全局单例
+                DapinSocketProxy.with().delayDestroy();
+            }
         }
     }
 }

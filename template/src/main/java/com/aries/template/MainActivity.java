@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 
 import com.aries.library.fast.entity.FastTabEntity;
 import com.aries.library.fast.manager.LoggerManager;
@@ -140,7 +141,8 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
     }
 
     /**
-     * 给医保卡读卡器上电
+     * 医保卡读卡器 获取信息
+     * devHandle -1 没有拿到 设备句柄号
      */
     public void openSerialport() {
         Log.d("111111MODEL", Build.MODEL);
@@ -365,7 +367,7 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                                                 new JTJKThirdAppUtil().gotoBodyTesting(MainActivity.this,
                                                         GlobalConfig.factoryResource,
                                                         GlobalConfig.factoryMainPage,
-                                                        entity.getData().getName(),
+                                                        entity.getData().getName().trim(),
                                                         entity.getData().getIdcard(),
                                                         entity.getData().getMobile());
                                                 pop();
@@ -457,7 +459,7 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                                                 boolean isDepartTag = true;
                                                 // 复诊单挂号和处方单不会同时出现，如果同时出现，则需要调整逻辑
                                                 // 查看挂号是否多余1条
-                                                if(entity.getData().getConsults().size()>0){
+                                                if(allConsult.size()>0){
                                                     for (GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Consults item : allConsult) {
                                                         int status = item.getConsults().getStatus();
                                                         if (item.getConsults().getConsultOrgan() != GlobalConfig.organId)
@@ -479,7 +481,7 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                                                     }
                                                 }
                                                 // 查看处方单是否多余1条处方
-                                                if (entity.getData().getRecipes().size()>0){
+                                                if (allRecipes.size()>0){
                                                     // 每一个处方单中，都有一个处方信息，这个处方信息是需要合并的
                                                     ArrayList<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes> recipes = new ArrayList();
                                                     for (GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes item : allRecipes) {
@@ -558,6 +560,8 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // 保持设备界面常亮
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         // 优先将设备号输入进来
         GlobalConfig.machineId = ApiRepository.getDeviceId();
         GlobalConfig.thirdMachineId = ApiRepository.getDeviceId();

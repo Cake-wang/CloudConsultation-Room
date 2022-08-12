@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -26,7 +27,9 @@ import com.aries.template.entity.PrescriptionPushEntity;
 import com.aries.template.module.base.BaseEventFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.template.utils.ActivityUtils;
+import com.aries.template.utils.JTJKLogUtils;
 import com.aries.ui.view.title.TitleBarView;
+import com.bumptech.glide.Glide;
 import com.trello.rxlifecycle3.android.FragmentEvent;
 import com.xuexiang.xaop.annotation.IOThread;
 import com.xuexiang.xaop.annotation.MainThread;
@@ -53,6 +56,11 @@ import io.reactivex.schedulers.Schedulers;
  * @Function: 我的
  */
 public class PayConsultFragment extends BaseEventFragment {
+    // logo 图片
+    private Bitmap logoBmp;
+    // 支付图片
+    private Bitmap payBmp;
+
     /**
      * 输入显示对象
      */
@@ -125,11 +133,6 @@ public class PayConsultFragment extends BaseEventFragment {
      */
     @Override
     public void initView(Bundle savedInstanceState) {
-        // 轮训复诊单
-        timeLoop();
-        // 获得支付二维码
-        requestPayOrder(consultId);
-
         //数据展示
         if (GlobalConfig.ssCard!=null)
             tv_name.setText(GlobalConfig.ssCard.getName());
@@ -169,41 +172,12 @@ public class PayConsultFragment extends BaseEventFragment {
                 .subscribe(aLong -> requestPaySuccess());//getUnreadCount()执行的任务
     }
 
-    /**
-     * 检查当前支付是否完成
-     * 循环任务，每5秒检查一次
-     * 检查处方单详情
-     * FastObserver
-     */
-    private void requestPaySuccess() {
-        ApiRepository.getInstance().getConsultAndPatientAndDoctorById(consultId)
-                .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
-                .subscribe(new FastObserver<GetConsultAndPatientAndDoctorByIdEntity>() {
-                    @Override
-                    public void _onNext(GetConsultAndPatientAndDoctorByIdEntity entity) {
-                        if (entity == null) {
-                            ToastUtil.show("请检查网络");
-                            return;
-                        }
-                        // 检查 payFlag 如果是 1 就是支付成功
-                        if (entity.isSuccess()){
-                            if (entity.getData().getJsonResponseBean().getBody().getConsult().getPayflag()==1){
-                                // 跳转到视频
-                                start(VideoConsultFragment.newInstance(consultId,
-                                        patientName,
-                                        doctorId,
-                                        doctorName,
-                                        false));
-                                // 释放对象资源
-                                onDismiss();
-                            }
-                        }
-                    }
-                });
-    }
-
     @Override
     public void loadData() {
+        // 轮训复诊单
+        timeLoop();
+        // 获得支付二维码
+        requestPayOrder(consultId);
     }
 
     /**
@@ -222,6 +196,44 @@ public class PayConsultFragment extends BaseEventFragment {
     }
 
     /**
+     * 检查当前支付是否完成
+     * 循环任务，每5秒检查一次
+     * 检查处方单详情
+     * FastObserver
+     */
+    private void requestPaySuccess() {
+        ApiRepository.getInstance().getConsultAndPatientAndDoctorById(consultId)
+                .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
+                .subscribe(new FastObserver<GetConsultAndPatientAndDoctorByIdEntity>() {
+                    @Override
+                    public void _onNext(GetConsultAndPatientAndDoctorByIdEntity entity) {
+                        if (entity == null) {
+                            ToastUtil.show("请检查网络");
+                            return;
+                        }
+                        try {
+                            // 检查 payFlag 如果是 1 就是支付成功
+                            if (entity.isSuccess()){
+                                if (entity.getData().getJsonResponseBean().getBody().getConsult().getPayflag()==1){
+                                    // 跳转到视频
+                                    start(VideoConsultFragment.newInstance(consultId,
+                                            patientName,
+                                            doctorId,
+                                            doctorName,
+                                            false));
+                                    // 释放对象资源
+                                    onDismiss();
+                                }
+                            }
+                        }catch (Exception e){
+                            e.printStackTrace();
+                            JTJKLogUtils.message(e.toString());
+                        }
+                    }
+                });
+    }
+
+    /**
      * 获得订单二维码和其他详细数据
      * @param busId 订单号 直接使用 复诊id 815423957
      */
@@ -235,15 +247,22 @@ public class PayConsultFragment extends BaseEventFragment {
                             ToastUtil.show("请检查网络");
                             return;
                         }
-                        if (entity.getData().isSuccess()){
-                            // 显示二维码
-                           String qrStr = entity.getData().getJsonResponseBean().getBody().qr_code;
-                           Resources res = getActivity().getResources();
-                           Bitmap bmp= BitmapFactory.decodeResource(res, R.drawable.pay_alilogo);
-                           showQRCode(XQRCode.createQRCodeWithLogo(qrStr, 400, 400, bmp));
-                            jtjk_pay_reflash_tip.setVisibility(View.GONE);
-                        }else {
-                            jtjk_pay_reflash_tip.setVisibility(View.VISIBLE);
+                        try {
+                            if (entity.getData().isSuccess()){
+                                // 显示二维码
+                                String qrStr = entity.getData().getJsonResponseBean().getBody().qr_code;
+                                Resources res = getActivity().getResources();
+                                logoBmp = BitmapFactory.decodeResource(res, R.drawable.pay_alilogo);
+                                payBmp = XQRCode.createQRCodeWithLogo(qrStr, 400, 400, logoBmp);
+//                                Log.i("JTJK", "压缩前图片的大小" + (payBmp.getByteCount() / 1024 / 1024) + "M宽度为" + payBmp.getWidth() + "高度为" + payBmp.getHeight());
+                                showQRCode(payBmp);
+                                jtjk_pay_reflash_tip.setVisibility(View.GONE);
+                            }else {
+                                jtjk_pay_reflash_tip.setVisibility(View.VISIBLE);
+                            }
+                        }catch (Exception e){
+                            e.printStackTrace();
+                            JTJKLogUtils.message(e.toString());
                         }
                     }
                 });
@@ -275,9 +294,36 @@ public class PayConsultFragment extends BaseEventFragment {
     public void onDismiss() {
         super.onDismiss();
         //清除mDisposable不再进行验证
-        if (mDisposable != null) {
-            mDisposable.dispose();
-            mDisposable = null;
+        try {
+            if (mDisposable != null) {
+                mDisposable.dispose();
+                mDisposable = null;
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            JTJKLogUtils.message(e.toString());
+        }
+
+        // 清理 logo 图片
+        try {
+            if (logoBmp!=null){
+//                logoBmp.recycle();
+                logoBmp = null;
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            JTJKLogUtils.message(e.toString());
+        }
+
+        // 清理支付图片
+        try {
+            if (payBmp!=null){
+//                payBmp.recycle();
+                payBmp = null;
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            JTJKLogUtils.message(e.toString());
         }
     }
 }
