@@ -7,6 +7,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.ainemo.util.JsonUtil;
+import com.aries.library.fast.util.ToastUtil;
 import com.aries.template.xiaoyu.EaseModeProxy;
 import com.aries.template.xiaoyu.model.EndPoint;
 import com.aries.template.xiaoyu.model.RegEndPoint;
@@ -47,7 +48,7 @@ public class XLMessage {
     // 信令 Socket 对象, 这个 socket 不需要设置心跳包
     private WebSocketClient webSocketClient;
     // 弱应用 activity
-    private WeakReference<Activity> activity;
+    private Activity activity;
     // 信令的监听对象
     private XLEventListener listener;
     // 延迟结束，成功或者失败1次后，结束
@@ -59,7 +60,7 @@ public class XLMessage {
     public XLMessage init(String xlPatientUserId, String XL_URL, Activity activity) {
         this.xlPatientUserId = xlPatientUserId;
         this.XL_URL = XL_URL;
-        this.activity = new WeakReference<>(activity);
+        this.activity = activity;
         return this;
     }
 
@@ -115,7 +116,7 @@ public class XLMessage {
                     public void onTextReceived(String s) {
                         final String message = s;
                         ToastWithLogin(message);
-                        activity.get().runOnUiThread(() -> {
+                        activity.runOnUiThread(() -> {
                             //这里改成用json来解析?
                             if (message.contains("REG_SUCCESS")) {
                                 // 登录成功
@@ -209,9 +210,9 @@ public class XLMessage {
      */
     private void ToastWithLogin(String msg){
         try {
-            if (activity!=null && activity.get()!=null){
-//                Log.d("EaseModeProxy",msg);
-                activity.get().runOnUiThread(() -> Toast.makeText(activity.get(), msg, Toast.LENGTH_SHORT).show());
+            if (activity!=null){
+                Log.d("JTJK","XLMESSAGE::"+msg);
+                activity.runOnUiThread(() -> ToastUtil.show(msg));
             }
         }catch (Exception e){
             e.printStackTrace();

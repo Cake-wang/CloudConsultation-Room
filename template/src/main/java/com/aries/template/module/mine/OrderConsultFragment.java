@@ -187,6 +187,8 @@ public class OrderConsultFragment extends BaseEventFragment {
                 showSimpleConfirmDialog("consults");
                 break;
             case R.id.btn_inquiry:
+                // 如果进入的是去问诊，则调整状态
+                GlobalConfig.isIntoVideoFromOrder = true;
                 // 跳视频问诊
                 // 动态输入参数
                 if (!TextUtils.isEmpty(patientName))

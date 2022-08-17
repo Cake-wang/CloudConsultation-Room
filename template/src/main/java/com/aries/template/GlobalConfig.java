@@ -76,6 +76,8 @@ public class GlobalConfig {
 
     /**
      * 最后一次执行大屏的命令是什么
+     * 如果最后一次大屏的通信是启动身体检测，则回来不打开视频广告画面
+     * 记录的是 DapinSocketProxy 常量，例如 FLAG_SCREENFLAG_BODYTESTING_OPEN
      */
     public static String lastDapinSocketStr = "";
 
@@ -156,6 +158,11 @@ public class GlobalConfig {
      * 检测用户是否注册的时候，添加进来的
      */
     public static String mobile;
+
+    /**
+     * 是否从 未支付 复诊单进入问诊
+     */
+    public static boolean isIntoVideoFromOrder;
 
     /**
      * 清空所有缓存数据

@@ -198,14 +198,14 @@ public class EaseModeProxy {
         }
     }
 
-    /**
-     * 释放
-     */
-    public void onStop(){
-        if (uvcCameraPresenter!=null){
-            uvcCameraPresenter.USBUnregister();
-        }
-    }
+//    /**
+//     * 释放
+//     */
+//    public void onStop(){
+//        if (uvcCameraPresenter!=null){
+//            uvcCameraPresenter.USBUnregister();
+//        }
+//    }
 
     /**
      * 专门登录环信
@@ -266,6 +266,34 @@ public class EaseModeProxy {
             public void onSuccess() {
                 EMClient.getInstance().groupManager().loadAllGroups();
                 EMClient.getInstance().chatManager().loadAllConversations();
+                // 如果是崩溃重新进行问诊，则向环信发送消息
+//                try {
+//                    if (GlobalConfig.isIntoVideoFromOrder){
+//                        // 向 环信投放信息，患者重新进入问诊，请重新视频
+//                        // EMClient.getInstance().getCurrentUser()
+//                        EMMessage message = EMMessage.createTxtSendMessage("患者重新进入问诊，请重新视频",doctorUserId);
+//                        message.setMessageStatusCallback(new EMCallBack() {
+//                            @Override
+//                            public void onSuccess() {
+//                                ToastUtil.show("yes");
+//                            }
+//
+//                            @Override
+//                            public void onError(int code, String error) {
+//                                ToastUtil.show("no");
+//                            }
+//
+//                            @Override
+//                            public void onProgress(int progress, String status) {
+//                            }
+//                        });
+//                        EMClient.getInstance().chatManager().sendMessage(message);
+//                        // 重置数据
+//                        GlobalConfig.isIntoVideoFromOrder = false;
+//                    }
+//                }catch (Exception e){
+//                    e.printStackTrace();
+//                }
                 ToastWithLogin("登录环信聊天服务器成功");
             }
 
@@ -335,6 +363,7 @@ public class EaseModeProxy {
             Log.d("JTJK", "onRegSuccess: "+e.getMessage());
         }
     }
+    //{"topic":"TX_RTC_SHUTDOWN_RES","payload":{"role":"patient","doctorUserId":"627dcfd9cc2f204b0217f3a7","thirdAppVideoConsult":"xyLink","patientUserId":"62aa8f36cc2f205c7eaa4536"}}
 
     /**
      * 小鱼登录启动初始化配置
@@ -357,7 +386,7 @@ public class EaseModeProxy {
      * 开始登录 小鱼
      */
     private void xyThirdPartyLogin(String account, String nickname) {
-        if (activity==null)
+        if (activity==null && activity.get() == null)
             return;
         activity.get().runOnUiThread(() -> {
             NemoSDK.getInstance().loginExternalAccount(nickname, account, new ConnectNemoCallback() {
@@ -513,15 +542,15 @@ public class EaseModeProxy {
                             isDoctorEnterRoom = true;
                         }
                     }
-//                    else if (videoInfos.size()==0){
-//                        // 现在的房间没有其他人了
-//                        if (isDoctorEnterRoom){
-//                            // 医生曾进入过
-////                            ToastUtil.show("医生已经离开");
-//                            if (listener!=null)
-//                                listener.onDoctorOutRoom();
-//                        }
-//                    }
+                    else if (videoInfos.size()==0){
+                        // 现在的房间没有其他人了
+                        if (isDoctorEnterRoom){
+                            // 医生曾进入过
+//                            ToastUtil.show("医生已经离开");
+                            if (listener!=null)
+                                listener.onDoctorOutRoom();
+                        }
+                    }
             }
         });
     }
@@ -583,7 +612,7 @@ public class EaseModeProxy {
         XLMessage.with().delayDestroy();
         Log.e("JTJK", "XLMessage: done" );
         if (activity!=null)
-            activity = null;
+            activity.clear();
         if (contentLayout !=null)
             contentLayout = null;
         if (videoCell !=null){

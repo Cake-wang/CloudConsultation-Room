@@ -45,6 +45,8 @@ public class MineCardFragment extends BaseEventFragment{
 
     @Override
     public void loadData() {
+        // 启动社保
+        callIDMachine();
     }
 
     /**
@@ -79,7 +81,7 @@ public class MineCardFragment extends BaseEventFragment{
         super.onStart();
         // 每次进入读卡界面，会重置请求用户数据，检测是否已经注册
         GlobalConfig.isFindUserDone = false;
-        callIDMachine();
+//        callIDMachine();
     }
 
     @Override

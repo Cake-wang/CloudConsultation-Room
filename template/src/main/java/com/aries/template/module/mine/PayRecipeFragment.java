@@ -161,8 +161,6 @@ public class PayRecipeFragment extends BaseEventFragment {
      */
     @Override
     public void initView(Bundle savedInstanceState) {
-        // 执行时间loop
-        timeLoop();
         //数据展示
         if (GlobalConfig.ssCard!=null)
             tv_name.setText(GlobalConfig.ssCard.getName());
@@ -176,6 +174,13 @@ public class PayRecipeFragment extends BaseEventFragment {
         jtjk_pay_reflash_tip.setOnClickListener(v -> {
             requestBatchCreateOrder(recipeFee);
         });
+    }
+
+    @Override
+    public void loadData() {
+        super.loadData();
+        // 执行时间loop
+        timeLoop();
     }
 
     @Override
@@ -270,9 +275,15 @@ public class PayRecipeFragment extends BaseEventFragment {
         try {
             // 生成处方单药物集，遍历生成数据，准备输入
             ArrayList<Map> drugs = new ArrayList<>(); // 存储所有处方药品信息的容器
+            int current = 0;
             for (DrugObject item : obj) {
                 // 药品发放数量必须是整型
-                item.sku = "6901339924484";//todo cc 6901339924484 4895013208569
+                if (current==0){
+                    item.sku = "6901339924484";//todo cc 6901339924484 4895013208569
+                }else{
+                    item.sku = "4895013208569";//todo cc 6901339924484 4895013208569
+                }
+                current++;
                 int quantityInt = (Double.valueOf(item.quantity)).intValue();
                 // 药品发放数量不小于1
                 if (quantityInt<=0)quantityInt=1;
@@ -330,10 +341,9 @@ public class PayRecipeFragment extends BaseEventFragment {
 //                                           String howToUse =  "(1天"+item.getUseTotalDose()/item.getUseDays()+"次，每次"+ item.getUseDoseStr()+"片)";
 //                                            drug += item.getDrugName() +" "+ howToUse+"&&";
 //                                        }
-                                    start(ResultFragment.newInstance("paySuc:"+objectMap.get("takeCode")+":"+drug));
-
                                     // 释放资源。只要进入到这里，就结束请求支付轮训
                                     onDismiss();
+                                    start(ResultFragment.newInstance("paySuc:"+objectMap.get("takeCode")+":"+drug));
                                 }
                             }catch (Exception e){
                                 e.printStackTrace();

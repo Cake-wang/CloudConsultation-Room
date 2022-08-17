@@ -6,7 +6,6 @@ import android.hardware.usb.UsbDevice;
 import android.log.L;
 import android.opengl.GLES20;
 import android.os.Handler;
-import android.os.HandlerThread;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -20,7 +19,6 @@ import com.serenegiant.usb.Size;
 import com.serenegiant.usb.USBMonitor;
 import com.serenegiant.usb.UVCCamera;
 import com.serenegiant.usb.UVCParam;
-import com.serenegiant.utils.UVCUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +31,7 @@ import vulture.module.call.nativemedia.NativeDataSourceManager;
  * 和小鱼SDK 深度融合，实现小鱼视频接收数据和格式化数据
  * 本类的核心业务是将摄像头打开，并启动摄像头数据录入，转存在小鱼SDK里面
  */
-public class UVCAndroidCameraPresenter {
+public class UVCAndroidCameraPresenter2 {
     private static final String TAG = "UVCCameraPresenter";
     // 上下文
     private Activity mContext;
@@ -54,23 +52,11 @@ public class UVCAndroidCameraPresenter {
     // 视频统一参数
     private Size size;
 
-    private HandlerThread mListenerHandlerThread;
-    private Handler mListenerHandler;
-
-    public UVCAndroidCameraPresenter(Activity context) {
+    public UVCAndroidCameraPresenter2(Activity context) {
         this.mContext = context;
         // fallback to YUV mode
-//        mUSBMonitor = new USBMonitor(context, mOnDeviceConnectListener);
+        mUSBMonitor = new USBMonitor(context, mOnDeviceConnectListener);
 //        mUSBMonitor.register();
-        mListenerHandlerThread = new HandlerThread("CameraConnection#" + hashCode());
-        mListenerHandlerThread.start();
-        mListenerHandler = new Handler(mListenerHandlerThread.getLooper());
-
-        mUSBMonitor = new USBMonitor(
-                UVCUtils.getApplication(),
-                mOnDeviceConnectListener,
-                mListenerHandler);
-
         // 如果有USB摄像头，就用他
         isUvcCamera = hasUvcCamera();
         // 初始化 mSurfaceTexture
@@ -271,6 +257,25 @@ public class UVCAndroidCameraPresenter {
             e.printStackTrace();
             JTJKLogUtils.message(e.toString());
         }
+
+//        switch (currentCamera) {
+//            case 0:
+//                releaseCamera();
+//                NemoSDK.getInstance().switchCamera(1);
+//                break;
+//            case 1:
+//                NemoSDK.getInstance().releaseCamera();
+//                NemoSDK.getInstance().switchCamera(2);
+//                onDialogResult();
+//                break;
+//            case 2:
+//                releaseCamera();
+//                NemoSDK.getInstance().switchCamera(0);
+//                NemoSDK.getInstance().requestCamera();
+//                break;
+//            default:
+//                break;
+//        }
     }
 
     /**
@@ -327,18 +332,17 @@ public class UVCAndroidCameraPresenter {
     private synchronized void releaseUsbMonitor() {
         try{
             if (mUSBMonitor != null) {
-//                try {
-//                    Log.d("JTJK","releaseUsbMonitor b");
-//                    // 由于 hasPermission 有崩溃，所以必须要在 destroy 之前，先判断
-//                    mUSBMonitor.hasPermission(null);
-//                    mUSBMonitor.destroy();
-//                    Log.d("JTJK","releaseUsbMonitor e");
-//                }catch (Exception e){
-//                    e.printStackTrace();
-//                }
+                try {
+                    Log.d("JTJK","releaseUsbMonitor b");
+                    // 由于 hasPermission 有崩溃，所以必须要在 destroy 之前，先判断
+                    mUSBMonitor.hasPermission(null);
+                    mUSBMonitor.destroy();
+//                    mService = CameraConnectionService.getInstance().newConnection();
+                    Log.d("JTJK","releaseUsbMonitor e");
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
                 mUSBMonitor = null;
-
-                mListenerHandlerThread.quitSafely();
             }
         }catch (Exception e){e.printStackTrace();};
     }

@@ -19,9 +19,14 @@ import com.decard.NDKMethod.BasicOper;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.TimeUnit;
 
 import androidx.annotation.Nullable;
 import butterknife.BindView;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import me.yokeyword.fragmentation.ISupportFragment;
 
 /**
@@ -39,6 +44,7 @@ public class ResultFragment extends BaseEventFragment implements ISupportFragmen
     private  String result= "";
     private  String takeCode= ""; // 取药码
     private  String stuckUse= ""; // 药物用量
+    private  boolean isFirstTimePrint=true; // 第一次打印判定，如果不是，则释放资源. true 为第一次
 
     @BindView(R.id.tv_result_title)
     TextView tv_result_title;
@@ -50,8 +56,6 @@ public class ResultFragment extends BaseEventFragment implements ISupportFragmen
     TextView tv_result_contet;
     @BindView(R.id.tv_result_code)
     TextView tv_result_code;
-
-
 
     public static ResultFragment newInstance(String result) {
         Bundle args = new Bundle();
@@ -235,10 +239,40 @@ public class ResultFragment extends BaseEventFragment implements ISupportFragmen
 
     @Override
     public void loadData() {
-        // 如果从处方单支付过来
-        if (result.contains("paySuc")){
-            // 打印 取药码 一维码
-            printCode(takeCode);
-        }
+        timeLoop();
+    }
+
+    private static final int PERIOD = 6* 1000;
+    private static final int DELAY = 1*1000;
+    private Disposable mDisposable;
+
+    /**
+     * 定时循环任务
+     */
+    private void timeLoop() {
+        mDisposable = Observable.interval(DELAY, PERIOD, TimeUnit.MILLISECONDS)
+                .map((aLong -> aLong + 1))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(aLong -> {
+                    // 如果从处方单支付过来
+                    if (isFirstTimePrint){
+                        if (result.contains("paySuc")){
+                            // 打印 取药码 一维码
+                            printCode(takeCode);
+                        }
+                        isFirstTimePrint = false;
+
+                        if (mDisposable != null) {
+                            mDisposable.dispose();
+                            mDisposable = null;
+                        }
+                    }else {
+                        if (mDisposable != null) {
+                            mDisposable.dispose();
+                            mDisposable = null;
+                        }
+                    }
+                });//getUnreadCount()执行的任务
     }
 }

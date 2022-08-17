@@ -13,6 +13,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.aries.library.fast.util.SPUtil;
 import com.aries.library.fast.util.ToastUtil;
 import com.aries.template.GlobalConfig;
 
@@ -23,7 +24,11 @@ import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import io.reactivex.Maybe;
 
 /**
  * 大屏socket 代理类
@@ -51,13 +56,13 @@ public class DapinSocketProxy {
     // 现在正在执行请求
     private boolean isSending = false;
     // 现有的执行中的socket 列队
-    private List<SocThread> socketThreads = new ArrayList<>();
+    private Map<String,SocThread> socketThreads = new HashMap<>();
 
     private boolean isUnUseAble = false;
     //  activity
     private Activity activityObj;
     // 当前的启动 标志 SCREENFLAG_CONTROLSCREEN 或者 SCREENFLAG_CLOSESCREEN
-    private String currentFlag;
+//    private String currentFlag;
     // 网络的IP地址
     private String ip ="";
 
@@ -65,17 +70,20 @@ public class DapinSocketProxy {
     public static final String FLAG_SCREENFLAG_CONTROLSCREEN = "ControlScreen_";
     /** 关闭 大屏视频流socket的 FLAG */
     public static final String FLAG_SCREENFLAG_CLOSESCREEN = "CloseScreen_";
+    /** 关闭大屏视频流 并 打开身体检测 */
+    public static final String FLAG_SCREENFLAG_ONLYCLOSESCREEN= "OnlyCloseScreen_";
     /** 开启身体检测 FLAG */
     public static final String FLAG_SCREENFLAG_BODYTESTING_OPEN = "bodytesting_open_";
     /** 关闭身体检测 FLAG */
     public static final String FLAG_SCREENFLAG_BODYTESTING_FINISH = "bodytesting_finish_";
+
+
 
     /**
      * 单例化
      */
     //单例
     private static volatile DapinSocketProxy sInstance;
-
 
     private DapinSocketProxy() {
     }
@@ -152,14 +160,15 @@ public class DapinSocketProxy {
      * 初始化
      * 如果socket 已经有相关的数据则不再配置
      * 如果没有，则启动新的
+     * 这里的输入是不动的
      *  SCREENFLAG_CONTROLSCREEN 或者 SCREENFLAG_CLOSESCREEN
      *      * @StringRes{SCREENFLAG_CONTROLSCREEN,SCREENFLAG_CLOSESCREEN}
      */
-    public DapinSocketProxy initWithOld(Activity _activity, String _address, String _flag){
-        GlobalConfig.lastDapinSocketStr = _flag;
+    public DapinSocketProxy initWithOld(Activity _activity, String _address){
+
         if (activityObj==null)
             this.activityObj = _activity;
-        if (TextUtils.isEmpty(address))
+//        if (TextUtils.isEmpty(address))
             this.address = _address;
         if (!SessionContext.getSessiontContext().isHaveContextChangedListener()){
             OnContextChangedListener onContextChangedListener = new OnContextChangedListener() {
@@ -200,7 +209,6 @@ public class DapinSocketProxy {
         }
         if (TextUtils.isEmpty(ip))
             ipSetting(activityObj);
-        currentFlag = _flag;
         return this;
     }
 
@@ -217,7 +225,7 @@ public class DapinSocketProxy {
     Handler mhandler= new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            if(TextUtils.isEmpty(currentFlag))
+            if(TextUtils.isEmpty(socketThread.flag))
                 return;
             if (msg.what == HeartBeat.BREAK_WHAT){
                 Log.d("JTJK", "DapinSocketProxy: 断开了");
@@ -227,22 +235,24 @@ public class DapinSocketProxy {
             if (msg.what == SocThread.CONNECT_SUCCESS){
                 //连接成功
                 isSendEnable = true;
+                final SocThread tempThread = socketThreads.get(String.valueOf(msg.obj));
                 AddressSettingSharedPreference.setAddrs(activityObj,AddressSettingSharedPreference.ADDRESS,address);
                 if (!TextUtils.isEmpty(ip))
                     AddressSettingSharedPreference.setAddrs(activityObj,AddressSettingSharedPreference.IP,ip);
                 else
                     ipSetting(activityObj);
                 if(isSendEnable) {
-                    if (socketThread != null) {
+                    if (tempThread != null) {
                         // 链接后发送
                         // 发送成功
-                        String send = currentFlag+ip;
+                        String send = tempThread.flag+ip;
                         try {
-                            socketThread.sendNew(send.getBytes("utf-8"));
+                            tempThread.sendNew(send.getBytes("utf-8"));
+//                            tempThread.isCanBeFinished = true;
                         } catch (UnsupportedEncodingException e) {
                             e.printStackTrace();
                         }
-                        Log.d("JTJK", "DapinSocketProxy: 发送成功"+send);
+                        Log.d("JTJK", "DapinSocketProxy: 发送成功 "+send);
                         ToastUtil.show("发送成功："+send);
                         // 成功后释放资源
                         if (isDelayDestroy){
@@ -281,10 +291,22 @@ public class DapinSocketProxy {
 //                        heartBeat.refreshTime();
                     }else if (bean.getDataType() == 1){
                         // 获取后台反馈数据数据，格式化
+                        String id = bean.body.split("&&")[1];
+                        SocThread tempThread = socketThreads.get(id);
                         if (bean.body.contains("MessageReturn")){
+                            // 返回后发现没有成功，则继续请求
+                            if (bean.body.contains("NoExecute")){
+                                tempThread.isCanBeFinished = true;
+                                // 如果失败 重新请求一次
+                                if (tempThread.currentTimes>0 && !isFailDestroy){
+                                    startSocket(tempThread.flag, --tempThread.currentTimes);
+                                }
+                                // 释放?
+                                return;
+                            }
                             // 发送成功后返回的信息，统一带MessageReturn字样
                             // 释放资源
-                            socketThread.isCanBeFinished = true;
+                            tempThread.isCanBeFinished = true;
                             // 通过调整 socketThreads 来destory 执行
                             //  destory 需要添加  socketThreads 的操作
                             loopDestroy();
@@ -336,20 +358,26 @@ public class DapinSocketProxy {
 //		}
     };
 
-
     /**
      * 启动socket
      * 这里不能使用destroy会出现null的问题
      * socketThread 永远新建
+     * 这个输入是变动的
+     * @param _flag 当前请求的flag
+     * @param _currentTime 当前请求的次数
      */
-    public void startSocket(){
+    public void startSocket(String _flag, int _currentTime){
+        GlobalConfig.lastDapinSocketStr = _flag;
+
+        if (_currentTime<=0)
+            _currentTime = 0;
+
         if (activityObj==null)
             return;
 
         if (socketThreads==null){
-            socketThreads = new ArrayList<>();
+            socketThreads = new HashMap<>();
         }
-        if (true){
 //        if (socketThread==null){
             if (!TextUtils.isEmpty(address) && address.contains(":")){
                 closeSocket();
@@ -357,6 +385,9 @@ public class DapinSocketProxy {
 //				heartBeat.stopHeart();
 //			}
                 socketThread = new SocThread(mhandler, mhandlerSend, activityObj);
+                socketThread.flag = _flag;
+                socketThread.currentTimes = _currentTime;
+                socketThread.id = System.currentTimeMillis()+ socketThreads.size();
                 try {
                     String[] split = address.split(":");
                     if (split.length != 2){
@@ -366,7 +397,7 @@ public class DapinSocketProxy {
                     socketThread.setIport(split[0], Integer.parseInt(split[1]));
                     socketThread.executeConn();
                     // 将新建的thread加进来
-                    socketThreads.add(socketThread);
+                    socketThreads.put(String.valueOf(socketThread.id),socketThread);
                     // 启动心跳
 //                    heartBeat = new HeartBeat(socketThread,mhandler);
                 }catch (Exception e){
@@ -379,21 +410,31 @@ public class DapinSocketProxy {
                     e.printStackTrace();
                 }
             }
-        }else {
-            // 如果已经有 socket 了
-            if (socketThread.client.isClosed()){
-                // 如果 socketThread 被释放了，则重新链接
-                socketThread.executeConn();
-            }else {
-                // 如果 socketThread 没有被释放，则直接使用他来发送消息
-                String s = currentFlag+ip;
-                try {
-                    socketThread.sendNew(s.getBytes("utf-8"));
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
+//        }else {
+//            // 如果已经有 socket 了
+//            if (socketThread.client.isClosed()){
+//                // 如果 socketThread 被释放了，则重新链接
+//                socketThread.executeConn();
+//            }else {
+//                // 如果 socketThread 没有被释放，则直接使用他来发送消息
+//                String s = _flag+ip;
+//                try {
+//                    socketThread.sendNew(s.getBytes("utf-8"));
+//                } catch (UnsupportedEncodingException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }
+    }
+
+    /**
+     * 启动socket
+     * 这里不能使用destroy会出现null的问题
+     * socketThread 永远新建
+     * 这个输入是变动的
+     */
+    public void startSocket(String _flag){
+        startSocket(_flag,5);
     }
 
     /**
@@ -416,11 +457,17 @@ public class DapinSocketProxy {
     private void loopDestroy(){
         if (socketThreads.size()>0) {
             final int len = socketThreads.size();
-            for (int i = 0; i <len; i++) {
-                SocThread thread = socketThreads.get(0);
-                thread.close();
-                thread = null;
-                socketThreads.remove(0);
+            final ArrayList<String> removeItemKeys = new ArrayList<>();
+            for (String s : socketThreads.keySet()) {
+                SocThread thread = socketThreads.get(s);
+                if (thread!=null && thread.isCanBeFinished){
+                    thread.close();
+                    thread = null;
+                    removeItemKeys.add(s);
+                }
+            }
+            for (String key : removeItemKeys) {
+                socketThreads.remove(key);
             }
             // todo 是不是还要添加一个超时删除
             if (socketThreads.size()<=0){
@@ -472,11 +519,17 @@ public class DapinSocketProxy {
         if (socketThreads!=null){
             if (socketThreads.size()>0){
                 final int len = socketThreads.size();
-                for (int i = 0; i <len; i++) {
-                    SocThread thread = socketThreads.get(0);
-                    thread.close();
-                    thread = null;
-                    socketThreads.remove(0);
+                final ArrayList<String> removeItemKeys = new ArrayList<>();
+                for (String s : socketThreads.keySet()) {
+                    SocThread thread = socketThreads.get(s);
+                    if (thread!=null){
+                        thread.close();
+                        thread = null;
+                        removeItemKeys.add(s);
+                    }
+                }
+                for (String key : removeItemKeys) {
+                    socketThreads.remove(key);
                 }
             }
             socketThreads = null;

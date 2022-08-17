@@ -79,12 +79,12 @@ public abstract class BaseEventFragment extends BaseTimerFragment{
                     gotoMain();
                 }
             });
-        if (versionCode!=null){
+        if (versionCode!=null && mContext!=null){
             PackageInfo info = null;
             try {
                 info = getActivity().getPackageManager().getPackageInfo(mContext.getPackageName(),0);
                 versionCode.setText("当前版本: "+info.versionName);
-            } catch (PackageManager.NameNotFoundException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }

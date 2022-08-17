@@ -155,6 +155,10 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
         if(devHandle>0){
             Log.d("open","dc_open success devHandle = "+devHandle);
             timeLoop();
+        }else{
+            ToastUtil.show("读卡失败，请重新插卡，并重试");
+            start(HomeFragment.newInstance(), SupportFragment.SINGLETASK);
+            BasicOper.dc_exit();
         }
     }
 
@@ -493,10 +497,40 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                                                             recipes.add(item);
                                                         }
                                                     }
-                                                    // 如果未支付处方单有，则进入批量处理界面
+                                                    // 遍历未支付处方单，如果有orderid 一样的，则合并处方
+                                                    // 每合并一次，就会减少 recipes
+                                                    // 每次结束，把0位置去掉，并添加到新
+                                                    ArrayList<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes> recipeGroup = new ArrayList();
                                                     if (recipes.size()>0){
+                                                        while (recipes.size()>0) {
+                                                            // 被移除的对象
+                                                            final ArrayList<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes> removeItems = new ArrayList();
+                                                            // 合并对象
+                                                            final GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes currentRecipes = recipes.get(0);
+                                                            for (int j = 1; j < recipes.size(); j++) {
+                                                                // orderId = null 表示没有合并支付过的，那么就不需要合并
+                                                                if ( recipes.get(j).orderId!=null && recipes.get(j).orderId.equals(currentRecipes.orderId)){
+                                                                    currentRecipes.getRecipeDetailBeans().addAll(recipes.get(j).getRecipeDetailBeans());
+                                                                    removeItems.add(recipes.get(j));
+                                                                }
+                                                            }
+                                                            // 移除合并单位
+                                                            if (removeItems.size()>0){
+                                                                for (GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes removeItem : removeItems) {
+                                                                    recipes.remove(removeItem);
+                                                                }
+                                                            }
+                                                            // 获得数据后，将合并后的集合单位移除
+                                                            recipes.remove(0);
+                                                            recipeGroup.add(currentRecipes);
+                                                        }
+                                                    }
+
+
+                                                    // 如果未支付处方单有，则进入批量处理界面
+                                                    if (recipeGroup.size()>0){
                                                         isDepartTag = false;
-                                                        start(OrderRecipesListFragment.newInstance(recipes));
+                                                        start(OrderRecipesListFragment.newInstance(recipeGroup));
                                                         return;
                                                     }
                                                 }

@@ -442,6 +442,7 @@
                     android:background="@drawable/btn_next_yzs"
                     android:gravity="center"
                     android:text="身体检测"
+                    android:enabled="false"
                     android:textColor="#fff" />
 
                 <Button

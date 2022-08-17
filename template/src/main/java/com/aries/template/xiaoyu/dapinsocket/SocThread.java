@@ -21,10 +21,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class SocThread {
+    public String flag;// 传入的信息Flag
+    public long id;// Soc 的唯一ID
     private String ip = "172.16.11.17";
     private int port = 9000;
     private String TAG = "socket====> ";
     private int timeout = 10000;
+    public int currentTimes = 5; // 最大的请求次数，超过次数，则自动停止，并启动删除
 
     // 外部调用的存储对象，如果这个值为 true 可以被外部删除
     // 这个属性仅由外部处理，外部输入，外部输入，
@@ -89,7 +92,11 @@ public class SocThread {
             isRun = true;
             Log.i(TAG, "输入输出流获取成功");
             isConnecting = false;
-            inHandler.sendEmptyMessage(CONNECT_SUCCESS);
+//            inHandler.sendEmptyMessage(CONNECT_SUCCESS);
+            Message msg = inHandler.obtainMessage();
+            msg.what = CONNECT_SUCCESS;
+            msg.obj = id;
+            inHandler.sendMessage(msg);// 结果返回给UI处理
             read();
         } catch (UnknownHostException e) {
             Log.i(TAG, "连接错误UnknownHostException 重新获取");
@@ -147,7 +154,7 @@ public class SocThread {
 //                            SessionContext.getSessiontContext().onReceiveData(all);
 //                            //parse(all);
 //                        }
-                        SessionContext.getSessiontContext().onReceiveData(line);
+                        SessionContext.getSessiontContext().onReceiveData(line+"&&"+id);
                         Log.i(TAG, " len=" + line.length());
                         //Log.i(TAG, "4.start set Message");
                     }

@@ -28,10 +28,31 @@ public class JTJKThirdAppUtil {
     public void gotoBodyTesting(Activity activity, String pck, String opCls, String userName, String idCard, String mobile){
         // 大屏的通信代理
         DapinSocketProxy.with()
-                .initWithOld(activity,GlobalConfig.machineIp,DapinSocketProxy.FLAG_SCREENFLAG_BODYTESTING_OPEN)
-                .startSocket();
+                .initWithOld(activity,GlobalConfig.machineIp)
+                .startSocket(DapinSocketProxy.FLAG_SCREENFLAG_BODYTESTING_OPEN);
 
         isOpenedBodyTesting = true;
+
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+        ComponentName componentName = new ComponentName(pck, opCls);
+        intent.setComponent(componentName);
+        intent.putExtra("userName", userName.trim());//这里Intent传值, 名称不能有空格
+        intent.putExtra("idCard", idCard);
+        intent.putExtra("mobile", mobile);
+        activity.startActivity(intent);
+    }
+
+    /**
+     * 视频问诊中跳转身体检测
+     */
+    public void gotoBodyTestingFromVideo(Activity activity, String pck, String opCls, String userName, String idCard, String mobile){
+        // 大屏的通信代理
+        DapinSocketProxy.with()
+                .initWithOld(activity,GlobalConfig.machineIp)
+                .startSocket(DapinSocketProxy.FLAG_SCREENFLAG_ONLYCLOSESCREEN);
+
+        // 从视频问诊进入身体检查不需要返回后通知启动 backFromBodyTesting
+        isOpenedBodyTesting = false;
 
         Intent intent = new Intent(Intent.ACTION_MAIN);
         ComponentName componentName = new ComponentName(pck, opCls);
@@ -52,8 +73,8 @@ public class JTJKThirdAppUtil {
         isOpenedBodyTesting = false;
 
         DapinSocketProxy.with()
-                .initWithOld(activity,GlobalConfig.machineIp,DapinSocketProxy.FLAG_SCREENFLAG_BODYTESTING_FINISH)
-                .startSocket();
+                .initWithOld(activity,GlobalConfig.machineIp)
+                .startSocket(DapinSocketProxy.FLAG_SCREENFLAG_BODYTESTING_FINISH);
     }
 
     /**
@@ -64,8 +85,8 @@ public class JTJKThirdAppUtil {
         isOpenedBodyTesting = false;
 
         DapinSocketProxy.with()
-                .initWithOld(activity,GlobalConfig.machineIp,DapinSocketProxy.FLAG_SCREENFLAG_BODYTESTING_FINISH)
-                .startSocket();
+                .initWithOld(activity,GlobalConfig.machineIp)
+                .startSocket(DapinSocketProxy.FLAG_SCREENFLAG_BODYTESTING_FINISH);
     }
 
     /**
@@ -75,7 +96,7 @@ public class JTJKThirdAppUtil {
      */
     public void onScreen(final Activity activity){
         DapinSocketProxy.with()
-                .initWithOld(activity,GlobalConfig.machineIp,DapinSocketProxy.FLAG_SCREENFLAG_BODYTESTING_FINISH)
-                .startSocket();
+                .initWithOld(activity,GlobalConfig.machineIp)
+                .startSocket(DapinSocketProxy.FLAG_SCREENFLAG_BODYTESTING_FINISH);
     }
 }
