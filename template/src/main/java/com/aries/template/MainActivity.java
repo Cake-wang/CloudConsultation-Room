@@ -37,6 +37,7 @@ import com.decard.entitys.SSCard;
 import com.trello.rxlifecycle3.android.ActivityEvent;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -106,7 +107,6 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
     @Override
     public void initView(Bundle savedInstanceState) {
         mTabLayout.setVisibility(View.GONE);
-
     }
 
     /**
@@ -134,9 +134,10 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
         super.onResume();
         String tag = (String) SPUtil.get(mContext,"tag","");
         if (tag.contains("backMain")){
-            HomeFragment fragment = findFragment(HomeFragment.class);
-            // 在栈内的HomeFragment以SingleTask模式启动（即在其之上的Fragment会出栈）
-            start(fragment, SupportFragment.SINGLETASK);
+//            HomeFragment fragment = findFragment(HomeFragment.class);
+//            // 在栈内的HomeFragment以SingleTask模式启动（即在其之上的Fragment会出栈）
+//            start(fragment, SupportFragment.SINGLETASK);
+//            start(HomeFragment.newInstance(), SupportFragment.SINGLETASK);
         }
     }
 
@@ -374,7 +375,7 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                                                         entity.getData().getName().trim(),
                                                         entity.getData().getIdcard(),
                                                         entity.getData().getMobile());
-                                                pop();
+                                                start(HomeFragment.newInstance(), SupportFragment.SINGLETASK);
                                             }else {
                                                 ToastUtil.show("没有第三方应用信息，无法跳转");
                                             }
@@ -427,8 +428,6 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
         final List<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Consults> allConsult = new ArrayList<>();
         // 所有处方单
         final ArrayList<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes> allRecipes = new ArrayList<>();
-
-
 
         ApiRepository.getInstance().getConsultsAndRecipes("ongoing")
                 .compose(this.bindUntilEvent(ActivityEvent.DESTROY))
@@ -511,6 +510,12 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                                                                 // orderId = null 表示没有合并支付过的，那么就不需要合并
                                                                 if ( recipes.get(j).orderId!=null && recipes.get(j).orderId.equals(currentRecipes.orderId)){
                                                                     currentRecipes.getRecipeDetailBeans().addAll(recipes.get(j).getRecipeDetailBeans());
+                                                                    currentRecipes.getRecipeDetailBeans().addAll(recipes.get(j).getRecipeDetailBeans()); //todo cc
+                                                                    currentRecipes.getRecipeDetailBeans().addAll(recipes.get(j).getRecipeDetailBeans());//todo cc
+                                                                    currentRecipes.getRecipeDetailBeans().addAll(recipes.get(j).getRecipeDetailBeans());//todo cc
+                                                                    currentRecipes.getRecipeDetailBeans().addAll(recipes.get(j).getRecipeDetailBeans());//todo cc
+                                                                    currentRecipes.getRecipeDetailBeans().addAll(recipes.get(j).getRecipeDetailBeans());//todo cc
+                                                                    currentRecipes.getRecipeDetailBeans().addAll(recipes.get(j).getRecipeDetailBeans());//todo cc
                                                                     removeItems.add(recipes.get(j));
                                                                 }
                                                             }

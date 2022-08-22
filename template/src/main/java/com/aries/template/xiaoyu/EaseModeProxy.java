@@ -535,21 +535,19 @@ public class EaseModeProxy {
                         // 如果医生没有进来过，那么就执行
                         // 如果医生已经进来过了，就不再执行
                         if (!isDoctorEnterRoom){
+                            isDoctorEnterRoom = true;
                             if (videoCell !=null)
                                 videoCell.setVideoInfo(videoInfos.get(0));
                             if (listener!=null)
                                 listener.onDoctorInRoom();
-                            isDoctorEnterRoom = true;
                         }
                     }
                     else if (videoInfos.size()==0){
                         // 现在的房间没有其他人了
-                        if (isDoctorEnterRoom){
-                            // 医生曾进入过
+                        // 医生曾进入过
 //                            ToastUtil.show("医生已经离开");
-                            if (listener!=null)
-                                listener.onDoctorOutRoom();
-                        }
+                        if (listener!=null)
+                            listener.onDoctorOutRoom();
                     }
             }
         });

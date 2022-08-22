@@ -201,8 +201,14 @@ public class VideoConsultFragment extends BaseEventFragment {
 
                 @Override
                 public void onDoctorOutRoom() {
+                    // 医生离开了
                     // 身体检测不可使用
                     btn_stjc.setEnabled(false);
+
+                    // 大屏接口，医生离席，关闭大屏视频
+                    DapinSocketProxy.with()
+                            .initWithOld(getActivity(),GlobalConfig.machineIp)
+                            .startSocket(DapinSocketProxy.FLAG_SCREENFLAG_CLOSESCREEN);
 
                     // 启动倒计时
                     // 启动后，如果没有正常的处方单，则不可以结束

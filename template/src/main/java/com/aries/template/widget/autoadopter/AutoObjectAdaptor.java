@@ -47,7 +47,8 @@ public class AutoObjectAdaptor extends RecyclerView.Adapter<AutoObjectAdaptor.Vi
         GridLayoutManager manager = new GridLayoutManager(context,spanCount){
             @Override
             public boolean canScrollVertically() {
-                return false;
+                // 是否允许 recycle view 能够纵向的滑动
+                return true;
             }
         };
         recyclerView.setLayoutManager(manager);

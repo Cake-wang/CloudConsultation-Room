@@ -46,6 +46,8 @@ public class ShineButtonDialog extends CustomMaterialDialog {
      */
     public ShineButtonDialog(Context context) {
         super(context);
+        // 空白以外的地方点击不可以取消
+        mDialog.setCanceledOnTouchOutside(false);
     }
 
     @Override

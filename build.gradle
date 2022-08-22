@@ -43,6 +43,8 @@ buildscript {
         classpath "com.didiglobal.booster:booster-transform-toast:$booster_version"
         //处理系统 Crash
         classpath "com.didiglobal.booster:booster-transform-activity-thread:$booster_version"
+        // okone 网络框架
+        classpath 'com.github.chidehang.OkOne:okone-gradle-plugin:2.3.0'
     }
 }
 

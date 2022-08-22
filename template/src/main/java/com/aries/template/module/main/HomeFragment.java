@@ -79,7 +79,7 @@ public class HomeFragment extends BaseEventFragment{
     @Override
     public void initView(Bundle savedInstanceState) {
         // 不显示倒计时，不进行倒计时计算
-        dismissCountTimeStop();
+//        dismissCountTimeStop();
         // 点击身体检查
         iv_stjc.setOnClickListener(v -> {
             SPUtil.put(mContext,"tag","stjc");
@@ -110,15 +110,23 @@ public class HomeFragment extends BaseEventFragment{
             SPUtil.put(mContext,"tag","fzpy");
             start(MineCardFragment.newInstance("fzpy"));
         });
+
+        // 显示医院
+        if (jtjk_hospital!=null)
+            jtjk_hospital.setText(GlobalConfig.hospitalName);
+        // 显示机器
+        if (jtjk_machine!=null)
+            jtjk_machine.setText("机器编号:"+GlobalConfig.machineId);
+
+        // 启动时，需要立刻请求，机器相关的数据，并保存在全局
+        requestMachineInfo();
+        // 启动环信视频
+        requestConfigurationToThirdForPatient();
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // 启动时，需要立刻请求，机器相关的数据，并保存在全局
-        requestMachineInfo();
-        // 启动环信视频
-        requestConfigurationToThirdForPatient();
     }
 
     /**
@@ -203,10 +211,14 @@ public class HomeFragment extends BaseEventFragment{
 //                        GlobalConfig.thirdMachineId = entity.data.thirdMachineId;// 暂定不赋予
                         GlobalConfig.factoryResource = entity.data.factoryResource;
                         GlobalConfig.factoryMainPage = entity.data.factoryMainPage;
+
+                        // 显示医院
                         if (jtjk_hospital!=null)
                             jtjk_hospital.setText(GlobalConfig.hospitalName);
+                        // 显示机器
                         if (jtjk_machine!=null)
                             jtjk_machine.setText("机器编号:"+GlobalConfig.machineId);
+
 
                         // 必须跟在获取全局信息之后
                         // 启动大屏显示
@@ -227,7 +239,7 @@ public class HomeFragment extends BaseEventFragment{
             GlobalConfig.clear();
             // 清理 信令
             XLMessage.with().destroy();
-            // 如果最后一次大屏的通信是启动身体检测，则回来不打开视频
+            // 如果最后一次大屏的通信是启动身体检测，则回来不打开视频广告
             if (!GlobalConfig.lastDapinSocketStr.equals(DapinSocketProxy.FLAG_SCREENFLAG_BODYTESTING_OPEN)){
                 new JTJKThirdAppUtil().onScreen(getActivity());
             }else {

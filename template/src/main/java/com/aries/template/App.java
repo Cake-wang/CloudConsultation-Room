@@ -1,5 +1,7 @@
 package com.aries.template;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -7,16 +9,20 @@ import android.os.Build;
 import android.os.PowerManager;
 import android.provider.Settings;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.aries.library.fast.FastManager;
 import com.aries.library.fast.manager.LoggerManager;
+import com.aries.library.fast.util.ToastUtil;
 import com.aries.template.constant.ApiConstant;
 import com.aries.template.impl.ActivityControlImpl;
 import com.aries.template.impl.AppImpl;
 import com.aries.template.impl.HttpRequestControlImpl;
+import com.aries.template.utils.SystemUtil;
 import com.aries.template.widget.mgson.MFastRetrofit;
 import com.aries.template.xiaoyu.EaseModeProxy;
 import com.decard.NDKMethod.BasicOper;
+import com.decard.dc_licensesdk.utils.AppInfoUtils;
 import com.orhanobut.logger.PrettyFormatStrategy;
 import com.xuexiang.xaop.XAOP;
 import com.xuexiang.xaop.checker.IThrowableHandler;
@@ -31,6 +37,8 @@ import java.util.List;
 import androidx.annotation.RequiresApi;
 import androidx.multidex.MultiDexApplication;
 import me.yokeyword.fragmentation.Fragmentation;
+import xcrash.ICrashCallback;
+import xcrash.XCrash;
 
 /**
  * 入口
@@ -202,6 +210,9 @@ public class App extends MultiDexApplication {
 
         // 初始化并启动 easeMode
         EaseModeProxy.with().initInAPP(getContext());
+
+        // 初始化 xCrash 崩溃提示
+        initXCrash();
     }
 
 
@@ -231,8 +242,35 @@ public class App extends MultiDexApplication {
         }
     }
 
+    /**
+     * 初始化爱奇艺 XCrash
+     * 崩溃恢复系统
+     *当APP出现Java异常、native异常和ANR时需要重启当前APP。
+     */
+    public void initXCrash(){
+        XCrash.InitParameters initParameters =new XCrash.InitParameters();
+        initParameters.setLogDir("xcrash/temp/");
+        initParameters.setAppVersion(AppInfoUtils.getAppName(this));
+        ICrashCallback crashCallback = (logPath, emergency) -> {
+            Log.d("JTJK", "initXCrash: done");
+//            ToastUtil.show("系统出了点小问题，请重新读卡操作");
+
+            SystemUtil.reStart(getContext());
+        };
+        initParameters.setJavaCallback(crashCallback);
+        initParameters.setAnrCallback(crashCallback);
+        initParameters.setNativeCallback(crashCallback);
+        XCrash.init(this,initParameters);
+
+        //Tombstone 文件默认将被写入到 Context#getFilesDir() + "/tombstones" 目录。
+        // （通常在： /data/data/PACKAGE_NAME/files/tombstones）
+//        XCrash.init(this);
+    }
+
     public static Context getContext() {
         return mContext;
     }
+
+
 
 }

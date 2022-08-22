@@ -4,6 +4,8 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -30,6 +32,8 @@ import com.aries.template.utils.ActivityUtils;
 import com.aries.template.utils.JTJKLogUtils;
 import com.aries.ui.view.title.TitleBarView;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
 import com.trello.rxlifecycle3.android.FragmentEvent;
 import com.xuexiang.xaop.annotation.IOThread;
 import com.xuexiang.xaop.annotation.MainThread;
@@ -254,8 +258,18 @@ public class PayConsultFragment extends BaseEventFragment {
                                 Resources res = getActivity().getResources();
                                 logoBmp = BitmapFactory.decodeResource(res, R.drawable.pay_alilogo);
                                 payBmp = XQRCode.createQRCodeWithLogo(qrStr, 400, 400, logoBmp);
+                                Drawable drawable = new BitmapDrawable(payBmp);
+                                RequestOptions requestOptions =new RequestOptions().centerCrop()
+                                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                                        .error(drawable)//放在出错位置
+                                         .placeholder(drawable);//放在占位符位置
+                                Glide.with(getContext())
+                                        .setDefaultRequestOptions(requestOptions)
+                                        .load("https://${System.currentTimeMillis()}")//随便给个不可用的url
+                                         .into(mIvQrcode);
+
 //                                Log.i("JTJK", "压缩前图片的大小" + (payBmp.getByteCount() / 1024 / 1024) + "M宽度为" + payBmp.getWidth() + "高度为" + payBmp.getHeight());
-                                showQRCode(payBmp);
+//                                showQRCode(payBmp);
                                 jtjk_pay_reflash_tip.setVisibility(View.GONE);
                             }else {
                                 jtjk_pay_reflash_tip.setVisibility(View.VISIBLE);

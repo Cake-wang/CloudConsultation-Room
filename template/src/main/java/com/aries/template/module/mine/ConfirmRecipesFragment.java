@@ -111,7 +111,7 @@ public class ConfirmRecipesFragment extends BaseEventFragment {
 
     @Override
     public int getContentLayout() {
-        return R.layout.fragment_order;
+        return R.layout.fragment_recipe_order;
     }
 
     /**

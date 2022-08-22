@@ -117,12 +117,20 @@ public class UpDownProxy<T> {
         }
         ArrayList<T> newDatas = new ArrayList<>();
         for (int i = 0; i < param_max_number; i++) {
-            if (startIndex+i>=totalDatas.size()){
+//            // 检测你现在是不是可以
+//            if (startIndex+i+1>=totalDatas.size()){
+//                // 下一页 不可用
+//                setBtnEnable(CASE_RV_DOWN,false);
+//                break; // out of boundary
+//            }
+            newDatas.add(totalDatas.get(startIndex+i));
+
+            // 检测你下一个是不是可以
+            if (startIndex+i+1>=totalDatas.size()){
                 // 下一页 不可用
                 setBtnEnable(CASE_RV_DOWN,false);
                 break; // out of boundary
             }
-            newDatas.add(totalDatas.get(startIndex+i));
         }
         if (listener!=null)
             listener.reFlashRV(newDatas);

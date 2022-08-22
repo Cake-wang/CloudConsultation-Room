@@ -76,6 +76,10 @@ public class DapinSocketProxy {
     public static final String FLAG_SCREENFLAG_BODYTESTING_OPEN = "bodytesting_open_";
     /** 关闭身体检测 FLAG */
     public static final String FLAG_SCREENFLAG_BODYTESTING_FINISH = "bodytesting_finish_";
+    /** 已经投屏成功的 返回 */
+    public static final String FLAG_BACK_SCREENHASOPENED = "ScreenHasOpened";
+
+
 
 
 
@@ -225,8 +229,8 @@ public class DapinSocketProxy {
     Handler mhandler= new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            if(TextUtils.isEmpty(socketThread.flag))
-                return;
+//            if(TextUtils.isEmpty(socketThread.flag))
+//                return;
             if (msg.what == HeartBeat.BREAK_WHAT){
                 Log.d("JTJK", "DapinSocketProxy: 断开了");
                 //断开了
@@ -294,8 +298,14 @@ public class DapinSocketProxy {
                         String id = bean.body.split("&&")[1];
                         SocThread tempThread = socketThreads.get(id);
                         if (bean.body.contains("MessageReturn")){
+                            // 正确返回的，可以被停止的返回集合
+                            if (bean.body.contains(FLAG_BACK_SCREENHASOPENED)){
+                                // 继续执行
+                                // 停止重新请求
+                            }
                             // 返回后发现没有成功，则继续请求
-                            if (bean.body.contains("NoExecute")){
+                            // 需要重新请求的集合
+                            else if (bean.body.contains("NoExecute")){
                                 tempThread.isCanBeFinished = true;
                                 // 如果失败 重新请求一次
                                 if (tempThread.currentTimes>0 && !isFailDestroy){
