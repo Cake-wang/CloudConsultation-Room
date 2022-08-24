@@ -350,6 +350,7 @@ public class VideoConsultFragment extends BaseEventFragment {
                         // 成功后，跳转到首页
                         requestPatientCancelGraphicTextConsult(consultId);
                 }
+                isDialogOpened = false;
             });
             dialog.btn_cancel.setOnClickListener(v ->  {dialog.dismiss();isDialogOpened=false;});
             dialog.iv_close.setOnClickListener(v -> {dialog.dismiss();isDialogOpened=false;});

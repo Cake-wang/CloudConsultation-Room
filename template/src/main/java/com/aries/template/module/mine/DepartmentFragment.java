@@ -16,7 +16,6 @@ import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.template.widget.autoadopter.AutoAdaptorProxy;
 import com.aries.template.widget.autoadopter.AutoObjectAdaptor;
 import com.aries.template.widget.autoadopter.DefenceAutoAdaptorProxy;
-import com.aries.template.widget.updownbtn.DefenceUpDownProxy;
 import com.aries.template.widget.updownbtn.UpDownProxy;
 import com.aries.ui.view.title.TitleBarView;
 import com.trello.rxlifecycle3.android.FragmentEvent;
@@ -159,6 +158,11 @@ public class DepartmentFragment extends BaseEventFragment {
         jtjk_recipe_name.setText(GlobalConfig.ssCard.getName()+"，您好");
         // 设置标题
         title.setText("请选择一级科室");
+    }
+
+    @Override
+    public void loadData() {
+        super.loadData();
         // 请求一级科室
         requestLevelOne();
     }
@@ -196,7 +200,6 @@ public class DepartmentFragment extends BaseEventFragment {
                     }
                 });
     }
-
 
     /**
      * 设置title的信息

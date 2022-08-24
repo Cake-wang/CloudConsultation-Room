@@ -143,6 +143,8 @@ public class GlobalConfig {
     /**
      * 用户医保卡信息，全局数据
      * 医保卡上电，循环读3秒一次，读到数据后，数据存上来。
+     * 其中
+     *  SSNum 是身份证
      */
     public static SSCard ssCard;
 

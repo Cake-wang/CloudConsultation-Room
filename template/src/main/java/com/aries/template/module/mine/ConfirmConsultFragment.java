@@ -1,16 +1,18 @@
 package com.aries.template.module.mine;
 
-import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.aries.library.fast.retrofit.FastLoadingObserver;
 import com.aries.library.fast.util.SPUtil;
 import com.aries.library.fast.util.ToastUtil;
@@ -18,9 +20,11 @@ import com.aries.template.GlobalConfig;
 import com.aries.template.R;
 import com.aries.template.adapter.FlowTagAdapter;
 import com.aries.template.entity.PatientListEntity;
+import com.aries.template.entity.ReportListDataEntity;
 import com.aries.template.entity.RequestConsultAndCdrOtherdocResultEntity;
 import com.aries.template.module.base.BaseEventFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
+import com.aries.template.utils.DateUtils;
 import com.aries.ui.view.title.TitleBarView;
 import com.trello.rxlifecycle3.android.FragmentEvent;
 import com.xuexiang.xaop.annotation.SingleClick;
@@ -87,6 +91,9 @@ public class ConfirmConsultFragment extends BaseEventFragment implements Compoun
     View cb_protocol_tx_tr;
 
     Integer returnVisitStatus = 0,alleric =  0,haveReaction =0;
+    // 用于确认复诊单，输入扶正单 leavemessage
+    public String reportHTML = "";
+    
 
 
     /**
@@ -191,7 +198,7 @@ public class ConfirmConsultFragment extends BaseEventFragment implements Compoun
                 // 确认，发起复诊请求
                 // 审查输入完整性
                 if (inputCheck())
-                    requestGetPatientList();
+                    requestReportList();
                 break;
             case R.id.cb_protocol_tx_o:
                 cb_protocol_o.setChecked(true);
@@ -251,6 +258,47 @@ public class ConfirmConsultFragment extends BaseEventFragment implements Compoun
     }
 
     /**
+     * 4.1.2 获取报告列表
+     * reportList
+     * 主要是获取他的报告HTML地址，最新的结果
+     */
+    public void requestReportList(){
+        ApiRepository.getInstance().reportList(GlobalConfig.cabinetId,GlobalConfig.ssCard.getSSNum())
+                .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
+                .subscribe(new FastLoadingObserver<ReportListDataEntity>() {
+                    @Override
+                    public void _onNext(ReportListDataEntity entity) {
+                        if (entity == null) {
+                            ToastUtil.show("请检查网络");
+                            return;
+                        }
+                        try {
+                            if (entity.data.success){
+                                //  获取HTML 做为确认报告的输入
+                                if (!TextUtils.isEmpty(entity.data.data)){
+                                    JSONArray array = JSON.parseArray(entity.data.data);
+                                    com.alibaba.fastjson.JSONObject jsonObject = (com.alibaba.fastjson.JSONObject) array.get(0);
+                                    String time = jsonObject.get("reportTime").toString();
+                                    // 把第一个数据扔进去
+                                    // 判断是不是今天的
+                                    if (DateUtils.ifToday(time)){
+                                        // 如果是今天的，则给予结果
+                                        reportHTML = jsonObject.get("reportUrl").toString();
+                                    }else{
+                                        // 如果不是今天的，则不给予结果
+                                        reportHTML = "";
+                                    }
+                                }
+                                requestGetPatientList();
+                            }
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+                });
+    }
+
+    /**
      * 执行复诊确认
      * 发起复诊单
      */
@@ -274,6 +322,7 @@ public class ConfirmConsultFragment extends BaseEventFragment implements Compoun
                         String.valueOf(returnVisitStatus),
                         "0.01",
                 "0.01",
+                        reportHTML,
                         GlobalConfig.doc.getDoctorId())
                 .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
                 .subscribe(new FastLoadingObserver<RequestConsultAndCdrOtherdocResultEntity>() {

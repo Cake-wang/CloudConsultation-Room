@@ -227,7 +227,7 @@
                         android:paddingTop="5dp"
                         android:paddingEnd="10dp"
                         android:paddingBottom="5dp"
-                        android:text="xxxxx协议"
+                        android:text="用户隐私政策"
                         android:textColor="@color/xui_config_color_primary_text" />
 
 

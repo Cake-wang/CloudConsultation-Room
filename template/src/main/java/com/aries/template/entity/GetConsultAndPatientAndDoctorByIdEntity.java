@@ -206,6 +206,8 @@ public class GetConsultAndPatientAndDoctorByIdEntity {
                     private int consultStatus;
                     private String paymentDate;
                     private double consultPrice;
+                    private double fundAmount;
+                    private double cashAmount;
                     private String sessionID;
                     private String sessionStartTime;
                     private boolean feedBack;
@@ -233,8 +235,6 @@ public class GetConsultAndPatientAndDoctorByIdEntity {
                     private String clientName;
                     private int userType;
                     private int medicalFlag;
-                    private double fundAmount;
-                    private double cashAmount;
                     private int busSource;
                     private int patientRefundStatus;
                     private int passNumber;

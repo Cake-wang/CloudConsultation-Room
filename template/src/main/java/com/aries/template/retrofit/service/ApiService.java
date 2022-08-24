@@ -10,13 +10,14 @@ import com.aries.template.entity.CanRequestOnlineConsultResultEntity;
 import com.aries.template.entity.CancelregisterResultEntity;
 import com.aries.template.entity.ConfigurationToThirdForPatientEntity;
 import com.aries.template.entity.CreateOrderResultEntity;
+import com.aries.template.entity.OrderPreSettleEntity;
 import com.aries.template.entity.FindRecipesForPatientAndTabStatusEntity;
 import com.aries.template.entity.FindUserResultEntity;
 import com.aries.template.entity.FindValidDepartmentForRevisitResultEntity;
 import com.aries.template.entity.FindValidOrganProfessionForRevisitResultEntity;
-import com.aries.template.entity.GetConfigurationToThirdForPatientResultEntity;
 import com.aries.template.entity.GetConsultAndPatientAndDoctorByIdEntity;
 import com.aries.template.entity.GetConsultsAndRecipesResultEntity;
+import com.aries.template.entity.GetExamDataEntity;
 import com.aries.template.entity.GetMedicalInfoEntity;
 import com.aries.template.entity.GetPatientRecipeByIdEntity;
 import com.aries.template.entity.GetRecipeListByConsultIdEntity;
@@ -27,11 +28,14 @@ import com.aries.template.entity.PatientFinishGraphicTextConsultEntity;
 import com.aries.template.entity.PatientListEntity;
 import com.aries.template.entity.PayOrderEntity;
 import com.aries.template.entity.PrescriptionPushEntity;
+import com.aries.template.entity.ReceiveMessageFromPatientWithRequestModeEntity;
 import com.aries.template.entity.RegisterResultEntity;
+import com.aries.template.entity.ReportListDataEntity;
 import com.aries.template.entity.RequestConsultAndCdrOtherdocResultEntity;
 import com.aries.template.entity.RoomIdInsAuthEntity;
 import com.aries.template.entity.SearchDoctorListByBusTypeV2ResultEntity;
 import com.aries.template.entity.UpdateEntity;
+import com.aries.template.entity.VisitMedicalPreSettleEntity;
 import com.aries.template.widget.mgson.MFastRetrofit;
 
 import java.util.Map;
@@ -40,7 +44,6 @@ import io.reactivex.Observable;
 import okhttp3.RequestBody;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
-import retrofit2.http.Header;
 import retrofit2.http.Headers;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
@@ -261,4 +264,46 @@ public interface ApiService {
     @Headers("Content-Type: application/json")
     @POST(ApiConstant.doBaseNgariRequest)
     Observable<PatientFinishGraphicTextConsultEntity> patientFinishGraphicTextConsult(@Body RequestBody body);
+
+    /**
+     * 4.1.1 获取检测项数据
+     * 盖瑞的接口
+     */
+    @Headers("Content-Type: application/json")
+    @POST(ApiConstant.doBaseGareaRequest)
+    Observable<GetExamDataEntity> getExamData(@Body RequestBody body);
+
+    /**
+     * 4.1.2 获取报告列表
+     * 盖瑞的接口
+     */
+    @Headers("Content-Type: application/json")
+    @POST(ApiConstant.doBaseGareaRequest)
+    Observable<ReportListDataEntity> reportList(@Body RequestBody body);
+
+    /**
+     * 4.32.	复诊预结算
+     * 纳里的接口
+     */
+    @Headers("Content-Type: application/json")
+    @POST(ApiConstant.doBaseNgariRequest)
+    Observable<VisitMedicalPreSettleEntity> visitMedicalPreSettle(@Body RequestBody body);
+
+    /**
+     * 4.14.	患者端发环信消息
+     * 纳里的接口
+     */
+    @Headers("Content-Type: application/json")
+    @POST(ApiConstant.doBaseNgariRequest)
+    Observable<ReceiveMessageFromPatientWithRequestModeEntity> receiveMessageFromPatientWithRequestMode(@Body RequestBody body);
+
+
+    /**
+     * 3.14.	处方预结算
+     * 纳里的接口
+     */
+    @Headers("Content-Type: application/json")
+    @POST(ApiConstant.doBaseNgariRequest)
+    Observable<OrderPreSettleEntity> orderPreSettle(@Body RequestBody body);
+
 }

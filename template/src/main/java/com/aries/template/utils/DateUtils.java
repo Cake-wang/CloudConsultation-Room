@@ -46,6 +46,16 @@ public class DateUtils {
     }
 
     /**
+     * 通过输入的格式来获得今天的文本
+     */
+    public static String getTodayWidthFormat(String formatTxt) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(formatTxt);
+        Date dt = new Date(System.currentTimeMillis());
+        String returnStr = simpleDateFormat.format(dt);
+        return returnStr;
+    }
+
+    /**
      * 输入一个生日时间，计算出现在的年龄
      * @param birthday 是一个yyyyMMdd 格式的日期
      */
@@ -92,6 +102,19 @@ public class DateUtils {
             e.printStackTrace();
         }
         return returnStr;
+    }
+
+    /**
+     * 是否为今天
+     * 通过检测输入的时间，是否有今天的字符来判断的
+     * 输入的格式有规定，今日的格式，必须是 yyyy-MM-dd 其他无所谓
+     * @param timeStr 输入时间格式 年月日必须是 2022-08-16
+     * @return true 为今天
+     */
+    public static boolean ifToday(String timeStr){
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        Date date = new Date(System.currentTimeMillis());
+        return timeStr.contains(format.format(date));
     }
 
 

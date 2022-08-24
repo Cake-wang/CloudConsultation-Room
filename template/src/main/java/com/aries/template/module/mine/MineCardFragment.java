@@ -13,6 +13,7 @@ import com.aries.ui.view.title.TitleBarView;
 
 import androidx.annotation.Nullable;
 
+
 /**
  * 医保卡
  * 获得医保卡的信息，不过这些动作现在都在MainActivity 里面了
@@ -23,6 +24,7 @@ import androidx.annotation.Nullable;
  * @Description:
  */
 public class MineCardFragment extends BaseEventFragment{
+
     private  String tag = "";
     private Handler handler;
 
@@ -102,6 +104,5 @@ public class MineCardFragment extends BaseEventFragment{
     @Override
     public void onDestroy() {
         super.onDestroy();
-
     }
 }

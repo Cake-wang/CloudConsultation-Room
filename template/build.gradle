@@ -155,4 +155,7 @@ dependencies {
 
     // https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp
     implementation 'com.squareup.okhttp3:okhttp:4.9.3'
+
+    // blockcanary example AndroidPerformanceMonitor
+    implementation 'com.github.markzhai:blockcanary-android:1.5.0'
 }

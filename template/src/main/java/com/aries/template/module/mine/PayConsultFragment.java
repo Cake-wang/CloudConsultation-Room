@@ -26,6 +26,7 @@ import com.aries.template.entity.GetConsultsAndRecipesResultEntity;
 import com.aries.template.entity.GetPatientRecipeByIdEntity;
 import com.aries.template.entity.PayOrderEntity;
 import com.aries.template.entity.PrescriptionPushEntity;
+import com.aries.template.entity.VisitMedicalPreSettleEntity;
 import com.aries.template.module.base.BaseEventFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.template.utils.ActivityUtils;
@@ -54,6 +55,8 @@ import io.reactivex.schedulers.Schedulers;
 /**
  * 支付复诊
  * 仅处理复诊的支付挂号费界面
+ *
+ * 复诊预结算，先调用让金额计算好，成功后，调用4.8 获取复诊单详情，更新价格。
  * @author louisluo
  * @Author: AriesHoo on 2018/7/13 17:09
  * @E-Mail: AriesHoo@126.com
@@ -140,13 +143,12 @@ public class PayConsultFragment extends BaseEventFragment {
         //数据展示
         if (GlobalConfig.ssCard!=null)
             tv_name.setText(GlobalConfig.ssCard.getName());
-//        tv_fee_all.setText(recipeFee);
 
         String[] orders = {"#38ABA0","支付宝·","#333333","扫一扫"};
         jtjk_pay_text.setText(ActivityUtils.formatTextView(orders));
 
         jtjk_pay_reflash_tip.setOnClickListener(v -> {
-            requestPayOrder(consultId);
+            requestVisitMedicalPreSettle();
         });
     }
 
@@ -181,7 +183,7 @@ public class PayConsultFragment extends BaseEventFragment {
         // 轮训复诊单
         timeLoop();
         // 获得支付二维码
-        requestPayOrder(consultId);
+        requestVisitMedicalPreSettle();
     }
 
     /**
@@ -218,6 +220,13 @@ public class PayConsultFragment extends BaseEventFragment {
                         try {
                             // 检查 payFlag 如果是 1 就是支付成功
                             if (entity.isSuccess()){
+                                // 刷新复诊单价格
+                                // 总价，自费和医保
+                                tv_fee_all.setText(String.valueOf(entity.getData().getJsonResponseBean().getBody().getConsult().getConsultPrice())+"元");
+                               // 医保
+                                tv_fee_yb.setText(String.valueOf(entity.getData().getJsonResponseBean().getBody().getConsult().getFundAmount())+"元");
+                                // 自费
+                                tv_fee_zf.setText(String.valueOf(entity.getData().getJsonResponseBean().getBody().getConsult().getCashAmount())+"元");
                                 if (entity.getData().getJsonResponseBean().getBody().getConsult().getPayflag()==1){
                                     // 跳转到视频
                                     start(VideoConsultFragment.newInstance(consultId,
@@ -228,6 +237,38 @@ public class PayConsultFragment extends BaseEventFragment {
                                     // 释放对象资源
                                     onDismiss();
                                 }
+                            }
+                        }catch (Exception e){
+                            e.printStackTrace();
+                            JTJKLogUtils.message(e.toString());
+                        }
+                    }
+                });
+    }
+
+    /**
+     * 复诊预结算
+     * 客户端需要重新调用“4.9节复诊单详情”接口，重新获取复诊单详情，获取最新价格进行下单
+     *
+     * 如果这个接口不成功，是无法支付的，所以他的下一个接口调用请求支付二维码
+     * 请求失败后，允许用户点击按钮，多次尝试
+     */
+    public void requestVisitMedicalPreSettle(){
+        ApiRepository.getInstance().visitMedicalPreSettle(consultId)
+                .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
+                .subscribe(new FastLoadingObserver<VisitMedicalPreSettleEntity>("请稍后...") {
+                    @Override
+                    public void _onNext(VisitMedicalPreSettleEntity entity) {
+                        if (entity == null) {
+                            ToastUtil.show("请检查网络");
+                            return;
+                        }
+                        try {
+                            if (entity.data.success){
+                                //通过 4.9 刷新价格
+                                requestPayOrder(consultId);
+                            }else {
+                                // 失败则让用户可以重新尝试
                             }
                         }catch (Exception e){
                             e.printStackTrace();
@@ -281,7 +322,6 @@ public class PayConsultFragment extends BaseEventFragment {
                     }
                 });
     }
-
 
     /**
      * 设置title的信息

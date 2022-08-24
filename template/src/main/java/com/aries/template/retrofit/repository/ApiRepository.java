@@ -10,6 +10,7 @@ import com.aries.library.fast.retrofit.FastRetryWhen;
 import com.aries.library.fast.retrofit.FastTransformer;
 import com.aries.library.fast.util.SPUtil;
 import com.aries.library.fast.util.ToastUtil;
+import com.aries.template.GlobalConfig;
 import com.aries.template.entity.AuthCodeResultEntity;
 import com.aries.template.entity.BaseMovieEntity;
 import com.aries.template.entity.BatchCreateOrderEntity;
@@ -25,6 +26,7 @@ import com.aries.template.entity.GetConfigurationToThirdForPatientRequestEntity;
 import com.aries.template.entity.GetConfigurationToThirdForPatientResultEntity;
 import com.aries.template.entity.GetConsultAndPatientAndDoctorByIdEntity;
 import com.aries.template.entity.GetConsultsAndRecipesResultEntity;
+import com.aries.template.entity.GetExamDataEntity;
 import com.aries.template.entity.GetMedicalInfoEntity;
 import com.aries.template.entity.GetPatientRecipeByIdEntity;
 import com.aries.template.entity.GetRecipeListByConsultIdEntity;
@@ -32,15 +34,19 @@ import com.aries.template.entity.GetStockInfoEntity;
 import com.aries.template.entity.IsRegisterRequestEntity;
 import com.aries.template.entity.IsRegisterResultEntity;
 import com.aries.template.entity.MachineEntity;
+import com.aries.template.entity.OrderPreSettleEntity;
 import com.aries.template.entity.PatientFinishGraphicTextConsultEntity;
 import com.aries.template.entity.PatientListEntity;
 import com.aries.template.entity.PayOrderEntity;
 import com.aries.template.entity.PrescriptionPushEntity;
+import com.aries.template.entity.ReceiveMessageFromPatientWithRequestModeEntity;
 import com.aries.template.entity.RegisterResultEntity;
+import com.aries.template.entity.ReportListDataEntity;
 import com.aries.template.entity.RequestConsultAndCdrOtherdocResultEntity;
 import com.aries.template.entity.RoomIdInsAuthEntity;
 import com.aries.template.entity.SearchDoctorListByBusTypeV2ResultEntity;
 import com.aries.template.entity.UpdateEntity;
+import com.aries.template.entity.VisitMedicalPreSettleEntity;
 import com.aries.template.retrofit.service.ApiService;
 import com.aries.template.utility.ConvertJavaBean;
 import com.aries.template.utility.JTJSONUtils;
@@ -468,6 +474,7 @@ public class ApiRepository extends BaseRepository {
                                                                                              String returnVisitStatus,
                                                                                              String consultCost,
                                                                                              String consultPrice,
+                                                                                             String leaveMess,
                                                                                              Long consultDoctor) {
         Map<String,String> questionnaire =new HashMap<>(); //问卷单对象（详见questionnaire详细描述）
 //        questionnaire.put("pregnent",pregnent); //是否怀孕 -1：男 0:无 1:有
@@ -499,7 +506,7 @@ public class ApiRepository extends BaseRepository {
         bizContent.put("consultDoctor",String.valueOf(consultDoctor));//复诊医生
         bizContent.put("consultCost",String.valueOf(consultCost));
         bizContent.put("consultPrice",String.valueOf(consultPrice));
-//        bizContent.put("leaveMess","");
+        bizContent.put("leaveMess",leaveMess); // 留给医生的信息，这里用来发送体检报告
         bizContent.put("questionnaire",questionnaire);
 //        bizContent.put("cdrOtherdocs",cdrOtherdocs);
 
@@ -721,6 +728,9 @@ public class ApiRepository extends BaseRepository {
      * 3.1.19 处方合并生成订单接口
      * 合并处方并生成处方订单号，供用户支付。
      * 处方订单号，是支付的凭据。
+     * @param recipeFee 费用
+     * @param recipeIds 处方ID集合
+     * @param recipeCode 处方HIS编码集合
      */
     public Observable<BatchCreateOrderEntity> batchCreateOrder(String recipeFee, ArrayList<String> recipeIds,ArrayList<String> recipeCode) {
         // 除了公共的数据之外，还有其他的数据请求
@@ -742,7 +752,7 @@ public class ApiRepository extends BaseRepository {
      * 获取支付的二维码和详细数据
      * 从3.11节获取的订单id
      * 轮询处方单详情，读取payFlag字段，如果为1表示已经支付成功。
-     * @param busId 交易订单，如果是复诊单，则是复诊单id
+     * @param busId 交易订单，如果是复诊单，则是复诊单id，也叫OrderId
      * @param busType 类型只有2种 处方:recipe,复诊：onlinerecipe
      */
     public Observable<PayOrderEntity> payOrder(String busId,String busType) {
@@ -759,6 +769,7 @@ public class ApiRepository extends BaseRepository {
 
     /**
      * 复诊单 详情
+     * @param consultId 复诊单ID
      */
     public Observable<GetConsultAndPatientAndDoctorByIdEntity> getConsultAndPatientAndDoctorById(String consultId) {
         // 除了公共的数据之外，还有其他的数据请求
@@ -790,6 +801,7 @@ public class ApiRepository extends BaseRepository {
     /**
      * 处方单  详情
      * 轮询处方单详情，读取payFlag字段，如果为1表示已经支付成功。
+     * @param recipeId 处方单ID
      */
     public Observable<GetPatientRecipeByIdEntity> getPatientRecipeById(String recipeId) {
         // 除了公共的数据之外，还有其他的数据请求
@@ -818,6 +830,7 @@ public class ApiRepository extends BaseRepository {
     /**
      * 获取处方列表，根据复诊单
      * 支付中，通过复诊单id来查询处方单id
+     * @param consultId 复诊单ID
      */
     public Observable<GetRecipeListByConsultIdEntity> getRecipeListByConsultId(String consultId) {
         // 除了公共的数据之外，还有其他的数据请求
@@ -832,6 +845,7 @@ public class ApiRepository extends BaseRepository {
     /**
      * 结束问诊
      * 纳里结束问诊的接口
+     * @param consultId 复诊单ID
      */
     public Observable<PatientFinishGraphicTextConsultEntity> patientFinishGraphicTextConsult(String consultId) {
         // 除了公共的数据之外，还有其他的数据请求
@@ -842,6 +856,125 @@ public class ApiRepository extends BaseRepository {
         RequestBody body = BodyCreate(bizContent,"patientFinishGraphicTextConsult");
         return FastTransformer.switchSchedulers(getApiService().patientFinishGraphicTextConsult(body).retryWhen(new FastRetryWhen()));
     }
+
+    /**
+     * 4.1.1 获取检测项数据
+     *
+     * 获取体检的检测项数据
+     * 根据身份证号,手机号,检测项,或者起始时间获取胶囊诊所检测项数据
+     *
+     * @param clinicSn 诊亭编号
+     * @param idNo 身份证
+     * @param startDate 开始时间 时间格式为yyyy-MM-dd
+     * @param endDate 结束时间 时间格式为yyyy-MM-dd
+     */
+    public Observable<GetExamDataEntity> getExamData(String clinicSn, String idNo, String startDate, String endDate) {
+        // 除了公共的数据之外，还有其他的数据请求
+        Map<String,Object> bizContent = new HashMap<>();
+        bizContent.put("clinicSn",clinicSn);//诊亭编号
+        bizContent.put("idNo",idNo);//身份证
+        if (!TextUtils.isEmpty(startDate))
+        bizContent.put("startDate",startDate);//开始时间
+        if (!TextUtils.isEmpty(endDate))
+        bizContent.put("endDate",endDate);//结束时间
+        // 请求的类型
+        RequestBody body = BodyCreate(bizContent,"getExamData",false);
+        return FastTransformer.switchSchedulers(getApiService().getExamData(body).retryWhen(new FastRetryWhen()));
+    }
+
+
+    /**
+     * 4.1.2 获取报告列表
+     *
+     * 获取报告列表
+     * 主要是获取他的报告HTML地址，最新的结果
+     *
+     * methodCode：reportList
+     *
+     * @param clinicSn 诊亭编号
+     * @param idNo 身份证
+     */
+    public Observable<ReportListDataEntity> reportList(String clinicSn, String idNo) {
+        // 除了公共的数据之外，还有其他的数据请求
+        Map<String,Object> bizContent = new HashMap<>();
+        bizContent.put("clinicSn",clinicSn);//诊亭编号
+        bizContent.put("idNo",idNo);//手机号
+        // 请求的类型
+        RequestBody body = BodyCreate(bizContent,"reportList",false);
+        return FastTransformer.switchSchedulers(getApiService().reportList(body).retryWhen(new FastRetryWhen()));
+    }
+
+    /**
+     * 4.32.	复诊预结算
+     * 纳里接口
+     * 1.	预结算接口成功返回200，我们的系统数据库中将更新复诊单预结算后的最新正确价格
+     * 2.	客户端需要重新调用“4.9节复诊单详情”接口，重新获取复诊单详情，获取最新价格进行下单
+     * @param consultId 复诊单ID
+     */
+    public Observable<VisitMedicalPreSettleEntity> visitMedicalPreSettle(String consultId) {
+        // 除了公共的数据之外，还有其他的数据请求
+        Map<String,Object> bizContent = new HashMap<>();
+        bizContent.put("consultId", consultId);//复诊单 ID
+
+        // 请求的类型
+        RequestBody body = BodyCreate(bizContent,"visitMedicalPreSettle");
+        return FastTransformer.switchSchedulers(getApiService().visitMedicalPreSettle(body).retryWhen(new FastRetryWhen()));
+    }
+
+    /**
+     * 4.14.	患者端发环信消息
+     *
+     * 从去问诊进入，向医生发送消息，请求开视频问诊
+     * 纳里接口
+     * @param hxMsgId 环信消息id
+     * @param revisitId 复诊业务Id
+     * @param msgContent 消息内容
+     * @param customerTimeGroup 发消息时间 案例 2021-04-19 14:40
+     */
+    public Observable<ReceiveMessageFromPatientWithRequestModeEntity> receiveMessageFromPatientWithRequestMode(
+            String hxMsgId,
+            String revisitId,
+            String msgContent,
+            String customerTimeGroup) {
+        // 除了公共的数据之外，还有其他的数据请求
+        Map<String,Object> bizContent = new HashMap<>();
+        bizContent.put("hxMsgId", hxMsgId);//环信消息id，这里是UUID
+        bizContent.put("terminalId", GlobalConfig.machineId);//终端ID
+        bizContent.put("customerKey", hxMsgId);//环信消息id，这里是UUID
+        bizContent.put("revisitId", revisitId);//复诊业务Id
+        bizContent.put("msgType", "1");// 消息类型(1:文本，2:图片)
+        bizContent.put("msgContent", msgContent);//消息内容
+        bizContent.put("customerTimeGroup", customerTimeGroup);// 发消息时间 案例 2021-04-19 14:40
+        bizContent.put("requestMode", "4");//复诊类型，固定4
+
+        // 请求的类型
+        RequestBody body = BodyCreate(bizContent,"receiveMessageFromPatientWithRequestMode");
+        return FastTransformer.switchSchedulers(getApiService().receiveMessageFromPatientWithRequestMode(body).retryWhen(new FastRetryWhen()));
+    }
+
+    /**
+     * 3.14.	处方预结算
+     * 纳里接口
+     * 1.	由于his还未对接，按金投健康要求，目前预结算返回的是mock数据
+     * 2.	在处方支付的页面上可以用返回值展示自费、医保、总费用等信息给患者
+     * 3.	下单接口会返回金投的支付链接，用支付宝打开后，会跳转到金投的收银台，在收银台中会自动进行计费，医保计费扣除掉，患者只需要处理自费费用
+     *
+     * 返回数据
+     * cashAmount	String	是	自费金额
+     * fundAmount	Integer	是	医保支付金额
+     * preSettleTotalAmount	String	是	总费用
+     * @param recipeIds 要进行预结算的处方单id集合
+     */
+    public Observable<OrderPreSettleEntity> orderPreSettle(ArrayList<String> recipeIds) {
+        // 除了公共的数据之外，还有其他的数据请求
+        Map<String,Object> bizContent = new HashMap<>();
+        bizContent.put("recipeIds", recipeIds);//复诊单 ID
+
+        // 请求的类型
+        RequestBody body = BodyCreate(bizContent,"orderPreSettle");
+        return FastTransformer.switchSchedulers(getApiService().orderPreSettle(body).retryWhen(new FastRetryWhen()));
+    }
+
 
 
 }

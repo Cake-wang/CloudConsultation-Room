@@ -15,6 +15,7 @@ import android.util.TypedValue;
 import android.view.View;
 import android.view.WindowManager;
 import android.webkit.WebView;
+import android.widget.LinearLayout;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
@@ -107,6 +108,15 @@ public class WebViewActivity extends FastWebActivity  implements IFastRefreshVie
         }
         titleBar.setTitleMainTextMarquee(true)
                 .setDividerVisible(Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP);
+
+        // 去掉 除了左边和中间的所有其他工具
+        int len = titleBar.getChildCount();
+        for (int i = 2; i < len; i++) {
+            titleBar.getChildAt(i).setVisibility(View.GONE);
+        }
+        // 去掉 左边工具的 叉叉
+        ((LinearLayout) titleBar.getChildAt(0)).getChildAt(1).setVisibility(View.GONE);
+
     }
 
     @Override
@@ -223,6 +233,7 @@ public class WebViewActivity extends FastWebActivity  implements IFastRefreshVie
 
     @Override
     public void onRefresh(RefreshLayout refreshLayout) {
+        refreshLayout.finishRefresh();
         mAgentWeb.getUrlLoader().reload();
     }
 

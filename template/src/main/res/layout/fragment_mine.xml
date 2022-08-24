@@ -167,7 +167,6 @@
             android:textColor="#333"
             android:visibility="gone" />
 
-
         <TextView
             android:id="@+id/tv_clock"
             android:layout_width="wrap_content"

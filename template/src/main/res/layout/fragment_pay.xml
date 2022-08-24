@@ -226,7 +226,7 @@
                         android:gravity="left"
                         android:layout_marginBottom="20dp"
                         android:id="@+id/tv_fee_all"
-                        android:text="100 元" />
+                        android:text="" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -238,7 +238,7 @@
                         android:gravity="left"
                         android:id="@+id/tv_fee_yb"
                         android:layout_marginBottom="20dp"
-                        android:text="80 元" />
+                        android:text="" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -250,7 +250,7 @@
                         android:gravity="left"
                         android:id="@+id/tv_fee_zf"
 
-                        android:text="20 元" />
+                        android:text="" />
 
                     <TextView
                         android:layout_width="wrap_content"

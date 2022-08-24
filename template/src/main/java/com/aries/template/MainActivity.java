@@ -172,6 +172,7 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
      * 每3秒检测一次
      */
     public void timeLoop() {
+
         mDisposable = null;
         mDisposable = Observable.interval(DELAY, PERIOD, TimeUnit.MILLISECONDS)
                 .map((aLong -> aLong + 1))
@@ -510,12 +511,6 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                                                                 // orderId = null 表示没有合并支付过的，那么就不需要合并
                                                                 if ( recipes.get(j).orderId!=null && recipes.get(j).orderId.equals(currentRecipes.orderId)){
                                                                     currentRecipes.getRecipeDetailBeans().addAll(recipes.get(j).getRecipeDetailBeans());
-                                                                    currentRecipes.getRecipeDetailBeans().addAll(recipes.get(j).getRecipeDetailBeans()); //todo cc
-                                                                    currentRecipes.getRecipeDetailBeans().addAll(recipes.get(j).getRecipeDetailBeans());//todo cc
-                                                                    currentRecipes.getRecipeDetailBeans().addAll(recipes.get(j).getRecipeDetailBeans());//todo cc
-                                                                    currentRecipes.getRecipeDetailBeans().addAll(recipes.get(j).getRecipeDetailBeans());//todo cc
-                                                                    currentRecipes.getRecipeDetailBeans().addAll(recipes.get(j).getRecipeDetailBeans());//todo cc
-                                                                    currentRecipes.getRecipeDetailBeans().addAll(recipes.get(j).getRecipeDetailBeans());//todo cc
                                                                     removeItems.add(recipes.get(j));
                                                                 }
                                                             }

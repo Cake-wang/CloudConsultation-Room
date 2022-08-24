@@ -20,6 +20,7 @@ import com.aries.template.GlobalConfig;
 import com.aries.template.R;
 import com.aries.template.entity.BatchCreateOrderEntity;
 import com.aries.template.entity.GetPatientRecipeByIdEntity;
+import com.aries.template.entity.OrderPreSettleEntity;
 import com.aries.template.entity.PayOrderEntity;
 import com.aries.template.entity.PrescriptionPushEntity;
 import com.aries.template.module.base.BaseEventFragment;
@@ -86,7 +87,7 @@ public class PayRecipeFragment extends BaseEventFragment {
     private String organDiseaseName;//疾病名称
     private String orderid;//订单号，如果是从未支付进来的，那么进来后，不需要合并订单，直接用orderid来获取支付二维码
 //    private String busId;//合并订单号，如果有，则刷新二维码，如果没有，就再次尝试合并订单
-    private String recipeFee="0.01";//药品费 当处方单产生订单，并且订单有效时取的是订单的真实金额，其他时候取的处方的总金额保留两位小数,总费用用接口获取
+    private String recipeFee="";//药品费 当处方单产生订单，并且订单有效时取的是订单的真实金额，其他时候取的处方的总金额保留两位小数,总费用用接口获取
     private ArrayList<String> recipes = new ArrayList<>();//处方ID集合
     private ArrayList<String> recipeCodes = new ArrayList<>();//HIS处方编码集合，可以从处方详情中获取
     private boolean isFirstLoop=true;// 是否是第一次执行timeloop，true为是
@@ -169,7 +170,6 @@ public class PayRecipeFragment extends BaseEventFragment {
         //数据展示
         if (GlobalConfig.ssCard!=null)
             tv_name.setText(GlobalConfig.ssCard.getName());
-//        tv_fee_all.setText(recipeFee);
         // 支付提示
         String[] orders = {"#38ABA0","支付宝·","#333333","扫一扫"};
         jtjk_pay_text.setText(ActivityUtils.formatTextView(orders));
@@ -177,7 +177,7 @@ public class PayRecipeFragment extends BaseEventFragment {
         tv_fee_type.setText("处方费");
         // 支付二维码刷新
         jtjk_pay_reflash_tip.setOnClickListener(v -> {
-            requestBatchCreateOrder(recipeFee);
+            requestOrderPreSettle(recipes);
         });
     }
 
@@ -186,6 +186,8 @@ public class PayRecipeFragment extends BaseEventFragment {
         super.loadData();
         // 执行时间loop
         timeLoop();
+        // 查询金额
+        requestOrderPreSettle(recipes);
     }
 
     @Override
@@ -235,12 +237,6 @@ public class PayRecipeFragment extends BaseEventFragment {
                             // 检查 payFlag 如果是 3 就是支付成功
                             if (entity.getData().isSuccess()){
                                 // 注入数据
-//                                drugList = entity.getData().getJsonResponseBean().getBody().getRecipedetails();
-                                // 第一次执行返回数据后，获取二维码
-                                if (isFirstLoop){
-                                    requestBatchCreateOrder(recipeFee);
-                                    isFirstLoop = false;
-                                }
                                 if (entity.getData().getJsonResponseBean().getBody()!=null &&
                                         entity.getData().getJsonResponseBean().getBody().getRecipe().getPayFlag()==1){
                                     try {
@@ -277,6 +273,11 @@ public class PayRecipeFragment extends BaseEventFragment {
      * 支付的基础是创建一个可以支付的处方单。里面有很多处方。
      */
     public void requestPrescriptionPush(String clinicSn){
+        if (TextUtils.isEmpty(recipeFee)){
+            ToastUtil.show("处方单价格异常，请重试");
+            return;
+        }
+
         try {
             // 生成处方单药物集，遍历生成数据，准备输入
             ArrayList<Map> drugs = new ArrayList<>(); // 存储所有处方药品信息的容器
@@ -380,6 +381,8 @@ public class PayRecipeFragment extends BaseEventFragment {
     /**
      * 处方合并生成订单接口
      * 这个接口的返回是3.12.	支付请求接口的输入
+     * 如果有 orderid 了那么就是已经合并过的，不需要再合并。
+     * 如果没有 orderid 那么，需要合并一次处方。
      */
     private void requestBatchCreateOrder(String recipeFee){
         try{
@@ -511,6 +514,45 @@ public class PayRecipeFragment extends BaseEventFragment {
             e.printStackTrace();
             JTJKLogUtils.message(e.toString());
         }
+    }
+
+    /**
+     * 处方预结算
+     * 获取处方单价格
+     * @param recipes 订单号集合
+     */
+    private void requestOrderPreSettle(ArrayList<String> recipes ){
+        ApiRepository.getInstance().orderPreSettle(recipes)
+                .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
+                .subscribe(new FastLoadingObserver<OrderPreSettleEntity>("请稍后...") {
+                    @Override
+                    public void _onNext(OrderPreSettleEntity entity) {
+                        if (entity == null) {
+                            ToastUtil.show("请检查网络");
+                            return;
+                        }
+                        try {
+                            if (entity.data.success){
+                                // 刷新价格
+                                // 总费用
+                                tv_fee_all.setText(entity.data.jsonResponseBean.body.preSettleTotalAmount+"元");
+                                // 医保
+                                tv_fee_yb.setText(entity.data.jsonResponseBean.body.preSettleTotalAmount+"元");
+                                // 自费
+                                tv_fee_zf.setText(entity.data.jsonResponseBean.body.preSettleTotalAmount+"元");
+                                // 启动支付二维码
+                                // 获得总费用后，请求二维码，这里的价格需要和上面的总费用对齐
+                                recipeFee = entity.data.jsonResponseBean.body.preSettleTotalAmount;
+                                // 处方合并生成订单接口
+                                requestBatchCreateOrder(entity.data.jsonResponseBean.body.preSettleTotalAmount);
+                            }else{
+                            }
+                        }catch (Exception e){
+                            e.printStackTrace();
+                            JTJKLogUtils.message(e.toString());
+                        }
+                    }
+                });
     }
 
 

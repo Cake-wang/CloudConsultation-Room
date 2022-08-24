@@ -19,8 +19,10 @@ import com.aries.template.R;
 import com.aries.template.entity.CancelregisterResultEntity;
 import com.aries.template.entity.GetConsultAndPatientAndDoctorByIdEntity;
 import com.aries.template.entity.GetConsultsAndRecipesResultEntity;
+import com.aries.template.entity.ReceiveMessageFromPatientWithRequestModeEntity;
 import com.aries.template.module.base.BaseEventFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
+import com.aries.template.utils.DateUtils;
 import com.aries.template.view.ShineButtonDialog;
 import com.aries.ui.view.title.TitleBarView;
 import com.trello.rxlifecycle3.android.FragmentEvent;
@@ -179,6 +181,38 @@ public class OrderConsultFragment extends BaseEventFragment {
                 });
     }
 
+    /**
+     * 从去问诊进入，向医生发送消息，请求开视频问诊
+     */
+    private void requestReceiveMessageFromPatientWithRequestMode(){
+        String imID = ApiRepository.getUUID(); // 统一使用 UUID 来传参
+        String today = DateUtils.getTodayWidthFormat("yyyy-MM-dd HH:mm");
+        ApiRepository.getInstance().receiveMessageFromPatientWithRequestMode(imID,
+                        consultId,
+                        "我向您发起视频问诊，请重新开始视频问诊",
+                        today)
+                .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
+                .subscribe(new FastLoadingObserver<ReceiveMessageFromPatientWithRequestModeEntity>("请等待") {
+                    @Override
+                    public void _onNext(ReceiveMessageFromPatientWithRequestModeEntity entity) {
+                        if (entity == null) {
+                            ToastUtil.show("请检查网络");
+                            return;
+                        }
+                        // 如果成功了，就跳转视频问诊。
+                        if (entity.data.success){
+                            start(VideoConsultFragment.newInstance(consultId,
+                                    patientName,
+                                    doctorId,
+                                    doctorName,
+                                    true));
+                        }else{
+                            ToastUtil.show("向医生发送消息失败，请重试去问诊");
+                        }
+                    }
+                });
+    }
+
     @SingleClick
     @OnClick({R.id.btn_cancel, R.id.btn_inquiry})
     public void onViewClicked(View view) {
@@ -192,11 +226,7 @@ public class OrderConsultFragment extends BaseEventFragment {
                 // 跳视频问诊
                 // 动态输入参数
                 if (!TextUtils.isEmpty(patientName))
-                    start(VideoConsultFragment.newInstance(consultId,
-                            patientName,
-                            doctorId,
-                            doctorName,
-                            true));
+                    requestReceiveMessageFromPatientWithRequestMode();
                 break;
             default:
                 break;

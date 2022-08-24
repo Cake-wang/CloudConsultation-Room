@@ -23,6 +23,7 @@ import com.aries.template.widget.mgson.MFastRetrofit;
 import com.aries.template.xiaoyu.EaseModeProxy;
 import com.decard.NDKMethod.BasicOper;
 import com.decard.dc_licensesdk.utils.AppInfoUtils;
+import com.github.moduth.blockcanary.BlockCanary;
 import com.orhanobut.logger.PrettyFormatStrategy;
 import com.xuexiang.xaop.XAOP;
 import com.xuexiang.xaop.checker.IThrowableHandler;
@@ -213,6 +214,10 @@ public class App extends MultiDexApplication {
 
         // 初始化 xCrash 崩溃提示
         initXCrash();
+
+        //blockcanary 初始化
+        // 不需要用只需要这里不让他们初始化
+        BlockCanary.install(this, new AppBlockCanaryContext()).start();
     }
 
 

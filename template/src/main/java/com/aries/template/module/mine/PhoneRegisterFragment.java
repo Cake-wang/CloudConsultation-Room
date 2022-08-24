@@ -12,6 +12,7 @@ import com.aries.library.fast.util.SPUtil;
 import com.aries.library.fast.util.ToastUtil;
 import com.aries.template.GlobalConfig;
 import com.aries.template.R;
+import com.aries.template.WebViewActivity;
 import com.aries.template.entity.AuthCodeResultEntity;
 import com.aries.template.entity.RegisterResultEntity;
 import com.aries.template.module.base.BaseEventFragment;
@@ -244,6 +245,7 @@ public class PhoneRegisterFragment extends BaseEventFragment implements ISupport
                 break;
             case R.id.tv_other_login:
                 // 点击协议
+                WebViewActivity.start(getActivity(),"https://www.hfi-health.com:28181/agreement/yzs-ysxy.html");
                 break;
             default:
                 break;
@@ -271,12 +273,12 @@ public class PhoneRegisterFragment extends BaseEventFragment implements ISupport
      * @param verifyCode  验证码
      */
     private void loginByVerifyCode(String phoneNumber, String verifyCode) {
-//        if (!TextUtils.isEmpty(authCodeId)){
-//            requestRegister(idCard,name,phoneNumber,verifyCode,authCodeId);
-//        }else{
-//            ToastUtil.show("请先获取验证码");
-//        }
-        requestRegister(idCard,name,phoneNumber,verifyCode,"123456");
+        if (!TextUtils.isEmpty(authCodeId)){
+            requestRegister(idCard,name,phoneNumber,verifyCode,authCodeId);
+        }else{
+            ToastUtil.show("请先获取验证码");
+        }
+//        requestRegister(idCard,name,phoneNumber,verifyCode,"123456"); //todo cc
     }
 
     /**

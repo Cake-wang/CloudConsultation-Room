@@ -32,4 +32,6 @@
     <string name="video_status_network_error">网络不稳定，请稍候</string>
     <string name="video_status_local_wifi_issue">WiFi信号不稳定</string>
 
+    <string name="block_canary_display_activity_label">Blocks</string>
+
 </resources>
