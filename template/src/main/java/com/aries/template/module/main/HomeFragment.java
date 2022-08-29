@@ -2,7 +2,9 @@ package com.aries.template.module.main;
 
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextClock;
 import android.widget.TextView;
 
 import com.alibaba.fastjson.JSON;
@@ -29,6 +31,9 @@ import com.aries.template.thridapp.JTJKThirdAppUtil;
 import com.aries.template.utils.DateUtils;
 import com.aries.template.utils.DefenceUtil;
 import com.aries.template.utils.JTJKLogUtils;
+import com.aries.template.view.ShineButtonDialog;
+import com.aries.template.view.SplashDialog;
+import com.aries.template.xiaoyu.EaseModeProxy;
 import com.aries.template.xiaoyu.dapinsocket.DapinSocketProxy;
 import com.aries.template.xiaoyu.xinlin.XLMessage;
 import com.aries.ui.view.title.TitleBarView;
@@ -41,8 +46,14 @@ import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
+import me.yokeyword.fragmentation.SupportFragment;
 
 /**
  * 首页
@@ -65,6 +76,59 @@ public class HomeFragment extends BaseEventFragment{
     TextView jtjk_machine;//机器编号
     @BindView(R.id.jtjk_hospital_name)
     TextView jtjk_hospital;//医院名称
+
+    private static final int PERIOD = 999* 1000;
+    private static final int DELAY = 15*1000;
+    private Disposable mDisposable;
+    private SplashDialog dialog;
+    /**
+     * 定时循环任务
+     * 入会成功后执行
+     * - 5秒循环查询新的待处理处方信息
+     * - 5秒用于信令，医生端接口反馈循环
+     */
+    private void timeLoop() {
+        if (mDisposable!=null){
+            mDisposable.dispose();
+            mDisposable = null;
+        }
+        mDisposable = Observable.interval(DELAY, PERIOD, TimeUnit.MILLISECONDS)
+                .map((aLong -> aLong + 1))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(aLong -> {
+                    // 会导致程序再被15秒后，拉起来
+                    if (dialog==null){
+                        // 启动显示 广告框
+                        if (getActivity()==null)
+                            return;
+                        dialog = new SplashDialog(getActivity());
+                        dialog.getBGLayout().setOnClickListener(view -> {
+                            dialog.onDismiss();
+                            dialog=null;
+                            timeLoop();
+                        });
+                        dialog.show();
+                        if (mDisposable!=null){
+                            mDisposable.dispose();
+                            mDisposable = null;
+                        }
+                    }
+                });//getUnreadCount()执行的任务
+    }
+
+    /**
+     * Activity 被缩下去后执行
+     */
+    @Override
+    public void onStop() {
+        super.onStop();
+        // 会导致程序不再被15秒后，拉起来
+//        if (mDisposable!=null){
+//            mDisposable.dispose();
+//            mDisposable = null;
+//        }
+    }
 
     public static HomeFragment newInstance() {
         Bundle args = new Bundle();
@@ -129,6 +193,8 @@ public class HomeFragment extends BaseEventFragment{
         requestMachineInfo();
         // 启动环信视频
         requestConfigurationToThirdForPatient();
+        // 启动时间循环，显示广告
+        timeLoop();
     }
 
     @Override
@@ -219,13 +285,11 @@ public class HomeFragment extends BaseEventFragment{
                         GlobalConfig.factoryResource = entity.data.factoryResource;
                         GlobalConfig.factoryMainPage = entity.data.factoryMainPage;
 
-                        // 显示医院
-                        if (jtjk_hospital!=null)
-                            jtjk_hospital.setText(GlobalConfig.hospitalName);
-                        // 显示机器
-                        if (jtjk_machine!=null)
-                            jtjk_machine.setText("机器编号:"+GlobalConfig.machineId);
-
+                        // 设置显示对象数据
+                        // 医院
+                        ((TextView) getActivity().findViewById(R.id.jtjk_hospital_name)).setText(GlobalConfig.hospitalName);
+                        // 机器编号
+                        ((TextView) getActivity().findViewById(R.id.jtjk_machine_id)).setText("机器编号: "+GlobalConfig.machineId);
 
                         // 必须跟在获取全局信息之后
                         // 启动大屏显示
@@ -254,12 +318,20 @@ public class HomeFragment extends BaseEventFragment{
                 DapinSocketProxy.with().delayDestroy();
             }
 
-            // 显示医院
-            if (jtjk_hospital!=null)
-                jtjk_hospital.setText(GlobalConfig.hospitalName);
-            // 显示机器
-            if (jtjk_machine!=null)
-                jtjk_machine.setText("机器编号:"+GlobalConfig.machineId);
+            // 广告框启动
+            timeLoop();
+
+//            // 显示医院
+//            if (jtjk_hospital!=null)
+//                jtjk_hospital.setText(GlobalConfig.hospitalName);
+//            // 显示机器
+//            if (jtjk_machine!=null)
+//                jtjk_machine.setText("机器编号:"+GlobalConfig.machineId);
+        }else{
+            if (mDisposable!=null){
+                mDisposable.dispose();
+                mDisposable = null;
+            }
         }
     }
 }

@@ -4,6 +4,11 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.os.Build;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 
 /**
  * 系统类型的功能
@@ -31,6 +36,5 @@ public class SystemUtil {
     public static  void exit(){
         System.exit(0);
     }
-
 
 }

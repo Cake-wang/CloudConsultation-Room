@@ -1,5 +1,6 @@
 package com.aries.template;
 
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -7,6 +8,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 
 import com.aries.library.fast.entity.FastTabEntity;
@@ -95,8 +97,8 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
     @Override
     public List<FastTabEntity> getTabList() {
         mTabEntities = new ArrayList<>();
-        mTabEntities.add(new FastTabEntity(R.string.home, R.drawable.ic_home_normal, R.drawable.ic_home_selected, HomeFragment.newInstance()));
-        mTabEntities.add(new FastTabEntity(R.string.mine, R.drawable.ic_mine_normal, R.drawable.ic_mine_selected, MineCardFragment.newInstance("")));
+//        mTabEntities.add(new FastTabEntity(R.string.home, R.drawable.ic_home_normal, R.drawable.ic_home_selected, HomeFragment.newInstance()));
+//        mTabEntities.add(new FastTabEntity(R.string.mine, R.drawable.ic_mine_normal, R.drawable.ic_mine_selected, MineCardFragment.newInstance("")));
         return mTabEntities;
     }
 
@@ -107,6 +109,7 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
     @Override
     public void initView(Bundle savedInstanceState) {
         mTabLayout.setVisibility(View.GONE);
+
     }
 
     /**
@@ -611,8 +614,8 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        ActivityUtils.fullScreen(getWindow(),false);
-        ActivityUtils.lightOnScreen(getWindow());
+//        ActivityUtils.fullScreen(getWindow(),false);
+//        ActivityUtils.lightOnScreen(getWindow());
         // 从身体检测返回测试，如果返回了，则启动返回socket
         new JTJKThirdAppUtil().backFromBodyTesting(MainActivity.this);
     }

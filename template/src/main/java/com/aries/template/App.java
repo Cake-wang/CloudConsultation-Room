@@ -1,7 +1,5 @@
 package com.aries.template;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -9,16 +7,16 @@ import android.os.Build;
 import android.os.PowerManager;
 import android.provider.Settings;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.aries.library.fast.FastManager;
 import com.aries.library.fast.manager.LoggerManager;
-import com.aries.library.fast.util.ToastUtil;
+import com.aries.library.fast.widget.FastLoadDialog;
 import com.aries.template.constant.ApiConstant;
 import com.aries.template.impl.ActivityControlImpl;
 import com.aries.template.impl.AppImpl;
 import com.aries.template.impl.HttpRequestControlImpl;
 import com.aries.template.utils.SystemUtil;
+import com.aries.template.view.FullScreenJTJKDialog;
 import com.aries.template.widget.mgson.MFastRetrofit;
 import com.aries.template.xiaoyu.EaseModeProxy;
 import com.decard.NDKMethod.BasicOper;
@@ -80,6 +78,11 @@ public class App extends MultiDexApplication {
                 .setLoadingDialog(impl)
                 //设置SmartRefreshLayout刷新头-自定加载使用BaseRecyclerViewAdapterHelper
                 .setDefaultRefreshHeader(impl)
+                // 设置对话框，添加全局对话框，沉浸式
+                .setLoadingDialog(activity -> new FastLoadDialog(activity,
+                        new FullScreenJTJKDialog.JTJKBuilder(activity)
+                                .setMessage(R.string.fast_loading)
+                                .create()))
                 //设置全局TitleBarView相关配置
                 .setTitleBarViewControl(impl)
                 //设置Activity滑动返回控制-默认开启滑动返回功能不需要设置透明主题
@@ -212,12 +215,12 @@ public class App extends MultiDexApplication {
         // 初始化并启动 easeMode
         EaseModeProxy.with().initInAPP(getContext());
 
-        // 初始化 xCrash 崩溃提示
-        initXCrash();
+        // 初始化 xCrash 崩溃提示，会导致 崩溃 不会被打印
+//        initXCrash();
 
-        //blockcanary 初始化
+        //blockcanary 初始化 卡顿
         // 不需要用只需要这里不让他们初始化
-        BlockCanary.install(this, new AppBlockCanaryContext()).start();
+//        BlockCanary.install(this, new AppBlockCanaryContext()).start();
     }
 
 

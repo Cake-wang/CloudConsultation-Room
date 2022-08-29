@@ -538,11 +538,12 @@ s
             android:id="@+id/jtjk_machine_id"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingLeft="16dp"
             android:layout_weight="1"
             android:gravity="center"
+            android:paddingLeft="16dp"
             android:text="机器编号：583958794759"
-            android:textColor="#fff" />
+            android:textColor="#fff"
+            android:textSize="16dp" />
 
 
         <TextView
@@ -559,11 +560,11 @@ s
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:paddingLeft="16dp"
-            android:layout_weight="1"
             android:layout_marginBottom="8dp"
+            android:layout_weight="1"
             android:fontFamily="sans-serif-light"
             android:gravity="left"
+            android:paddingLeft="16dp"
             android:textColor="#fff"
             android:textSize="16dp"
             android:textStyle="normal" />
@@ -572,24 +573,24 @@ s
             android:id="@+id/tv_version"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:layout_marginTop="8dp"
-            android:paddingLeft="16dp"
             android:layout_marginBottom="8dp"
+            android:layout_weight="1"
             android:fontFamily="sans-serif-light"
             android:gravity="left"
+            android:paddingLeft="16dp"
             android:textColor="#fff"
             android:textSize="16dp"
-            android:textStyle="normal"
-            />
+            android:textStyle="normal" />
 
         <TextView
             android:id="@+id/jtjk_hospital_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingLeft="16dp"
-            android:gravity="center"
             android:layout_weight="2"
+            android:gravity="center"
+            android:paddingLeft="16dp"
+            android:textSize="16dp"
             android:text="杭州市第一人民医院"
             android:textColor="#fff" />
     </LinearLayout>

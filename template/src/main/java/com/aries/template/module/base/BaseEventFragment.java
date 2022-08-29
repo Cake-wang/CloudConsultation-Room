@@ -89,6 +89,8 @@ public abstract class BaseEventFragment extends BaseTimerFragment{
             }
         }
         resetView();
+        // 沉浸
+        fullScreen();
     }
 
     @Override
@@ -164,5 +166,10 @@ public abstract class BaseEventFragment extends BaseTimerFragment{
      * 只要按到这里两个按钮，就触发
      */
     public void onDismiss(){
+    }
+
+    public void fullScreen(){
+        ActivityUtils.fullScreen(getActivity().getWindow(),false);
+        ActivityUtils.lightOnScreen(getActivity().getWindow());
     }
 }

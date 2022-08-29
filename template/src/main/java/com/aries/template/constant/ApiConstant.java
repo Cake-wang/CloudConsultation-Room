@@ -25,34 +25,42 @@ public class ApiConstant {
 
     public static  String BASEURL = "http://10.100.10.45:18033/";
 
-    public static  String BASEURLTest = "https://jsbceshi.hfi-health.com:18188/cloudHospital/";
+//    public static  String BASEURLTest = "https://jsbceshi.hfi-health.com:18188/cloudHospital/";
+    public static  String BASEURLTest = "https://jsbceshi.hfi-health.com:18188/app/hzAppMS/api/";
 
     public static  String DownURL = "http://10.100.10.45:18033/";
 
-//查询激活状态
-    public static final String isRegister  =  "ngariUserRelation/isRegister";
+    /** 查询激活状态 */
+//    public static final String isRegister  =  "ngariUserRelation/isRegister";
+    public static final String isRegister  =  "cloudHospitalCore/isRegister";
 
     /** 用户信息查询 */
-    public static final String findUser  =  "ngariUserRelation/findUser";
+//    public static final String findUser  =  "ngariUserRelation/findUser";
+    public static final String findUser  =  "cloudHospitalCore/findUser";
 
     /** 用户注册 */
-    public static final String register  =  "ngariUserRelation/register";
+//    public static final String register  =  "ngariUserRelation/register";
+    public static final String register  =  "cloudHospitalCore/register";
 
     /** 获取手机注册验证码 */
-    public static final String getAuthCode  =  "ngariUserRelation/getAuthCode";
+//    public static final String getAuthCode  =  "ngariUserRelation/getAuthCode";
+    public static final String getAuthCode  =  "cloudHospitalCore/getAuthCode";
 
     /** 纳里复诊服务接口 */
-    public static final String doBaseNgariRequest =  "ngari/revisit/doBaseNgariRequest";
+//    public static final String doBaseNgariRequest =  "ngari/revisit/doBaseNgariRequest";
+    public static final String doBaseNgariRequest =  "cloudHospitalCore/doBaseNgariRequest";
 
     /** 盖瑞接口 */
-    public static final String doBaseGareaRequest =  "garea/doBaseGareaRequest";
+//    public static final String doBaseGareaRequest =  "garea/doBaseGareaRequest";
+    public static final String doBaseGareaRequest =  "cloudHospitalCore/doBaseGareaRequest";
 
     /** 调用机器全部初始信息 */
-//    public static final String machineRelationByMachineId =  "machineRelation/findByMachineId";
-    public static final String machineRelationByMachineId =  "machineRelation/findByThird";
+//    public static final String machineRelationByMachineId =  "machineRelation/findByThird";
+    public static final String machineRelationByMachineId =  "cloudHospitalCore/findMachineRelationByThird";
 
     /** 复诊单和挂号单 */
-    public static final String getConsultsAndRecipes  =  "ngari/revisit/getConsultsAndRecipes";
+//    public static final String getConsultsAndRecipes  =  "ngari/revisit/getConsultsAndRecipes";
+    public static final String getConsultsAndRecipes  =  "cloudHospitalCore/getConsultsAndRecipes";
 
 
 //    http://XXXXX:port/api/activation/queryActive

@@ -680,10 +680,10 @@ public class ApiRepository extends BaseRepository {
 //        bizContent.put("patientDateOfBirth",patientDateOfBirth);//
 //        bizContent.put("complaint",complaint);//主诉 比如感冒发烧
         bizContent.put("diseaseName",diseaseName);//诊断名称
-        bizContent.put("outerOrderNo",outerOrderNo);//处方流水号
+        bizContent.put("outerOrderNo",outerOrderNo);//处方流水号 现在是 orderid
         bizContent.put("prescriptionType","");//可以为空
         bizContent.put("totalAmount",totalAmount);//
-        bizContent.put("billNo","");//可以为空
+        bizContent.put("billNo",outerOrderNo);//可以为空 现在是 orderid
         bizContent.put("paymentSeqNo","");//可以为空
         bizContent.put("paymentType","SELF");//
         bizContent.put("timeout","1440");//
