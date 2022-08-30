@@ -2,10 +2,13 @@ package com.aries.template.retrofit.repository;
 
 
 import android.content.Context;
+import android.content.Entity;
 import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.aries.library.fast.retrofit.FastRetryWhen;
 import com.aries.library.fast.retrofit.FastTransformer;
 import com.aries.library.fast.util.SPUtil;
@@ -18,6 +21,7 @@ import com.aries.template.entity.CanRequestOnlineConsultResultEntity;
 import com.aries.template.entity.CancelregisterResultEntity;
 import com.aries.template.entity.ConfigurationToThirdForPatientEntity;
 import com.aries.template.entity.CreateOrderResultEntity;
+import com.aries.template.entity.FindMedicineStockEntity;
 import com.aries.template.entity.FindRecipesForPatientAndTabStatusEntity;
 import com.aries.template.entity.FindUserResultEntity;
 import com.aries.template.entity.FindValidDepartmentForRevisitResultEntity;
@@ -975,6 +979,37 @@ public class ApiRepository extends BaseRepository {
         return FastTransformer.switchSchedulers(getApiService().orderPreSettle(body).retryWhen(new FastRetryWhen()));
     }
 
+
+    /**
+     * 4.1.2 获取报告列表
+     *
+     * 获取报告列表
+     * 主要是获取他的报告HTML地址，最新的结果
+     *
+     * methodCode：reportList
+     *
+     * @param clinicSn 诊亭编号
+     * @param skus 开药列表 例如 [ { "drugCode": "6941456100446", "total": 20 }, { "drugCode": "packing-bag", "total": 10 } ]
+     */
+    public Observable<FindMedicineStockEntity> findMedicineStock(String clinicSn, ArrayList<Map<String,String>> skus) {
+
+        JSONArray drugList = new JSONArray();
+        for (Map<String, String> map : skus) {
+            for (Map.Entry<String, String> stringStringEntry : map.entrySet()) {
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("drugCode",stringStringEntry.getKey());
+                jsonObject.put("total",stringStringEntry.getValue());
+                drugList.add(jsonObject);
+            }
+        }
+        // 除了公共的数据之外，还有其他的数据请求
+        Map<String,Object> bizContent = new HashMap<>();
+        bizContent.put("customId",clinicSn);//诊亭编号
+        bizContent.put("drugList",drugList);//手机号
+        // 请求的类型
+        RequestBody body = BodyCreate(bizContent,"canRequestOnlineConsult",false);
+        return FastTransformer.switchSchedulers(getApiService().findMedicineStock(body).retryWhen(new FastRetryWhen()));
+    }
 
 
 }

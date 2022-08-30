@@ -111,14 +111,14 @@ public class DepartmentFragment extends BaseEventFragment {
                     @Override
                     public void onClickTheme(AutoObjectAdaptor.ViewHolder holder, int position, Map itemData) {
                         //点击后样式
-                        ((TextView)holder.itemView.findViewById(R.id.jtjk_fz_item_tv)).setBackground(getActivity().getDrawable(R.drawable.btn_register_pressed_yzs));
+                        ((TextView)holder.itemView.findViewById(R.id.jtjk_fz_item_tv)).setBackground(getActivity().getDrawable(R.mipmap.btn_register_pressed_yzs));
                         ((TextView)holder.itemView.findViewById(R.id.jtjk_fz_item_tv)).setTextColor(Color.parseColor("#ffffff"));
                     }
 
                     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
                     @Override
                     public void unClickTheme(AutoObjectAdaptor.ViewHolder holder, int position, Map itemData) {
-                        ((TextView)holder.itemView.findViewById(R.id.jtjk_fz_item_tv)).setBackground(getActivity().getDrawable(R.drawable.btn_register_normal_yzs));
+                        ((TextView)holder.itemView.findViewById(R.id.jtjk_fz_item_tv)).setBackground(getActivity().getDrawable(R.mipmap.btn_register_normal_yzs));
                         ((TextView)holder.itemView.findViewById(R.id.jtjk_fz_item_tv)).setTextColor(Color.parseColor("#333333"));
                     }
                 });
@@ -135,10 +135,10 @@ public class DepartmentFragment extends BaseEventFragment {
                 button.setEnabled(b);
                 if (b){
                     button.setTextColor(Color.parseColor("#ffffff"));
-                    button.setBackgroundResource(R.drawable.btn_next_yzs);
+                    button.setBackgroundResource(R.mipmap.btn_next_yzs);
                 }else {
                     button.setTextColor(Color.parseColor("#999999"));
-                    button.setBackgroundResource(R.drawable.btn_ago_yzs);
+                    button.setBackgroundResource(R.mipmap.btn_ago_yzs);
                 }
             }
         });

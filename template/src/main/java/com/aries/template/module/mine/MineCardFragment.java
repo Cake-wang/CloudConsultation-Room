@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 
+import com.aries.template.FakeDataExample;
 import com.aries.template.GlobalConfig;
 import com.aries.template.MainActivity;
 import com.aries.template.R;
@@ -55,6 +56,9 @@ public class MineCardFragment extends BaseEventFragment{
      * 启动社保卡
      */
     private void callIDMachine() {
+//        if (getActivity() !=null)
+//        ((MainActivity)getActivity()).setSSDCardData(FakeDataExample.fakeSSCard()); //todo cc
+
         Log.d("111111MODEL", "111111MODEL");
         handler = new Handler();
         handler.postDelayed(() -> {

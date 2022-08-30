@@ -1,23 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content">
-
-
 
         <TextView
             android:id="@+id/jtjk_fz_item_tv"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="#333"
-
             android:textSize="24dp"
-            android:background="@drawable/btn_register_normal_yzs"
+            android:background="@mipmap/btn_register_normal_yzs"
             android:gravity="center"
-
             android:textStyle="bold"
-            android:text="耳鼻喉" />
-
-
+            android:text="耳鼻喉耳鼻喉耳鼻喉" />
 
 </LinearLayout>

@@ -238,23 +238,25 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
 //            }
                 SSCard ssCard = EGovernment.EgAPP_SI_ReadSSCardInfo();
                 if(ssCard!=null){
-                    Log.d("EgAPP_SI_ReadSSCardInfo",ssCard.toString());
-                    // 向全局填写当前社保卡信息
-                    GlobalConfig.ssCard = ssCard;
-                    // 由于病人的名字是带空格的，必须去掉
-                    GlobalConfig.ssCard.setName(ssCard.getName().trim());
-                    GlobalConfig.age = getAge(ssCard.getSSNum());
 
-                    SPUtil.put(mContext,"smkCard",ssCard.getCardNum());
-                    SPUtil.put(mContext,"age",getAge(ssCard.getSSNum()));
-                    SPUtil.put(mContext,"userName",ssCard.getName().trim());
-                    SPUtil.put(mContext,"sex",ssCard.getSex());
-                    SPUtil.put(mContext,"idCard",ssCard.getSSNum());
+                    // 输入社保数据
+                    setSSDCardData(ssCard);
 
-                    // 获取信息后，直接请求用户数据
-                    runOnUiThread(() -> requestFindUser(GlobalConfig.ssCard.getSSNum(),GlobalConfig.ssCard.getName(),GlobalConfig.ssCard.getCardNum()));
-//                    requestFindUser(ssCard.getSSNum(),ssCard.getName(),ssCard.getCardNum());
-
+//                    Log.d("EgAPP_SI_ReadSSCardInfo",ssCard.toString());
+//                    // 向全局填写当前社保卡信息
+//                    GlobalConfig.ssCard = ssCard;
+//                    // 由于病人的名字是带空格的，必须去掉
+//                    GlobalConfig.ssCard.setName(ssCard.getName().trim());
+//                    GlobalConfig.age = getAge(ssCard.getSSNum());
+//
+//                    SPUtil.put(mContext,"smkCard",ssCard.getCardNum());
+//                    SPUtil.put(mContext,"age",getAge(ssCard.getSSNum()));
+//                    SPUtil.put(mContext,"userName",ssCard.getName().trim());
+//                    SPUtil.put(mContext,"sex",ssCard.getSex());
+//                    SPUtil.put(mContext,"idCard",ssCard.getSSNum());
+//
+//                    // 获取信息后，直接请求用户数据
+//                    runOnUiThread(() -> requestFindUser(GlobalConfig.ssCard.getSSNum(),GlobalConfig.ssCard.getName(),GlobalConfig.ssCard.getCardNum()));
 
                     // 读取成功后，清除mDisposable不再进行验证
                     if (mDisposable != null) {
@@ -314,6 +316,30 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
 //                Log.d("dc_setcpu","error code = "+resultArr[0] +" error msg = "+resultArr[1] );
 //            }
 //        }
+    }
+
+    /**
+     * 向全局输入SSDcard数据，并进行跳转
+     * @param ssCard 社保卡数据
+     */
+    public void setSSDCardData(SSCard ssCard){
+        if(ssCard!=null){
+            Log.d("EgAPP_SI_ReadSSCardInfo",ssCard.toString());
+            // 向全局填写当前社保卡信息
+            GlobalConfig.ssCard = ssCard;
+            // 由于病人的名字是带空格的，必须去掉
+            GlobalConfig.ssCard.setName(ssCard.getName().trim());
+            GlobalConfig.age = getAge(ssCard.getSSNum());
+
+            SPUtil.put(mContext,"smkCard",ssCard.getCardNum());
+            SPUtil.put(mContext,"age",getAge(ssCard.getSSNum()));
+            SPUtil.put(mContext,"userName",ssCard.getName().trim());
+            SPUtil.put(mContext,"sex",ssCard.getSex());
+            SPUtil.put(mContext,"idCard",ssCard.getSSNum());
+
+            // 获取信息后，直接请求用户数据
+            runOnUiThread(() -> requestFindUser(GlobalConfig.ssCard.getSSNum(),GlobalConfig.ssCard.getName(),GlobalConfig.ssCard.getCardNum()));
+        }
     }
 
     /**

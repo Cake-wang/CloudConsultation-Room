@@ -21,8 +21,8 @@ import okhttp3.RequestBody;
 public class FakeDataExample extends BaseRepository {
 
     public static final String phoneNumber = "18667115892";
-//    public static final String idCard = "33052219861229693X";
-    public static final String idCard = "330522198612296933";
+    public static final String idCard = "33052219861229693X";
+//    public static final String idCard = "330522198612296933";
     public static final String name = "飞飞";
     public static final String consultId = "815423874";
     public static final String departmentId = "18804";//行政科室编码
@@ -128,6 +128,7 @@ public class FakeDataExample extends BaseRepository {
         ssCard.setName(name);
         ssCard.setSSNum(idCard);
         ssCard.setCardNum(phoneNumber);
+        ssCard.setSex("男");
         return ssCard;
     }
 

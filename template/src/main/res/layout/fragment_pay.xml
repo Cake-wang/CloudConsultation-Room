@@ -3,33 +3,20 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@drawable/bg_other_yzs"
+    android:background="@mipmap/bg_other_yzs"
     android:orientation="vertical">
-
-    <!--    <include layout="@layout/fast_layout_title_bar" />-->
-
-
-    <!--    <TextView-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:gravity="center"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:text="请插入医保卡" />-->
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-
-
         android:layout_marginTop="130dp"
         android:layout_marginLeft="40dp"
         android:layout_marginRight="40dp"
         android:layout_marginBottom="80dp"
         android:background="@drawable/bg_readcard_gray"
-
         android:paddingTop="10dp"
         android:paddingRight="40dp"
         android:paddingLeft="40dp"
-
         android:orientation="vertical"
         >
 
@@ -38,7 +25,6 @@
             android:layout_height="50dp"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-
             >
 
             <View
@@ -63,7 +49,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#333"
-                android:drawableLeft="@drawable/icon_countdown_yzs"
+                android:drawableLeft="@mipmap/icon_countdown_yzs"
                 android:textSize="24dp"
                 android:drawablePadding="10dp"
                 android:gravity="center"
@@ -72,357 +58,342 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="400dp"
-
-
+            android:layout_height="0dp"
+            android:layout_weight="1"
             android:layout_marginTop="10dp"
-
-
-
             android:background="@drawable/bg_readcard_white"
-
-
-            android:gravity="center"
             android:orientation="vertical"
             >
-
-
-
-
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:gravity="center_vertical"
-                android:layout_marginLeft="20dp"
+                android:layout_marginLeft="30dp"
                 android:orientation="horizontal"
+                android:gravity="center"
                 >
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-
-
-                    android:paddingTop="10dp"
-                    android:paddingBottom="10dp"
-                    android:orientation="vertical"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="horizontal"
+                    android:gravity="center"
                     >
 
-                    <TextView
+                    <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textColor="#666666"
-                        android:layout_weight="1"
-                        android:layout_marginTop="10dp"
-                        android:layout_marginLeft="10dp"
-                        android:textSize="22dp"
-                        android:gravity="left"
-                        android:layout_marginBottom="20dp"
-                        android:text="姓名：" />
+                        android:gravity="center_vertical"
+                        android:paddingTop="10dp"
+                        android:paddingBottom="10dp"
+                        android:orientation="vertical"
+                        >
 
-                    <TextView
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#666666"
+                            android:layout_weight="1"
+                            android:layout_marginTop="10dp"
+                            android:layout_marginLeft="10dp"
+                            android:textSize="22dp"
+                            android:gravity="left"
+                            android:layout_marginBottom="20dp"
+                            android:text="姓名：" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#666666"
+                            android:layout_weight="1"
+                            android:layout_marginLeft="10dp"
+                            android:textSize="22dp"
+                            android:gravity="left"
+                            android:layout_marginBottom="20dp"
+                            android:text="费用类型：" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#666666"
+                            android:layout_weight="1"
+                            android:layout_marginLeft="10dp"
+                            android:textSize="22dp"
+                            android:gravity="left"
+                            android:layout_marginBottom="20dp"
+                            android:text="费用总额：" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#666666"
+                            android:layout_weight="1"
+                            android:layout_marginLeft="10dp"
+                            android:textSize="22dp"
+                            android:gravity="left"
+                            android:layout_marginBottom="20dp"
+                            android:text="医保支付：" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#666666"
+                            android:layout_weight="1"
+                            android:layout_marginLeft="10dp"
+                            android:textSize="22dp"
+                            android:gravity="left"
+                            android:text="自费支付：" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#666666"
+                            android:layout_weight="1"
+                            android:layout_marginLeft="10dp"
+                            android:textSize="22dp"
+                            android:gravity="left"
+                            android:visibility="gone"
+                            android:layout_marginBottom="15dp"
+                            android:text="开方时间：" />
+                    </LinearLayout>
+
+                    <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textColor="#666666"
-                        android:layout_weight="1"
-                        android:layout_marginLeft="10dp"
-                        android:textSize="22dp"
-                        android:gravity="left"
-                        android:layout_marginBottom="20dp"
-                        android:text="费用类型：" />
+                        android:gravity="center_vertical"
+                        android:paddingTop="10dp"
+                        android:paddingBottom="10dp"
+                        android:layout_marginRight="10dp"
+                        android:orientation="vertical"
+                        android:minWidth="200dp"
+                        >
 
-                    <TextView
+                        <TextView
+                            android:layout_marginTop="10dp"
+                            android:id="@+id/tv_name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#333333"
+                            android:layout_weight="1"
+                            android:layout_marginLeft="10dp"
+                            android:textSize="22dp"
+                            android:gravity="left"
+                            android:layout_marginBottom="20dp"
+                            android:text="王二" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#333333"
+                            android:layout_weight="1"
+                            android:layout_marginLeft="10dp"
+                            android:textSize="22dp"
+                            android:gravity="left"
+                            android:id="@+id/tv_fee_type"
+                            android:layout_marginBottom="20dp"
+                            android:text="挂号费" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#698FCB"
+                            android:layout_weight="1"
+                            android:layout_marginLeft="10dp"
+                            android:textSize="22dp"
+                            android:gravity="left"
+                            android:layout_marginBottom="20dp"
+                            android:id="@+id/tv_fee_all"
+                            android:text="" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#698FCB"
+                            android:layout_weight="1"
+                            android:layout_marginLeft="10dp"
+                            android:textSize="22dp"
+                            android:gravity="left"
+                            android:id="@+id/tv_fee_yb"
+                            android:layout_marginBottom="20dp"
+                            android:text="" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#698FCB"
+                            android:layout_weight="1"
+                            android:layout_marginLeft="10dp"
+                            android:textSize="22dp"
+                            android:gravity="left"
+                            android:id="@+id/tv_fee_zf"
+                            android:text="" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#333333"
+                            android:layout_weight="1"
+                            android:layout_marginLeft="10dp"
+                            android:textSize="22dp"
+                            android:gravity="left"
+                            android:visibility="gone"
+                            android:layout_marginBottom="15dp"
+                            android:text="2022-04-06" />
+                    </LinearLayout>
+
+                    <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textColor="#666666"
-                        android:layout_weight="1"
-                        android:layout_marginLeft="10dp"
-                        android:textSize="22dp"
-                        android:gravity="left"
-                        android:layout_marginBottom="20dp"
-
-                        android:text="费用总额：" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="#666666"
-                        android:layout_weight="1"
-                        android:layout_marginLeft="10dp"
-                        android:textSize="22dp"
-                        android:gravity="left"
-
-                        android:layout_marginBottom="20dp"
-                        android:text="医保支付：" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="#666666"
-                        android:layout_weight="1"
-                        android:layout_marginLeft="10dp"
-                        android:textSize="22dp"
-                        android:gravity="left"
-
-
-                        android:text="自费支付：" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="#666666"
-                        android:layout_weight="1"
-                        android:layout_marginLeft="10dp"
-                        android:textSize="22dp"
-                        android:gravity="left"
+                        android:gravity="center_vertical"
+                        android:layout_marginLeft="140dp"
+                        android:layout_marginTop="20dp"
+                        android:layout_gravity="top"
                         android:visibility="gone"
-                        android:layout_marginBottom="15dp"
-                        android:text="开方时间：" />
-                </LinearLayout>
+                        android:layout_marginRight="10dp"
+                        android:orientation="vertical"
+                        >
 
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:paddingTop="10dp"
-                    android:paddingBottom="10dp"
-                    android:layout_marginRight="10dp"
-                    android:orientation="vertical"
-                    android:minWidth="200dp"
-                    >
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#666666"
+                            android:layout_weight="1"
+                            android:layout_marginLeft="10dp"
+                            android:textSize="22dp"
+                            android:gravity="left"
+                            android:layout_marginBottom="15dp"
+                            android:text="处方信息：" />
 
-                    <TextView
-                        android:layout_marginTop="10dp"
-                        android:id="@+id/tv_name"
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#333333"
+                            android:layout_weight="1"
+                            android:layout_marginLeft="10dp"
+                            android:textSize="22dp"
+                            android:gravity="left"
+                            android:layout_marginBottom="15dp"
+                            android:text="1、阿莫西林（1天3次，每次2片）" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#333333"
+                            android:layout_weight="1"
+                            android:layout_marginLeft="10dp"
+                            android:textSize="22dp"
+                            android:gravity="left"
+                            android:layout_marginBottom="15dp"
+                            android:text="2、止咳糖浆（1天3次，每次20毫升）" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#333333"
+                            android:layout_weight="1"
+                            android:layout_marginLeft="10dp"
+                            android:textSize="22dp"
+                            android:gravity="left"
+                            android:text="3、口服液（1天2次，每次1支）" />
+
+
+                    </LinearLayout>
+
+                    <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textColor="#333333"
-                        android:layout_weight="1"
-                        android:layout_marginLeft="10dp"
-                        android:textSize="22dp"
-                        android:gravity="left"
-                        android:layout_marginBottom="20dp"
-                        android:text="王二" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="#333333"
-                        android:layout_weight="1"
-                        android:layout_marginLeft="10dp"
-                        android:textSize="22dp"
-                        android:gravity="left"
-                        android:id="@+id/tv_fee_type"
-                        android:layout_marginBottom="20dp"
-                        android:text="挂号费" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="#698FCB"
-                        android:layout_weight="1"
-                        android:layout_marginLeft="10dp"
-                        android:textSize="22dp"
-                        android:gravity="left"
-                        android:layout_marginBottom="20dp"
-                        android:id="@+id/tv_fee_all"
-                        android:text="" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="#698FCB"
-                        android:layout_weight="1"
-                        android:layout_marginLeft="10dp"
-                        android:textSize="22dp"
-                        android:gravity="left"
-                        android:id="@+id/tv_fee_yb"
-                        android:layout_marginBottom="20dp"
-                        android:text="" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="#698FCB"
-                        android:layout_weight="1"
-                        android:layout_marginLeft="10dp"
-                        android:textSize="22dp"
-                        android:gravity="left"
-                        android:id="@+id/tv_fee_zf"
-
-                        android:text="" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="#333333"
-                        android:layout_weight="1"
-                        android:layout_marginLeft="10dp"
-                        android:textSize="22dp"
-                        android:gravity="left"
+                        android:gravity="center_vertical"
+                        android:layout_marginLeft="140dp"
                         android:visibility="gone"
-                        android:layout_marginBottom="15dp"
-                        android:text="2022-04-06" />
-                </LinearLayout>
+                        android:orientation="vertical"
+                        >
 
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:layout_marginLeft="140dp"
-                    android:layout_marginTop="20dp"
-                    android:layout_gravity="top"
-                    android:visibility="gone"
-                    android:layout_marginRight="10dp"
-                    android:orientation="vertical"
-                    >
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#666666"
+                            android:layout_weight="1"
+                            android:layout_marginLeft="10dp"
+                            android:textSize="22dp"
+                            android:gravity="left"
+                            android:layout_marginBottom="15dp"
+                            android:text="年龄：" />
 
-                    <TextView
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#666666"
+                            android:layout_weight="1"
+                            android:layout_marginLeft="10dp"
+                            android:textSize="22dp"
+                            android:gravity="left"
+                            android:layout_marginBottom="15dp"
+                            android:text="科室：" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#666666"
+                            android:layout_weight="1"
+                            android:layout_marginLeft="10dp"
+                            android:textSize="22dp"
+                            android:gravity="left"
+                            android:text="挂号时间：" />
+
+
+                    </LinearLayout>
+
+                    <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textColor="#666666"
-                        android:layout_weight="1"
-                        android:layout_marginLeft="10dp"
-                        android:textSize="22dp"
-                        android:gravity="left"
-                        android:layout_marginBottom="15dp"
-                        android:text="处方信息：" />
+                        android:gravity="center_vertical"
+                        android:visibility="gone"
+                        android:layout_marginRight="10dp"
+                        android:orientation="vertical"
+                        >
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="#333333"
-                        android:layout_weight="1"
-                        android:layout_marginLeft="10dp"
-                        android:textSize="22dp"
-                        android:gravity="left"
-                        android:layout_marginBottom="15dp"
-                        android:text="1、阿莫西林（1天3次，每次2片）" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#333333"
+                            android:layout_weight="1"
+                            android:layout_marginLeft="10dp"
+                            android:textSize="22dp"
+                            android:gravity="left"
+                            android:layout_marginBottom="15dp"
+                            android:text="22" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="#333333"
-                        android:layout_weight="1"
-                        android:layout_marginLeft="10dp"
-                        android:textSize="22dp"
-                        android:gravity="left"
-                        android:layout_marginBottom="15dp"
-                        android:text="2、止咳糖浆（1天3次，每次20毫升）" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#333333"
+                            android:layout_weight="1"
+                            android:layout_marginLeft="10dp"
+                            android:textSize="22dp"
+                            android:gravity="left"
+                            android:layout_marginBottom="15dp"
+                            android:text="心胸外科" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="#333333"
-                        android:layout_weight="1"
-                        android:layout_marginLeft="10dp"
-                        android:textSize="22dp"
-                        android:gravity="left"
-
-                        android:text="3、口服液（1天2次，每次1支）" />
-
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:layout_marginLeft="140dp"
-
-                    android:visibility="gone"
-                    android:orientation="vertical"
-                    >
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="#666666"
-                        android:layout_weight="1"
-                        android:layout_marginLeft="10dp"
-                        android:textSize="22dp"
-                        android:gravity="left"
-                        android:layout_marginBottom="15dp"
-                        android:text="年龄：" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="#666666"
-                        android:layout_weight="1"
-                        android:layout_marginLeft="10dp"
-                        android:textSize="22dp"
-                        android:gravity="left"
-                        android:layout_marginBottom="15dp"
-                        android:text="科室：" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="#666666"
-                        android:layout_weight="1"
-                        android:layout_marginLeft="10dp"
-                        android:textSize="22dp"
-                        android:gravity="left"
-
-                        android:text="挂号时间：" />
-
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-
-                    android:visibility="gone"
-                    android:layout_marginRight="10dp"
-                    android:orientation="vertical"
-                    >
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="#333333"
-                        android:layout_weight="1"
-                        android:layout_marginLeft="10dp"
-                        android:textSize="22dp"
-                        android:gravity="left"
-                        android:layout_marginBottom="15dp"
-                        android:text="22" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="#333333"
-                        android:layout_weight="1"
-                        android:layout_marginLeft="10dp"
-                        android:textSize="22dp"
-                        android:gravity="left"
-                        android:layout_marginBottom="15dp"
-                        android:text="心胸外科" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="#333333"
-                        android:layout_weight="1"
-                        android:layout_marginLeft="10dp"
-                        android:textSize="22dp"
-                        android:gravity="left"
-
-                        android:text="2022-04-06" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#333333"
+                            android:layout_weight="1"
+                            android:layout_marginLeft="10dp"
+                            android:textSize="22dp"
+                            android:gravity="left"
+                            android:text="2022-04-06" />
+                    </LinearLayout>
 
 
                 </LinearLayout>
 
                 <RelativeLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="match_parent"
+                    android:layout_weight="1"
                     android:gravity="center"
-                    android:layout_marginLeft="120dp"
                     android:visibility="visible"
-                    android:paddingHorizontal="40dp"
                     android:paddingVertical="20dp"
                     >
 
@@ -448,7 +419,7 @@
                         <ImageView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:src="@drawable/bg_pay_w_yzs"
+                            android:src="@mipmap/bg_pay_w_yzs"
                             android:visibility="gone"
                             />
 
@@ -456,7 +427,7 @@
                             android:id="@+id/iv_qrcode"
                             android:layout_width="300dp"
                             android:layout_height="300dp"
-                            android:background="@drawable/bg_pay_w_yzs"
+                            android:background="@mipmap/bg_pay_w_yzs"
                             android:layout_marginTop="10dp"
                             android:minWidth="120dp"
                             android:minHeight="120dp"
@@ -470,19 +441,13 @@
                         android:layout_height="match_parent"
                         android:gravity="center"
                         android:text="请点击刷新"
-                        android:textSize="22dp"
                         android:textColor="#38ABA0"
-                        />
+                        android:textSize="22dp" />
 
                 </RelativeLayout>
 
 
             </LinearLayout>
-
-
-
-
-
 
         </LinearLayout>
 
@@ -502,7 +467,7 @@
                 android:id="@+id/btn_back"
                 android:textColor="#38ABA0"
                 android:gravity="center"
-                android:background="@drawable/btn_back_yzs"
+                android:background="@mipmap/btn_back_yzs"
                 />
 
             <Button
@@ -513,7 +478,7 @@
                 android:textColor="#fff"
                 android:gravity="center"
                 android:layout_marginLeft="15dp"
-                android:background="@drawable/btn_main_yzs"
+                android:background="@mipmap/btn_main_yzs"
                 />
         </LinearLayout>
 

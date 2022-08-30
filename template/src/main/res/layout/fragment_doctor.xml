@@ -3,10 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@drawable/bg_other_yzs"
+    android:background="@mipmap/bg_other_yzs"
     android:orientation="vertical">
-
-    <!--    <include layout="@layout/fast_layout_title_bar" />-->
 
     <TextView
         android:id="@+id/jtjk_recipe_name"
@@ -19,11 +17,6 @@
         android:textColor="#fff"
         android:textSize="24dp"
         android:textStyle="bold" />
-    <!--    <TextView-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:gravity="center"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:text="请插入医保卡" />-->
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -74,7 +67,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#333"
-                android:drawableLeft="@drawable/icon_countdown_yzs"
+                android:drawableLeft="@mipmap/icon_countdown_yzs"
                 android:textSize="24dp"
                 android:drawablePadding="10dp"
 
@@ -84,7 +77,8 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="400dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"
             android:layout_marginTop="10dp"
             android:background="@drawable/bg_readcard_white"
             android:gravity="center"
@@ -95,7 +89,8 @@
                 android:id="@+id/jtjk_fz_fragment_rv"
                 android:layout_width="match_parent"
                 android:minHeight="300dp"
-                android:layout_height="wrap_content"/>
+                android:layout_height="0dp"
+                android:layout_weight="1"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -126,7 +121,7 @@
                     android:gravity="center"
                     android:layout_marginLeft="30dp"
                     android:layout_marginRight="10dp"
-                    android:background="@drawable/btn_ago_yzs"
+                    android:background="@mipmap/btn_ago_yzs"
                     />
 
                 <Button
@@ -137,7 +132,7 @@
                     android:gravity="center"
                     android:id="@+id/btn_inquiry"
                     android:layout_marginLeft="50dp"
-                    android:background="@drawable/btn_next_yzs"
+                    android:background="@mipmap/btn_next_yzs"
                     />
             </LinearLayout>
 
@@ -159,7 +154,7 @@
                 android:id="@+id/btn_back"
                 android:textColor="#38ABA0"
                 android:gravity="center"
-                android:background="@drawable/btn_back_yzs"
+                android:background="@mipmap/btn_back_yzs"
                 />
 
             <Button
@@ -170,7 +165,7 @@
                 android:textColor="#fff"
                 android:gravity="center"
                 android:layout_marginLeft="15dp"
-                android:background="@drawable/btn_main_yzs"
+                android:background="@mipmap/btn_main_yzs"
                 />
         </LinearLayout>
 

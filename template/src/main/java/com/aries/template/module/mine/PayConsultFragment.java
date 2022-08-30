@@ -297,7 +297,7 @@ public class PayConsultFragment extends BaseEventFragment {
                                 // 显示二维码
                                 String qrStr = entity.getData().getJsonResponseBean().getBody().qr_code;
                                 Resources res = getActivity().getResources();
-                                logoBmp = BitmapFactory.decodeResource(res, R.drawable.pay_alilogo);
+                                logoBmp = BitmapFactory.decodeResource(res, R.mipmap.pay_alilogo);
                                 payBmp = XQRCode.createQRCodeWithLogo(qrStr, 400, 400, logoBmp);
                                 Drawable drawable = new BitmapDrawable(payBmp);
                                 RequestOptions requestOptions =new RequestOptions().centerCrop()

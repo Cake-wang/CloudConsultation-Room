@@ -148,10 +148,10 @@ public class DoctorListFragment extends BaseEventFragment {
                 button.setEnabled(b);
                 if (b){
                     button.setTextColor(Color.parseColor("#ffffff"));
-                    button.setBackgroundResource(R.drawable.btn_next_yzs);
+                    button.setBackgroundResource(R.mipmap.btn_next_yzs);
                 }else {
                     button.setTextColor(Color.parseColor("#999999"));
-                    button.setBackgroundResource(R.drawable.btn_ago_yzs);
+                    button.setBackgroundResource(R.mipmap.btn_ago_yzs);
                 }
             }
         });

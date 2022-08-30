@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_focused="true" android:drawable="@drawable/bg_edit_yzs" />
-    <item android:drawable="@drawable/bg_edit_yzs" />
+    <item android:state_focused="true" android:drawable="@mipmap/bg_edit_yzs" />
+    <item android:drawable="@mipmap/bg_edit_yzs" />
 
 </selector>
 

@@ -379,6 +379,10 @@ public class DapinSocketProxy {
     public void startSocket(String _flag, int _currentTime){
         GlobalConfig.lastDapinSocketStr = _flag;
 
+        // 如果IP 是空的，则不请求
+        if (TextUtils.isEmpty(ip))
+            return;
+
         if (_currentTime<=0)
             _currentTime = 0;
 

@@ -62,6 +62,11 @@ public class ApiConstant {
 //    public static final String getConsultsAndRecipes  =  "ngari/revisit/getConsultsAndRecipes";
     public static final String getConsultsAndRecipes  =  "cloudHospitalCore/getConsultsAndRecipes";
 
+    /**
+     * 获取部分库存
+     */
+    public static final String findMedicineStock  =  "cloudHospitalCore/findMedicineStock";
+
 
 //    http://XXXXX:port/api/activation/queryActive
 

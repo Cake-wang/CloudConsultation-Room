@@ -10,6 +10,7 @@ import com.aries.template.entity.CanRequestOnlineConsultResultEntity;
 import com.aries.template.entity.CancelregisterResultEntity;
 import com.aries.template.entity.ConfigurationToThirdForPatientEntity;
 import com.aries.template.entity.CreateOrderResultEntity;
+import com.aries.template.entity.FindMedicineStockEntity;
 import com.aries.template.entity.OrderPreSettleEntity;
 import com.aries.template.entity.FindRecipesForPatientAndTabStatusEntity;
 import com.aries.template.entity.FindUserResultEntity;
@@ -305,5 +306,13 @@ public interface ApiService {
     @Headers("Content-Type: application/json")
     @POST(ApiConstant.doBaseNgariRequest)
     Observable<OrderPreSettleEntity> orderPreSettle(@Body RequestBody body);
+
+    /**
+     * 5.3.1  请求部分库存
+     * 请求部分库存
+     */
+    @Headers("Content-Type: application/json")
+    @POST(ApiConstant.findMedicineStock)
+    Observable<FindMedicineStockEntity> findMedicineStock(@Body RequestBody body);
 
 }

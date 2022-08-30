@@ -18,6 +18,7 @@ import com.aries.template.GlobalConfig;
 import com.aries.template.R;
 import com.aries.template.entity.CanRequestOnlineConsultResultEntity;
 import com.aries.template.entity.CreateOrderResultEntity;
+import com.aries.template.entity.FindMedicineStockEntity;
 import com.aries.template.entity.GetConsultsAndRecipesResultEntity;
 import com.aries.template.entity.GetRecipeListByConsultIdEntity;
 import com.aries.template.entity.GetStockInfoEntity;
@@ -211,9 +212,14 @@ public class ConfirmRecipesFragment extends BaseEventFragment {
      * 确定处方单
      */
     public void requestCreateOrder(){
-        ArrayList<String> list = new ArrayList<>();
-        for (GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO currentRecipe : currentRecipes) {
-            list.add(currentRecipe.recipeDetailBeanList.get(0).organDrugCode);
+        //先查库存，再跳转支付页
+//        ArrayList<String> list = new ArrayList<>();
+        ArrayList<Map<String,String>> list = new ArrayList<>();
+        for (GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO item : currentRecipes) {
+            Map<String,String > map = new HashMap<>();
+            map.put(item.recipeDetailBeanList.get(0).organDrugCode,String.valueOf(item.recipeDetailBeanList.get(0).sendNumber));
+//            list.add(currentRecipe.recipeDetailBeanList.get(0).organDrugCode);
+            list.add(map);
         }
         requestGetStockInfo(GlobalConfig.cabinetId,list);
 
@@ -244,70 +250,165 @@ public class ConfirmRecipesFragment extends BaseEventFragment {
      * @param clinicSn 诊亭编号
      * @param skus 药品编码 列表
      */
-    public void requestGetStockInfo(String clinicSn, ArrayList<String> skus){
-        skus = new ArrayList<String>(){{add("6901339924484");}};//todo cc
+    public void requestGetStockInfo(String clinicSn, ArrayList<Map<String,String>> skus){
+        skus = new ArrayList<Map<String,String>>(){{
+            Map<String,String> map =new HashMap<>();
+            map.put("6901339924484","1");
+            add(map);
+        }};//todo cc
 //        skus = new ArrayList<String>(){{add("4895013208569");}};//todo cc
-        ApiRepository.getInstance().getStockInfo(clinicSn,skus)
+        ApiRepository.getInstance().findMedicineStock(clinicSn,skus)
                 .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
-                .subscribe(new FastLoadingObserver<GetStockInfoEntity>("请稍后...") {
+                .subscribe(new FastLoadingObserver<FindMedicineStockEntity>("请稍后...") {
                     @Override
-                    public void _onNext(GetStockInfoEntity entity) {
+                    public void _onNext(FindMedicineStockEntity entity) {
                         if (entity == null) {
                             ToastUtil.show("请检查网络，返回首页后重试");
                             return;
                         }
-                        if (entity.getData().isSuccess()){
-                            // 判定药品是否还有库存
-                            // data 的返回类型 {\"1\":0,\"2\":0}
-                            Map<String,Object> objectMap = (Map<String, Object>) JSON.parse(entity.getData().getData());
-                            for (String key : objectMap.keySet()) {
-                                if (String.valueOf(objectMap.get(key)).equals("0")){
-                                    // 药品编码 的 这个药没有，提示用户
-//                                ToastUtil.show("药品库存不够");
-                                    start(ResultFragment.newInstance("stockFail"));
-                                    return;
+                        try {
+                            if (entity.success){
+                                // 判定药品是否还有库存
+                                // data 的返回类型 {\"1\":0,\"2\":0}
+//                                Map<String,Object> objectMap = (Map<String, Object>) JSON.parse(entity.getData().getData());
+//                                for (String key : objectMap.keySet()) {
+//                                    if (String.valueOf(objectMap.get(key)).equals("0")){
+//                                        // 药品编码 的 这个药没有，提示用户
+////                                ToastUtil.show("药品库存不够");
+//                                        start(ResultFragment.newInstance("stockFail"));
+//                                        return;
+//                                    }
+//                                }
+
+                                // 检查每一种药物
+                                for (FindMedicineStockEntity.DataDTO.DrugListDTO item : entity.data.drugList) {
+                                    // 包括没有库存，库存小于取药数
+                                    if (item.stockAmount-item.total<=0){
+                                        // 没有库存
+                                        // 药品编码 的 这个药没有，提示用户
+                                        start(ResultFragment.newInstance("stockFail"));
+                                        return;
+                                    }
                                 }
-                            }
 
-                            // 启动处方单推送接口
-                            // 拉到数据了，有库存
-                            // 然后取支付页面请求支付，合并处方单
-                            ArrayList<String> recipeids = new ArrayList<>();
-                            ArrayList<String> recipeCodes = new ArrayList<>();
-                            ArrayList<PayRecipeFragment.DrugObject> drugs = new ArrayList<>();
-                            for (GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO currentRecipe : currentRecipes) {
-                                // 9 是取消
-                                if (currentRecipe.status==9)
-                                    continue;
+                                // 启动处方单推送接口
+                                // 拉到数据了，有库存
+                                // 然后取支付页面请求支付，合并处方单
+                                ArrayList<String> recipeids = new ArrayList<>();
+                                ArrayList<String> recipeCodes = new ArrayList<>();
+                                ArrayList<PayRecipeFragment.DrugObject> drugs = new ArrayList<>();
+                                for (GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO currentRecipe : currentRecipes) {
+                                    // 9 是取消
+                                    if (currentRecipe.status==9)
+                                        continue;
 
-                                GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO.RecipeDetailBeanListDTO vo = currentRecipe.recipeDetailBeanList.get(0);
-                                // 用量
-                                String howToUse = "(1天"+vo.useTotalDose/vo.useDays+"次，每次"+((Double) vo.useDose).intValue()+"片)";
-                                PayRecipeFragment.DrugObject drug= new PayRecipeFragment.DrugObject();
-                                //            drugs.put("direction","口服");
-                                drug.dosageUnit = vo.drugUnit;
-                                drug.drugCommonName = vo.drugName;
-                                drug.drugTradeName = vo.drugName;
-                                drug.eachDosage = String.valueOf(vo.defaultUseDose);
-                                drug.itemDays = String.valueOf(vo.useDays);
-                                drug.price = String.valueOf(vo.drugCost);
-                                drug.quantity =String.valueOf( vo.sendNumber);
-                                drug.quantityUnit = vo.drugUnit;
-                                drug.sku = vo.organDrugCode;
-                                drug.spec =String.valueOf( vo.drugSpec);
-                                drug.howToUse =howToUse; // 用量
-                                drugs.add(drug);
-                                recipeids.add(String.valueOf(vo.recipeId));
-                                recipeCodes.add(String.valueOf(vo.organDrugCode));
+                                    GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO.RecipeDetailBeanListDTO vo = currentRecipe.recipeDetailBeanList.get(0);
+                                    // 用量
+                                    String howToUse = "(1天"+vo.useTotalDose/vo.useDays+"次，每次"+((Double) vo.useDose).intValue()+"片)";
+                                    PayRecipeFragment.DrugObject drug= new PayRecipeFragment.DrugObject();
+                                    //            drugs.put("direction","口服");
+                                    drug.dosageUnit = vo.drugUnit;
+                                    drug.drugCommonName = vo.drugName;
+                                    drug.drugTradeName = vo.drugName;
+                                    drug.eachDosage = String.valueOf(vo.defaultUseDose);
+                                    drug.itemDays = String.valueOf(vo.useDays);
+                                    drug.price = String.valueOf(vo.drugCost);
+                                    drug.quantity =String.valueOf( vo.sendNumber);
+                                    drug.quantityUnit = vo.drugUnit;
+                                    drug.sku = vo.organDrugCode;
+                                    drug.spec =String.valueOf( vo.drugSpec);
+                                    drug.howToUse =howToUse; // 用量
+                                    drugs.add(drug);
+                                    recipeids.add(String.valueOf(vo.recipeId));
+                                    recipeCodes.add(String.valueOf(vo.organDrugCode));
+                                }
+                                // 拉到数据了，有库存
+                                // 然后取支付页面请求支付，合并处方单
+                                //当处方单产生订单，并且订单有效时取的是订单的真实金额，其他时候取的处方的总金额保留两位小数
+                                start(PayRecipeFragment.newInstance(recipeids,recipeCodes,drugs,null));
                             }
-                            // 拉到数据了，有库存
-                            // 然后取支付页面请求支付，合并处方单
-                            //当处方单产生订单，并且订单有效时取的是订单的真实金额，其他时候取的处方的总金额保留两位小数
-                            start(PayRecipeFragment.newInstance(recipeids,recipeCodes,drugs,null));
+                        }catch (Exception e){
+                            e.printStackTrace();
+                            ToastUtil.show("查询药品库存失败");
                         }
                     }
                 });
     }
+
+    /**
+     * 查询药品库存是否还有
+     * @param clinicSn 诊亭编号
+     * @param skus 药品编码 列表
+     */
+//    public void requestGetStockInfo(String clinicSn, ArrayList<String> skus){
+//        skus = new ArrayList<String>(){{add("6901339924484");}};//todo cc
+////        skus = new ArrayList<String>(){{add("4895013208569");}};//todo cc
+//        ApiRepository.getInstance().getStockInfo(clinicSn,skus)
+//                .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
+//                .subscribe(new FastLoadingObserver<GetStockInfoEntity>("请稍后...") {
+//                    @Override
+//                    public void _onNext(GetStockInfoEntity entity) {
+//                        if (entity == null) {
+//                            ToastUtil.show("请检查网络，返回首页后重试");
+//                            return;
+//                        }
+//                        try {
+//                            if (entity.getData().isSuccess()){
+//                                // 判定药品是否还有库存
+//                                // data 的返回类型 {\"1\":0,\"2\":0}
+//                                Map<String,Object> objectMap = (Map<String, Object>) JSON.parse(entity.getData().getData());
+//                                for (String key : objectMap.keySet()) {
+//                                    if (String.valueOf(objectMap.get(key)).equals("0")){
+//                                        // 药品编码 的 这个药没有，提示用户
+////                                ToastUtil.show("药品库存不够");
+//                                        start(ResultFragment.newInstance("stockFail"));
+//                                        return;
+//                                    }
+//                                }
+//
+//                                // 启动处方单推送接口
+//                                // 拉到数据了，有库存
+//                                // 然后取支付页面请求支付，合并处方单
+//                                ArrayList<String> recipeids = new ArrayList<>();
+//                                ArrayList<String> recipeCodes = new ArrayList<>();
+//                                ArrayList<PayRecipeFragment.DrugObject> drugs = new ArrayList<>();
+//                                for (GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO currentRecipe : currentRecipes) {
+//                                    // 9 是取消
+//                                    if (currentRecipe.status==9)
+//                                        continue;
+//
+//                                    GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO.RecipeDetailBeanListDTO vo = currentRecipe.recipeDetailBeanList.get(0);
+//                                    // 用量
+//                                    String howToUse = "(1天"+vo.useTotalDose/vo.useDays+"次，每次"+((Double) vo.useDose).intValue()+"片)";
+//                                    PayRecipeFragment.DrugObject drug= new PayRecipeFragment.DrugObject();
+//                                    //            drugs.put("direction","口服");
+//                                    drug.dosageUnit = vo.drugUnit;
+//                                    drug.drugCommonName = vo.drugName;
+//                                    drug.drugTradeName = vo.drugName;
+//                                    drug.eachDosage = String.valueOf(vo.defaultUseDose);
+//                                    drug.itemDays = String.valueOf(vo.useDays);
+//                                    drug.price = String.valueOf(vo.drugCost);
+//                                    drug.quantity =String.valueOf( vo.sendNumber);
+//                                    drug.quantityUnit = vo.drugUnit;
+//                                    drug.sku = vo.organDrugCode;
+//                                    drug.spec =String.valueOf( vo.drugSpec);
+//                                    drug.howToUse =howToUse; // 用量
+//                                    drugs.add(drug);
+//                                    recipeids.add(String.valueOf(vo.recipeId));
+//                                    recipeCodes.add(String.valueOf(vo.organDrugCode));
+//                                }
+//                                // 拉到数据了，有库存
+//                                // 然后取支付页面请求支付，合并处方单
+//                                //当处方单产生订单，并且订单有效时取的是订单的真实金额，其他时候取的处方的总金额保留两位小数
+//                                start(PayRecipeFragment.newInstance(recipeids,recipeCodes,drugs,null));
+//                            }
+//                        }catch (Exception e){
+//                            e.printStackTrace();
+//                            ToastUtil.show("查询药品库存失败");
+//                        }
+//                    }
+//                });
+//    }
 
     /**
      * 创建取消对话框

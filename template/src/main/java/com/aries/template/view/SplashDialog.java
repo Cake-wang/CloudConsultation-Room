@@ -68,16 +68,16 @@ public class SplashDialog{
         // 获取最底层的显示对象
         screenLayout = new RelativeLayout(context);
         RelativeLayout.LayoutParams screenParams = new RelativeLayout.LayoutParams(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
-        screenLayout.setPadding(46,116,46,0);
+        screenLayout.setPadding(46,116,46,116);
         screenLayout.setLayoutParams(screenParams);
         screenLayout.setVerticalGravity(RelativeLayout.CENTER_IN_PARENT);
         screenLayout.setHorizontalGravity(RelativeLayout.CENTER_IN_PARENT);
         screenLayout.setBackgroundColor(0x00000000);
 
         splashImageView = new ImageView(context);
-        ViewGroup.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        ViewGroup.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         splashImageView.setLayoutParams(layoutParams);
-        splashImageView.setBackground(context.getDrawable(R.drawable.dialog_home_pic));
+        splashImageView.setBackground(context.getDrawable(R.mipmap.dialog_home_pic));
         splashImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
 
         splashDialog = new FullScreenDialog(context);

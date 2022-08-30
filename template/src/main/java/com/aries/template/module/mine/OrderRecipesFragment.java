@@ -10,11 +10,14 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.aries.library.fast.retrofit.FastLoadingObserver;
 import com.aries.library.fast.util.SPUtil;
 import com.aries.library.fast.util.ToastUtil;
 import com.aries.template.GlobalConfig;
 import com.aries.template.R;
+import com.aries.template.entity.FindMedicineStockEntity;
 import com.aries.template.entity.GetConsultsAndRecipesResultEntity;
 import com.aries.template.entity.GetStockInfoEntity;
 import com.aries.template.module.base.BaseEventFragment;
@@ -28,6 +31,7 @@ import com.trello.rxlifecycle3.android.FragmentEvent;
 import com.xuexiang.xaop.annotation.SingleClick;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -165,9 +169,12 @@ public class OrderRecipesFragment extends BaseEventFragment {
                 break;
             case R.id.btn_inquiry:
                     //先查库存，再跳转支付页
-                    ArrayList<String> list = new ArrayList<>();
+                    ArrayList<Map<String,String>> list = new ArrayList<>();
                     for (GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes.RecipeDetail item : obj.recipeDetailBeans) {
-                        list.add(item.organDrugCode);
+                        Map<String,String > map = new HashMap<>();
+                        map.put(item.organDrugCode,item.sendNumber.toString());
+//                        list.add(item.organDrugCode, item.sendNumber);
+                        list.add(map);
                     }
                     requestGetStockInfo(GlobalConfig.cabinetId,list);
                 break;
@@ -237,27 +244,43 @@ public class OrderRecipesFragment extends BaseEventFragment {
      * @param clinicSn 诊亭编号
      * @param skus 药品编码 列表
      */
-    public void requestGetStockInfo(String clinicSn, ArrayList<String> skus){
-        skus = new ArrayList<String>(){{add("6901339924484");}};//todo cc
+    public void requestGetStockInfo(String clinicSn, ArrayList<Map<String,String>> skus){
+//        skus = new ArrayList<String>(){{add("6901339924484");}};//todo cc
 //        skus = new ArrayList<String>(){{add("4895013208569");}};//todo cc
-        ApiRepository.getInstance().getStockInfo(clinicSn,skus)
+        skus = new ArrayList<Map<String,String>>(){{
+            Map<String,String> map =new HashMap<>();
+            map.put("6901339924484","1");
+            add(map);
+        }};//todo cc
+        ApiRepository.getInstance().findMedicineStock(clinicSn,skus)
                 .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
-                .subscribe(new FastLoadingObserver<GetStockInfoEntity>("请稍后...") {
+                .subscribe(new FastLoadingObserver<FindMedicineStockEntity>("请稍后...") {
                     @Override
-                    public void _onNext(GetStockInfoEntity entity) {
+                    public void _onNext(FindMedicineStockEntity entity) {
                         if (entity == null) {
                             ToastUtil.show("请检查网络，返回首页后重试");
                             return;
                         }
                         try {
-                            if (entity.getData().isSuccess()){
+                            if (entity.success){
                                 // 判定药品是否还有库存
 //                             data 的返回类型 {\"1\":0,\"2\":0}
-                                Map<String,Object> objectMap = (Map<String, Object>) JSON.parse(entity.getData().getData());
-                                for (String key : objectMap.keySet()) {
-                                    if (String.valueOf(objectMap.get(key)).equals("0")){
+//                                Map<String,Object> objectMap = (Map<String, Object>) JSON.parse(entity.data().getData());
+//                                for (String key : objectMap.keySet()) {
+//                                    if (String.valueOf(objectMap.get(key)).equals("0")){
+//                                        // 药品编码 的 这个药没有，提示用户
+////                                ToastUtil.show("药品库存不够");
+//                                        start(ResultFragment.newInstance("stockFail"));
+//                                        return;
+//                                    }
+//                                }
+
+                                // 检查每一种药物
+                                for (FindMedicineStockEntity.DataDTO.DrugListDTO item : entity.data.drugList) {
+                                    // 包括没有库存，库存小于取药数
+                                    if (item.stockAmount-item.total<=0){
+                                        // 没有库存
                                         // 药品编码 的 这个药没有，提示用户
-//                                ToastUtil.show("药品库存不够");
                                         start(ResultFragment.newInstance("stockFail"));
                                         return;
                                     }
@@ -303,6 +326,78 @@ public class OrderRecipesFragment extends BaseEventFragment {
                     }
                 });
     }
+
+    /**
+     * 查询药品库存是否还有
+     * @param clinicSn 诊亭编号
+     * @param skus 药品编码 列表
+     */
+//    public void requestGetStockInfo(String clinicSn, ArrayList<Map<String,String>> skus){
+////        skus = new ArrayList<String>(){{add("6901339924484");}};//todo cc
+////        skus = new ArrayList<String>(){{add("4895013208569");}};//todo cc
+//        ApiRepository.getInstance().getStockInfo(clinicSn,skus)
+//                .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
+//                .subscribe(new FastLoadingObserver<GetStockInfoEntity>("请稍后...") {
+//                    @Override
+//                    public void _onNext(GetStockInfoEntity entity) {
+//                        if (entity == null) {
+//                            ToastUtil.show("请检查网络，返回首页后重试");
+//                            return;
+//                        }
+//                        try {
+//                            if (entity.getData().isSuccess()){
+//                                // 判定药品是否还有库存
+////                             data 的返回类型 {\"1\":0,\"2\":0}
+//                                Map<String,Object> objectMap = (Map<String, Object>) JSON.parse(entity.getData().getData());
+//                                for (String key : objectMap.keySet()) {
+//                                    if (String.valueOf(objectMap.get(key)).equals("0")){
+//                                        // 药品编码 的 这个药没有，提示用户
+////                                ToastUtil.show("药品库存不够");
+//                                        start(ResultFragment.newInstance("stockFail"));
+//                                        return;
+//                                    }
+//                                }
+//
+//                                // 启动处方单推送接口
+//                                // 拉到数据了，有库存
+//                                // 然后取支付页面请求支付，合并处方单
+//                                ArrayList<String> recipeids = new ArrayList<>();
+//                                ArrayList<String> recipeCodes = new ArrayList<>();
+//                                ArrayList<PayRecipeFragment.DrugObject> drugs = new ArrayList<>();
+//                                for (GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes.RecipeDetail item : obj.recipeDetailBeans) {
+//                                    // 由于取消的 处方单 是不会存在的，所以不需要判断9，取消订单的问题
+//                                    // 用量
+//                                    String howToUse = "(1天"+item.getUseTotalDose()/item.getUseDays()+"次，每次"+ item.getUseDose().intValue()+"片)";
+//                                    PayRecipeFragment.DrugObject drug= new PayRecipeFragment.DrugObject();
+//                                    //            drugs.put("direction","口服");
+//                                    drug.dosageUnit = item.drugUnit;
+//                                    drug.drugCommonName = item.drugName;
+//                                    drug.drugTradeName = item.drugName;
+//                                    drug.eachDosage = String.valueOf(item.defaultUseDose);
+//                                    drug.itemDays = String.valueOf(item.useDays);
+//                                    drug.price = String.valueOf(item.drugCost);
+//                                    drug.quantity =String.valueOf( item.sendNumber);
+//                                    drug.quantityUnit = item.drugUnit;
+//                                    drug.sku = item.organDrugCode;
+//                                    drug.spec =String.valueOf( item.drugSpec);
+//                                    drug.howToUse =howToUse;// 用量
+//                                    drugs.add(drug);
+//                                    recipeids.add(String.valueOf(item.recipeId));
+//                                    recipeCodes.add(String.valueOf(item.organDrugCode));
+//                                }
+//                                //当处方单产生订单，并且订单有效时取的是订单的真实金额，其他时候取的处方的总金额保留两位小数
+//                                String orderId = obj.orderId==null?"":String.valueOf(obj.orderId);
+//                                start(PayRecipeFragment.newInstance(recipeids,recipeCodes,drugs,orderId));
+//                            }else {
+//                                ToastUtil.show("药品查询失败");
+//                            }
+//                        }catch (Exception e){
+//                            e.printStackTrace();
+//                            ToastUtil.show("药品查询失败");
+//                        }
+//                    }
+//                });
+//    }
 
 
 }

@@ -4,23 +4,19 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_other_yzs">
+    android:background="@mipmap/bg_other_yzs">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-
-
         android:layout_marginLeft="40dp"
         android:layout_marginTop="130dp"
         android:layout_marginRight="40dp"
         android:layout_marginBottom="80dp"
         android:background="@drawable/bg_readcard_gray"
-
         android:orientation="vertical"
         android:paddingLeft="40dp"
         android:paddingTop="10dp"
-
         android:paddingRight="40dp">
 
         <LinearLayout
@@ -50,7 +46,7 @@
                 android:id="@+id/jtjk_fz_fragment_timer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:drawableLeft="@drawable/icon_countdown_yzs"
+                android:drawableLeft="@mipmap/icon_countdown_yzs"
                 android:drawablePadding="10dp"
                 android:gravity="center"
                 android:text=""
@@ -61,34 +57,31 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="400dp"
-
-
+            android:layout_height="0dp"
+            android:layout_weight="1"
             android:layout_marginTop="10dp"
-
-
             android:background="@drawable/bg_readcard_white"
-
-
             android:gravity="center"
             android:orientation="vertical">
 
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:layout_marginHorizontal="10dp"
+                android:layout_marginVertical="16dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
                 <RelativeLayout
                     android:layout_width="0dp"
-                    android:layout_height="300dp"
+                    android:minHeight="300dp"
+                    android:layout_height="match_parent"
                     android:layout_gravity="top"
                     android:layout_marginTop="20dp"
                     android:layout_weight="1"
-                    android:background="@drawable/bg_redio_yzs"
+                    android:background="@mipmap/bg_redio_yzs"
                     android:gravity="top"
                     android:visibility="visible">
 
@@ -96,189 +89,24 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:scaleType="center"
-                        android:src="@drawable/video_doctor_img" />
+                        android:src="@mipmap/video_doctor_img" />
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/videoContent"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:padding="12dp"
-                        app:layout_constraintDimensionRatio="16:9"></androidx.constraintlayout.widget.ConstraintLayout>
+                        app:layout_constraintDimensionRatio="16:9" />
                 </RelativeLayout>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="40dp"
-                    android:gravity="center_vertical"
-                    android:orientation="vertical"
-                    android:paddingTop="10dp"
-                    android:paddingBottom="10dp"
-                    android:visibility="gone">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginTop="10dp"
-                        android:layout_marginBottom="15dp"
-                        android:layout_weight="1"
-                        android:gravity="left"
-                        android:text="姓名："
-                        android:textColor="#666666"
-                        android:textSize="22dp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginBottom="15dp"
-                        android:layout_weight="1"
-                        android:gravity="left"
-                        android:text="医保卡号："
-                        android:textColor="#666666"
-                        android:textSize="22dp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginBottom="15dp"
-                        android:layout_weight="1"
-                        android:gravity="left"
-                        android:text="医生："
-                        android:textColor="#666666"
-
-                        android:textSize="22dp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginBottom="15dp"
-                        android:layout_weight="1"
-                        android:gravity="left"
-                        android:text="科室："
-                        android:textColor="#666666"
-                        android:textSize="22dp"
-                        android:visibility="gone" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginBottom="15dp"
-                        android:layout_weight="1"
-                        android:gravity="left"
-                        android:text="诊断结果："
-                        android:textColor="#666666"
-                        android:textSize="22dp"
-                        android:visibility="gone" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginBottom="15dp"
-                        android:layout_weight="1"
-                        android:gravity="left"
-                        android:text="开方时间："
-                        android:textColor="#666666"
-                        android:textSize="22dp"
-                        android:visibility="gone" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="10dp"
-                    android:gravity="center_vertical"
-                    android:orientation="vertical"
-                    android:paddingTop="10dp"
-                    android:paddingBottom="10dp"
-                    android:visibility="gone">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginTop="10dp"
-                        android:layout_marginBottom="15dp"
-                        android:layout_weight="1"
-                        android:gravity="left"
-                        android:text="王二二（男）"
-                        android:textColor="#333333"
-                        android:textSize="22dp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginBottom="15dp"
-                        android:layout_weight="1"
-                        android:gravity="left"
-                        android:text="A12345678"
-                        android:textColor="#333333"
-                        android:textSize="22dp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginBottom="15dp"
-                        android:layout_weight="1"
-                        android:gravity="left"
-                        android:text="张三三"
-                        android:textColor="#333333"
-
-                        android:textSize="22dp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginBottom="15dp"
-                        android:layout_weight="1"
-                        android:gravity="left"
-                        android:text="心胸外科"
-                        android:textColor="#333333"
-                        android:textSize="22dp"
-                        android:visibility="gone" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginBottom="15dp"
-                        android:layout_weight="1"
-                        android:gravity="left"
-                        android:text="过度熬夜"
-                        android:textColor="#333333"
-                        android:textSize="22dp"
-                        android:visibility="gone" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginBottom="15dp"
-                        android:layout_weight="1"
-                        android:gravity="left"
-                        android:text="2022-04-06"
-                        android:textColor="#333333"
-                        android:textSize="22dp"
-                        android:visibility="gone" />
-                </LinearLayout>
 
                 <RelativeLayout
                     android:layout_width="0dp"
-                    android:layout_height="300dp"
+                    android:layout_height="match_parent"
                     android:layout_gravity="top"
                     android:layout_marginLeft="30dp"
                     android:layout_marginTop="20dp"
                     android:layout_weight="1"
-                    android:background="@drawable/bg_redio_yzs"
+                    android:background="@mipmap/bg_redio_yzs"
                     android:gravity="center"
                     android:padding="20dp"
                     android:visibility="visible">
@@ -307,98 +135,9 @@
                         android:id="@+id/rv_video_tip"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:padding="26dp"
                         android:visibility="gone" />
                 </RelativeLayout>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="140dp"
-                    android:gravity="center_vertical"
-
-                    android:orientation="vertical"
-                    android:visibility="gone">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginBottom="15dp"
-                        android:layout_weight="1"
-                        android:gravity="left"
-                        android:text="年龄："
-                        android:textColor="#666666"
-                        android:textSize="22dp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginBottom="15dp"
-                        android:layout_weight="1"
-                        android:gravity="left"
-                        android:text="科室："
-                        android:textColor="#666666"
-                        android:textSize="22dp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
-                        android:layout_weight="1"
-                        android:gravity="left"
-                        android:text="挂号时间："
-                        android:textColor="#666666"
-
-                        android:textSize="22dp" />
-
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="10dp"
-
-                    android:gravity="center_vertical"
-                    android:orientation="vertical"
-                    android:visibility="gone">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginBottom="15dp"
-                        android:layout_weight="1"
-                        android:gravity="left"
-                        android:text="22"
-                        android:textColor="#333333"
-                        android:textSize="22dp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginBottom="15dp"
-                        android:layout_weight="1"
-                        android:gravity="left"
-                        android:text="心胸外科"
-                        android:textColor="#333333"
-                        android:textSize="22dp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
-                        android:layout_weight="1"
-                        android:gravity="left"
-                        android:text="2022-04-06"
-                        android:textColor="#333333"
-
-                        android:textSize="22dp" />
-
-
-                </LinearLayout>
 
             </LinearLayout>
 
@@ -417,7 +156,6 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-
                 android:gravity="center"
                 android:orientation="horizontal"
                 android:paddingTop="5dp">
@@ -428,7 +166,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="30dp"
                     android:layout_marginRight="10dp"
-                    android:background="@drawable/btn_next_yzs"
+                    android:background="@mipmap/btn_next_yzs"
                     android:gravity="center"
                     android:text="全屏播放"
                     android:textColor="#fff" />
@@ -439,7 +177,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="30dp"
                     android:layout_marginRight="10dp"
-                    android:background="@drawable/btn_next_yzs"
+                    android:background="@mipmap/btn_next_yzs"
                     android:gravity="center"
                     android:text="身体检测"
                     android:enabled="false"
@@ -450,7 +188,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="50dp"
-                    android:background="@drawable/bg_end_yzs"
+                    android:background="@mipmap/bg_end_yzs"
                     android:gravity="center"
                     android:text="结束问诊"
                     android:textColor="#fff" />
@@ -470,7 +208,7 @@
                 android:id="@+id/btn_back"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/btn_back_yzs"
+                android:background="@mipmap/btn_back_yzs"
                 android:gravity="center"
                 android:text="返回"
                 android:textColor="#38ABA0"
@@ -481,7 +219,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="15dp"
-                android:background="@drawable/btn_main_yzs"
+                android:background="@mipmap/btn_main_yzs"
                 android:gravity="center"
                 android:text="首页"
                 android:textColor="#fff"
@@ -585,7 +323,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
-                android:background="@drawable/btn_next_yzs"
+                android:background="@mipmap/btn_next_yzs"
                 android:text="关闭全屏"
                 android:textSize="24dp"
                 android:gravity="center"

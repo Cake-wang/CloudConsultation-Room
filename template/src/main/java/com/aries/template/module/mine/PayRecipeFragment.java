@@ -487,7 +487,7 @@ public class PayRecipeFragment extends BaseEventFragment {
                                     Resources res = getActivity().getResources();
 //                                    Bitmap bmp= BitmapFactory.decodeResource(res, R.drawable.pay_alilogo);
 //                                    showQRCode(XQRCode.createQRCodeWithLogo(qrStr, 400, 400, bmp));
-                                    logoBmp = BitmapFactory.decodeResource(res, R.drawable.pay_alilogo);
+                                    logoBmp = BitmapFactory.decodeResource(res, R.mipmap.pay_alilogo);
                                     payBmp = XQRCode.createQRCodeWithLogo(qrStr, 400, 400, logoBmp);
                                     Drawable drawable = new BitmapDrawable(payBmp);
                                     RequestOptions requestOptions =new RequestOptions().centerCrop()

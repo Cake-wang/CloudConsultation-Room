@@ -101,20 +101,20 @@ public class ResultFragment extends BaseEventFragment implements ISupportFragmen
     public void initView(Bundle savedInstanceState) {
         if (result.contains("cancelConsult")){
              tv_result_title.setText("取消成功");
-            tv_result_bg.setBackgroundResource(R.drawable.bg_suc_yzs);
+            tv_result_bg.setBackgroundResource(R.mipmap.bg_suc_yzs);
              tv_result_tip.setText("取消成功");
              tv_result_contet.setText("您的结算单已取消，如需开药请再次发起问诊");
             tv_result_code.setVisibility(View.GONE);
         }else  if (result.contains("paySuc")){
             tv_result_title.setText("支付成功");
-            tv_result_bg.setBackgroundResource(R.drawable.bg_pay_suc_yzs);
+            tv_result_bg.setBackgroundResource(R.mipmap.bg_pay_suc_yzs);
             tv_result_tip.setText("支付成功");
             tv_result_contet.setText("请取走凭条，凭取药码至药柜取药");
             tv_result_code.setVisibility(View.VISIBLE);
             tv_result_code.setText("取号码"+takeCode);
         }else {
             tv_result_title.setText("支付失败");
-            tv_result_bg.setBackgroundResource(R.drawable.bg_fail_yzs);
+            tv_result_bg.setBackgroundResource(R.mipmap.bg_fail_yzs);
             tv_result_tip.setText("支付失败");
             tv_result_contet.setText("当前药品库存不足");
             tv_result_code.setVisibility(View.GONE);

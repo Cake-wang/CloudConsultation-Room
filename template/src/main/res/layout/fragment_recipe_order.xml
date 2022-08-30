@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@drawable/bg_other_yzs"
+    android:background="@mipmap/bg_other_yzs"
     android:orientation="vertical">
 
     <LinearLayout
@@ -25,7 +25,6 @@
             android:layout_height="50dp"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-
             >
 
             <View
@@ -50,7 +49,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#333"
-                android:drawableLeft="@drawable/icon_countdown_yzs"
+                android:drawableLeft="@mipmap/icon_countdown_yzs"
                 android:textSize="24dp"
                 android:drawablePadding="10dp"
                 android:gravity="center"
@@ -59,7 +58,8 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="400dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"
             android:layout_marginTop="10dp"
             android:background="@drawable/bg_readcard_white"
             android:gravity="center"
@@ -68,9 +68,10 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="1"
                 android:orientation="horizontal"
-                android:background="@drawable/bg_pay_yzs"
+                android:background="@mipmap/bg_pay_yzs"
                 >
                 <ScrollView
                     android:layout_marginTop="16dp"
@@ -389,8 +390,9 @@
                 </ScrollView>
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
                     android:gravity="center_vertical"
                     android:layout_marginLeft="130dp"
                     android:layout_marginTop="20dp"
@@ -403,11 +405,10 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="#666666"
-                        android:layout_weight="1"
                         android:layout_marginLeft="10dp"
+                        android:layout_marginBottom="15dp"
                         android:textSize="22dp"
                         android:gravity="left"
-                        android:layout_marginBottom="15dp"
                         android:text="处方信息：" />
 
 
@@ -417,16 +418,9 @@
                         android:layout_marginLeft="10dp"
                         android:nestedScrollingEnabled="true"
                         android:scrollbars="vertical"
-                        android:layout_width="340dp"
-                        android:layout_height="160dp"/>
-
-
-                    <!--                    <include-->
-                    <!--                        layout="@layout/fast_layout_refresh_recycler"-->
-                    <!--                        android:layout_width="340dp"-->
-                    <!--                        android:layout_height="wrap_content"-->
-                    <!--                        android:layout_marginLeft="10dp"-->
-                    <!--                        />-->
+                        android:layout_width="match_parent"
+                        android:layout_weight="1"
+                        android:layout_height="0dp"/>
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -498,7 +492,7 @@
                     android:gravity="center"
                     android:layout_marginLeft="30dp"
                     android:layout_marginRight="60dp"
-                    android:background="@drawable/btn_ago_yzs"
+                    android:background="@mipmap/btn_ago_yzs"
                     android:visibility="gone"
                     />
 
@@ -510,7 +504,7 @@
                     android:gravity="center"
                     android:id="@+id/btn_inquiry"
                     android:layout_marginLeft="50dp"
-                    android:background="@drawable/btn_next_yzs"
+                    android:background="@mipmap/btn_next_yzs"
                     />
             </LinearLayout>
 
@@ -532,7 +526,7 @@
                 android:id="@+id/btn_back"
                 android:textColor="#38ABA0"
                 android:gravity="center"
-                android:background="@drawable/btn_back_yzs"
+                android:background="@mipmap/btn_back_yzs"
                 />
 
             <Button
@@ -543,7 +537,7 @@
                 android:textColor="#fff"
                 android:gravity="center"
                 android:layout_marginLeft="15dp"
-                android:background="@drawable/btn_main_yzs"
+                android:background="@mipmap/btn_main_yzs"
                 />
         </LinearLayout>
 
