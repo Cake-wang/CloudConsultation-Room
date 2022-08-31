@@ -216,8 +216,12 @@ public class HomeFragment extends BaseEventFragment{
                             ToastUtil.show("请检查网络");
                             return;
                         }
-                        if (entity.getData().isSuccess()){
-                            loginEmClient(entity.getData().getJsonResponseBean().getBody().getUsername(),entity.getData().getJsonResponseBean().getBody().getUserpwd());
+                        try {
+                            if (entity.getData().isSuccess()){
+                                loginEmClient(entity.getData().getJsonResponseBean().getBody().getUsername(),entity.getData().getJsonResponseBean().getBody().getUserpwd());
+                            }
+                        }catch (Exception e){
+                            e.printStackTrace();
                         }
                     }
                 });
@@ -270,33 +274,37 @@ public class HomeFragment extends BaseEventFragment{
                         ToastUtil.show("请检查网络，返回首页后重试");
                         return;
                     }
-                    if (entity.success){
-                        if (entity.data==null){
-                            ToastUtil.show("机器号没有配置");
-                            return;
-                        }
-                        GlobalConfig.machineId = entity.data.machineId;
-                        GlobalConfig.cabinetId = entity.data.cabinetId;
-                        GlobalConfig.hospitalName = entity.data.hospitalName;
-                        GlobalConfig.organId = Integer.valueOf(entity.data.hospitalNo);
-                        GlobalConfig.machineIp = entity.data.machineIp + ":"+GlobalConfig.machinePort;// 端口是写死的，传入的只有ip
-                        GlobalConfig.thirdFactory = entity.data.thirdFactory;
+                   try {
+                       if (entity.success){
+                           if (entity.data==null){
+                               ToastUtil.show("机器号没有配置");
+                               return;
+                           }
+                           GlobalConfig.machineId = entity.data.machineId;
+                           GlobalConfig.cabinetId = entity.data.cabinetId;
+                           GlobalConfig.hospitalName = entity.data.hospitalName;
+                           GlobalConfig.organId = Integer.valueOf(entity.data.hospitalNo);
+                           GlobalConfig.machineIp = entity.data.machineIp + ":"+GlobalConfig.machinePort;// 端口是写死的，传入的只有ip
+                           GlobalConfig.thirdFactory = entity.data.thirdFactory;
 //                        GlobalConfig.thirdMachineId = entity.data.thirdMachineId;// 暂定不赋予
-                        GlobalConfig.factoryResource = entity.data.factoryResource;
-                        GlobalConfig.factoryMainPage = entity.data.factoryMainPage;
+                           GlobalConfig.factoryResource = entity.data.factoryResource;
+                           GlobalConfig.factoryMainPage = entity.data.factoryMainPage;
 
-                        // 设置显示对象数据
-                        // 医院
-                        ((TextView) getActivity().findViewById(R.id.jtjk_hospital_name)).setText(GlobalConfig.hospitalName);
-                        // 机器编号
-                        ((TextView) getActivity().findViewById(R.id.jtjk_machine_id)).setText("机器编号: "+GlobalConfig.machineId);
+                           // 设置显示对象数据
+                           // 医院
+                           ((TextView) getActivity().findViewById(R.id.jtjk_hospital_name)).setText(GlobalConfig.hospitalName);
+                           // 机器编号
+                           ((TextView) getActivity().findViewById(R.id.jtjk_machine_id)).setText("机器编号: "+GlobalConfig.machineId);
 
-                        // 必须跟在获取全局信息之后
-                        // 启动大屏显示
-                        new JTJKThirdAppUtil().backFromBodyTestingForce(getActivity());
-                    }else {
-                        ToastUtil.show(entity.message);
-                    }
+                           // 必须跟在获取全局信息之后
+                           // 启动大屏显示
+                           new JTJKThirdAppUtil().backFromBodyTestingForce(getActivity());
+                       }else {
+                           ToastUtil.show(entity.message);
+                       }
+                   }catch (Exception e){
+                       e.printStackTrace();
+                   }
                 }
             });
     }

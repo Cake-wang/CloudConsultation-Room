@@ -169,10 +169,10 @@ public class OrderRecipesFragment extends BaseEventFragment {
                 break;
             case R.id.btn_inquiry:
                     //先查库存，再跳转支付页
-                    ArrayList<Map<String,String>> list = new ArrayList<>();
+                    ArrayList<Map<String,Object>> list = new ArrayList<>();
                     for (GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes.RecipeDetail item : obj.recipeDetailBeans) {
-                        Map<String,String > map = new HashMap<>();
-                        map.put(item.organDrugCode,item.sendNumber.toString());
+                        Map<String,Object > map = new HashMap<>();
+                        map.put(item.organDrugCode,item.useTotalDose);
 //                        list.add(item.organDrugCode, item.sendNumber);
                         list.add(map);
                     }
@@ -244,12 +244,12 @@ public class OrderRecipesFragment extends BaseEventFragment {
      * @param clinicSn 诊亭编号
      * @param skus 药品编码 列表
      */
-    public void requestGetStockInfo(String clinicSn, ArrayList<Map<String,String>> skus){
+    public void requestGetStockInfo(String clinicSn, ArrayList<Map<String,Object>> skus){
 //        skus = new ArrayList<String>(){{add("6901339924484");}};//todo cc
 //        skus = new ArrayList<String>(){{add("4895013208569");}};//todo cc
-        skus = new ArrayList<Map<String,String>>(){{
-            Map<String,String> map =new HashMap<>();
-            map.put("6901339924484","1");
+        skus = new ArrayList<Map<String,Object>>(){{
+            Map<String,Object> map =new HashMap<>();
+            map.put("6901339924484",1);
             add(map);
         }};//todo cc
         ApiRepository.getInstance().findMedicineStock(clinicSn,skus)

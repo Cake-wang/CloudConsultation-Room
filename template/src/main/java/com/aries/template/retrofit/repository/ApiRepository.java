@@ -991,11 +991,11 @@ public class ApiRepository extends BaseRepository {
      * @param clinicSn 诊亭编号
      * @param skus 开药列表 例如 [ { "drugCode": "6941456100446", "total": 20 }, { "drugCode": "packing-bag", "total": 10 } ]
      */
-    public Observable<FindMedicineStockEntity> findMedicineStock(String clinicSn, ArrayList<Map<String,String>> skus) {
+    public Observable<FindMedicineStockEntity> findMedicineStock(String clinicSn, ArrayList<Map<String,Object>> skus) {
 
         JSONArray drugList = new JSONArray();
-        for (Map<String, String> map : skus) {
-            for (Map.Entry<String, String> stringStringEntry : map.entrySet()) {
+        for (Map<String, Object> map : skus) {
+            for (Map.Entry<String, Object> stringStringEntry : map.entrySet()) {
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put("drugCode",stringStringEntry.getKey());
                 jsonObject.put("total",stringStringEntry.getValue());

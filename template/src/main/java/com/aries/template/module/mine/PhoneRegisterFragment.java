@@ -347,9 +347,13 @@ public class PhoneRegisterFragment extends BaseEventFragment implements ISupport
                             ToastUtil.show("请检查网络");
                             return;
                         }
-                        if (entity.success){
-                            // 先获取验证码，再执行注册
-                            authCodeId = entity.data.authCodeId;
+                        try {
+                            if (entity.success){
+                                // 先获取验证码，再执行注册
+                                authCodeId = entity.data.authCodeId;
+                            }
+                        }catch (Exception e){
+                            e.printStackTrace();
                         }
                     }
                 });

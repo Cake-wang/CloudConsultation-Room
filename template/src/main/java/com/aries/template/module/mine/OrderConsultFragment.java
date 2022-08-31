@@ -171,11 +171,16 @@ public class OrderConsultFragment extends BaseEventFragment {
                             ToastUtil.show("请检查网络");
                             return;
                         }
-                        // 检查 payFlag 如果是 1 就是支付成功
-                        if (entity.isSuccess()){
-                            patientName = GlobalConfig.ssCard.getName().trim();
-                            doctorId=String.valueOf(entity.getData().getJsonResponseBean().getBody().getDoctor().getLoginId());
-                            doctorName=String.valueOf(entity.getData().getJsonResponseBean().getBody().getDoctor().getName());
+
+                        try {
+                            // 检查 payFlag 如果是 1 就是支付成功
+                            if (entity.isSuccess()){
+                                patientName = GlobalConfig.ssCard.getName().trim();
+                                doctorId=String.valueOf(entity.getData().getJsonResponseBean().getBody().getDoctor().getLoginId());
+                                doctorName=String.valueOf(entity.getData().getJsonResponseBean().getBody().getDoctor().getName());
+                            }
+                        }catch (Exception e){
+                            e.printStackTrace();
                         }
                     }
                 });
@@ -199,16 +204,20 @@ public class OrderConsultFragment extends BaseEventFragment {
                             ToastUtil.show("请检查网络");
                             return;
                         }
-                        // 如果成功了，就跳转视频问诊。
-                        if (entity.data.success){
-                            start(VideoConsultFragment.newInstance(consultId,
-                                    patientName,
-                                    doctorId,
-                                    doctorName,
-                                    true));
-                        }else{
-                            ToastUtil.show("向医生发送消息失败，请重试去问诊");
-                        }
+                       try {
+                           // 如果成功了，就跳转视频问诊。
+                           if (entity.data.success){
+                               start(VideoConsultFragment.newInstance(consultId,
+                                       patientName,
+                                       doctorId,
+                                       doctorName,
+                                       true));
+                           }else{
+                               ToastUtil.show("向医生发送消息失败，请重试去问诊");
+                           }
+                       }catch (Exception e){
+                           e.printStackTrace();
+                       }
                     }
                 });
     }

@@ -15,8 +15,10 @@ import com.aries.library.fast.entity.FastTabEntity;
 import com.aries.library.fast.manager.LoggerManager;
 import com.aries.library.fast.module.activity.FastMainActivity;
 import com.aries.library.fast.retrofit.FastLoadingObserver;
+import com.aries.library.fast.retrofit.FastObserver;
 import com.aries.library.fast.util.SPUtil;
 import com.aries.library.fast.util.ToastUtil;
+import com.aries.template.entity.CancelregisterResultEntity;
 import com.aries.template.entity.FindUserResultEntity;
 import com.aries.template.entity.GetConsultsAndRecipesResultEntity;
 import com.aries.template.module.base.BaseEventFragment;
@@ -378,62 +380,66 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                                     ToastUtil.show("请检查网络");
                                     return;
                                 }
-                                if (entity.isSuccess()){
-                                    String tag = (String) SPUtil.get(mContext,"tag","fzpy");
-                                    if (entity.getData()!=null){
-                                        GlobalConfig.isFindUserDone = true;
-                                        GlobalConfig.NALI_TID = entity.getData().getUserId();
-                                        GlobalConfig.mobile = entity.getData().getMobile();
-                                        SPUtil.put(mContext,"tid",entity.getData().getUserId());
-                                        SPUtil.put(mContext,"mobile",entity.getData().getMobile());
-                                        if(tag.contains("stjc")){
+                               try {
+                                   if (entity.isSuccess()){
+                                       String tag = (String) SPUtil.get(mContext,"tag","fzpy");
+                                       if (entity.getData()!=null){
+                                           GlobalConfig.isFindUserDone = true;
+                                           GlobalConfig.NALI_TID = entity.getData().getUserId();
+                                           GlobalConfig.mobile = entity.getData().getMobile();
+                                           SPUtil.put(mContext,"tid",entity.getData().getUserId());
+                                           SPUtil.put(mContext,"mobile",entity.getData().getMobile());
+                                           if(tag.contains("stjc")){
 //                                            Intent intent = new Intent(Intent.ACTION_MAIN);
-                                            /**知道要跳转应用的包命与目标Activity*/
-                                            // 启动身体检查系统
-                                           SPUtil.put(mContext,"tag","backMain");
-                                            if (mDisposable != null) {
-                                                mDisposable.dispose();
-                                                mDisposable=null;
-                                            }
-                                            BasicOper.dc_exit();
+                                               /**知道要跳转应用的包命与目标Activity*/
+                                               // 启动身体检查系统
+                                               SPUtil.put(mContext,"tag","backMain");
+                                               if (mDisposable != null) {
+                                                   mDisposable.dispose();
+                                                   mDisposable=null;
+                                               }
+                                               BasicOper.dc_exit();
 
-                                            // 启动第三方跳转
-                                            if (!TextUtils.isEmpty(GlobalConfig.factoryResource)){
-                                                new JTJKThirdAppUtil().gotoBodyTesting(MainActivity.this,
-                                                        GlobalConfig.factoryResource,
-                                                        GlobalConfig.factoryMainPage,
-                                                        entity.getData().getName().trim(),
-                                                        entity.getData().getIdcard(),
-                                                        entity.getData().getMobile());
-                                                start(HomeFragment.newInstance(), SupportFragment.SINGLETASK);
-                                            }else {
-                                                ToastUtil.show("没有第三方应用信息，无法跳转");
-                                            }
+                                               // 启动第三方跳转
+                                               if (!TextUtils.isEmpty(GlobalConfig.factoryResource)){
+                                                   new JTJKThirdAppUtil().gotoBodyTesting(MainActivity.this,
+                                                           GlobalConfig.factoryResource,
+                                                           GlobalConfig.factoryMainPage,
+                                                           entity.getData().getName().trim(),
+                                                           entity.getData().getIdcard(),
+                                                           entity.getData().getMobile());
+                                                   start(HomeFragment.newInstance(), SupportFragment.SINGLETASK);
+                                               }else {
+                                                   ToastUtil.show("没有第三方应用信息，无法跳转");
+                                               }
 //                                            ComponentName componentName = new ComponentName("com.garea.launcher", "com.garea.launcher.login.LauncherLogin");
 //                                            intent.setComponent(componentName);
 //                                            intent.putExtra("userName", entity.getData().getName());//这里Intent传值
 //                                            intent.putExtra("idCard", entity.getData().getIdcard());
 //                                            intent.putExtra("mobile", entity.getData().getMobile());
 //                                            startActivity(intent);
-                                        }else {
-                                            //判断是否有挂号或处方，如果没有，跳转一级部门选择。
-                                            requestConsultsAndRecipes();
-                                        }
-                                    }else {
-                                        if(TextUtils.isEmpty(tag)){
-                                            ToastUtil.show("参数缺失");
-                                            isReadCardProcessing = false;
-                                        }else {
-                                            // 如果没有注册，跳转到手机注册页面
-                                            start(PhoneRegisterFragment.newInstance( idCard, name.trim(), smkcard));
-                                        }
-                                    }
-                                }else {
-                                    ToastUtil.show(entity.getMessage());
-                                    if (Objects.equals(entity.code, "2100"))// 如果没有注册，跳转到手机注册页面
-                                        start(PhoneRegisterFragment.newInstance( idCard, name.trim(), smkcard));
-                                    isReadCardProcessing = false;
-                                }
+                                           }else {
+                                               //判断是否有挂号或处方，如果没有，跳转一级部门选择。
+                                               requestConsultsAndRecipes();
+                                           }
+                                       }else {
+                                           if(TextUtils.isEmpty(tag)){
+                                               ToastUtil.show("参数缺失");
+                                               isReadCardProcessing = false;
+                                           }else {
+                                               // 如果没有注册，跳转到手机注册页面
+                                               start(PhoneRegisterFragment.newInstance( idCard, name.trim(), smkcard));
+                                           }
+                                       }
+                                   }else {
+                                       ToastUtil.show(entity.getMessage());
+                                       if (Objects.equals(entity.code, "2100"))// 如果没有注册，跳转到手机注册页面
+                                           start(PhoneRegisterFragment.newInstance( idCard, name.trim(), smkcard));
+                                       isReadCardProcessing = false;
+                                   }
+                               }catch (Exception e){
+                                   e.printStackTrace();
+                               }
                             }
 
                     @Override
@@ -468,121 +474,135 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                             ToastUtil.show("请检查网络，返回首页后重试");
                             return;
                         }
-                        if (entity.isSuccess()){
-                            // 这里只收集数据，并不做处理
-                            allConsult.addAll(entity.data.getConsults());
-                            allRecipes.addAll(entity.data.recipes);
+                        try {
+                            if (entity.isSuccess()){
+                                // 这里只收集数据，并不做处理
+                                allConsult.addAll(entity.data.getConsults());
+                                allRecipes.addAll(entity.data.recipes);
 
-                            // 请求 onready
-                            ApiRepository.getInstance().getConsultsAndRecipes("onready")
-                                    .compose(MainActivity.this.bindUntilEvent(ActivityEvent.DESTROY))
-                                    .subscribe(new FastLoadingObserver<GetConsultsAndRecipesResultEntity>("请稍后...") {
-                                        @Override
-                                        public void _onNext(@io.reactivex.annotations.NonNull GetConsultsAndRecipesResultEntity entity) {
-                                            if (entity == null) {
-                                                ToastUtil.show("请检查网络，返回首页后重试");
-                                                return;
+                                // 请求 onready
+                                ApiRepository.getInstance().getConsultsAndRecipes("onready")
+                                        .compose(MainActivity.this.bindUntilEvent(ActivityEvent.DESTROY))
+                                        .subscribe(new FastLoadingObserver<GetConsultsAndRecipesResultEntity>("请稍后...") {
+                                            @Override
+                                            public void _onNext(@io.reactivex.annotations.NonNull GetConsultsAndRecipesResultEntity entity) {
+                                                if (entity == null) {
+                                                    ToastUtil.show("请检查网络，返回首页后重试");
+                                                    return;
+                                                }
+                                                try {
+                                                    if (entity.isSuccess()){
+                                                        // 这里只收集数据，并不做处理
+                                                        allConsult.addAll(entity.data.getConsults());
+                                                        allRecipes.addAll(entity.data.recipes);
+
+                                                        // 如果2个都不满足则跳转科室
+                                                        boolean isDepartTag = true;
+                                                        // 复诊单挂号和处方单不会同时出现，如果同时出现，则需要调整逻辑
+                                                        // 查看挂号是否多余1条
+                                                        if(allConsult.size()>0){
+                                                            for (GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Consults item : allConsult) {
+                                                                int status = item.getConsults().getStatus();
+                                                                if (item.getConsults().getConsultOrgan() != GlobalConfig.organId)
+                                                                    // 如果不是同一家机构，则跳过不处理
+                                                                    break;
+                                                                if ( item.getConsults().getPayflag()==1 &&
+                                                                        (status==1 || status ==2 || status == 3 || status == 4)){
+                                                                    //status=4 问诊中
+                                                                    isDepartTag = false;
+                                                                    // 去往复诊单挂号
+                                                                    start(OrderConsultFragment.newInstance(item));
+                                                                    return;
+                                                                }
+                                                                //  如果复诊单挂单有多余的无效单，批量进行取消。
+                                                                if (item.getConsults().getPayflag()==0 && status!=8){
+                                                                    // 取消复诊单 status = 8 已经取消
+                                                                    ApiRepository.getInstance().patientCancelGraphicTextConsult(String.valueOf(item.getConsults().getConsultId()))
+                                                                            .compose(MainActivity.this.bindUntilEvent(ActivityEvent.DESTROY))
+                                                                            .subscribe(new FastObserver<CancelregisterResultEntity>() {
+                                                                                @Override
+                                                                                public void _onNext(CancelregisterResultEntity entity) {
+                                                                                }
+                                                                            });
+                                                                }
+                                                            }
+                                                        }
+                                                        // 查看处方单是否多余1条处方
+                                                        if (allRecipes.size()>0){
+                                                            // 每一个处方单中，都有一个处方信息，这个处方信息是需要合并的
+                                                            ArrayList<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes> recipes = new ArrayList();
+                                                            for (GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes item : allRecipes) {
+                                                                if (item.getOrganId() != GlobalConfig.organId)
+                                                                    // 如果不是同一家机构，则跳过不处理
+                                                                    break;
+                                                                // 1 待审核, 2 待处理, 3 待取药
+                                                                if (item.status==2){
+                                                                    recipes.add(item);
+                                                                }
+                                                            }
+                                                            // 遍历未支付处方单，如果有orderid 一样的，则合并处方
+                                                            // 每合并一次，就会减少 recipes
+                                                            // 每次结束，把0位置去掉，并添加到新
+                                                            ArrayList<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes> recipeGroup = new ArrayList();
+                                                            if (recipes.size()>0){
+                                                                while (recipes.size()>0) {
+                                                                    // 被移除的对象
+                                                                    final ArrayList<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes> removeItems = new ArrayList();
+                                                                    // 合并对象
+                                                                    final GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes currentRecipes = recipes.get(0);
+                                                                    for (int j = 1; j < recipes.size(); j++) {
+                                                                        // orderId = null 表示没有合并支付过的，那么就不需要合并
+                                                                        if ( recipes.get(j).orderId!=null && recipes.get(j).orderId.equals(currentRecipes.orderId)){
+                                                                            currentRecipes.getRecipeDetailBeans().addAll(recipes.get(j).getRecipeDetailBeans());
+                                                                            removeItems.add(recipes.get(j));
+                                                                        }
+                                                                    }
+                                                                    // 移除合并单位
+                                                                    if (removeItems.size()>0){
+                                                                        for (GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes removeItem : removeItems) {
+                                                                            recipes.remove(removeItem);
+                                                                        }
+                                                                    }
+                                                                    // 获得数据后，将合并后的集合单位移除
+                                                                    recipes.remove(0);
+                                                                    recipeGroup.add(currentRecipes);
+                                                                }
+                                                            }
+
+
+                                                            // 如果未支付处方单有，则进入批量处理界面
+                                                            if (recipeGroup.size()>0){
+                                                                isDepartTag = false;
+                                                                start(OrderRecipesListFragment.newInstance(recipeGroup));
+                                                                return;
+                                                            }
+                                                        }
+                                                        // 如果即没有未支付处方单，也没有未支付复诊单
+                                                        if (isDepartTag){
+                                                            // 如果2个都不满足则跳转科室
+                                                            start(DepartmentFragment.newInstance());
+                                                        }
+                                                    }else {
+                                                        ToastUtil.show("获取未支付失败，请稍后重试");
+                                                        start(HomeFragment.newInstance(), SupportFragment.SINGLETASK);
+                                                    }
+                                                    isReadCardProcessing = false;
+                                                }catch (Exception e){
+                                                    e.printStackTrace();
+                                                }
                                             }
-                                            if (entity.isSuccess()){
-                                                // 这里只收集数据，并不做处理
-                                                allConsult.addAll(entity.data.getConsults());
-                                                allRecipes.addAll(entity.data.recipes);
 
-                                                // 如果2个都不满足则跳转科室
-                                                boolean isDepartTag = true;
-                                                // 复诊单挂号和处方单不会同时出现，如果同时出现，则需要调整逻辑
-                                                // 查看挂号是否多余1条
-                                                if(allConsult.size()>0){
-                                                    for (GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Consults item : allConsult) {
-                                                        int status = item.getConsults().getStatus();
-                                                        if (item.getConsults().getConsultOrgan() != GlobalConfig.organId)
-                                                            // 如果不是同一家机构，则跳过不处理
-                                                            break;
-                                                        if ( item.getConsults().getPayflag()==1 &&
-                                                                (status==1 || status ==2 || status == 3 || status == 4)){
-                                                            //status=4 问诊中
-                                                            isDepartTag = false;
-                                                            // 去往复诊单挂号
-                                                            start(OrderConsultFragment.newInstance(item));
-                                                            return;
-                                                        }
-                                                        //  如果复诊单挂单有多余的无效单，批量进行取消。
-                                                        if (item.getConsults().getPayflag()==0 && status!=8){
-                                                            // 取消复诊单 status = 8 已经取消
-                                                            ApiRepository.getInstance().patientCancelGraphicTextConsult(String.valueOf(item.getConsults().getConsultId())).subscribe();
-                                                        }
-                                                    }
-                                                }
-                                                // 查看处方单是否多余1条处方
-                                                if (allRecipes.size()>0){
-                                                    // 每一个处方单中，都有一个处方信息，这个处方信息是需要合并的
-                                                    ArrayList<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes> recipes = new ArrayList();
-                                                    for (GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes item : allRecipes) {
-                                                        if (item.getOrganId() != GlobalConfig.organId)
-                                                            // 如果不是同一家机构，则跳过不处理
-                                                            break;
-                                                        // 1 待审核, 2 待处理, 3 待取药
-                                                        if (item.status==2){
-                                                            recipes.add(item);
-                                                        }
-                                                    }
-                                                    // 遍历未支付处方单，如果有orderid 一样的，则合并处方
-                                                    // 每合并一次，就会减少 recipes
-                                                    // 每次结束，把0位置去掉，并添加到新
-                                                    ArrayList<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes> recipeGroup = new ArrayList();
-                                                    if (recipes.size()>0){
-                                                        while (recipes.size()>0) {
-                                                            // 被移除的对象
-                                                            final ArrayList<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes> removeItems = new ArrayList();
-                                                            // 合并对象
-                                                            final GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes currentRecipes = recipes.get(0);
-                                                            for (int j = 1; j < recipes.size(); j++) {
-                                                                // orderId = null 表示没有合并支付过的，那么就不需要合并
-                                                                if ( recipes.get(j).orderId!=null && recipes.get(j).orderId.equals(currentRecipes.orderId)){
-                                                                    currentRecipes.getRecipeDetailBeans().addAll(recipes.get(j).getRecipeDetailBeans());
-                                                                    removeItems.add(recipes.get(j));
-                                                                }
-                                                            }
-                                                            // 移除合并单位
-                                                            if (removeItems.size()>0){
-                                                                for (GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes removeItem : removeItems) {
-                                                                    recipes.remove(removeItem);
-                                                                }
-                                                            }
-                                                            // 获得数据后，将合并后的集合单位移除
-                                                            recipes.remove(0);
-                                                            recipeGroup.add(currentRecipes);
-                                                        }
-                                                    }
-
-
-                                                    // 如果未支付处方单有，则进入批量处理界面
-                                                    if (recipeGroup.size()>0){
-                                                        isDepartTag = false;
-                                                        start(OrderRecipesListFragment.newInstance(recipeGroup));
-                                                        return;
-                                                    }
-                                                }
-                                                // 如果即没有未支付处方单，也没有未支付复诊单
-                                                if (isDepartTag){
-                                                    // 如果2个都不满足则跳转科室
-                                                    start(DepartmentFragment.newInstance());
-                                                }
-                                            }else {
-                                                ToastUtil.show("获取未支付失败，请稍后重试");
+                                            @Override
+                                            public void _onError(Throwable e) {
+                                                super._onError(e);
+                                                ToastUtil.show("网络问题，返回首页后重试");
                                                 start(HomeFragment.newInstance(), SupportFragment.SINGLETASK);
+                                                isReadCardProcessing = false;
                                             }
-                                            isReadCardProcessing = false;
-                                        }
-
-                                        @Override
-                                        public void _onError(Throwable e) {
-                                            super._onError(e);
-                                            ToastUtil.show("网络问题，返回首页后重试");
-                                            start(HomeFragment.newInstance(), SupportFragment.SINGLETASK);
-                                            isReadCardProcessing = false;
-                                        }
-                                    });
+                                        });
+                            }
+                        }catch (Exception e){
+                            e.printStackTrace();
                         }
                     }
 

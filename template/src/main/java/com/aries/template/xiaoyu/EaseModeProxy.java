@@ -546,6 +546,8 @@ public class EaseModeProxy {
                         // 现在的房间没有其他人了
                         // 医生曾进入过
 //                            ToastUtil.show("医生已经离开");
+                        if (videoCell!=null)
+                            videoCell.removeVideoInfo();
                         if (listener!=null)
                             listener.onDoctorOutRoom();
                     }
@@ -613,7 +615,8 @@ public class EaseModeProxy {
             activity.clear();
         if (contentLayout !=null)
             contentLayout = null;
-        if (videoCell !=null){
+        if (videoCell!=null){
+            videoCell.removeVideoInfo();
             videoCell = null;
         }
         Log.e("JTJK", "failed: done" );

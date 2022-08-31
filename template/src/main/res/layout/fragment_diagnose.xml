@@ -75,9 +75,9 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:background="@mipmap/bg_pay_yzs"
-                android:gravity="center_vertical"
+                android:gravity="top"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
                 android:orientation="horizontal"
@@ -85,7 +85,7 @@
 
                 <LinearLayout
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:gravity="center_horizontal"
                     android:layout_marginLeft="30dp"
                     android:paddingTop="10dp"
@@ -100,7 +100,7 @@
                         android:layout_marginTop="20dp"
                         android:textSize="22dp"
                         android:gravity="left"
-                        android:layout_marginBottom="25dp"
+                        android:layout_marginBottom="35dp"
                         android:text="就诊人：" />
 
                     <TextView
@@ -110,7 +110,7 @@
                         android:layout_marginLeft="10dp"
                         android:textSize="22dp"
                         android:gravity="left"
-                        android:layout_marginBottom="25dp"
+                        android:layout_marginBottom="28dp"
                         android:text="首诊时间：" />
 
                     <TextView
@@ -161,7 +161,7 @@
 
                 <LinearLayout
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:gravity="center_vertical|top"
                     android:paddingTop="10dp"
                     android:paddingBottom="10dp"
@@ -210,7 +210,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:gravity="center_vertical"
-                        android:layout_marginLeft="10dp"
+                        android:layout_marginLeft="2dp"
                         android:orientation="horizontal"
                         >
 
@@ -336,7 +336,7 @@
 
                 <LinearLayout
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:gravity="center_vertical|top"
                     android:visibility="visible"
                     android:layout_marginLeft="40dp"
@@ -364,8 +364,9 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:button="@drawable/checkbox_theme"
-                            android:scaleX="1"
-                            android:scaleY="1" />
+                            android:paddingVertical="8dp"
+                            android:scaleX="0.8"
+                            android:scaleY="0.8" />
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -385,12 +386,14 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:orientation="horizontal"
+                        android:layout_marginVertical="16dp"
                         >
                         <androidx.appcompat.widget.AppCompatCheckBox
                             android:id="@+id/cb_protocol_tw"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:button="@drawable/checkbox_theme"
+                            android:paddingVertical="8dp"
                             android:scaleX="0.8"
                             android:scaleY="0.8" />
                         <TextView
@@ -416,6 +419,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:button="@drawable/checkbox_theme"
+                            android:paddingVertical="8dp"
                             android:scaleX="0.8"
                             android:scaleY="0.8" />
                         <TextView

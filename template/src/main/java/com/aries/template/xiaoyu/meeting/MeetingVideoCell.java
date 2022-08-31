@@ -54,5 +54,12 @@ public class MeetingVideoCell extends OpenGLTextureView {
         postDelayed(renderRunnable, 1000/16);
     }
 
+    /**
+     * 清理渲染 ID 停止渲染
+     */
+    public void removeVideoInfo(){
+        setSourceID("");
+    }
+
 
 }

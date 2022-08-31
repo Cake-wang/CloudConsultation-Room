@@ -65,35 +65,32 @@
             android:background="@drawable/bg_readcard_white"
             android:gravity="center_vertical"
             android:orientation="horizontal"
+            android:layout_gravity="center"
             >
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="85dp"
-
-                android:layout_marginEnd="24dp"
+                android:layout_weight="1.5"
                 android:orientation="vertical">
 
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
+                </LinearLayout>
 
 
                     <com.xuexiang.xui.widget.alpha.XUIAlphaTextView
                         style="@style/TextStyle.Explain"
                         android:layout_gravity="start|center_vertical"
-
                         android:paddingTop="5dp"
                         android:paddingEnd="10dp"
                         android:paddingBottom="15dp"
                         android:text="联系方式:"
                         android:textSize="18dp"
                         android:textColor="@color/xui_config_color_primary_text" />
-
-                    <!--            <TextView-->
-                    <!--                android:layout_width="wrap_content"-->
-                    <!--                android:layout_height="wrap_content"-->
-                    <!--                android:layout_gravity="start|center_vertical"-->
-                    <!--                android:text="手机号码" />-->
 
                     <EditText
                         android:id="@+id/et_phone_number"
@@ -104,12 +101,6 @@
                         android:inputType="number"
                         android:maxLength="13"
                       />
-
-<!--                app:met_clearButton="true"-->
-<!--                app:met_errorMessage="@string/tip_phone_number_error"-->
-<!--                app:met_floatingLabel="normal"-->
-<!--                app:met_floatingLabelText="@string/title_phone_number"-->
-<!--                app:met_regexp="@string/regex_phone_number"-->
 
                 <com.xuexiang.xui.widget.alpha.XUIAlphaTextView
                     style="@style/TextStyle.Explain"
@@ -288,19 +279,17 @@
             </LinearLayout>
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="1.5"
                 android:layout_height="wrap_content"
                android:background="@mipmap/bg_input_yzs"
-
                 android:padding="10dp"
-                android:layout_marginLeft="100dp"
                 android:orientation="horizontal"
                 >
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-
                     android:orientation="vertical"
                     >
 

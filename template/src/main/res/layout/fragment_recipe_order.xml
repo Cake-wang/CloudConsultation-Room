@@ -396,6 +396,7 @@
                     android:gravity="center_vertical"
                     android:layout_marginLeft="130dp"
                     android:layout_marginTop="20dp"
+                    android:paddingRight="28dp"
                     android:layout_gravity="top"
                     android:id="@+id/ll_prescription"
                     android:orientation="vertical"

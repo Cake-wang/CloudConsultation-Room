@@ -266,7 +266,6 @@ public class PayRecipeFragment extends BaseEventFragment {
         }
     }
 
-
     /**
      * 推送处方单
      * 有库存，详细信息推送到服务端，准备进入支付阶段
@@ -350,6 +349,8 @@ public class PayRecipeFragment extends BaseEventFragment {
                                     // 释放资源。只要进入到这里，就结束请求支付轮训
                                     onDismiss();
                                     start(ResultFragment.newInstance("paySuc:"+objectMap.get("takeCode")+":"+drug));
+                                }else{
+                                    ToastUtil.show("推送处方单失败");
                                 }
                             }catch (Exception e){
                                 e.printStackTrace();

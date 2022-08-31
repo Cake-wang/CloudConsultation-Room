@@ -214,10 +214,10 @@ public class ConfirmRecipesFragment extends BaseEventFragment {
     public void requestCreateOrder(){
         //先查库存，再跳转支付页
 //        ArrayList<String> list = new ArrayList<>();
-        ArrayList<Map<String,String>> list = new ArrayList<>();
+        ArrayList<Map<String,Object>> list = new ArrayList<>();
         for (GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO item : currentRecipes) {
-            Map<String,String > map = new HashMap<>();
-            map.put(item.recipeDetailBeanList.get(0).organDrugCode,String.valueOf(item.recipeDetailBeanList.get(0).sendNumber));
+            Map<String,Object > map = new HashMap<>();
+            map.put(item.recipeDetailBeanList.get(0).organDrugCode,item.recipeDetailBeanList.get(0).useTotalDose);
 //            list.add(currentRecipe.recipeDetailBeanList.get(0).organDrugCode);
             list.add(map);
         }
@@ -250,9 +250,9 @@ public class ConfirmRecipesFragment extends BaseEventFragment {
      * @param clinicSn 诊亭编号
      * @param skus 药品编码 列表
      */
-    public void requestGetStockInfo(String clinicSn, ArrayList<Map<String,String>> skus){
-        skus = new ArrayList<Map<String,String>>(){{
-            Map<String,String> map =new HashMap<>();
+    public void requestGetStockInfo(String clinicSn, ArrayList<Map<String,Object>> skus){
+        skus = new ArrayList<Map<String,Object>>(){{
+            Map<String,Object> map =new HashMap<>();
             map.put("6901339924484","1");
             add(map);
         }};//todo cc

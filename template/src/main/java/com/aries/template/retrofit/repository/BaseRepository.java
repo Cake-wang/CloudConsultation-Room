@@ -94,6 +94,11 @@ public abstract class BaseRepository {
             params.put("bizContent", maps);
         else
             params.put("bizContent", maps.get(0));// 不是取第一个值，而是取bizContent数组的第一位，maps是多个bizContent
+
+        // 将 biz content 全转成字符串
+        String bizContentStr = ConvertJavaBean.converJavaBeanToJsonNew(params.get("bizContent"));
+        params.put("bizContent",bizContentStr);
+
         params.put("common", ApiRepository.common.getInstance());
         params.put("logTraceId", ApiRepository.getUUID());//getUUID 请求日志ID唯一识别流水ID，32位，推荐使用UUID
         params.put("merchantId",GlobalConfig.merchantId);

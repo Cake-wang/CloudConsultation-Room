@@ -181,21 +181,25 @@ public class DepartmentFragment extends BaseEventFragment {
                             ToastUtil.show("请检查网络");
                             return;
                         }
-                        if (entity.data.jsonResponseBean.body==null)
-                            return;
-                        //将返回的数据显示出来
-                        totalDatas = new ArrayList<>();
+                        try {
+                            if (entity.data.jsonResponseBean.body==null)
+                                return;
+                            //将返回的数据显示出来
+                            totalDatas = new ArrayList<>();
 
-                        for (FindValidOrganProfessionForRevisitResultEntity.QueryArrearsSummary.JsonResponseBean.OrganProfessionDTO item : entity.data.jsonResponseBean.body) {
-                            Map<String,String> data = new HashMap<>();
-                            data.put(KEY_ITEM_VALUE,item.name);
-                            data.put(KEY_ITEM_ORGANPROFESSIONID,String.valueOf(item.id));
-                            totalDatas.add(data);
-                        }
-                        if (totalDatas.size()>0){
-                            upDownProxy.setParamMaxNumber(9);
-                            upDownProxy.setTotalDatas(totalDatas);
-                            upDownProxy.doStartReFlash();
+                            for (FindValidOrganProfessionForRevisitResultEntity.QueryArrearsSummary.JsonResponseBean.OrganProfessionDTO item : entity.data.jsonResponseBean.body) {
+                                Map<String,String> data = new HashMap<>();
+                                data.put(KEY_ITEM_VALUE,item.name);
+                                data.put(KEY_ITEM_ORGANPROFESSIONID,String.valueOf(item.id));
+                                totalDatas.add(data);
+                            }
+                            if (totalDatas.size()>0){
+                                upDownProxy.setParamMaxNumber(9);
+                                upDownProxy.setTotalDatas(totalDatas);
+                                upDownProxy.doStartReFlash();
+                            }
+                        }catch (Exception e){
+                            e.printStackTrace();
                         }
                     }
                 });

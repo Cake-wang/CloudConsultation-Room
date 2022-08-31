@@ -186,20 +186,24 @@ public class DoctorListFragment extends BaseEventFragment {
                             ToastUtil.show("请检查网络");
                             return;
                         }
-                        if (entity.data.jsonResponseBean.body==null)
-                            return;
-                        //将返回的数据显示出来
-                        totalDatas = new ArrayList<>();
-                        for (SearchDoctorListByBusTypeV2ResultEntity.QueryArrearsSummary.JsonResponseBean.OrganProfessionDTO.DocList doc : entity.data.jsonResponseBean.body.getDocList()) {
-                            doc.getDoctor().getName();
-                            Map<String,Object> data = new HashMap<>();
-                            data.put(KEY_ITEM_CURRENT_DOC,doc.getDoctor());
-                            totalDatas.add(data);
-                        }
-                        if (totalDatas.size()>0){
-                            upDownProxy.setParamMaxNumber(2);
-                            upDownProxy.setTotalDatas(totalDatas);
-                            upDownProxy.doStartReFlash();
+                        try {
+                            if (entity.data.jsonResponseBean.body==null)
+                                return;
+                            //将返回的数据显示出来
+                            totalDatas = new ArrayList<>();
+                            for (SearchDoctorListByBusTypeV2ResultEntity.QueryArrearsSummary.JsonResponseBean.OrganProfessionDTO.DocList doc : entity.data.jsonResponseBean.body.getDocList()) {
+                                doc.getDoctor().getName();
+                                Map<String,Object> data = new HashMap<>();
+                                data.put(KEY_ITEM_CURRENT_DOC,doc.getDoctor());
+                                totalDatas.add(data);
+                            }
+                            if (totalDatas.size()>0){
+                                upDownProxy.setParamMaxNumber(2);
+                                upDownProxy.setTotalDatas(totalDatas);
+                                upDownProxy.doStartReFlash();
+                            }
+                        }catch (Exception e){
+                            e.printStackTrace();
                         }
                     }
                 });
@@ -218,17 +222,21 @@ public class DoctorListFragment extends BaseEventFragment {
                             ToastUtil.show("请检查网络");
                             return;
                         }
-                        if (entity.data.isSuccess()){
-                            // 请求成功，存储科室ID
-                            GlobalConfig.departmentID = departmentId;
-                            // 将医生信息存储为全局复诊医生信息
-                            GlobalConfig.doc = doc;
-                            // 医生可以进行复诊 跳转确认
-                            start(ConfirmConsultFragment.newInstance("ok"));
-                        }else{
-                            // 医生不可以进行复诊
-                            // 如果不能复诊，则检查异常原因
-                            errorCheck(entity.data.jsonResponseBean.msg,entity.data.jsonResponseBean.code);
+                        try {
+                            if (entity.data.isSuccess()){
+                                // 请求成功，存储科室ID
+                                GlobalConfig.departmentID = departmentId;
+                                // 将医生信息存储为全局复诊医生信息
+                                GlobalConfig.doc = doc;
+                                // 医生可以进行复诊 跳转确认
+                                start(ConfirmConsultFragment.newInstance("ok"));
+                            }else{
+                                // 医生不可以进行复诊
+                                // 如果不能复诊，则检查异常原因
+                                errorCheck(entity.data.jsonResponseBean.msg,entity.data.jsonResponseBean.code);
+                            }
+                        }catch (Exception e){
+                            e.printStackTrace();
                         }
                     }
                 });

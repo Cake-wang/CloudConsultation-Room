@@ -186,17 +186,21 @@ public class DepartmentTwoFragment extends BaseEventFragment {
                             ToastUtil.show("请检查网络");
                             return;
                         }
-                        totalDatas = new ArrayList<>();
-                        for (FindValidDepartmentForRevisitResultEntity.QueryArrearsSummary.JsonResponseBean.OrganProfessionDTO item :
-                                entity.data.jsonResponseBean.body) {
-                            Map<String,Object> data = new HashMap<>();
-                            data.put(KEY_ITEM_OBJECT,item);
-                            totalDatas.add(data);
-                        }
-                        if (totalDatas.size()>0){
-                            upDownProxy.setParamMaxNumber(9);
-                            upDownProxy.setTotalDatas(totalDatas);
-                            upDownProxy.doStartReFlash();
+                        try {
+                            totalDatas = new ArrayList<>();
+                            for (FindValidDepartmentForRevisitResultEntity.QueryArrearsSummary.JsonResponseBean.OrganProfessionDTO item :
+                                    entity.data.jsonResponseBean.body) {
+                                Map<String,Object> data = new HashMap<>();
+                                data.put(KEY_ITEM_OBJECT,item);
+                                totalDatas.add(data);
+                            }
+                            if (totalDatas.size()>0){
+                                upDownProxy.setParamMaxNumber(9);
+                                upDownProxy.setTotalDatas(totalDatas);
+                                upDownProxy.doStartReFlash();
+                            }
+                        }catch (Exception e){
+                            e.printStackTrace();
                         }
                     }
                 });
