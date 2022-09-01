@@ -1,5 +1,7 @@
 package com.aries.template.module.mine;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -34,10 +36,14 @@ import com.aries.template.xiaoyu.EaseModeProxy;
 import com.aries.template.xiaoyu.dapinsocket.DapinSocketProxy;
 import com.aries.template.xiaoyu.xinlin.XLMessage;
 import com.aries.ui.view.title.TitleBarView;
+import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.trello.rxlifecycle3.android.FragmentEvent;
 import com.xuexiang.xaop.annotation.SingleClick;
 
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
@@ -49,6 +55,7 @@ import butterknife.OnClick;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import me.yokeyword.fragmentation.SupportFragment;
 
@@ -229,6 +236,18 @@ public class VideoConsultFragment extends BaseEventFragment {
                 }
             });
         }
+
+//        // 启动请求权限
+//        // 检测PHONE_STATE 如果未授权
+//        if (ContextCompat.checkSelfPermission(getContext(),Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+//            //申请权限
+//            String[] permission = new String[]{Manifest.permission.CAMERA,Manifest.permission.RECORD_AUDIO};
+//            ActivityCompat.requestPermissions(getActivity(), permission, 0x101);
+//        }
+
+        RxPermissions permissions = new RxPermissions(this);
+        permissions.request(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO)
+                .subscribe(aBoolean->{});
     }
 
     /**

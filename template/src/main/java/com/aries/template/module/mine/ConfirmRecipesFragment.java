@@ -157,7 +157,8 @@ public class ConfirmRecipesFragment extends BaseEventFragment {
         btn_back.setVisibility(View.GONE);// 不显示返回
         btn_cancel.setText("取消");
         btn_inquiry.setText("确认结算");
-        String sex = GlobalConfig.ssCard.getSex().equals("0")?"女":"男";
+//        String sex = GlobalConfig.ssCard.getSex().equals("0")?"女":"男";
+        String sex = GlobalConfig.ssCard.getSex();
         tv_name.setText(GlobalConfig.ssCard.getName().trim()+"("+sex+")");
         tv_card.setText(GlobalConfig.ssCard.getCardNum());
         tv_age_l.setText(String.valueOf(GlobalConfig.age));

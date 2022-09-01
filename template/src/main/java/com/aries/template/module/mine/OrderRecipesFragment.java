@@ -142,7 +142,8 @@ public class OrderRecipesFragment extends BaseEventFragment {
         btn_cancel.setText("取消支付");
         btn_inquiry.setText("去支付");
 
-        String sex = GlobalConfig.ssCard.getSex().equals("0")?"女":"男";
+//        String sex = GlobalConfig.ssCard.getSex().equals("0")?"女":"男";
+        String sex = GlobalConfig.ssCard.getSex();
         tv_name.setText(GlobalConfig.ssCard.getName().trim()+"("+sex+")");
         tv_card.setText(GlobalConfig.ssCard.getCardNum());
         tv_age_l.setText(String.valueOf(GlobalConfig.age));

@@ -30,6 +30,7 @@ import com.aries.template.module.mine.OrderRecipesListFragment;
 import com.aries.template.module.mine.PhoneRegisterFragment;
 import com.aries.template.module.mine.VideoConsultFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
+import com.aries.template.thridapp.JTJKSSDCard;
 import com.aries.template.thridapp.JTJKThirdAppUtil;
 import com.aries.template.utils.ActivityUtils;
 import com.aries.template.utils.DateUtils;
@@ -37,9 +38,11 @@ import com.aries.template.xiaoyu.dapinsocket.DapinSocketProxy;
 import com.aries.ui.view.tab.CommonTabLayout;
 import com.decard.NDKMethod.BasicOper;
 import com.decard.NDKMethod.EGovernment;
+import com.decard.NDKMethod.SSCardDriver;
 import com.decard.entitys.SSCard;
 import com.trello.rxlifecycle3.android.ActivityEvent;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -238,7 +241,26 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
 //            catch (UnsupportedEncodingException e) {
 //                e.printStackTrace();
 //            }
-                SSCard ssCard = EGovernment.EgAPP_SI_ReadSSCardInfo();
+
+                // 新一代读卡
+                // 格式化卡数据
+//                330100|522725198711013517|AA0368350|330100D156000005456188401C06C0CE|陈东武|008100885086653301015DD82C|3.00|20210318|20310318|330100912171|00012600202203000183|
+                byte info[] = new byte[256];
+                long ret = SSCardDriver.iReadCardBas(1, info);
+                try {
+                    Log.d("TAG", "iReadCardBas: ret:" + ret + " info:" + new String(info, "gbk").trim());
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+                JTJKSSDCard ssCard = null;
+                try {
+                    ssCard = JTJKSSDCard.build2D(new String(info, "gbk").trim());
+                    //                SSCard ssCard = EGovernment.EgAPP_SI_ReadSSCardInfo();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                // 注入数据
                 if(ssCard!=null){
 
                     // 输入社保数据
@@ -324,7 +346,7 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
      * 向全局输入SSDcard数据，并进行跳转
      * @param ssCard 社保卡数据
      */
-    public void setSSDCardData(SSCard ssCard){
+    public void setSSDCardData(JTJKSSDCard ssCard){
         if(ssCard!=null){
             Log.d("EgAPP_SI_ReadSSCardInfo",ssCard.toString());
             // 向全局填写当前社保卡信息
@@ -652,6 +674,10 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
         if (findFragment(HomeFragment.class) == null) {
             loadRootFragment(R.id.fLayout_containerFastMain, HomeFragment.newInstance());  // 加载根Fragment
         }
+
+        // 初始化社保卡设备
+        BasicOper.setInitParameter(2, null, 0);
+        BasicOper.CreateAndroidContext(this);
     }
 
     /**

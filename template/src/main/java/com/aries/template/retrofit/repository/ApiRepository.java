@@ -739,7 +739,7 @@ public class ApiRepository extends BaseRepository {
     public Observable<BatchCreateOrderEntity> batchCreateOrder(String recipeFee, ArrayList<String> recipeIds,ArrayList<String> recipeCode) {
         // 除了公共的数据之外，还有其他的数据请求
         Map<String,Object> bizContent = new HashMap<>();
-        bizContent.put("giveMode","2");//2 暂定
+        bizContent.put("giveMode","3");//3 固定
         bizContent.put("payway", "32");//32 支付宝
         bizContent.put("recipeFee", recipeFee);//挂号费
         bizContent.put("busType", "recipe");//业务类型字符串 处方:recipe,复诊：revisit

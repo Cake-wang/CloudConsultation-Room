@@ -289,10 +289,11 @@ public class ConfirmConsultFragment extends BaseEventFragment implements Compoun
                                         reportHTML = "";
                                     }
                                 }
-                                requestGetPatientList();
                             }
                         }catch (Exception e){
                             e.printStackTrace();
+                        }finally {
+                            requestGetPatientList();
                         }
                     }
                 });

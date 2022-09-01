@@ -2,6 +2,7 @@ package com.aries.template;
 
 import com.aries.template.entity.SearchDoctorListByBusTypeV2ResultEntity;
 import com.aries.template.retrofit.repository.ApiRepository;
+import com.aries.template.thridapp.JTJKSSDCard;
 import com.decard.entitys.SSCard;
 
 /******
@@ -146,7 +147,7 @@ public class GlobalConfig {
      * 其中
      *  SSNum 是身份证
      */
-    public static SSCard ssCard;
+    public static JTJKSSDCard ssCard;
 
     /**
      * 是否已经获得用户数据

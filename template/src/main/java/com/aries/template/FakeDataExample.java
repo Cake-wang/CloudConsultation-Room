@@ -2,6 +2,7 @@ package com.aries.template;
 
 import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.template.retrofit.repository.BaseRepository;
+import com.aries.template.thridapp.JTJKSSDCard;
 import com.decard.entitys.SSCard;
 
 import java.util.ArrayList;
@@ -22,7 +23,8 @@ public class FakeDataExample extends BaseRepository {
 
     public static final String phoneNumber = "18667115892";
 //    public static final String idCard = "33052219861229693X";
-    public static final String idCard = "330522198612296933";
+    public static final String idCard = "330184199401223513";
+//    public static final String idCard = "330522198612296933";
     public static final String name = "飞飞";
     public static final String consultId = "815423874";
     public static final String departmentId = "18804";//行政科室编码
@@ -123,8 +125,8 @@ public class FakeDataExample extends BaseRepository {
     /**
      * 社保卡假数据
      */
-    public static SSCard fakeSSCard(){
-        SSCard ssCard = new SSCard();
+    public static JTJKSSDCard fakeSSCard(){
+        JTJKSSDCard ssCard = new JTJKSSDCard();
         ssCard.setName(name);
         ssCard.setSSNum(idCard);
         ssCard.setCardNum(phoneNumber);

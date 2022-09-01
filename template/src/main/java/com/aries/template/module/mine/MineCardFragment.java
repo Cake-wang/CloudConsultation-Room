@@ -56,16 +56,16 @@ public class MineCardFragment extends BaseEventFragment{
      * 启动社保卡
      */
     private void callIDMachine() {
-        if (getActivity() !=null)
-        ((MainActivity)getActivity()).setSSDCardData(FakeDataExample.fakeSSCard()); //todo cc
+//        if (getActivity() !=null)
+//        ((MainActivity)getActivity()).setSSDCardData(FakeDataExample.fakeSSCard()); //todo cc
 
-//        Log.d("111111MODEL", "111111MODEL");
-//        handler = new Handler();
-//        handler.postDelayed(() -> {
-//            // 要执行的操作 启动卡片读取操作。
-//            if (getActivity() !=null)
-//                ((MainActivity)getActivity()).openSerialport();
-//        }, 500);//3秒后执行Runnable中的run方法
+       Log.d("111111MODEL", "111111MODEL");
+       handler = new Handler();
+       handler.postDelayed(() -> {
+           // 要执行的操作 启动卡片读取操作。
+          if (getActivity() !=null)
+              ((MainActivity)getActivity()).openSerialport();
+        }, 500);//3秒后执行Runnable中的run方法
     }
 
     @Override

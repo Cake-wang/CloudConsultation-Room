@@ -51,9 +51,9 @@ android {
         }
         release {
             debuggable false
-            zipAlignEnabled true //是否支持Zip Align
-            shrinkResources true //是否清理无用资源
-            minifyEnabled true //是否启动混淆
+            zipAlignEnabled false //是否支持Zip Align
+            shrinkResources false //是否清理无用资源
+            minifyEnabled false //是否启动混淆
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
         }
