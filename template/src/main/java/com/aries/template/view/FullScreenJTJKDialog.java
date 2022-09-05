@@ -76,6 +76,15 @@ public class FullScreenJTJKDialog extends UIProgressDialog{
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         }
 
+        // 隐藏导航栏
+        // 如果打开这个选项，会直接进入非沉浸式
+        hideNavigationBar();
+
+        // 在show之前必须要关闭焦点，这个代码是很有必要的不能删除
+        //不获取焦点
+        int flag = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+        getWindow().setFlags(flag,flag);
+
 
         // 设置状态栏为 light 的模式
         setStatusBarLightMode();
@@ -86,6 +95,45 @@ public class FullScreenJTJKDialog extends UIProgressDialog{
         //处理VIVO手机8.0以上系统部分机型的状态栏问题和弹窗下移问题
         boolean isPortrait = getContext().getResources().getConfiguration().orientation
                 == Configuration.ORIENTATION_PORTRAIT;
+    }
+
+    /**
+     * 隐藏导航栏
+     * 通过直接设置 对底层的 ViewGroup获取他的navigationBarBackground对象来控制
+     * 所以这个ID是特别的设置
+     */
+    public void hideNavigationBar() {
+        // 获得最底层对象
+        final ViewGroup decorView = (ViewGroup) getWindow().getDecorView();
+        for (int i = 0, count = decorView.getChildCount(); i < count; i++) {
+            final View child = decorView.getChildAt(i);
+            final int id = child.getId();
+            if (id != View.NO_ID) {
+                String resourceEntryName = getResNameById(id);
+                // 靶向到 navigationBarBackground 并设置他的可见度
+                if ("navigationBarBackground".equals(resourceEntryName)) {
+                    child.setVisibility(View.INVISIBLE);
+                }
+            }
+        }
+        // 通过FLAG设置导航栏
+        final int uiOptions = View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION |
+                View.SYSTEM_UI_FLAG_HIDE_NAVIGATION|
+                View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+        decorView.setSystemUiVisibility(decorView.getSystemUiVisibility() | uiOptions);
+    }
+
+    /**
+     * 获取资源名
+     * 工具方法
+     * 获取context范围内的资源名称
+     */
+    private  String getResNameById(int id) {
+        try {
+            return getContext().getResources().getResourceEntryName(id);
+        } catch (Exception ignore) {
+            return "";
+        }
     }
 
     /**

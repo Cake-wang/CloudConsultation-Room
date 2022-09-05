@@ -67,6 +67,11 @@ public class ApiConstant {
      */
     public static final String findMedicineStock  =  "cloudHospitalCore/findMedicineStock";
 
+    /**
+     * 2.1.9 获取盖瑞取药码
+     */
+    public static final String getTakeCode  =  "cloudHospitalCore/getTakeCode";
+
 
 //    http://XXXXX:port/api/activation/queryActive
 

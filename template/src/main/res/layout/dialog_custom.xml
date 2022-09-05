@@ -9,11 +9,12 @@
     android:gravity="center_horizontal">
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="600dp"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:layout_gravity="center"
         android:gravity="center_horizontal"
+        android:padding="16dp"
         android:background="@drawable/bg_readcard_white"
         >
 
@@ -56,7 +57,7 @@
 
             <Button
                 android:id="@+id/btn_inquiry"
-                android:layout_width="wrap_content"
+                android:layout_width="250dp"
                 android:layout_height="wrap_content"
                 android:text="是"
                 android:textColor="#fff"
@@ -66,7 +67,7 @@
 
             <Button
                 android:id="@+id/btn_cancel"
-                android:layout_width="wrap_content"
+                android:layout_width="250dp"
                 android:layout_height="wrap_content"
                 android:text="否"
                 android:textColor="#999999"

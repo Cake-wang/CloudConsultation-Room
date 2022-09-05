@@ -339,12 +339,12 @@
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical|top"
                     android:visibility="visible"
-                    android:layout_marginLeft="40dp"
                     android:orientation="vertical"
                     >
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:paddingLeft="40dp"
                         android:textColor="#666"
                         android:textSize="22dp"
                         android:gravity="left"
@@ -356,6 +356,8 @@
                         android:id="@+id/cb_protocol_tx_o"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:paddingLeft="40dp"
+                        android:paddingVertical="8dp"
                         android:layout_weight="1"
                         android:orientation="horizontal"
                         >
@@ -365,6 +367,8 @@
                             android:layout_height="wrap_content"
                             android:button="@drawable/checkbox_theme"
                             android:paddingVertical="8dp"
+                            android:clickable="false"
+                            android:enabled="false"
                             android:scaleX="0.8"
                             android:scaleY="0.8" />
 
@@ -386,7 +390,8 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:orientation="horizontal"
-                        android:layout_marginVertical="16dp"
+                        android:paddingVertical="8dp"
+                        android:paddingLeft="40dp"
                         >
                         <androidx.appcompat.widget.AppCompatCheckBox
                             android:id="@+id/cb_protocol_tw"
@@ -394,6 +399,8 @@
                             android:layout_height="wrap_content"
                             android:button="@drawable/checkbox_theme"
                             android:paddingVertical="8dp"
+                            android:clickable="false"
+                            android:enabled="false"
                             android:scaleX="0.8"
                             android:scaleY="0.8" />
                         <TextView
@@ -413,6 +420,8 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:orientation="horizontal"
+                        android:paddingLeft="40dp"
+                        android:paddingVertical="8dp"
                         >
                         <androidx.appcompat.widget.AppCompatCheckBox
                             android:id="@+id/cb_protocol_tr"
@@ -420,6 +429,8 @@
                             android:layout_height="wrap_content"
                             android:button="@drawable/checkbox_theme"
                             android:paddingVertical="8dp"
+                            android:clickable="false"
+                            android:enabled="false"
                             android:scaleX="0.8"
                             android:scaleY="0.8" />
                         <TextView

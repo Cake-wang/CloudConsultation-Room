@@ -223,10 +223,13 @@ public class OrderRecipesFragment extends BaseEventFragment {
 
            @Override
            public void onItemViewDraw(AutoObjectAdaptor.ViewHolder holder, int position, GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes.RecipeDetail itemData) {
-               int perDayUse = itemData.getUseDose().intValue();
+               String perDayUse = "适量";
+               if (itemData.getUseDose()!=null)
+                 perDayUse = String.valueOf(itemData.getUseDose().intValue()) + "片";
+
 
                String drugName = (position+1)+"、"+itemData.getDrugName();
-               String wayToUse = "(1天"+itemData.getUseTotalDose()/itemData.getUseDays()+"次，每次"+perDayUse+"片)";
+               String wayToUse = "(1天"+itemData.getUseTotalDose()/itemData.getUseDays()+"次，每次"+perDayUse+")";
                String[] orders = {"#333333",drugName,"#38ABA0",wayToUse};
                ((TextView)holder.itemView.findViewById(R.id.tv_useDose)).setText(ActivityUtils.formatTextView(orders));//使用方法
            }
@@ -296,7 +299,12 @@ public class OrderRecipesFragment extends BaseEventFragment {
                                 for (GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes.RecipeDetail item : obj.recipeDetailBeans) {
                                     // 由于取消的 处方单 是不会存在的，所以不需要判断9，取消订单的问题
                                     // 用量
-                                    String howToUse = "(1天"+item.getUseTotalDose()/item.getUseDays()+"次，每次"+ item.getUseDose().intValue()+"片)";
+
+                                    String perDayUse = "适量";
+                                    if (item.getUseDose()!=null)
+                                        perDayUse = String.valueOf(item.getUseDose().intValue()) + "片";
+
+                                    String howToUse = "(1天"+item.getUseTotalDose()/item.getUseDays()+"次，每次"+ perDayUse+")";
                                     PayRecipeFragment.DrugObject drug= new PayRecipeFragment.DrugObject();
                                     //            drugs.put("direction","口服");
                                     drug.dosageUnit = item.drugUnit;

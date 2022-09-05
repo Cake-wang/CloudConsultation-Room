@@ -35,6 +35,7 @@ import com.aries.template.entity.GetMedicalInfoEntity;
 import com.aries.template.entity.GetPatientRecipeByIdEntity;
 import com.aries.template.entity.GetRecipeListByConsultIdEntity;
 import com.aries.template.entity.GetStockInfoEntity;
+import com.aries.template.entity.GetTakeCodeEntity;
 import com.aries.template.entity.IsRegisterRequestEntity;
 import com.aries.template.entity.IsRegisterResultEntity;
 import com.aries.template.entity.MachineEntity;
@@ -1011,5 +1012,24 @@ public class ApiRepository extends BaseRepository {
         return FastTransformer.switchSchedulers(getApiService().findMedicineStock(body).retryWhen(new FastRetryWhen()));
     }
 
+
+    /**
+     * 2.1.9 获取盖瑞取药码
+     *
+     * 获取报告列表
+     * 主要是获取他的报告HTML地址，最新的结果
+     *
+     * methodCode：reportList
+     *
+     * @param busId 纳里订单id
+     */
+    public Observable<GetTakeCodeEntity> getTakeCode(String busId) {
+        // 除了公共的数据之外，还有其他的数据请求
+        Map<String,Object> bizContent = new HashMap<>();
+        bizContent.put("busId",busId);// 纳里订单id
+        // 请求的类型
+        RequestBody body = BodyCreate(bizContent,"",false);
+        return FastTransformer.switchSchedulers(getApiService().getTakeCode(body).retryWhen(new FastRetryWhen()));
+    }
 
 }

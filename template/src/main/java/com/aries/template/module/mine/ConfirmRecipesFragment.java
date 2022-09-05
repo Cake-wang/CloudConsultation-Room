@@ -305,7 +305,11 @@ public class ConfirmRecipesFragment extends BaseEventFragment {
 
                                     GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO.RecipeDetailBeanListDTO vo = currentRecipe.recipeDetailBeanList.get(0);
                                     // 用量
-                                    String howToUse = "(1天"+vo.useTotalDose/vo.useDays+"次，每次"+((Double) vo.useDose).intValue()+"片)";
+                                    String perDayUse = "适量";
+                                    if ((Double) vo.useDose!=null)
+                                        perDayUse = String.valueOf(((Double) vo.useDose).intValue()) + "片";
+
+                                    String howToUse = "(1天"+vo.useTotalDose/vo.useDays+"次，每次"+perDayUse+")";
                                     PayRecipeFragment.DrugObject drug= new PayRecipeFragment.DrugObject();
                                     //            drugs.put("direction","口服");
                                     drug.dosageUnit = vo.drugUnit;
@@ -449,10 +453,13 @@ public class ConfirmRecipesFragment extends BaseEventFragment {
                 @Override
                 public void onItemViewDraw(AutoObjectAdaptor.ViewHolder holder, int position, GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO itemData) {
                     GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO.RecipeDetailBeanListDTO vo = itemData.recipeDetailBeanList.get(0);
-                    int perDayUse = ((Double) vo.useDose).intValue();
+//                    int perDayUse = ((Double) vo.useDose).intValue();
+                    String perDayUse = "适量";
+                    if ((Double) vo.useDose!=null)
+                        perDayUse = String.valueOf(((Double) vo.useDose).intValue()) + "片";
 
                     String drugName = (position+1)+"、"+vo.drugName;
-                    String wayToUse = "(1天"+vo.useTotalDose/vo.useDays+"次，每次"+perDayUse+"片)";
+                    String wayToUse = "(1天"+vo.useTotalDose/vo.useDays+"次，每次"+perDayUse+")";
                     String[] orders = {"#333333",drugName,"#38ABA0",wayToUse};
                     ((TextView)holder.itemView.findViewById(R.id.tv_useDose)).setText(ActivityUtils.formatTextView(orders));//使用方法
                 } });

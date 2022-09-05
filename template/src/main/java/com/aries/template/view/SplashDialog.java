@@ -85,6 +85,7 @@ public class SplashDialog{
         screenLayout.addView(splashImageView);
 
         splashDialog.setContentView(screenLayout);
+        // 点击外部不隐藏
         splashDialog.setCancelable(false);
     }
 

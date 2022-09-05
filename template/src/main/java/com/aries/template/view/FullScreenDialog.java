@@ -28,9 +28,9 @@ public class FullScreenDialog extends Dialog {
     /** 是否保持屏幕打开 */
     boolean keepScreenOn = false;
     /** 是否给与导航栏 全屏幕手机 */
-    boolean hasNavigationBar = true;
+    boolean hasNavigationBar = false;
     /** 需要焦点控制 */
-    boolean isRequestFocus = true;
+    boolean isRequestFocus = false;
     /** 是否有隐藏状态栏，true 隐藏, 可以将状态栏网上顶 */
     boolean hasStatusBar = true;
     /** 是否是 Light mode*/
