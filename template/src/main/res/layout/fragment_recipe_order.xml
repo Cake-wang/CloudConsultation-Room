@@ -33,7 +33,7 @@
                 android:background="#24A6A0"
                 />
 
-            <TextView
+            <com.aries.template.utils.ScaleTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#333"
@@ -44,7 +44,7 @@
                 android:textStyle="bold"
                 android:text="请确认您的订单" />
 
-            <TextView
+            <com.aries.template.utils.ScaleTextView
                 android:id="@+id/jtjk_fz_fragment_timer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -98,7 +98,7 @@
                             android:orientation="vertical"
                             >
 
-                            <TextView
+                            <com.aries.template.utils.ScaleTextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:textColor="#666666"
@@ -111,7 +111,7 @@
                                 android:layout_marginBottom="15dp"
                                 android:text="姓名：" />
 
-                            <TextView
+                            <com.aries.template.utils.ScaleTextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:textColor="#666666"
@@ -124,7 +124,7 @@
                                 android:layout_marginBottom="15dp"
                                 android:text="年龄：" />
 
-                            <TextView
+                            <com.aries.template.utils.ScaleTextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:textColor="#666666"
@@ -136,7 +136,7 @@
                                 android:layout_marginBottom="15dp"
                                 android:text="医保卡号：" />
 
-                            <TextView
+                            <com.aries.template.utils.ScaleTextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:textColor="#666666"
@@ -148,7 +148,7 @@
                                 android:id="@+id/tv_doc_tv"
                                 android:text="医生：" />
 
-                            <TextView
+                            <com.aries.template.utils.ScaleTextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:textColor="#666666"
@@ -161,7 +161,7 @@
                                 android:layout_marginBottom="15dp"
                                 android:text="科室：" />
 
-                            <TextView
+                            <com.aries.template.utils.ScaleTextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:textColor="#666666"
@@ -174,7 +174,7 @@
                                 android:layout_marginBottom="15dp"
                                 android:text="诊断结果：" />
 
-                            <TextView
+                            <com.aries.template.utils.ScaleTextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:textColor="#666666"
@@ -199,7 +199,7 @@
                             android:orientation="vertical"
                             >
 
-                            <TextView
+                            <com.aries.template.utils.ScaleTextView
                                 android:layout_marginTop="10dp"
 
                                 android:layout_width="wrap_content"
@@ -213,7 +213,7 @@
                                 android:layout_marginBottom="15dp"
                                 android:text="王二二（男）" />
 
-                            <TextView
+                            <com.aries.template.utils.ScaleTextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:textColor="#333333"
@@ -226,7 +226,7 @@
                                 android:layout_marginBottom="15dp"
                                 android:text="01" />
 
-                            <TextView
+                            <com.aries.template.utils.ScaleTextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:textColor="#333333"
@@ -238,7 +238,7 @@
                                 android:layout_marginBottom="15dp"
                                 android:text="A12345678" />
 
-                            <TextView
+                            <com.aries.template.utils.ScaleTextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:textColor="#333333"
@@ -250,7 +250,7 @@
                                 android:id="@+id/tv_doc"
                                 android:text="张三三" />
 
-                            <TextView
+                            <com.aries.template.utils.ScaleTextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:textColor="#333333"
@@ -263,7 +263,7 @@
                                 android:layout_marginBottom="15dp"
                                 android:text="心胸外科" />
 
-                            <TextView
+                            <com.aries.template.utils.ScaleTextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:textColor="#333333"
@@ -276,7 +276,7 @@
                                 android:layout_marginBottom="15dp"
                                 android:text="过度熬夜" />
 
-                            <TextView
+                            <com.aries.template.utils.ScaleTextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:textColor="#333333"
@@ -302,7 +302,7 @@
                             android:orientation="vertical"
                             >
 
-                            <TextView
+                            <com.aries.template.utils.ScaleTextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:textColor="#666666"
@@ -313,7 +313,7 @@
                                 android:layout_marginBottom="15dp"
                                 android:text="年龄：" />
 
-                            <TextView
+                            <com.aries.template.utils.ScaleTextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:textColor="#666666"
@@ -324,7 +324,7 @@
                                 android:layout_marginBottom="15dp"
                                 android:text="科室：" />
 
-                            <TextView
+                            <com.aries.template.utils.ScaleTextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:textColor="#666666"
@@ -348,7 +348,7 @@
                             android:orientation="vertical"
                             >
 
-                            <TextView
+                            <com.aries.template.utils.ScaleTextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:textColor="#333333"
@@ -360,7 +360,7 @@
                                 android:layout_marginBottom="15dp"
                                 android:text="01" />
 
-                            <TextView
+                            <com.aries.template.utils.ScaleTextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:textColor="#333333"
@@ -372,7 +372,7 @@
                                 android:layout_marginBottom="15dp"
                                 android:text="心胸外科" />
 
-                            <TextView
+                            <com.aries.template.utils.ScaleTextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:textColor="#333333"
@@ -402,7 +402,7 @@
                     android:orientation="vertical"
                     >
 
-                    <TextView
+                    <com.aries.template.utils.ScaleTextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="#666666"
@@ -423,7 +423,7 @@
                         android:layout_weight="1"
                         android:layout_height="0dp"/>
 
-                    <TextView
+                    <com.aries.template.utils.ScaleTextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="#333333"
@@ -435,7 +435,7 @@
                         android:layout_marginBottom="15dp"
                         android:text="1、阿莫西林（1天3次，每次2片）" />
 
-                    <TextView
+                    <com.aries.template.utils.ScaleTextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="#333333"
@@ -447,7 +447,7 @@
                         android:layout_marginBottom="15dp"
                         android:text="2、止咳糖浆（1天3次，每次20毫升）" />
 
-                    <TextView
+                    <com.aries.template.utils.ScaleTextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="#333333"
@@ -464,7 +464,7 @@
             </LinearLayout>
 
 
-            <TextView
+            <com.aries.template.utils.ScaleTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#FE6E63"
@@ -553,7 +553,7 @@
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
-        <TextView
+        <com.aries.template.utils.ScaleTextView
             android:id="@+id/jtjk_machine_id"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -565,7 +565,7 @@
             android:textColor="#fff" />
 
 
-        <TextView
+        <com.aries.template.utils.ScaleTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="10dp"
@@ -574,7 +574,7 @@
             android:visibility="gone" />
 
 
-        <TextView
+        <com.aries.template.utils.ScaleTextView
             android:id="@+id/tv_clock"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -588,7 +588,7 @@
             android:textSize="16dp"
             android:textStyle="normal" />
 
-        <TextView
+        <com.aries.template.utils.ScaleTextView
             android:id="@+id/tv_version"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -602,7 +602,7 @@
             android:textSize="16dp"
             android:textStyle="normal" />
 
-        <TextView
+        <com.aries.template.utils.ScaleTextView
             android:id="@+id/jtjk_hospital_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

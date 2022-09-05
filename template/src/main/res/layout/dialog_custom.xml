@@ -26,7 +26,7 @@
             android:layout_marginTop="16dp"
             app:srcCompat="@mipmap/btn_close_yzs" />
 
-        <TextView
+        <com.aries.template.utils.ScaleTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="#333"
@@ -36,7 +36,7 @@
             android:textStyle="bold"
             android:text="取消支付订单" />
 
-        <TextView
+        <com.aries.template.utils.ScaleTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="#666"

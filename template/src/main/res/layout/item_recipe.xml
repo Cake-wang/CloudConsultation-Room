@@ -21,14 +21,14 @@
             android:layout_weight="0.35"
             android:orientation="vertical"
             >
-            <TextView
+            <com.aries.template.utils.ScaleTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingVertical="8dp"
                 android:textSize="16dp"
                 android:text="诊断结果:"
                 />
-            <TextView
+            <com.aries.template.utils.ScaleTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingVertical="8dp"
@@ -42,7 +42,7 @@
             android:layout_weight="0.65"
             android:orientation="vertical"
             >
-            <TextView
+            <com.aries.template.utils.ScaleTextView
                 android:id="@+id/jtjk_recipe_disastname"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -51,7 +51,7 @@
                 android:textStyle="bold"
                 android:text="肥胖"
                 />
-            <TextView
+            <com.aries.template.utils.ScaleTextView
                 android:id="@+id/jtjk_recipe_totoalpayment"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -66,7 +66,7 @@
             android:layout_weight="1"
             android:orientation="vertical"
             >
-            <TextView
+            <com.aries.template.utils.ScaleTextView
                 android:id="@+id/jtjk_recipe_optime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -74,7 +74,7 @@
                 android:textSize="16dp"
                 android:text="开放时间 2022-07-01"
                 />
-            <TextView
+            <com.aries.template.utils.ScaleTextView
                 android:id="@+id/jtjk_recipe_closetime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -90,7 +90,7 @@
             android:orientation="vertical"
             android:gravity="center"
             >
-            <TextView
+            <com.aries.template.utils.ScaleTextView
                 android:id="@+id/jtjk_recipe_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

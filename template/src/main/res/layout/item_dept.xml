@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-        <TextView
+        <com.aries.template.utils.ScaleTextView
             android:id="@+id/jtjk_fz_item_tv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

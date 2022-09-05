@@ -167,9 +167,9 @@ public class ResultFragment extends BaseEventFragment implements ISupportFragmen
                 // 卡号
                 // 机器编号
                 try {
-                    String name = "姓名："+GlobalConfig.ssCard.getName()+System.getProperty("line.separator");
-                    String cardNum= "卡号："+GlobalConfig.ssCard.getCardNum()+System.getProperty("line.separator");
-                    String machineId= "设备号："+GlobalConfig.machineId+System.getProperty("line.separator");
+                    String name = "姓名："+GlobalConfig.ssCard.getName();
+                    String cardNum= "卡号："+GlobalConfig.ssCard.getCardNum();
+                    String machineId= "设备号："+GlobalConfig.machineId;
 //                    byte[] strByte = printString.getBytes("GBK");
                     //打印字符
                     BasicOper.dc_printcharacter(name.getBytes("GBK"));
@@ -223,7 +223,7 @@ public class ResultFragment extends BaseEventFragment implements ISupportFragmen
                 //打印空白
                 try {
                     // 使用系统换行符
-                    String strBlank = System.getProperty("line.separator");
+                    String strBlank = " ";
                     byte[] byteTemp = strBlank.getBytes("GBK");
                     //打印一维码
                     BasicOper.dc_printcharacter(byteTemp);

@@ -558,7 +558,7 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                                                                     // 如果不是同一家机构，则跳过不处理
                                                                     break;
                                                                 // 1 待审核, 2 待处理, 3 待取药
-                                                                if (item.status==2){
+                                                                if (item.status==2 || item.status==3){
                                                                     recipes.add(item);
                                                                 }
                                                             }

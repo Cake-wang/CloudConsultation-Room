@@ -9,19 +9,29 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.alibaba.fastjson.JSON;
+import com.aries.library.fast.retrofit.FastLoadingObserver;
+import com.aries.library.fast.util.ToastUtil;
 import com.aries.template.GlobalConfig;
 import com.aries.template.R;
 import com.aries.template.entity.GetConsultsAndRecipesResultEntity;
+import com.aries.template.entity.GetTakeCodeEntity;
+import com.aries.template.entity.SearchDoctorListByBusTypeV2ResultEntity;
 import com.aries.template.module.base.BaseEventFragment;
+import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.template.utils.ActivityUtils;
 import com.aries.template.utils.DateUtils;
+import com.aries.template.utils.DefenceUtil;
 import com.aries.template.widget.autoadopter.AutoAdaptorProxy;
 import com.aries.template.widget.autoadopter.AutoObjectAdaptor;
 import com.aries.template.widget.autoadopter.DefenceAutoAdaptorProxy;
 import com.aries.template.widget.updownbtn.UpDownProxy;
 import com.aries.ui.view.title.TitleBarView;
+import com.trello.rxlifecycle3.android.FragmentEvent;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import butterknife.BindView;
 
@@ -113,8 +123,14 @@ public class OrderRecipesListFragment extends BaseEventFragment {
                     @Override
                     public void onItemViewDraw(AutoObjectAdaptor.ViewHolder holder, int position, GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes itemData) {
                         holder.itemView.findViewById(R.id.jtjk_recipe_btn).setOnClickListener(v -> {
-                            // 跳转到详细页
-                            start(OrderRecipesFragment.newInstance(obj.get(position)));
+                            // 如果是处方详情状态是3 表示这个处方已经支付，但是没有取药成功
+                            if (obj.get(position).status==3){
+                                //请求获得药品
+                                requestDoctorInfo(String.valueOf(obj.get(position).orderId),obj.get(position));
+                            }else{
+                                // 跳转到详细页
+                                start(OrderRecipesFragment.newInstance(obj.get(position)));
+                            }
                         });
 
                         // 添加文字
@@ -127,6 +143,13 @@ public class OrderRecipesListFragment extends BaseEventFragment {
                         ((TextView)holder.itemView.findViewById(R.id.jtjk_recipe_disastname)).setText(itemData.organDiseaseName);
                         ((TextView)holder.itemView.findViewById(R.id.jtjk_recipe_optime)).setText("开方时间:  "+openTime);
                         ((TextView)holder.itemView.findViewById(R.id.jtjk_recipe_closetime)).setText("失效时间:  "+endTime);
+                        ((TextView)holder.itemView.findViewById(R.id.jtjk_recipe_btn)).setText("处方详情");
+
+                        // 如果是处方详情状态是3 表示这个处方已经支付，但是没有取药成功
+                        if (obj.get(position).status==3){
+                            // 变化样式
+                            ((TextView)holder.itemView.findViewById(R.id.jtjk_recipe_btn)).setText("拿取药码");
+                        }
 
                         // 添加金额样式
                         if (itemData.totalMoney==null)itemData.totalMoney = 0.0d;
@@ -178,6 +201,57 @@ public class OrderRecipesListFragment extends BaseEventFragment {
         upDownProxy.setTotalDatas(obj);
         upDownProxy.doStartReFlash();
     }
+
+
+    /**
+     * 请求取药码
+     */
+    public void requestDoctorInfo(String orderid, GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes recipes){
+        // 防重复提交
+        if (!DefenceUtil.checkReSubmit("OrderRecipesListFragment.requestDoctorInfo"))
+            return;
+
+        // 获取取药码后，跳转到取药成功界面
+        ApiRepository.getInstance().getTakeCode(orderid)
+                .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
+                .subscribe(new FastLoadingObserver<GetTakeCodeEntity>("请稍后...") {
+                    @Override
+                    public void _onNext(GetTakeCodeEntity entity) {
+                        if (entity == null) {
+                            ToastUtil.show("请检查网络");
+                            return;
+                        }
+                        try {
+                            if (entity.success){
+                                Map<String,Object> objectMap = new HashMap<>();
+                                objectMap.put("takeCode",entity.data.takeCode);
+                                String drug = "";
+                                if (!TextUtils.isEmpty(objectMap.get("takeCode").toString()))
+                                    // 格式化打印数据
+                                    // 药物用量
+//                                    for (PayRecipeFragment.DrugObject item : obj) {
+//                                        drug+=item.drugCommonName +" "+ item.howToUse+"&&";
+//                                    }
+                                for (GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes.RecipeDetail item : recipes.recipeDetailBeans) {
+                                    String perDayUse = "适量";
+                                    if (item.getUseDose()!=null)
+                                        perDayUse = String.valueOf(item.getUseDose().intValue()) + "片";
+                                    String howToUse = "(1天"+item.getUseTotalDose()/item.getUseDays()+"次，每次"+ perDayUse+")";
+                                    drug+= item.drugName +" "+howToUse+"&&";
+                                }
+                                // 释放资源。只要进入到这里，就结束请求支付轮训
+                                onDismiss();
+                                start(ResultFragment.newInstance("paySuc:"+objectMap.get("takeCode")+":"+drug));
+                            }else{
+                                ToastUtil.show("获取药品失败");
+                            }
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+                });
+    }
+
 
 
     /**

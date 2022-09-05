@@ -20,10 +20,14 @@ public class ScaleTextView extends AppCompatTextView {
     public ScaleTextView(Context context, AttributeSet attrs) {
         super(context, attrs);
         TypedArray type = context.obtainStyledAttributes(attrs,R.styleable.ScaleTextView);//获得属性值
-        int i = type.getInteger(R.styleable.ScaleTextView_textSizePx, 16);
+//        int i = type.getInteger(R.styleable.ScaleTextView_textSizePx, 16);
+        Float textSize = getTextSize();
+        int i = textSize.intValue();
+        // recompute the size
         Log.d("LOGCAT","i:"+i);
         baseScreenHeight = type.getInteger(R.styleable.ScaleTextView_baseScreenHeight, designedHeight);
         Log.d("LOGCAT","baseScreenHeight:"+baseScreenHeight);
+        // re set
         setTextSize(TypedValue.COMPLEX_UNIT_PX, getFontSize(i));
         boolean _isBold=type.getBoolean(R.styleable.ScaleTextView_textBold, false);
         getPaint().setFakeBoldText(_isBold);

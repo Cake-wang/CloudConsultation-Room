@@ -5,7 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@mipmap/bg_other_yzs"
     android:orientation="vertical">
-    <TextView
+    <com.aries.template.utils.ScaleTextView
         android:id="@+id/jtjk_recipe_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -44,7 +44,7 @@
                 android:background="#24A6A0"
                 />
 
-            <TextView
+            <com.aries.template.utils.ScaleTextView
                 android:id="@+id/jtjk_fz_fragment_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -56,7 +56,7 @@
                 android:textStyle="bold"
                 android:text="请选择一级科室" />
 
-            <TextView
+            <com.aries.template.utils.ScaleTextView
                 android:id="@+id/jtjk_fz_fragment_timer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -522,7 +522,7 @@
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
-        <TextView
+        <com.aries.template.utils.ScaleTextView
             android:id="@+id/jtjk_machine_id"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -543,7 +543,7 @@
             android:visibility="gone" />
 
 
-        <TextView
+        <com.aries.template.utils.ScaleTextView
             android:id="@+id/tv_clock"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -557,7 +557,7 @@
             android:textSize="16dp"
             android:textStyle="normal" />
 
-        <TextView
+        <com.aries.template.utils.ScaleTextView
             android:id="@+id/tv_version"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -571,7 +571,7 @@
             android:textSize="16dp"
             android:textStyle="normal" />
 
-        <TextView
+        <com.aries.template.utils.ScaleTextView
             android:id="@+id/jtjk_hospital_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

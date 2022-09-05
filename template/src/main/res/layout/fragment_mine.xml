@@ -33,7 +33,7 @@
             android:background="#24A6A0"
             />
 
-        <TextView
+        <com.aries.template.utils.ScaleTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="#333"
@@ -44,7 +44,7 @@
             android:textStyle="bold"
             android:text="请插入医保卡" />
 
-        <TextView
+        <com.aries.template.utils.ScaleTextView
             android:id="@+id/jtjk_fz_fragment_timer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -74,7 +74,7 @@
             android:layout_marginBottom="15dp"
             />
 
-        <TextView
+        <com.aries.template.utils.ScaleTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="#333"
@@ -128,7 +128,7 @@
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
-        <TextView
+        <com.aries.template.utils.ScaleTextView
             android:id="@+id/jtjk_machine_id"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -140,7 +140,7 @@
             android:textColor="#fff" />
 
 
-        <TextView
+        <com.aries.template.utils.ScaleTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="10dp"
@@ -148,7 +148,7 @@
             android:textColor="#333"
             android:visibility="gone" />
 
-        <TextView
+        <com.aries.template.utils.ScaleTextView
             android:id="@+id/tv_clock"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -162,7 +162,7 @@
             android:textSize="16dp"
             android:textStyle="normal" />
 
-        <TextView
+        <com.aries.template.utils.ScaleTextView
             android:id="@+id/tv_version"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -177,7 +177,7 @@
             android:textStyle="normal"
             />
 
-        <TextView
+        <com.aries.template.utils.ScaleTextView
             android:id="@+id/jtjk_hospital_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
