@@ -598,7 +598,7 @@ public class EaseModeProxy {
     /**
      * 释放资源
      */
-    private void releaseProxy(){
+    public void releaseProxy(){
         // 重置全局数据
         isDoctorEnterRoom = false;
         Log.e("JTJK", "releaseProxy: start" );

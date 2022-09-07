@@ -57,6 +57,7 @@ import com.aries.template.utility.ConvertJavaBean;
 import com.aries.template.utility.JTJSONUtils;
 import com.aries.template.utility.RSASignature;
 import com.aries.template.widget.mgson.MFastRetrofit;
+import com.aries.template.widget.mgson.MGsonFactory;
 import com.decard.NDKMethod.BasicOper;
 
 import java.io.BufferedReader;
@@ -75,6 +76,8 @@ import java.util.UUID;
 
 import io.reactivex.Observable;
 import okhttp3.RequestBody;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
 /**
  * @Author: AriesHoo on 2018/11/19 14:25
@@ -330,6 +333,9 @@ public class ApiRepository extends BaseRepository {
     /**
      * 用户信息查询
      * 用于验证用户是否注册。
+     *
+     * 自己的接口
+     *
      * @param idCard 身份证 可能对应 SSNUM
      */
     public Observable<FindUserResultEntity> findUser(String idCard) {
@@ -343,6 +349,9 @@ public class ApiRepository extends BaseRepository {
 
     /**
      * 通过手机号注册
+     *
+     * 自己的接口
+     *
      * @param idCard 证件号码
      * @param name 姓名
      * @param mobile 手机号
@@ -367,6 +376,8 @@ public class ApiRepository extends BaseRepository {
      * 获取手机号注册的验证码
      * 这个接口只在申请注册的时候，使用
      * 这个验证码会以手机短信的形式注册在
+     *
+     * 自己的接口
      */
     public Observable<AuthCodeResultEntity> authCode(String mobile) {
         // 除了公共的数据之外，还有其他的数据请求
@@ -600,6 +611,9 @@ public class ApiRepository extends BaseRepository {
 
     /**
      * 获取复诊和处方列表
+     *
+     * 自己的接口
+     *
      * 获取处方单 10 页
      * 获取挂号单 10 页
      * @param tabStatus 状态标志位 ,ongoing 进行中，isover 已完成tab，onready 待处理。
@@ -623,6 +637,9 @@ public class ApiRepository extends BaseRepository {
 
     /**
      * 根据机器ID获取机器信息
+     *
+     * 自己的接口
+     *
      * @param machineId 机器ID
      */
     public Observable<MachineEntity> findByMachineId(String machineId) {
@@ -653,6 +670,9 @@ public class ApiRepository extends BaseRepository {
     /**
      * 4.1.4 处方药品推送接口
      * todo 处方单里面没有医生和科室信息？
+     *
+     * doBaseGareaRequest 盖瑞接口
+     *
      * @param totalAmount 这里的价格单位是分，所以输入的时候，要乘以100
      */
     public Observable<PrescriptionPushEntity> prescriptionPush(String  clinicSN,
@@ -701,6 +721,7 @@ public class ApiRepository extends BaseRepository {
     /**
      * 4.1.5 查询设备所有库存接口
      * todo 返回的 GetMedicalInfoEntity.data.data 是一个json的字符串，不能转换为对象
+     * doBaseGareaRequest 盖瑞接口
      * @param clinicSn 诊亭编号
      */
     public Observable<GetMedicalInfoEntity> getMedicalInfo(String clinicSn) {
@@ -715,6 +736,7 @@ public class ApiRepository extends BaseRepository {
     /**
      * 4.1.6 查询部分库存信息
      * todo 返回的 GetStockInfoEntity.data.data 是一个json的字符串，不能转换为对象
+     * doBaseGareaRequest 盖瑞接口
      * @param clinicSn 诊亭编号
      * @param skus 药品编码 列表
      */
@@ -868,6 +890,8 @@ public class ApiRepository extends BaseRepository {
      * 获取体检的检测项数据
      * 根据身份证号,手机号,检测项,或者起始时间获取胶囊诊所检测项数据
      *
+     * doBaseGareaRequest 盖瑞接口
+     *
      * @param clinicSn 诊亭编号
      * @param idNo 身份证
      * @param startDate 开始时间 时间格式为yyyy-MM-dd
@@ -896,6 +920,8 @@ public class ApiRepository extends BaseRepository {
      *
      * methodCode：reportList
      *
+     * doBaseGareaRequest 盖瑞接口
+     *
      * @param clinicSn 诊亭编号
      * @param idNo 身份证
      */
@@ -905,7 +931,7 @@ public class ApiRepository extends BaseRepository {
         bizContent.put("clinicSn",clinicSn);//诊亭编号
         bizContent.put("idNo",idNo);//手机号
         // 请求的类型
-        RequestBody body = BodyCreate(bizContent,"reportList",false);
+        RequestBody body = BodyCreate(bizContent,"reportList");
         return FastTransformer.switchSchedulers(getApiService().reportList(body).retryWhen(new FastRetryWhen()));
     }
 
@@ -982,12 +1008,7 @@ public class ApiRepository extends BaseRepository {
 
 
     /**
-     * 4.1.2 获取报告列表
-     *
-     * 获取报告列表
-     * 主要是获取他的报告HTML地址，最新的结果
-     *
-     * methodCode：reportList
+     * 查询药品库存是否还有
      *
      * @param clinicSn 诊亭编号
      * @param skus 开药列表 例如 [ { "drugCode": "6941456100446", "total": 20 }, { "drugCode": "packing-bag", "total": 10 } ]
@@ -1016,10 +1037,7 @@ public class ApiRepository extends BaseRepository {
     /**
      * 2.1.9 获取盖瑞取药码
      *
-     * 获取报告列表
-     * 主要是获取他的报告HTML地址，最新的结果
-     *
-     * methodCode：reportList
+     * 自己的接口
      *
      * @param busId 纳里订单id
      */

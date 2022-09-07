@@ -4,23 +4,11 @@ package com.aries.template.xiaoyu.xinlin;
 import android.app.Activity;
 import android.text.TextUtils;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.ainemo.util.JsonUtil;
 import com.aries.library.fast.util.ToastUtil;
-import com.aries.template.xiaoyu.EaseModeProxy;
-import com.aries.template.xiaoyu.model.EndPoint;
-import com.aries.template.xiaoyu.model.RegEndPoint;
-import com.aries.template.xiaoyu.model.RegRequest;
-import com.aries.template.xiaoyu.model.RtcStartInvokeRequest;
 
-import java.lang.ref.WeakReference;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import tech.gusavila92.websocketclient.WebSocketClient;
 

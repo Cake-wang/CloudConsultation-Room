@@ -223,7 +223,8 @@ public class DoctorListFragment extends BaseEventFragment {
                             return;
                         }
                         try {
-                            if (entity.data.isSuccess()){
+                            // 判断是否可以进行复诊 body true 就是可以
+                            if (entity.data.jsonResponseBean.body){
                                 // 请求成功，存储科室ID
                                 GlobalConfig.departmentID = departmentId;
                                 // 将医生信息存储为全局复诊医生信息

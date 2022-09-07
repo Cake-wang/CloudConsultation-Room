@@ -69,13 +69,19 @@ public abstract class BaseRepository {
     /**
      * 输入到通信的body创造工程
      * 由于是一个统一的网络请求，通过methodcode来调用不同的方法，所以需要输入methodCode
+     *
+     * 输入类型
+     * 纳里的接口，bizContent 使用 字符串，有method，izContent 要添加数组
+     * 我们自己的接口，bizContent使用字符串，没有method，bizContent 不添加数组
+     * 盖瑞的接口，bizContent使用字符串 ，有method，bizContent 不添加数组
+     *
      * @param isBizArray bizcontent 是否为 array。纳里的请求bizcontent是个数组,
      */
     protected RequestBody BodyCreate(Map map, String methodCode, boolean isBizArray){
         // bizContent 结构数据信息补全
         Map<String,String> bizContent = new HashMap<>();
         bizContent.put("appKey", GlobalConfig.NALI_APPKEY);
-        bizContent.put("appkey", GlobalConfig.NALI_APPKEY);//todo cc
+        bizContent.put("appkey", GlobalConfig.NALI_APPKEY);//todo cc 是不是需要2 个 appkey，可能2个都需要给。
         bizContent.put("tid",GlobalConfig.NALI_TID);
         bizContent.putAll(map);
 
@@ -90,10 +96,13 @@ public abstract class BaseRepository {
 
         //  由于加密要求，必须要按照字母顺序排列
         final Map<String, Object> params = new HashMap<>(4);
-        if (isBizArray)
+
+        // 如果有数组，那就是纳里的接口，不需要把 biz content 转换成字符串
+        if (isBizArray){
             params.put("bizContent", maps);
-        else
+        } else {
             params.put("bizContent", maps.get(0));// 不是取第一个值，而是取bizContent数组的第一位，maps是多个bizContent
+        }
 
         // 将 biz content 全转成字符串
         String bizContentStr = ConvertJavaBean.converJavaBeanToJsonNew(params.get("bizContent"));

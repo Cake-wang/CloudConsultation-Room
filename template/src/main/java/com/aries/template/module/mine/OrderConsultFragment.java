@@ -276,7 +276,7 @@ public class OrderConsultFragment extends BaseEventFragment {
                             ToastUtil.show("请检查网络");
                             return;
                         }
-                        if (entity.getData().isSuccess()){
+                        if (entity.getData().getJsonResponseBean().body){
                             if (entity.data.jsonResponseBean.body)
                                 start(ResultFragment.newInstance("cancelConsult"));
                             else

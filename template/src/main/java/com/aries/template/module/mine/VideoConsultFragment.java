@@ -416,7 +416,7 @@ public class VideoConsultFragment extends BaseEventFragment {
                             return;
                         }
                         try {
-                            if (entity.isSuccess()){
+                            if (entity.data.jsonResponseBean.body){
                                 if (entity.getData().isSuccess()){
                                     Log.d("JTJK","患者取消复诊服务");
                                     // 医生不曾进入到视频中
@@ -548,7 +548,7 @@ public class VideoConsultFragment extends BaseEventFragment {
                             return;
                         }
                         try {
-                            if (entity.data.success){
+                            if (entity.data.jsonResponseBean.body){
                                 Log.d("JTJK","结束问诊");
                                 // 跳转
                                 if (isHaveRecipe){

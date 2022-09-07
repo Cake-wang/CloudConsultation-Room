@@ -216,7 +216,7 @@ public class App extends MultiDexApplication {
         EaseModeProxy.with().initInAPP(getContext());
 
         // 初始化 xCrash 崩溃提示，会导致 崩溃 不会被打印
-//        initXCrash();
+        initXCrash();
 
         //blockcanary 初始化 卡顿
         // 不需要用只需要这里不让他们初始化
@@ -262,8 +262,10 @@ public class App extends MultiDexApplication {
         ICrashCallback crashCallback = (logPath, emergency) -> {
             Log.d("JTJK", "initXCrash: done");
 //            ToastUtil.show("系统出了点小问题，请重新读卡操作");
-
             SystemUtil.reStart(getContext());
+
+            // 如果崩溃了，就启动视频释放机制
+            EaseModeProxy.with().releaseProxy();
         };
         initParameters.setJavaCallback(crashCallback);
         initParameters.setAnrCallback(crashCallback);

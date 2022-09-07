@@ -2,7 +2,6 @@ package com.aries.template.xiaoyu.uvc;
 
 import android.content.Context;
 
-import com.aries.template.xiaoyu.EaseModeProxy;
 import com.serenegiant.usb.USBMonitor;
 
 /**

@@ -1,39 +1,23 @@
 package com.aries.template.module.main;
 
 import android.os.Bundle;
-import android.text.TextUtils;
-import android.view.View;
 import android.widget.ImageView;
-import android.widget.TextClock;
 import android.widget.TextView;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.aries.library.fast.retrofit.FastLoadingObserver;
 import com.aries.library.fast.util.SPUtil;
 import com.aries.library.fast.util.ToastUtil;
-import com.aries.template.FakeDataExample;
 import com.aries.template.GlobalConfig;
 import com.aries.template.MainActivity;
 import com.aries.template.R;
-import com.aries.template.WebViewActivity;
 import com.aries.template.entity.ConfigurationToThirdForPatientEntity;
 import com.aries.template.entity.MachineEntity;
-import com.aries.template.entity.ReportListDataEntity;
 import com.aries.template.module.base.BaseEventFragment;
 import com.aries.template.module.mine.MineCardFragment;
-import com.aries.template.module.mine.PayRecipeFragment;
-import com.aries.template.module.mine.ResultFragment;
-import com.aries.template.module.mine.VideoConsultFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.template.thridapp.JTJKThirdAppUtil;
-import com.aries.template.utils.DateUtils;
 import com.aries.template.utils.DefenceUtil;
-import com.aries.template.utils.JTJKLogUtils;
-import com.aries.template.view.ShineButtonDialog;
 import com.aries.template.view.SplashDialog;
-import com.aries.template.xiaoyu.EaseModeProxy;
 import com.aries.template.xiaoyu.dapinsocket.DapinSocketProxy;
 import com.aries.template.xiaoyu.xinlin.XLMessage;
 import com.aries.ui.view.title.TitleBarView;
@@ -44,8 +28,6 @@ import com.trello.rxlifecycle3.android.FragmentEvent;
 
 import androidx.annotation.Nullable;
 
-import java.util.ArrayList;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
@@ -53,7 +35,6 @@ import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
-import me.yokeyword.fragmentation.SupportFragment;
 
 /**
  * 首页
