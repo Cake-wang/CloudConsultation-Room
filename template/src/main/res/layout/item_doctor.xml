@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
+    android:fillViewport="true"
     android:layout_height="match_parent">
 
     <LinearLayout
@@ -18,22 +19,39 @@
             android:layout_height="wrap_content"
             android:textColor="#333"
             android:layout_marginTop="30dp"
-            android:layout_marginLeft="40dp"
+            android:layout_marginLeft="30dp"
             android:textSize="24dp"
             android:gravity="left"
             android:textStyle="bold"
             android:text="张三三" />
 
-        <com.aries.template.utils.ScaleTextView
-            android:id="@+id/jtjk_doc_item_introduce_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="#666"
-            android:layout_marginTop="20dp"
-            android:layout_marginLeft="40dp"
-            android:textSize="22dp"
-            android:gravity="left"
+<!--        <ScrollView-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:scrollbars="none"-->
+<!--            android:fillViewport="true"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            >-->
 
-            android:text="简介:主任医师，从事核医学诊断、\n治疗工作近20年，浙江省医学会核\n医学与放射医学防护分会副主委;浙\n江医师协会核医学分会常委兼秘书" />
+            <com.aries.template.utils.ScaleTextView
+                android:id="@+id/jtjk_doc_item_introduce_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#666"
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="30dp"
+                android:layout_marginRight="30dp"
+                android:layout_marginBottom="30dp"
+                android:textSize="22dp"
+                android:gravity="left"
+
+
+
+
+
+                android:text="简介:主任医师，从事核医学诊断、\n治疗工作近20年，浙江省医学会核\n医学与放射医学防护分会副主委;浙\n江医师协会核医学分会常委兼秘书" />
+
+<!--        </ScrollView>-->
+
+
     </LinearLayout>
 </LinearLayout>

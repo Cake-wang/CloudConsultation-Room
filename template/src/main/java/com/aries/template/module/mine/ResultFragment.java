@@ -1,24 +1,24 @@
 package com.aries.template.module.mine;
 
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.aries.library.fast.retrofit.FastLoadingObserver;
 import com.aries.library.fast.util.ToastUtil;
 import com.aries.template.GlobalConfig;
 import com.aries.template.R;
+import com.aries.template.entity.TopexampageResultEntity;
 import com.aries.template.module.base.BaseEventFragment;
-import com.aries.template.utils.JTJKLogUtils;
+import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.ui.view.title.TitleBarView;
 import com.decard.NDKMethod.BasicOper;
+import com.trello.rxlifecycle3.android.FragmentEvent;
 
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 
 import androidx.annotation.Nullable;
@@ -142,25 +142,116 @@ public class ResultFragment extends BaseEventFragment implements ISupportFragmen
 //        ViewUtils.setChecked(cbProtocol, false);
     }
 
+    public void printCode(){
+        String printContent  = "123685";
+//        Log.d("111111MODEL", Build.MODEL);
+        //打开端口，usb模式，打开之前必须确保已经获取到USB权限，返回值为设备句柄号。
+        int devHandle = BasicOper.dc_open("AUSB",getActivity(),"",0);
+//        Log.d("111111MODEL", devHandle+"");
+        if(devHandle>0){
+//            Log.d("open","dc_open success devHandle = "+devHandle);
+            if (!TextUtils.isEmpty(printContent)){
+                //打印机参数设置
+                String setPrint = BasicOper.dc_setprint(0x02, 0x01, 0, 0, 10, 0x00);
+//                Log.d("print", "BasicOper.dc_setprint:" + setPrint);
+                // 打印机进纸设置
+                String enter = BasicOper.dc_printenter(50);
+//                Log.d("print", "BasicOper.dc_printenter:" + enter);
+
+                // 打印基础信息
+                // 姓名
+                // 卡号
+                // 机器编号
+                try {
+                    String name = "姓名：王郭亮";
+                    String cardNum= "卡号：W30103722";
+                    String machineId= "设备号：widdnidvjvfkv";
+//                    byte[] strByte = printString.getBytes("GBK");
+                    //打印字符
+                    BasicOper.dc_printcharacter(name.getBytes("GBK"));
+                    BasicOper.dc_printcharacter(cardNum.getBytes("GBK"));
+                    BasicOper.dc_printcharacter(machineId.getBytes("GBK"));
+//                    Log.d("print", "BasicOper.dc_printcharacter:" + name);
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+
+                // 取药码
+                String printString = "取药码："+printContent;
+                try {
+                    byte[] strByte = printString.getBytes("GBK");
+                    //打印字符
+                    String print_char = BasicOper.dc_printcharacter(strByte);
+//                    Log.d("print", "BasicOper.dc_printcharacter:" + print_char);
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+
+                //一维码内容
+                String strTemp = printContent;
+                try {
+                    byte[] byteTemp = strTemp.getBytes("GBK");
+                    //打印一维码
+                    String temp = BasicOper.dc_printOnedimensional(50, 0x01, 0x01, byteTemp);
+//                    Log.d("print", "PrintLineByLinePicture:" + temp);
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+
+                // 处方用量
+                String[] split = {"铝碳酸镁咀嚼片（1天1.0次，每次10片）","阿司匹林（1天1.0次，每次10片）","氯雷他定（1天1.0次，每次10片）"};
+                try {
+                    BasicOper.dc_printcharacter("处方信息：".getBytes("GBK"));
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+                for (String str : split) {
+                    try {
+                        byte[] strByte = str.getBytes("GBK");
+                        //打印字符
+                        String print_char = BasicOper.dc_printcharacter(strByte);
+//                    Log.d("print", "BasicOper.dc_printcharacter:" + print_char);
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                //打印空白
+                try {
+                    // 使用系统换行符
+                    String strBlank = " ";
+                    byte[] byteTemp = strBlank.getBytes("GBK");
+                    //打印一维码
+                    BasicOper.dc_printcharacter(byteTemp);
+                    BasicOper.dc_printcharacter(byteTemp);
+                    BasicOper.dc_printcharacter(byteTemp);
+//                    Log.d("print", "PrintLineByLinePicture:" + byteTemp);
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
     /**
      * 打印取药码
      * 先打开设备，上电
      * 再打印
      */
     public void printCode(String printContent){
-        Log.d("111111MODEL", Build.MODEL);
+//        Log.d("111111MODEL", Build.MODEL);
         //打开端口，usb模式，打开之前必须确保已经获取到USB权限，返回值为设备句柄号。
         int devHandle = BasicOper.dc_open("AUSB",getActivity(),"",0);
-        Log.d("111111MODEL", devHandle+"");
+//        Log.d("111111MODEL", devHandle+"");
         if(devHandle>0){
-            Log.d("open","dc_open success devHandle = "+devHandle);
+//            Log.d("open","dc_open success devHandle = "+devHandle);
             if (!TextUtils.isEmpty(printContent)){
                 //打印机参数设置
                 String setPrint = BasicOper.dc_setprint(0x02, 0x01, 0, 0, 10, 0x00);
-                Log.d("print", "BasicOper.dc_setprint:" + setPrint);
+//                Log.d("print", "BasicOper.dc_setprint:" + setPrint);
                 // 打印机进纸设置
                 String enter = BasicOper.dc_printenter(50);
-                Log.d("print", "BasicOper.dc_printenter:" + enter);
+//                Log.d("print", "BasicOper.dc_printenter:" + enter);
 
                 // 打印基础信息
                 // 姓名
@@ -175,7 +266,7 @@ public class ResultFragment extends BaseEventFragment implements ISupportFragmen
                     BasicOper.dc_printcharacter(name.getBytes("GBK"));
                     BasicOper.dc_printcharacter(cardNum.getBytes("GBK"));
                     BasicOper.dc_printcharacter(machineId.getBytes("GBK"));
-                    Log.d("print", "BasicOper.dc_printcharacter:" + name);
+//                    Log.d("print", "BasicOper.dc_printcharacter:" + name);
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }
@@ -186,7 +277,7 @@ public class ResultFragment extends BaseEventFragment implements ISupportFragmen
                     byte[] strByte = printString.getBytes("GBK");
                     //打印字符
                     String print_char = BasicOper.dc_printcharacter(strByte);
-                    Log.d("print", "BasicOper.dc_printcharacter:" + print_char);
+//                    Log.d("print", "BasicOper.dc_printcharacter:" + print_char);
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }
@@ -197,7 +288,7 @@ public class ResultFragment extends BaseEventFragment implements ISupportFragmen
                     byte[] byteTemp = strTemp.getBytes("GBK");
                     //打印一维码
                     String temp = BasicOper.dc_printOnedimensional(50, 0x01, 0x01, byteTemp);
-                    Log.d("print", "PrintLineByLinePicture:" + temp);
+//                    Log.d("print", "PrintLineByLinePicture:" + temp);
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }
@@ -214,7 +305,7 @@ public class ResultFragment extends BaseEventFragment implements ISupportFragmen
                         byte[] strByte = str.getBytes("GBK");
                         //打印字符
                     String print_char = BasicOper.dc_printcharacter(strByte);
-                    Log.d("print", "BasicOper.dc_printcharacter:" + print_char);
+//                    Log.d("print", "BasicOper.dc_printcharacter:" + print_char);
                     } catch (UnsupportedEncodingException e) {
                         e.printStackTrace();
                     }
@@ -229,7 +320,7 @@ public class ResultFragment extends BaseEventFragment implements ISupportFragmen
                     BasicOper.dc_printcharacter(byteTemp);
                     BasicOper.dc_printcharacter(byteTemp);
                     BasicOper.dc_printcharacter(byteTemp);
-                    Log.d("print", "PrintLineByLinePicture:" + byteTemp);
+//                    Log.d("print", "PrintLineByLinePicture:" + byteTemp);
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }
@@ -239,7 +330,37 @@ public class ResultFragment extends BaseEventFragment implements ISupportFragmen
 
     @Override
     public void loadData() {
-        timeLoop();
+        if (GlobalConfig.thirdFactory.equals("3")){
+            // 处方用量
+            String[] split = stuckUse.split("&&");
+            ApiRepository.getInstance().printcode(takeCode,split)
+                    .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
+                    .subscribe(new FastLoadingObserver<TopexampageResultEntity>() {
+                        @Override
+                        public void _onNext(TopexampageResultEntity entity) {
+                            if (entity == null) {
+                                ToastUtil.show("请检查网络");
+                                return;
+                            }
+                            try {
+                                if (entity.success){
+
+
+
+                                }else {
+                                    ToastUtil.show(entity.getMessage());
+                                }
+                            }catch (Exception e){
+                                ToastUtil.show("打印小票异常");
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+
+        }else {
+            timeLoop();
+        }
+
     }
 
     private static final int PERIOD = 6* 1000;
@@ -257,8 +378,10 @@ public class ResultFragment extends BaseEventFragment implements ISupportFragmen
                 .subscribe(aLong -> {
                     // 如果从处方单支付过来
                     if (isFirstTimePrint){
+//                        result = "paySuc";
                         if (result.contains("paySuc")){
                             // 打印 取药码 一维码
+//                            printCode();
                             printCode(takeCode);
                         }
                         isFirstTimePrint = false;

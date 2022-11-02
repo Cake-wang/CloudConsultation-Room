@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -26,7 +25,6 @@ import com.aries.template.entity.PrescriptionPushEntity;
 import com.aries.template.module.base.BaseEventFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.template.utils.ActivityUtils;
-import com.aries.template.utils.JTJKLogUtils;
 import com.aries.ui.view.title.TitleBarView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -39,13 +37,10 @@ import com.xuexiang.xqrcode.XQRCode;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import androidx.annotation.Nullable;
-import androidx.collection.ArraySet;
-
 import butterknife.BindView;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -112,7 +107,7 @@ public class PayRecipeFragment extends BaseEventFragment {
     TextView jtjk_pay_text;
     @BindView(R.id.jtjk_pay_reflash_tip)
     TextView jtjk_pay_reflash_tip;
-
+    boolean flagone = true;
     /**
      * 跳转科室，需要带的数据
 //     * @param recipeId 处方单ID
@@ -177,7 +172,8 @@ public class PayRecipeFragment extends BaseEventFragment {
         tv_fee_type.setText("处方费");
         // 支付二维码刷新
         jtjk_pay_reflash_tip.setOnClickListener(v -> {
-            requestOrderPreSettle(recipes);
+//            requestOrderPreSettle(recipes);
+            requestBatchCreateOrder("1");
         });
     }
 
@@ -187,7 +183,8 @@ public class PayRecipeFragment extends BaseEventFragment {
         // 执行时间loop
         timeLoop();
         // 查询金额
-        requestOrderPreSettle(recipes);
+//        requestOrderPreSettle(recipes);
+        requestBatchCreateOrder("1");
     }
 
     @Override
@@ -239,30 +236,36 @@ public class PayRecipeFragment extends BaseEventFragment {
                                 // 注入数据
                                 if (entity.getData().getJsonResponseBean().getBody()!=null &&
                                         entity.getData().getJsonResponseBean().getBody().getRecipe().getPayFlag()==1){
-                                    try {
-                                        // 停止循环体
+
+                                    if (flagone){
+                                        flagone = false;
                                         try {
-                                            if (mDisposable != null) {
-                                                mDisposable.dispose();
-                                                mDisposable = null;
+                                            // 停止循环体
+                                            try {
+                                                if (mDisposable != null) {
+                                                    mDisposable.dispose();
+                                                    mDisposable = null;
+                                                }
+                                            }catch (Exception e){
+                                                e.printStackTrace();
+//                                                JTJKLogUtils.message(e.toString());
                                             }
+                                            // 4.1.4 处方药品推送接口
+                                            requestPrescriptionPush(GlobalConfig.cabinetId);
                                         }catch (Exception e){
                                             e.printStackTrace();
-                                            JTJKLogUtils.message(e.toString());
+//                                            JTJKLogUtils.message(e.toString());
                                         }
-                                        // 4.1.4 处方药品推送接口
-                                        requestPrescriptionPush(GlobalConfig.cabinetId);
-                                    }catch (Exception e){
-                                        e.printStackTrace();
-                                        JTJKLogUtils.message(e.toString());
                                     }
+
+
                                 }
                             }
                         }
                     });
         }catch (Exception e){
             e.printStackTrace();
-            JTJKLogUtils.message(e.toString());
+//            JTJKLogUtils.message(e.toString());
         }
     }
 
@@ -283,11 +286,11 @@ public class PayRecipeFragment extends BaseEventFragment {
             int current = 0;
             for (DrugObject item : obj) {
                 // 药品发放数量必须是整型
-                if (current==0){
-                    item.sku = "6901339924484";//todo cc 6901339924484 4895013208569
-                }else{
-                    item.sku = "4895013208569";//todo cc 6901339924484 4895013208569
-                }
+//                if (current==0){
+//                    item.sku = "6901339924484";//todo cc 6901339924484 4895013208569
+//                }else{
+//                    item.sku = "4895013208569";//todo cc 6901339924484 4895013208569
+//                }
                 current++;
                 int quantityInt = (Double.valueOf(item.quantity)).intValue();
                 // 药品发放数量不小于1
@@ -309,6 +312,7 @@ public class PayRecipeFragment extends BaseEventFragment {
                 drug.put("spec",item.spec);
                 drugs.add(drug);
             }
+            String takeCode = String.valueOf((int) ((Math.random() * 9 + 1) * Math.pow(10,5)));
             int recipeFeeTrans = (((Float) (Float.valueOf(recipeFee) * 100)).intValue());
             ApiRepository.getInstance().prescriptionPush(clinicSn,
                             GlobalConfig.hospitalName,
@@ -317,6 +321,7 @@ public class PayRecipeFragment extends BaseEventFragment {
                             GlobalConfig.ssCard.getName(),
                             organDiseaseName,
                             orderid,
+                            takeCode,
                             String.valueOf(recipeFeeTrans),
                             drugs)
                     .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
@@ -349,18 +354,40 @@ public class PayRecipeFragment extends BaseEventFragment {
                                     // 释放资源。只要进入到这里，就结束请求支付轮训
                                     onDismiss();
                                     start(ResultFragment.newInstance("paySuc:"+objectMap.get("takeCode")+":"+drug));
-                                }else{
+                                }
+//                                if (entity.getData().isSuccess()){
+//                                    // 打印取药单
+//                                    //"data": "{\"orderNo\":\"\",\"takeCode\":\"34811555\"}",
+//                                    // 判定药品是否还有库存
+//                                    // data 的返回类型 {\"1\":0,\"2\":0}
+////                                    Map<String,Object> objectMap = (Map<String, Object>) JSON.parse(entity.getData().getData());
+//                                    String drug = "";
+////                                    if (!TextUtils.isEmpty(objectMap.get("takeCode").toString()))
+//                                        // 格式化打印数据
+//                                        // 药物用量
+//                                        for (DrugObject item : obj) {
+//                                            drug+=item.drugCommonName +" "+ item.howToUse+"&&";
+//                                        }
+////                                        for (GetPatientRecipeByIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO.RecipedetailsDTO item : drugList) {
+////                                           String howToUse =  "(1天"+item.getUseTotalDose()/item.getUseDays()+"次，每次"+ item.getUseDoseStr()+"片)";
+////                                            drug += item.getDrugName() +" "+ howToUse+"&&";
+////                                        }
+//                                    // 释放资源。只要进入到这里，就结束请求支付轮训
+//                                    onDismiss();
+//                                    start(ResultFragment.newInstance("paySuc:"+takeCode+":"+drug));
+//                                }
+                                else{
                                     ToastUtil.show("推送处方单失败");
                                 }
                             }catch (Exception e){
                                 e.printStackTrace();
-                                JTJKLogUtils.message(e.toString());
+//                                JTJKLogUtils.message(e.toString());
                             }
                         }
                     });
         }catch (Exception e){
             e.printStackTrace();
-            JTJKLogUtils.message(e.toString());
+//            JTJKLogUtils.message(e.toString());
         }
     }
 
@@ -390,7 +417,8 @@ public class PayRecipeFragment extends BaseEventFragment {
 
             // 如果已经有订单了
             if (!TextUtils.isEmpty(orderid)){
-                requestPayOrder(orderid);
+//                requestPayOrder(orderid);
+                requestOrderPreSettle(recipes,orderid);
                 return;
             }
 
@@ -442,20 +470,22 @@ public class PayRecipeFragment extends BaseEventFragment {
                                 if (entity.getData().isSuccess()){
                                     String inputPusId = String.valueOf(entity.getData().getJsonResponseBean().getBody());
                                     if (!TextUtils.isEmpty(inputPusId)){
-                                        requestPayOrder(inputPusId);
+                                        orderid = inputPusId;
+                                        requestOrderPreSettle(recipes,inputPusId);
+//                                        requestPayOrder(inputPusId);
                                     }
                                 }else{
                                     ToastUtil.show("合并订单失败");
                                 }
                             }catch (Exception e){
                                 e.printStackTrace();
-                                JTJKLogUtils.message(e.toString());
+//                                JTJKLogUtils.message(e.toString());
                             }
                         }
                     });
         }catch (Exception e){
             e.printStackTrace();
-            JTJKLogUtils.message(e.toString());
+//            JTJKLogUtils.message(e.toString());
         }
     }
 
@@ -484,36 +514,37 @@ public class PayRecipeFragment extends BaseEventFragment {
                                 if (entity.getData().isSuccess()){
                                     // 显示二维码
                                     jtjk_pay_reflash_tip.setVisibility(View.GONE);
-                                    String qrStr = entity.getData().getJsonResponseBean().getBody().qr_code;
+                                    String qrStr = entity.getData().getJsonResponseBean().getBody().getFormData();
                                     Resources res = getActivity().getResources();
 //                                    Bitmap bmp= BitmapFactory.decodeResource(res, R.drawable.pay_alilogo);
 //                                    showQRCode(XQRCode.createQRCodeWithLogo(qrStr, 400, 400, bmp));
                                     logoBmp = BitmapFactory.decodeResource(res, R.mipmap.pay_alilogo);
                                     payBmp = XQRCode.createQRCodeWithLogo(qrStr, 400, 400, logoBmp);
-                                    Drawable drawable = new BitmapDrawable(payBmp);
+                                    BitmapDrawable drawable = new BitmapDrawable(payBmp);
                                     RequestOptions requestOptions =new RequestOptions().centerCrop()
                                             .diskCacheStrategy(DiskCacheStrategy.ALL)
                                             .error(drawable)//放在出错位置
                                             .placeholder(drawable);//放在占位符位置
                                     Glide.with(getContext())
                                             .setDefaultRequestOptions(requestOptions)
-                                            .load("https://${System.currentTimeMillis()}")//随便给个不可用的url
+                                            .load("https://")//随便给个不可用的url
                                             .into(mIvQrcode);
 
 //                                    showQRCode(payBmp);
+//                                    requestOrderPreSettle(recipes);
                                 }else{
                                     jtjk_pay_reflash_tip.setVisibility(View.VISIBLE);
                                     ToastUtil.show("获取支付宝二维码失败");
                                 }
                             }catch (Exception e){
                                 e.printStackTrace();
-                                JTJKLogUtils.message(e.toString());
+//                                JTJKLogUtils.message(e.toString());
                             }
                         }
                     });
         }catch (Exception e){
             e.printStackTrace();
-            JTJKLogUtils.message(e.toString());
+//            JTJKLogUtils.message(e.toString());
         }
     }
 
@@ -522,7 +553,7 @@ public class PayRecipeFragment extends BaseEventFragment {
      * 获取处方单价格
      * @param recipes 订单号集合
      */
-    private void requestOrderPreSettle(ArrayList<String> recipes ){
+    private void requestOrderPreSettle(ArrayList<String> recipes,String  inputPusId){
         ApiRepository.getInstance().orderPreSettle(recipes)
                 .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
                 .subscribe(new FastLoadingObserver<OrderPreSettleEntity>("请稍后...") {
@@ -538,19 +569,20 @@ public class PayRecipeFragment extends BaseEventFragment {
                                 // 总费用
                                 tv_fee_all.setText(entity.data.jsonResponseBean.body.preSettleTotalAmount+"元");
                                 // 医保
-                                tv_fee_yb.setText(entity.data.jsonResponseBean.body.preSettleTotalAmount+"元");
+                                tv_fee_yb.setText(entity.data.jsonResponseBean.body.fundAmount+"元");
                                 // 自费
-                                tv_fee_zf.setText(entity.data.jsonResponseBean.body.preSettleTotalAmount+"元");
+                                tv_fee_zf.setText(entity.data.jsonResponseBean.body.cashAmount+"元");
                                 // 启动支付二维码
                                 // 获得总费用后，请求二维码，这里的价格需要和上面的总费用对齐
                                 recipeFee = entity.data.jsonResponseBean.body.preSettleTotalAmount;
                                 // 处方合并生成订单接口
-                                requestBatchCreateOrder(entity.data.jsonResponseBean.body.preSettleTotalAmount);
+//                                requestBatchCreateOrder(entity.data.jsonResponseBean.body.preSettleTotalAmount);
+                                requestPayOrder(inputPusId);
                             }else{
                             }
                         }catch (Exception e){
                             e.printStackTrace();
-                            JTJKLogUtils.message(e.toString());
+//                            JTJKLogUtils.message(e.toString());
                         }
                     }
                 });
@@ -594,30 +626,30 @@ public class PayRecipeFragment extends BaseEventFragment {
             }
         }catch (Exception e){
             e.printStackTrace();
-            JTJKLogUtils.message(e.toString());
+//            JTJKLogUtils.message(e.toString());
         }
 
         // 清理 logo 图片
-        try {
-            if (logoBmp!=null){
-//                logoBmp.recycle();
-                logoBmp = null;
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-            JTJKLogUtils.message(e.toString());
-        }
-
-        // 清理支付图片
-        try {
-            if (payBmp!=null){
-//                payBmp.recycle();
-                payBmp = null;
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-            JTJKLogUtils.message(e.toString());
-        }
+//        try {
+//            if (logoBmp!=null){
+////                logoBmp.recycle();
+//                logoBmp = null;
+//            }
+//        }catch (Exception e){
+//            e.printStackTrace();
+//            JTJKLogUtils.message(e.toString());
+//        }
+//
+//        // 清理支付图片
+//        try {
+//            if (payBmp!=null){
+////                payBmp.recycle();
+//                payBmp = null;
+//            }
+//        }catch (Exception e){
+//            e.printStackTrace();
+//            JTJKLogUtils.message(e.toString());
+//        }
     }
 
     /**

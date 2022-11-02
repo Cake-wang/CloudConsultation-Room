@@ -6,20 +6,12 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.RecyclerView;
-
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.aries.library.fast.retrofit.FastLoadingObserver;
-import com.aries.library.fast.util.SPUtil;
 import com.aries.library.fast.util.ToastUtil;
 import com.aries.template.GlobalConfig;
 import com.aries.template.R;
 import com.aries.template.entity.FindMedicineStockEntity;
 import com.aries.template.entity.GetConsultsAndRecipesResultEntity;
-import com.aries.template.entity.GetStockInfoEntity;
 import com.aries.template.module.base.BaseEventFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.template.utils.ActivityUtils;
@@ -35,6 +27,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.OnClick;
 
@@ -229,7 +223,8 @@ public class OrderRecipesFragment extends BaseEventFragment {
 
 
                String drugName = (position+1)+"、"+itemData.getDrugName();
-               String wayToUse = "(1天"+itemData.getUseTotalDose()/itemData.getUseDays()+"次，每次"+perDayUse+")";
+//               String wayToUse = "(1天"+itemData.getUseTotalDose()/itemData.getUseDays()+"次，每次"+perDayUse+")";
+               String wayToUse = "(每次"+perDayUse+")";
                String[] orders = {"#333333",drugName,"#38ABA0",wayToUse};
                ((TextView)holder.itemView.findViewById(R.id.tv_useDose)).setText(ActivityUtils.formatTextView(orders));//使用方法
            }
@@ -251,11 +246,11 @@ public class OrderRecipesFragment extends BaseEventFragment {
     public void requestGetStockInfo(String clinicSn, ArrayList<Map<String,Object>> skus){
 //        skus = new ArrayList<String>(){{add("6901339924484");}};//todo cc
 //        skus = new ArrayList<String>(){{add("4895013208569");}};//todo cc
-        skus = new ArrayList<Map<String,Object>>(){{
-            Map<String,Object> map =new HashMap<>();
-            map.put("6901339924484",1);
-            add(map);
-        }};//todo cc
+//        skus = new ArrayList<Map<String,Object>>(){{
+//            Map<String,Object> map =new HashMap<>();
+//            map.put("6901339924484",1);
+//            add(map);
+//        }};//todo cc
         ApiRepository.getInstance().findMedicineStock(clinicSn,skus)
                 .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
                 .subscribe(new FastLoadingObserver<FindMedicineStockEntity>("请稍后...") {
@@ -304,7 +299,8 @@ public class OrderRecipesFragment extends BaseEventFragment {
                                     if (item.getUseDose()!=null)
                                         perDayUse = String.valueOf(item.getUseDose().intValue()) + "片";
 
-                                    String howToUse = "(1天"+item.getUseTotalDose()/item.getUseDays()+"次，每次"+ perDayUse+")";
+//                                    String howToUse = "(1天"+item.getUseTotalDose()/item.getUseDays()+"次，每次"+ perDayUse+")";
+                                    String howToUse = "(每次"+ perDayUse+")";
                                     PayRecipeFragment.DrugObject drug= new PayRecipeFragment.DrugObject();
                                     //            drugs.put("direction","口服");
                                     drug.dosageUnit = item.drugUnit;

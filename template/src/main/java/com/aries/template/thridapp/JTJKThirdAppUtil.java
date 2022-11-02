@@ -3,6 +3,7 @@ package com.aries.template.thridapp;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Intent;
+import android.text.TextUtils;
 
 import com.aries.template.GlobalConfig;
 import com.aries.template.xiaoyu.dapinsocket.DapinSocketProxy;
@@ -27,9 +28,12 @@ public class JTJKThirdAppUtil {
      */
     public void gotoBodyTesting(Activity activity, String pck, String opCls, String userName, String idCard, String mobile){
         // 大屏的通信代理
-        DapinSocketProxy.with()
-                .initWithOld(activity,GlobalConfig.machineIp)
-                .startSocket(DapinSocketProxy.FLAG_SCREENFLAG_BODYTESTING_OPEN);
+        if (!TextUtils.isEmpty(GlobalConfig.machineIp)){
+            DapinSocketProxy.with()
+                    .initWithOld(activity,GlobalConfig.machineIp)
+                    .startSocket(DapinSocketProxy.FLAG_SCREENFLAG_BODYTESTING_OPEN);
+        }
+
 
         isOpenedBodyTesting = true;
 
@@ -47,9 +51,12 @@ public class JTJKThirdAppUtil {
      */
     public void gotoBodyTestingFromVideo(Activity activity, String pck, String opCls, String userName, String idCard, String mobile){
         // 大屏的通信代理
-        DapinSocketProxy.with()
-                .initWithOld(activity,GlobalConfig.machineIp)
-                .startSocket(DapinSocketProxy.FLAG_SCREENFLAG_ONLYCLOSESCREEN);
+        if (!TextUtils.isEmpty(GlobalConfig.machineIp)){
+            DapinSocketProxy.with()
+                    .initWithOld(activity,GlobalConfig.machineIp)
+                    .startSocket(DapinSocketProxy.FLAG_SCREENFLAG_ONLYCLOSESCREEN);
+        }
+
 
         // 从视频问诊进入身体检查不需要返回后通知启动 backFromBodyTesting
         isOpenedBodyTesting = false;
@@ -71,10 +78,12 @@ public class JTJKThirdAppUtil {
             return;
 
         isOpenedBodyTesting = false;
+        if (!TextUtils.isEmpty(GlobalConfig.machineIp)){
+            DapinSocketProxy.with()
+                    .initWithOld(activity,GlobalConfig.machineIp)
+                    .startSocket(DapinSocketProxy.FLAG_SCREENFLAG_BODYTESTING_FINISH);
+        }
 
-        DapinSocketProxy.with()
-                .initWithOld(activity,GlobalConfig.machineIp)
-                .startSocket(DapinSocketProxy.FLAG_SCREENFLAG_BODYTESTING_FINISH);
     }
 
     /**
@@ -83,10 +92,12 @@ public class JTJKThirdAppUtil {
      */
     public void backFromBodyTestingForce(final Activity activity){
         isOpenedBodyTesting = false;
+        if (!TextUtils.isEmpty(GlobalConfig.machineIp)){
+            DapinSocketProxy.with()
+                    .initWithOld(activity,GlobalConfig.machineIp)
+                    .startSocket(DapinSocketProxy.FLAG_SCREENFLAG_BODYTESTING_FINISH);
+        }
 
-        DapinSocketProxy.with()
-                .initWithOld(activity,GlobalConfig.machineIp)
-                .startSocket(DapinSocketProxy.FLAG_SCREENFLAG_BODYTESTING_FINISH);
     }
 
     /**
@@ -95,8 +106,12 @@ public class JTJKThirdAppUtil {
      * 每次返回到首页时，启动画面
      */
     public void onScreen(final Activity activity){
-        DapinSocketProxy.with()
-                .initWithOld(activity,GlobalConfig.machineIp)
-                .startSocket(DapinSocketProxy.FLAG_SCREENFLAG_BODYTESTING_FINISH);
+
+        if (!TextUtils.isEmpty(GlobalConfig.machineIp)){
+            DapinSocketProxy.with()
+                    .initWithOld(activity,GlobalConfig.machineIp)
+                    .startSocket(DapinSocketProxy.FLAG_SCREENFLAG_BODYTESTING_FINISH);
+        }
+
     }
 }

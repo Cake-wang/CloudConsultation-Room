@@ -21,7 +21,6 @@ import com.aries.template.widget.mgson.MFastRetrofit;
 import com.aries.template.xiaoyu.EaseModeProxy;
 import com.decard.NDKMethod.BasicOper;
 import com.decard.dc_licensesdk.utils.AppInfoUtils;
-import com.github.moduth.blockcanary.BlockCanary;
 import com.orhanobut.logger.PrettyFormatStrategy;
 import com.xuexiang.xaop.XAOP;
 import com.xuexiang.xaop.checker.IThrowableHandler;
@@ -140,6 +139,15 @@ public class App extends MultiDexApplication {
 //                .addHeader(" Content-Type","application/json")
                 .putBaseUrl(ApiConstant.getConsultsAndRecipes, ApiConstant.BASEURLTest);
 
+
+        MFastRetrofit.getInstance()
+//                .addHeader(" Content-Type","application/json")
+                .putBaseUrl(ApiConstant.sbkcard, ApiConstant.BASEURLYY);
+
+        MFastRetrofit.getInstance()
+//                .addHeader(" Content-Type","application/json")
+                .putBaseUrl(ApiConstant.topexampage, ApiConstant.BASEURLYY);
+
         //方式二 通过 Service 里添加特定header设置
         //step1
 //        FastRetrofit.getInstance()
@@ -226,26 +234,26 @@ public class App extends MultiDexApplication {
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     private boolean isIgnoringBatteryOptimizations() {
-        Log.d("111111MODEL", "22222MODEL");
+//        Log.d("111111MODEL", "22222MODEL");
         boolean isIgnoring = false;
         PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
         if (powerManager != null) {
             isIgnoring = powerManager.isIgnoringBatteryOptimizations(getPackageName());
         }
-        Log.d("111111MODEL", isIgnoring+"");
+//        Log.d("111111MODEL", isIgnoring+"");
         return isIgnoring;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     public void requestIgnoreBatteryOptimizations() {
         try {
-            Log.d("111111MODEL", "33333MODEL");
+//            Log.d("111111MODEL", "33333MODEL");
             Intent intent = new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
             intent.setData(Uri.parse("package:" + getPackageName()));
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
         } catch (Exception e) {
-            Log.d("111111MODEL", "44444MODEL");
+//            Log.d("111111MODEL", "44444MODEL");
             e.printStackTrace();
         }
     }
@@ -260,7 +268,7 @@ public class App extends MultiDexApplication {
         initParameters.setLogDir("xcrash/temp/");
         initParameters.setAppVersion(AppInfoUtils.getAppName(this));
         ICrashCallback crashCallback = (logPath, emergency) -> {
-            Log.d("JTJK", "initXCrash: done");
+//            Log.d("JTJK", "initXCrash: done");
 //            ToastUtil.show("系统出了点小问题，请重新读卡操作");
             SystemUtil.reStart(getContext());
 

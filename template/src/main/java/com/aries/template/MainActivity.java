@@ -1,14 +1,11 @@
 package com.aries.template;
 
-import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
 
 import com.aries.library.fast.entity.FastTabEntity;
@@ -19,8 +16,12 @@ import com.aries.library.fast.retrofit.FastObserver;
 import com.aries.library.fast.util.SPUtil;
 import com.aries.library.fast.util.ToastUtil;
 import com.aries.template.entity.CancelregisterResultEntity;
+import com.aries.template.entity.ConfigurationToThirdForPatientEntity;
+import com.aries.template.entity.FindPatIdByPatientQueryEntity;
 import com.aries.template.entity.FindUserResultEntity;
 import com.aries.template.entity.GetConsultsAndRecipesResultEntity;
+import com.aries.template.entity.PatientListEntity;
+import com.aries.template.entity.TopexampageResultEntity;
 import com.aries.template.module.base.BaseEventFragment;
 import com.aries.template.module.main.HomeFragment;
 import com.aries.template.module.mine.DepartmentFragment;
@@ -32,19 +33,16 @@ import com.aries.template.module.mine.VideoConsultFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.template.thridapp.JTJKSSDCard;
 import com.aries.template.thridapp.JTJKThirdAppUtil;
-import com.aries.template.utils.ActivityUtils;
 import com.aries.template.utils.DateUtils;
-import com.aries.template.xiaoyu.dapinsocket.DapinSocketProxy;
 import com.aries.ui.view.tab.CommonTabLayout;
 import com.decard.NDKMethod.BasicOper;
 import com.decard.NDKMethod.EGovernment;
 import com.decard.NDKMethod.SSCardDriver;
-import com.decard.entitys.SSCard;
+import com.hyphenate.EMCallBack;
+import com.hyphenate.chat.EMClient;
 import com.trello.rxlifecycle3.android.ActivityEvent;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -94,6 +92,8 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
     /** 检测当前读卡请求用户状态是否进行中 */
     private boolean isReadCardProcessing;
 
+    Handler handler;
+
     @Override
     public boolean isSwipeEnable() {
         return false;
@@ -116,6 +116,35 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
         mTabLayout.setVisibility(View.GONE);
 
     }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus) {
+            hideSystemUI();
+        }
+    }
+
+
+
+    private void hideSystemUI() {
+        // Enables regular immersive mode.
+        // For "lean back" mode, remove SYSTEM_UI_FLAG_IMMERSIVE.
+        // Or for "sticky immersive," replace it with SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+        View decorView = getWindow().getDecorView();
+        decorView.setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_IMMERSIVE
+                        // Set the content to appear under the system bars so that the
+                        // content doesn't resize when the system bars hide and show.
+                        | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        // Hide the nav bar and status bar
+                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_FULLSCREEN);
+    }
+
+
 
     /**
      * 禁用首页的物理键
@@ -154,15 +183,15 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
      * devHandle -1 没有拿到 设备句柄号
      */
     public void openSerialport() {
-        Log.d("111111MODEL", Build.MODEL);
-        Log.d("111111MODEL", getTopFragment()+"");
+//        Log.d("111111MODEL", Build.MODEL);
+//        Log.d("111111MODEL", getTopFragment()+"");
         //打开端口，usb模式，打开之前必须确保已经获取到USB权限，返回值为设备句柄号。
         int devHandle = BasicOper.dc_open("AUSB",this,"",0);
 //        int devHandle = BasicOper.dc_open("AUSB",this,"/dev/ttyHSL1",115200);
 //        int devHandle = BasicOper.dc_open("COM",null,"/dev/ttyS0",115200);
-        Log.d("111111MODEL", devHandle+"");
+//        Log.d("111111MODEL", devHandle+"");
         if(devHandle>0){
-            Log.d("open","dc_open success devHandle = "+devHandle);
+//            Log.d("open","dc_open success devHandle = "+devHandle);
             timeLoop();
         }else{
             ToastUtil.show("读卡失败，请重新插卡，并重试");
@@ -208,7 +237,7 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
      * 如果没有芯片就需要非接设备
      */
     public void readCardNew() {
-        Log.d("111111MODEL", getTopFragment()+"");
+//        Log.d("111111MODEL", getTopFragment()+"");
 //        if (getTopFragment() instanceof HomeFragment){
 //            if (mDisposable != null) {
 //                mDisposable.dispose();
@@ -218,20 +247,68 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
 //            return;
 //        }
         if (getTopFragment() instanceof MineCardFragment){
-//            //社保卡上电
-            boolean bCardPowerOn = false;
-            String result = null;
-            String[] resultArr = null;
-            result = EGovernment.EgAPP_SI_CardPowerOn(1);
-            resultArr = result.split("\\|",-1);
-            if(resultArr[0].equals("0000")){
-                bCardPowerOn = true;
-                Log.d("EgAPP_SI_CardPowerOn","success");
-            }else{
-                Log.d("EgAPP_SI_CardPowerOn","error code = "+resultArr[0] +" error msg = "+resultArr[1] );
-            }
-            //读取社保卡基本信息
-            if(bCardPowerOn){
+//            boolean readidCardFlag = true;
+//            try {
+//                //身份证
+//                IDCard idCard = BasicOper.dc_SamAReadCardInfo(1);
+//                if (idCard != null) {
+//
+//                    JTJKSSDCard ssCard = null;
+//                    try {
+//                        ssCard = JTJKSSDCard.buildiD(idCard);
+//                        //                SSCard ssCard = EGovernment.EgAPP_SI_ReadSSCardInfo();
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+////                        Log.d("EgAPP_SI_ReadSSCardInfo","读取社保卡信息失败2");
+//                        readidCardFlag = true;
+//                    }
+//
+//                    // 注入数据
+//                    if(ssCard!=null) {
+//
+//                        // 输入社保数据
+//                        setSSDCardData(ssCard);
+//                        if (mDisposable != null) {
+//                            mDisposable.dispose();
+//                            mDisposable=null;
+//                        }
+//                        BasicOper.dc_exit();
+//
+//                    }else {
+//                        ToastUtil.show("读取身份证失败，您也可以用社保卡复诊配药");
+////                    Log.d("EgAPP_SI_ReadSSCardInfo","读取社保卡信息失败");
+//                        if (mDisposable != null) {
+//                            mDisposable.dispose();
+//                            mDisposable=null;
+//                        }
+//                        BasicOper.dc_exit();
+//                    }
+//
+//                    readidCardFlag = false;
+//
+//                }else {
+////                    Log.d("EgAPP_SI_ReadSSCardInfo","读取社保卡信息失败1");
+//                    readidCardFlag = true;
+//                }
+//            }catch (Exception e){
+//                readidCardFlag = true;
+//            }
+
+//            if (readidCardFlag){
+                //            //社保卡上电
+                boolean bCardPowerOn = false;
+                String result = null;
+                String[] resultArr = null;
+                result = EGovernment.EgAPP_SI_CardPowerOn(1);
+                resultArr = result.split("\\|",-1);
+                if(resultArr[0].equals("0000")){
+                    bCardPowerOn = true;
+//                Log.d("EgAPP_SI_CardPowerOn","success");
+                }else{
+//                Log.d("EgAPP_SI_CardPowerOn","error code = "+resultArr[0] +" error msg = "+resultArr[1] );
+                }
+                //读取社保卡基本信息
+                if(bCardPowerOn){
 //            byte info[] = new byte[256];
 //            long ret = SSCardDriver.iReadCardBas(1,info);
 //            try {
@@ -242,29 +319,29 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
 //                e.printStackTrace();
 //            }
 
-                // 新一代读卡
-                // 格式化卡数据
+                    // 新一代读卡
+                    // 格式化卡数据
 //                330100|522725198711013517|AA0368350|330100D156000005456188401C06C0CE|陈东武|008100885086653301015DD82C|3.00|20210318|20310318|330100912171|00012600202203000183|
-                byte info[] = new byte[256];
-                long ret = SSCardDriver.iReadCardBas(1, info);
-                try {
-                    Log.d("TAG", "iReadCardBas: ret:" + ret + " info:" + new String(info, "gbk").trim());
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                }
-                JTJKSSDCard ssCard = null;
-                try {
-                    ssCard = JTJKSSDCard.build2D(new String(info, "gbk").trim());
-                    //                SSCard ssCard = EGovernment.EgAPP_SI_ReadSSCardInfo();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                    byte info[] = new byte[256];
+                    long ret = SSCardDriver.iReadCardBas(1, info);
+                    try {
+//                    Log.d("TAG", "iReadCardBas: ret:" + ret + " info:" + new String(info, "gbk").trim());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    JTJKSSDCard ssCard = null;
+                    try {
+                        ssCard = JTJKSSDCard.build2D(new String(info, "gbk").trim());
+                        //                SSCard ssCard = EGovernment.EgAPP_SI_ReadSSCardInfo();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
 
-                // 注入数据
-                if(ssCard!=null){
+                    // 注入数据
+                    if(ssCard!=null){
 
-                    // 输入社保数据
-                    setSSDCardData(ssCard);
+                        // 输入社保数据
+                        setSSDCardData(ssCard);
 
 //                    Log.d("EgAPP_SI_ReadSSCardInfo",ssCard.toString());
 //                    // 向全局填写当前社保卡信息
@@ -282,25 +359,29 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
 //                    // 获取信息后，直接请求用户数据
 //                    runOnUiThread(() -> requestFindUser(GlobalConfig.ssCard.getSSNum(),GlobalConfig.ssCard.getName(),GlobalConfig.ssCard.getCardNum()));
 
-                    // 读取成功后，清除mDisposable不再进行验证
-                    if (mDisposable != null) {
-                        mDisposable.dispose();
-                        mDisposable=null;
+                        // 读取成功后，清除mDisposable不再进行验证
+                        if (mDisposable != null) {
+                            mDisposable.dispose();
+                            mDisposable=null;
+                        }
+                        BasicOper.dc_exit();
+                    }else{
+                        if (mDisposable != null) {mDisposable.dispose();}
+                        BasicOper.dc_exit();
+                        ToastUtil.show("读取社保卡失败，请返回首页重试");
+//                    Log.d("EgAPP_SI_ReadSSCardInfo","读取社保卡信息失败");
                     }
-                    BasicOper.dc_exit();
-                }else{
-                    if (mDisposable != null) {mDisposable.dispose();}
-                    BasicOper.dc_exit();
-                    ToastUtil.show("读取社保卡信息失败，请重试");
-                    Log.d("EgAPP_SI_ReadSSCardInfo","读取社保卡信息失败");
+                }else {
+//                    ToastUtil.show("读取社保卡失败，请重新插拔社保卡,您也可以刷身份证复诊配药");
+                    ToastUtil.show("读取社保卡失败，请重新插拔社保卡");
                 }
-            }else {
-                ToastUtil.show("读卡失败，请重新插入卡片");
-            }
-            //社保卡下电
-            if(bCardPowerOn){
-                result = EGovernment.EgAPP_SI_CardPowerOff(1);
-            }
+                //社保卡下电
+                if(bCardPowerOn){
+                    result = EGovernment.EgAPP_SI_CardPowerOff(1);
+                }
+//            }
+
+
         }else {
             if (mDisposable != null) {
                 mDisposable.dispose();
@@ -348,7 +429,7 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
      */
     public void setSSDCardData(JTJKSSDCard ssCard){
         if(ssCard!=null){
-            Log.d("EgAPP_SI_ReadSSCardInfo",ssCard.toString());
+//            Log.d("EgAPP_SI_ReadSSCardInfo",ssCard.toString());
             // 向全局填写当前社保卡信息
             GlobalConfig.ssCard = ssCard;
             // 由于病人的名字是带空格的，必须去掉
@@ -362,9 +443,14 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
             SPUtil.put(mContext,"idCard",ssCard.getSSNum());
 
             // 获取信息后，直接请求用户数据
+//            runOnUiThread(() -> findPatIdByPatientQuery(GlobalConfig.ssCard.getSSNum(),GlobalConfig.ssCard.getName(),GlobalConfig.ssCard.getCardNum()));
+
+
             runOnUiThread(() -> requestFindUser(GlobalConfig.ssCard.getSSNum(),GlobalConfig.ssCard.getName(),GlobalConfig.ssCard.getCardNum()));
         }
     }
+
+
 
     /**
      * 通过生日返回年龄
@@ -389,7 +475,7 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
         // 验证当前请求是否已经在执行中，如果是，则不再多次请求。
         if (isReadCardProcessing)
             return;
-        Log.d("readCardSuccess","readCardSuccess");
+//        Log.d("readCardSuccess","readCardSuccess");
         // 正在执行中。。。
         isReadCardProcessing = true;
         // 验证用户是否注册。
@@ -411,6 +497,7 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                                            GlobalConfig.mobile = entity.getData().getMobile();
                                            SPUtil.put(mContext,"tid",entity.getData().getUserId());
                                            SPUtil.put(mContext,"mobile",entity.getData().getMobile());
+//                                           requestConfigurationToThirdForPatient();
                                            if(tag.contains("stjc")){
 //                                            Intent intent = new Intent(Intent.ACTION_MAIN);
                                                /**知道要跳转应用的包命与目标Activity*/
@@ -422,18 +509,35 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                                                }
                                                BasicOper.dc_exit();
 
-                                               // 启动第三方跳转
-                                               if (!TextUtils.isEmpty(GlobalConfig.factoryResource)){
-                                                   new JTJKThirdAppUtil().gotoBodyTesting(MainActivity.this,
-                                                           GlobalConfig.factoryResource,
-                                                           GlobalConfig.factoryMainPage,
-                                                           entity.getData().getName().trim(),
-                                                           entity.getData().getIdcard(),
-                                                           entity.getData().getMobile());
-                                                   start(HomeFragment.newInstance(), SupportFragment.SINGLETASK);
+
+                                               if (GlobalConfig.thirdFactory.equals("3")){
+
+                                                    gotoYYPJ();
+
                                                }else {
-                                                   ToastUtil.show("没有第三方应用信息，无法跳转");
+                                                   // 启动第三方跳转
+                                                   if (!TextUtils.isEmpty(GlobalConfig.factoryResource)){
+                                                       start(HomeFragment.newInstance(), SupportFragment.SINGLETASK);
+                                                       handler = new Handler();
+                                                       handler.postDelayed(() -> {
+                                                           //
+                                                           new JTJKThirdAppUtil().gotoBodyTesting(MainActivity.this,
+                                                                   GlobalConfig.factoryResource,
+                                                                   GlobalConfig.factoryMainPage,
+                                                                   entity.getData().getName().trim(),
+                                                                   entity.getData().getIdcard(),
+                                                                   entity.getData().getMobile());
+                                                       }, 500);//3秒后执行Runnable中的run方法
+
+
+                                                   }else {
+//                                                   start(PhoneRegisterFragment.newInstance( idCard, name.trim(), smkcard));
+
+                                                       ToastUtil.show("请您移步到旁边的健康管理设备进行检测");
+                                                   }
                                                }
+
+
 //                                            ComponentName componentName = new ComponentName("com.garea.launcher", "com.garea.launcher.login.LauncherLogin");
 //                                            intent.setComponent(componentName);
 //                                            intent.putExtra("userName", entity.getData().getName());//这里Intent传值
@@ -441,8 +545,10 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
 //                                            intent.putExtra("mobile", entity.getData().getMobile());
 //                                            startActivity(intent);
                                            }else {
+                                               //先判断建档
+                                               requestGetPatientList();
                                                //判断是否有挂号或处方，如果没有，跳转一级部门选择。
-                                               requestConsultsAndRecipes();
+//                                               requestConsultsAndRecipes();
                                            }
                                        }else {
                                            if(TextUtils.isEmpty(tag)){
@@ -470,6 +576,152 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                         isReadCardProcessing = false;
                     }
                 });
+    }
+
+    public void gotoYYPJ() {
+
+        ApiRepository.getInstance().topexampage()
+                .compose(this.bindUntilEvent(ActivityEvent.DESTROY))
+                .subscribe(new FastLoadingObserver<TopexampageResultEntity>() {
+                    @Override
+                    public void _onNext(TopexampageResultEntity entity) {
+                        if (entity == null) {
+                            ToastUtil.show("请检查网络");
+                            return;
+                        }
+                        try {
+                            if (entity.success){
+
+
+
+                            }else {
+                                ToastUtil.show(entity.getMessage());
+                            }
+                        }catch (Exception e){
+                            ToastUtil.show("检测数据异常");
+                            e.printStackTrace();
+                        }
+                    }
+                });
+
+    }
+
+    /**
+     * 获取病人信息
+     * 为了能够获得Mpiid
+     */
+    public  void requestGetPatientList(){
+        ApiRepository.getInstance().getPatientList()
+                .compose(this.bindUntilEvent(ActivityEvent.DESTROY))
+                .subscribe(new FastLoadingObserver<PatientListEntity>() {
+                    @Override
+                    public void _onNext(PatientListEntity entity) {
+                        if (entity == null) {
+                            ToastUtil.show("请检查网络");
+                            return;
+                        }
+                        try {
+                            if (entity.data.success){
+                                GlobalConfig.mpiId = entity.data.jsonResponseBean.body.patient.mpiId;
+                                requestfindPatIdByPatientQuery(entity.data.jsonResponseBean.body.patient.mpiId);
+                            }else {
+                                GlobalConfig.mpiId = "";
+                            }
+                        }catch (Exception e){
+                            GlobalConfig.mpiId = "";
+                            e.printStackTrace();
+                        }
+                    }
+                });
+    }
+
+    public  void requestfindPatIdByPatientQuery(String mpiId){
+        ApiRepository.getInstance().getfindPatIdByPatientQuery(mpiId)
+                .compose(this.bindUntilEvent(ActivityEvent.DESTROY))
+                .subscribe(new FastLoadingObserver<FindPatIdByPatientQueryEntity>() {
+                    @Override
+                    public void _onNext(FindPatIdByPatientQueryEntity entity) {
+                        if (entity == null) {
+                            ToastUtil.show("请检查网络");
+                            return;
+                        }
+                        try {
+                            if (entity.data.success){
+                                //判断是否有挂号或处方，如果没有，跳转一级部门选择。
+                                if(entity.data.jsonResponseBean.body.getHealthType()==1){
+                                    requestConsultsAndRecipes();
+                                }else {
+                                    ToastUtil.showWarning("查询到您未在当前医院建档，请联系医院完成建档再来哦");
+                                }
+
+
+                            }
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+                });
+    }
+
+    /**
+     * 获取第三方配置信息
+     * 专门登录环信 专用
+     */
+    private void requestConfigurationToThirdForPatient(){
+        ApiRepository.getInstance().getConfigurationToThirdForPatient(GlobalConfig.NALI_TID,GlobalConfig.NALI_APPKEY)
+                .compose(this.bindUntilEvent(ActivityEvent.DESTROY))
+                .subscribe(new FastObserver<ConfigurationToThirdForPatientEntity>() {
+                    @Override
+                    public void _onNext(ConfigurationToThirdForPatientEntity entity) {
+                        if (entity == null) {
+                            ToastUtil.show("请检查网络");
+                            return;
+                        }
+                        try {
+                            if (entity.getData().isSuccess()){
+
+                                 handler = new Handler();
+                                    handler.postDelayed(() -> {
+           //
+                                           loginEmClient(entity.getData().getJsonResponseBean().getBody().getUsername(),entity.getData().getJsonResponseBean().getBody().getUserpwd());
+
+                                    }, 1000);//3秒后执行Runnable中的run方法
+//                                loginEmClient(entity.getData().getJsonResponseBean().getBody().getUsername(),entity.getData().getJsonResponseBean().getBody().getUserpwd());
+                            }
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+                });
+    }
+
+    /**
+     * 专门登录环信
+     */
+    public void loginEmClient(String easemobUserName,String easemobPassword){
+        //登陆 https://docs-im.easemob.com/im/android/sdk/basic
+//        EMClient.getInstance().logout(true);
+        EMCallBack emcallback = new EMCallBack() {//回调
+            @Override
+            public void onSuccess() {
+                EMClient.getInstance().groupManager().loadAllGroups();
+                EMClient.getInstance().chatManager().loadAllConversations();
+//                ToastUtil.show("环信登录成功");
+            }
+
+            @Override
+            public void onProgress(int progress, String status) {
+            }
+
+            @Override
+            public void onError(int code, String message) {
+            }
+        };
+        // 防止用户由于特殊原因登出，然后再进来的时候，被提示已经登录
+        EMClient.getInstance().logout(true);
+        EMClient.getInstance().login("zj_test_"+easemobUserName, easemobPassword,emcallback );
+//        Log.e("easemob",easemobUserName);
+//        Log.e("easemob",easemobPassword);
     }
 
     /**
@@ -552,15 +804,22 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                                                         // 查看处方单是否多余1条处方
                                                         if (allRecipes.size()>0){
                                                             // 每一个处方单中，都有一个处方信息，这个处方信息是需要合并的
+//                                                            Log.d("090090",allRecipes.size()+"");
                                                             ArrayList<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes> recipes = new ArrayList();
                                                             for (GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes item : allRecipes) {
-                                                                if (item.getOrganId() != GlobalConfig.organId)
+//                                                                Log.d("090090",item.getOrganId()+"");
+//                                                                Log.d("090090",GlobalConfig.organId+"");
+                                                                if (item.getOrganId() == GlobalConfig.organId){
                                                                     // 如果不是同一家机构，则跳过不处理
-                                                                    break;
-                                                                // 1 待审核, 2 待处理, 3 待取药
-                                                                if (item.status==2 || item.status==3){
-                                                                    recipes.add(item);
+
+                                                                    // 1 待审核, 2 待处理, 3 待取药
+//                                                                if (item.status==2 || item.status==3){
+//                                                                    Log.d("090090",item.status+"");
+                                                                    if (item.status==2){
+                                                                        recipes.add(item);
+                                                                    }
                                                                 }
+
                                                             }
                                                             // 遍历未支付处方单，如果有orderid 一样的，则合并处方
                                                             // 每合并一次，就会减少 recipes
@@ -665,6 +924,7 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         // 保持设备界面常亮
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         // 优先将设备号输入进来
@@ -702,6 +962,10 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
     protected void onDestroy() {
         mDelegate.onDestroy();
         super.onDestroy();
+        if (handler!=null){
+            handler.removeCallbacksAndMessages(null);
+            handler = null;
+        }
     }
 
     /**

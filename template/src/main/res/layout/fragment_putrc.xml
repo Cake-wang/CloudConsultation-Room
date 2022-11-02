@@ -70,6 +70,7 @@
 
             <LinearLayout
                 android:layout_width="0dp"
+                android:layout_marginLeft="10dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1.5"
                 android:orientation="vertical">
@@ -148,14 +149,16 @@
                         style="@style/RoundButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="right"
+                        android:layout_gravity="right|center"
                         android:paddingStart="10dp"
                         android:paddingTop="3dp"
                         android:paddingEnd="10dp"
                         android:paddingBottom="3dp"
+                        android:gravity="center"
                         android:text="@string/action_get_verify_code"
                         android:textColor="@color/selector_round_button_main_theme_color"
-                        android:textSize="13sp"
+                        android:textSize="14dp"
+
                         app:rb_borderColor="@color/xui_transparent"
                         app:rb_radius="15dp" />
 
@@ -281,15 +284,19 @@
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_weight="1.5"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                android:background="@mipmap/bg_input_yzs"
                 android:padding="10dp"
+                android:layout_marginTop="5dp"
+                android:gravity="center"
                 android:orientation="horizontal"
                 >
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center"
+                    android:layout_marginBottom="5dp"
+
                     android:orientation="vertical"
                     >
 
@@ -297,7 +304,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:gravity="center"
-                        android:paddingTop="10dp"
+                        android:paddingTop="5dp"
                         android:paddingRight="10dp"
                         android:paddingLeft="10dp"
                         android:paddingBottom="5dp"
@@ -342,7 +349,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:gravity="center"
-                        android:paddingTop="10dp"
+                        android:paddingTop="5dp"
                         android:paddingRight="10dp"
                         android:paddingLeft="10dp"
                         android:paddingBottom="5dp"
@@ -387,7 +394,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:gravity="center"
-                        android:paddingTop="10dp"
+                        android:paddingTop="5dp"
                         android:paddingRight="10dp"
                         android:paddingLeft="10dp"
                         android:paddingBottom="5dp"
@@ -471,7 +478,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:padding="10dp"
+                    android:paddingLeft="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:paddingRight="10dp"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
                     android:orientation="vertical"
                     >
 
@@ -482,7 +493,9 @@
                         android:id="@+id/btn_clear"
                         android:textSize="30dp"
                         android:gravity="center"
-                       android:layout_marginBottom="16dp"
+                        android:layout_weight="1"
+                        android:layout_marginBottom="10dp"
+                        android:layout_marginTop="10dp"
                         android:textColor="@color/white"
                         android:background="@mipmap/bg_clear_yzs"
                         />
@@ -491,8 +504,10 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="退\n格"
+
                         android:id="@+id/btn_back_text"
                         android:textSize="30dp"
+                        android:layout_weight="1"
                         android:gravity="center"
                         android:textColor="@color/white"
                         android:background="@mipmap/bg_clear_yzs"

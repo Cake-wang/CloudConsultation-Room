@@ -3,6 +3,7 @@ package com.aries.template.module.mine;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
@@ -11,11 +12,13 @@ import com.aries.library.fast.retrofit.FastLoadingObserver;
 import com.aries.library.fast.util.SPUtil;
 import com.aries.library.fast.util.ToastUtil;
 import com.aries.template.GlobalConfig;
+import com.aries.template.MainActivity;
 import com.aries.template.R;
 import com.aries.template.WebViewActivity;
 import com.aries.template.entity.AuthCodeResultEntity;
 import com.aries.template.entity.RegisterResultEntity;
 import com.aries.template.module.base.BaseEventFragment;
+import com.aries.template.module.main.HomeFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.template.thridapp.JTJKThirdAppUtil;
 import com.aries.template.utils.DefenceUtil;
@@ -31,6 +34,7 @@ import butterknife.BindView;
 import butterknife.OnClick;
 import io.reactivex.annotations.NonNull;
 import me.yokeyword.fragmentation.ISupportFragment;
+import me.yokeyword.fragmentation.SupportFragment;
 
 import static com.aries.template.utils.RegUtils.isMobileNO;
 import static com.aries.template.utils.RegUtils.isVerifyCode;
@@ -87,6 +91,14 @@ public class PhoneRegisterFragment extends BaseEventFragment implements ISupport
         args.putString("smkcard",smkcard);
         fragment.setArguments(args);
         return fragment;
+    }
+
+    @Override
+    public void beforeInitView(Bundle savedInstanceState) {
+        super.beforeInitView(savedInstanceState);
+//        WindowManager.LayoutParams params = getActivity().getWindow().getAttributes();
+//        params.systemUiVisibility = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION|View.SYSTEM_UI_FLAG_IMMERSIVE;
+//        getActivity().getWindow().setAttributes(params);
     }
 
     @Override
@@ -151,12 +163,39 @@ public class PhoneRegisterFragment extends BaseEventFragment implements ISupport
                         if(cbProtocol.isChecked()){
                             loginByVerifyCode(etPhoneNumber.getEditableText().toString().trim(), etVerifyCode.getEditableText().toString().trim());
                         }else {
+
+//                            AlertDialog dialog = new AlertDialog.Builder(mContext)
+////                                    .setIcon(R.mipmap.icon)//设置标题的图片
+//                                    .setTitle("提示")//设置对话框的标题
+//                                    .setMessage(R.string.tip_next_register)//设置对话框的内容
+//                                    //设置对话框的按钮
+//                                    .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+//                                        @Override
+//                                        public void onClick(DialogInterface dialog, int which) {
+////                                            Toast.makeText(MainActivity.this, "点击了取消按钮", Toast.LENGTH_SHORT).show();
+//                                            dialog.dismiss();
+//                                        }
+//                                    })
+//                                    .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+//                                        @Override
+//                                        public void onClick(DialogInterface dialog, int which) {
+////                                            Toast.makeText(MainActivity.this, "点击了确定的按钮", Toast.LENGTH_SHORT).show();
+//                                            loginByVerifyCode(etPhoneNumber.getEditableText().toString().trim(), etVerifyCode.getEditableText().toString().trim());
+//                                            dialog.dismiss();
+//                                        }
+//                                    }).create();
+//                            dialog.show();
+
+
                             new MaterialDialog.Builder(getContext())
                                     .content(R.string.tip_next_register)
                                     .positiveText(R.string.lab_yes)
                                     .negativeText(R.string.lab_no)
                                     .onPositive((dialog, which) ->  loginByVerifyCode(etPhoneNumber.getEditableText().toString().trim(), etVerifyCode.getEditableText().toString().trim()))
                                     .show();
+//                            WindowManager.LayoutParams params = getActivity().getWindow().getAttributes();
+//                            params.systemUiVisibility = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION|View.SYSTEM_UI_FLAG_IMMERSIVE;
+//                            getActivity().getWindow().setAttributes(params);
                         }
                     }else{
                         ToastUtil.show("验证码必须是6位的");
@@ -281,6 +320,8 @@ public class PhoneRegisterFragment extends BaseEventFragment implements ISupport
 //        requestRegister(idCard,name,phoneNumber,verifyCode,"123456"); //todo cc
     }
 
+    Handler   handler;
+
     /**
      * 请求注册
      * 478465
@@ -302,17 +343,31 @@ public class PhoneRegisterFragment extends BaseEventFragment implements ISupport
                                     SPUtil.put(mContext,"mobile",mobile);
                                     GlobalConfig.mobile = mobile;
                                     if(tag.contains("stjc")){
-                                        // 启动第三方跳转
-                                        if (!TextUtils.isEmpty(GlobalConfig.factoryResource)){
-                                            new JTJKThirdAppUtil().gotoBodyTesting(getActivity(),
-                                                    GlobalConfig.factoryResource,
-                                                    GlobalConfig.factoryMainPage,
-                                                    name,
-                                                    idCard,
-                                                    mobile);
+
+                                        if (GlobalConfig.thirdFactory.equals("3")){
+
+                                            ((MainActivity)getActivity()).gotoYYPJ();
+
                                         }else {
-                                            ToastUtil.show("没有第三方应用信息，无法跳转");
+                                            // 启动第三方跳转
+                                            if (!TextUtils.isEmpty(GlobalConfig.factoryResource)){
+                                                start(HomeFragment.newInstance(), SupportFragment.SINGLETASK);
+                                                handler = new Handler();
+                                                handler.postDelayed(() -> {
+                                                    //
+                                                    new JTJKThirdAppUtil().gotoBodyTesting(getActivity(),
+                                                            GlobalConfig.factoryResource,
+                                                            GlobalConfig.factoryMainPage,
+                                                            name,
+                                                            idCard,
+                                                            mobile);
+                                                }, 500);//3秒后执行Runnable中的run方法
+
+                                            }else {
+                                                ToastUtil.show("请您移步到旁边的健康管理设备进行检测");
+                                            }
                                         }
+
 //                                            Intent intent = new Intent(Intent.ACTION_MAIN);
 //                                            /**知道要跳转应用的包命与目标Activity*/
 //                                            ComponentName componentName = new ComponentName("com.garea.launcher", "com.garea.launcher.login.LauncherLogin");
@@ -363,6 +418,10 @@ public class PhoneRegisterFragment extends BaseEventFragment implements ISupport
     public void onDestroyView() {
         if (mCountDownHelper != null) {
             mCountDownHelper.recycle();
+        }
+        if (handler!=null){
+            handler.removeCallbacksAndMessages(null);
+            handler = null;
         }
         super.onDestroyView();
     }

@@ -11,8 +11,7 @@ import com.aries.template.entity.CancelregisterResultEntity;
 import com.aries.template.entity.ConfigurationToThirdForPatientEntity;
 import com.aries.template.entity.CreateOrderResultEntity;
 import com.aries.template.entity.FindMedicineStockEntity;
-import com.aries.template.entity.GetTakeCodeEntity;
-import com.aries.template.entity.OrderPreSettleEntity;
+import com.aries.template.entity.FindPatIdByPatientQueryEntity;
 import com.aries.template.entity.FindRecipesForPatientAndTabStatusEntity;
 import com.aries.template.entity.FindUserResultEntity;
 import com.aries.template.entity.FindValidDepartmentForRevisitResultEntity;
@@ -24,8 +23,10 @@ import com.aries.template.entity.GetMedicalInfoEntity;
 import com.aries.template.entity.GetPatientRecipeByIdEntity;
 import com.aries.template.entity.GetRecipeListByConsultIdEntity;
 import com.aries.template.entity.GetStockInfoEntity;
+import com.aries.template.entity.GetTakeCodeEntity;
 import com.aries.template.entity.IsRegisterResultEntity;
 import com.aries.template.entity.MachineEntity;
+import com.aries.template.entity.OrderPreSettleEntity;
 import com.aries.template.entity.PatientFinishGraphicTextConsultEntity;
 import com.aries.template.entity.PatientListEntity;
 import com.aries.template.entity.PayOrderEntity;
@@ -35,7 +36,9 @@ import com.aries.template.entity.RegisterResultEntity;
 import com.aries.template.entity.ReportListDataEntity;
 import com.aries.template.entity.RequestConsultAndCdrOtherdocResultEntity;
 import com.aries.template.entity.RoomIdInsAuthEntity;
+import com.aries.template.entity.SbkcardResultEntity;
 import com.aries.template.entity.SearchDoctorListByBusTypeV2ResultEntity;
+import com.aries.template.entity.TopexampageResultEntity;
 import com.aries.template.entity.UpdateEntity;
 import com.aries.template.entity.VisitMedicalPreSettleEntity;
 import com.aries.template.widget.mgson.MFastRetrofit;
@@ -89,6 +92,19 @@ public interface ApiService {
     Observable<IsRegisterResultEntity> isRegister(@Body RequestBody body);
 
     @Headers("Content-Type: application/json")
+    @POST(ApiConstant.sbkcard)
+    Observable<SbkcardResultEntity> sbkcard();
+
+
+    @Headers("Content-Type: application/json")
+    @POST(ApiConstant.topexampage)
+    Observable<TopexampageResultEntity> topexampage(@Body RequestBody body);
+
+    @Headers("Content-Type: application/json")
+    @POST(ApiConstant.printcode)
+    Observable<TopexampageResultEntity> printcode(@Body RequestBody body);
+
+    @Headers("Content-Type: application/json")
     @POST(ApiConstant.findUser)
     Observable<FindUserResultEntity> findUser(@Body RequestBody body);
 
@@ -103,6 +119,11 @@ public interface ApiService {
     @Headers("Content-Type: application/json")
     @POST(ApiConstant.doBaseNgariRequest)
     Observable<CancelregisterResultEntity> patientCancelGraphicTextConsult(@Body RequestBody body);
+
+
+    @Headers("Content-Type: application/json")
+    @POST(ApiConstant.doBaseNgariRequest)
+    Observable<FindUserResultEntity> findPatIdByPatientQuery(@Body RequestBody body);
 
     /**
      * 复诊按机构查找一级科室
@@ -249,6 +270,10 @@ public interface ApiService {
     @Headers("Content-Type: application/json")
     @POST(ApiConstant.doBaseNgariRequest)
     Observable<PatientListEntity> getPatientList(@Body RequestBody body);
+
+    @Headers("Content-Type: application/json")
+    @POST(ApiConstant.doBaseNgariRequest)
+    Observable<FindPatIdByPatientQueryEntity> getfindPatIdByPatientQuery(@Body RequestBody body);
 
 
     /**

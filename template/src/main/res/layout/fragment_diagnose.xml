@@ -207,7 +207,7 @@
                         android:text="是否有过敏史 \u3000 \u3000是否有不良反应" />
 
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center_vertical"
                         android:layout_marginLeft="2dp"
@@ -217,6 +217,7 @@
                         <com.xuexiang.xui.widget.flowlayout.FlowTagLayout
                             android:id="@+id/flowlayout_single_select_o"
                             android:layout_width="150dp"
+                            android:layout_marginLeft="35dp"
                             android:layout_height="wrap_content" />
 
                         <com.xuexiang.xui.widget.flowlayout.FlowTagLayout
@@ -359,6 +360,7 @@
                         android:paddingLeft="40dp"
                         android:paddingVertical="8dp"
                         android:layout_weight="1"
+                        android:gravity="center_vertical"
                         android:orientation="horizontal"
                         >
                         <androidx.appcompat.widget.AppCompatCheckBox
@@ -369,8 +371,7 @@
                             android:paddingVertical="8dp"
                             android:clickable="false"
                             android:enabled="false"
-                            android:scaleX="0.8"
-                            android:scaleY="0.8" />
+                         />
 
                         <com.aries.template.utils.ScaleTextView
                             android:layout_width="wrap_content"
@@ -389,6 +390,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
+                        android:gravity="center_vertical"
                         android:orientation="horizontal"
                         android:paddingVertical="8dp"
                         android:paddingLeft="40dp"
@@ -401,8 +403,7 @@
                             android:paddingVertical="8dp"
                             android:clickable="false"
                             android:enabled="false"
-                            android:scaleX="0.8"
-                            android:scaleY="0.8" />
+                           />
                         <com.aries.template.utils.ScaleTextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -421,6 +422,7 @@
                         android:layout_weight="1"
                         android:orientation="horizontal"
                         android:paddingLeft="40dp"
+                        android:gravity="center_vertical"
                         android:paddingVertical="8dp"
                         >
                         <androidx.appcompat.widget.AppCompatCheckBox
@@ -431,8 +433,7 @@
                             android:paddingVertical="8dp"
                             android:clickable="false"
                             android:enabled="false"
-                            android:scaleX="0.8"
-                            android:scaleY="0.8" />
+                         />
                         <com.aries.template.utils.ScaleTextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"

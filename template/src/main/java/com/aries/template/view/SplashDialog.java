@@ -18,22 +18,18 @@
 package com.aries.template.view;
 
 import android.content.Context;
-import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import com.aries.template.R;
-import com.xuexiang.xui.widget.alpha.XUIAlphaImageView;
-import com.xuexiang.xui.widget.dialog.materialdialog.CustomMaterialDialog;
-import com.xuexiang.xui.widget.dialog.materialdialog.MaterialDialog;
-
-import java.util.zip.Inflater;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
 
 
 /**
@@ -49,6 +45,7 @@ public class SplashDialog{
     private RelativeLayout screenLayout;
     private FullScreenDialog splashDialog;
     private ImageView splashImageView;
+    BitmapDrawable drawable;
 
     /**
      * 构造窗体
@@ -77,8 +74,18 @@ public class SplashDialog{
         splashImageView = new ImageView(context);
         ViewGroup.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         splashImageView.setLayoutParams(layoutParams);
-        splashImageView.setBackground(context.getDrawable(R.mipmap.dialog_home_pic));
-        splashImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+//        splashImageView.setBackground(context.getDrawable(R.mipmap.dialog_home_pic));
+//        splashImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+
+         drawable = (BitmapDrawable) context.getDrawable(R.mipmap.dialog_home_pic);
+        RequestOptions requestOptions =new RequestOptions().centerCrop()
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .error(drawable)//放在出错位置
+                .placeholder(drawable);//放在占位符位置
+        Glide.with(context)
+                .setDefaultRequestOptions(requestOptions)
+                .load("https://")//随便给个不可用的url
+                .into(splashImageView);
 
         splashDialog = new FullScreenDialog(context);
         // set all view into content
@@ -100,11 +107,26 @@ public class SplashDialog{
      * 释放资源
      */
     public void onDismiss(){
-        splashDialog.dismiss();
-        splashDialog = null;
+        if (splashDialog!=null){
+            splashDialog.dismiss();
+            splashDialog = null;
+        }
+
+//        try {
+//            if (drawable!=null){
+////                logoBmp.recycle();
+//                drawable = null;
+//            }
+//        }catch (Exception e){
+//            e.printStackTrace();
+//            JTJKLogUtils.message(e.toString());
+//        }
     }
 
     public void show(){
-        splashDialog.show();
+        if (splashDialog!=null){
+            splashDialog.show();
+        }
+
     }
 }

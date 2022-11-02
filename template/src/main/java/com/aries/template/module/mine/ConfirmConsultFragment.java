@@ -31,15 +31,14 @@ import com.xuexiang.xaop.annotation.SingleClick;
 import com.xuexiang.xui.utils.ResUtils;
 import com.xuexiang.xui.widget.flowlayout.FlowTagLayout;
 
+import org.json.JSONObject;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatCheckBox;
-
-import org.json.JSONObject;
-
 import butterknife.BindView;
 import butterknife.OnClick;
 
@@ -290,10 +289,19 @@ public class ConfirmConsultFragment extends BaseEventFragment implements Compoun
                                     }
                                 }
                             }
+//                            else{
+//                                requestGetPatientList();
+//                            }
                         }catch (Exception e){
+//                            requestGetPatientList();
                             e.printStackTrace();
                         }finally {
-                            requestGetPatientList();
+                            if(TextUtils.isEmpty(GlobalConfig.mpiId)){
+                                requestGetPatientList();
+                            }else {
+                                requestConsultAndCdrOtherdoc(GlobalConfig.mpiId);
+                            }
+
                         }
                     }
                 });
@@ -308,6 +316,13 @@ public class ConfirmConsultFragment extends BaseEventFragment implements Compoun
             // todo 添加用户提示
             return;
         }
+//        Log.d("99999", GlobalConfig.consultSet.getRecipeConsultPrice()+"");
+
+        if (GlobalConfig.consultSet.getRecipeConsultPrice()==0){
+            // todo 添加用户提示
+            return;
+        }
+//        Log.d("99999", TextUtils.isEmpty(GlobalConfig.consultSet.getRecipeConsultPrice()+"")?"0.01":GlobalConfig.consultSet.getRecipeConsultPrice()+"");
         String alleric = String.valueOf(flowlayout_single_select_o.getSelectedIndex());
         String haveReaction = String.valueOf(flowlayout_single_select_t.getSelectedIndex());
         String confirmedDate = tv_date.getText().toString();
@@ -321,8 +336,10 @@ public class ConfirmConsultFragment extends BaseEventFragment implements Compoun
                         haveReaction,
                         confirmedDate,
                         String.valueOf(returnVisitStatus),
-                        "0.01",
-                "0.01",
+//                        "0.01",
+//                "0.01",
+                TextUtils.isEmpty(GlobalConfig.consultSet.getRecipeConsultPrice()+"")?"0.01":GlobalConfig.consultSet.getRecipeConsultPrice()+"",
+                TextUtils.isEmpty(GlobalConfig.consultSet.getRecipeConsultPrice()+"")?"0.01":GlobalConfig.consultSet.getRecipeConsultPrice()+"",
                         reportHTML,
                         GlobalConfig.doc.getDoctorId())
                 .compose(this.bindUntilEvent(FragmentEvent.DESTROY))

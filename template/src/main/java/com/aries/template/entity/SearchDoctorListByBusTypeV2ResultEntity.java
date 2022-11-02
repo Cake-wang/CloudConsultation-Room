@@ -214,6 +214,83 @@ public class SearchDoctorListByBusTypeV2ResultEntity {
 
                     private String departmentName;
                     private Doctor doctor;
+                    private ConsultSet consultSet;
+
+                    public  class ConsultSet{
+
+                        private int recipeConsultStatus;
+                        private int recipeConsultPrice;
+                        private boolean canModifyRecipeConsultPrice;
+                        private boolean xiYaoRecipeRight;
+                        private int doctorId;
+                        private boolean zhongChengRecipeRight;
+                        private boolean gaoFangRecipeRight;
+                        private boolean recipeConsultEnable;
+                        private boolean zhongRecipeRight;
+                        public void setRecipeConsultStatus(int recipeConsultStatus) {
+                            this.recipeConsultStatus = recipeConsultStatus;
+                        }
+                        public int getRecipeConsultStatus() {
+                            return recipeConsultStatus;
+                        }
+
+                        public void setRecipeConsultPrice(int recipeConsultPrice) {
+                            this.recipeConsultPrice = recipeConsultPrice;
+                        }
+                        public int getRecipeConsultPrice() {
+                            return recipeConsultPrice;
+                        }
+
+                        public void setCanModifyRecipeConsultPrice(boolean canModifyRecipeConsultPrice) {
+                            this.canModifyRecipeConsultPrice = canModifyRecipeConsultPrice;
+                        }
+                        public boolean getCanModifyRecipeConsultPrice() {
+                            return canModifyRecipeConsultPrice;
+                        }
+
+                        public void setXiYaoRecipeRight(boolean xiYaoRecipeRight) {
+                            this.xiYaoRecipeRight = xiYaoRecipeRight;
+                        }
+                        public boolean getXiYaoRecipeRight() {
+                            return xiYaoRecipeRight;
+                        }
+
+                        public void setDoctorId(int doctorId) {
+                            this.doctorId = doctorId;
+                        }
+                        public int getDoctorId() {
+                            return doctorId;
+                        }
+
+                        public void setZhongChengRecipeRight(boolean zhongChengRecipeRight) {
+                            this.zhongChengRecipeRight = zhongChengRecipeRight;
+                        }
+                        public boolean getZhongChengRecipeRight() {
+                            return zhongChengRecipeRight;
+                        }
+
+                        public void setGaoFangRecipeRight(boolean gaoFangRecipeRight) {
+                            this.gaoFangRecipeRight = gaoFangRecipeRight;
+                        }
+                        public boolean getGaoFangRecipeRight() {
+                            return gaoFangRecipeRight;
+                        }
+
+                        public void setRecipeConsultEnable(boolean recipeConsultEnable) {
+                            this.recipeConsultEnable = recipeConsultEnable;
+                        }
+                        public boolean getRecipeConsultEnable() {
+                            return recipeConsultEnable;
+                        }
+
+                        public void setZhongRecipeRight(boolean zhongRecipeRight) {
+                            this.zhongRecipeRight = zhongRecipeRight;
+                        }
+                        public boolean getZhongRecipeRight() {
+                            return zhongRecipeRight;
+                        }
+
+                    }
 
                     public void setDepartmentName(String departmentName) {
                         this.departmentName = departmentName;
@@ -229,6 +306,14 @@ public class SearchDoctorListByBusTypeV2ResultEntity {
 
                     public Doctor getDoctor() {
                         return doctor;
+                    }
+
+                    public ConsultSet getConsultSet() {
+                        return consultSet;
+                    }
+
+                    public void setConsultSet(ConsultSet consultSet) {
+                        this.consultSet = consultSet;
                     }
 
                     public class Doctor {
@@ -626,6 +711,8 @@ public class SearchDoctorListByBusTypeV2ResultEntity {
                         }
 
                     }
+
+
 
                 }
 

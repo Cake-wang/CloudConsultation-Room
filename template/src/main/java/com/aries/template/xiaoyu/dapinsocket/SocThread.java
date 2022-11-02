@@ -4,9 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
-
-import com.alibaba.fastjson.JSON;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -57,7 +54,7 @@ public class SocThread {
         inHandler = handlerin;
         outHandler = handlerout;
         ctx = context;
-        Log.i(TAG, "创建线程socket");
+//        Log.i(TAG, "创建线程socket");
     }
 
     public void setIport(String ip, int port) {
@@ -75,7 +72,7 @@ public class SocThread {
         isConnecting = true;
         try {
 //            initdate();
-            Log.i(TAG, "连接中……");
+//            Log.i(TAG, "连接中……");
             if (client != null && client.isConnected()){
                 client.close();
             }
@@ -83,14 +80,14 @@ public class SocThread {
             client = new Socket();
             //client.setSoTimeout(timeout);// 设置阻塞时间
             client.connect(new InetSocketAddress(ip,port),timeout);
-            Log.e(TAG, "连接成功");
+//            Log.e(TAG, "连接成功");
             isConnected = true;
 //            in = new BufferedReader(new InputStreamReader(
 //                    client.getInputStream()));
             in= new BufferedReader(new InputStreamReader(client.getInputStream(), "gb2312"));
             outputStream = client.getOutputStream();
             isRun = true;
-            Log.i(TAG, "输入输出流获取成功");
+//            Log.i(TAG, "输入输出流获取成功");
             isConnecting = false;
 //            inHandler.sendEmptyMessage(CONNECT_SUCCESS);
             Message msg = inHandler.obtainMessage();
@@ -99,13 +96,13 @@ public class SocThread {
             inHandler.sendMessage(msg);// 结果返回给UI处理
             read();
         } catch (UnknownHostException e) {
-            Log.i(TAG, "连接错误UnknownHostException 重新获取");
+//            Log.i(TAG, "连接错误UnknownHostException 重新获取");
             e.printStackTrace();
             isRun = false;
             isConnecting = false;
             inHandler.sendEmptyMessage(CONNECT_FAIL);
         } catch (IOException e) {
-            Log.i(TAG, "连接服务器io错误");
+//            Log.i(TAG, "连接服务器io错误");
             isRun = false;
             isConnecting = false;
             inHandler.sendEmptyMessage(CONNECT_FAIL);
@@ -115,7 +112,7 @@ public class SocThread {
             isRun = false;
             if (inHandler!=null)
                 inHandler.sendEmptyMessage(CONNECT_FAIL);
-            Log.i(TAG, "连接服务器错误Exception" + e.getMessage());
+//            Log.i(TAG, "连接服务器错误Exception" + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -124,7 +121,7 @@ public class SocThread {
         sp = ctx.getSharedPreferences("SP", Context.MODE_PRIVATE);
         ip = sp.getString("ipstr", ip);
         port = Integer.parseInt(sp.getString("port", String.valueOf(port)));
-        Log.i(TAG, "获取到ip端口:" + ip + ";" + port);
+//        Log.i(TAG, "获取到ip端口:" + ip + ";" + port);
     }
 
     /**
@@ -155,7 +152,7 @@ public class SocThread {
 //                            //parse(all);
 //                        }
                         SessionContext.getSessiontContext().onReceiveData(line+"&&"+id);
-                        Log.i(TAG, " len=" + line.length());
+//                        Log.i(TAG, " len=" + line.length());
                         //Log.i(TAG, "4.start set Message");
                     }
                 }
@@ -171,7 +168,7 @@ public class SocThread {
         if(isSendRun){
             return;
         }
-        Log.e(TAG,"sendMessageTask======start");
+//        Log.e(TAG,"sendMessageTask======start");
         isSendRun = true;
         while (isSendRun) {
             byte[] bytes = new byte[0];
@@ -182,14 +179,14 @@ public class SocThread {
                         if (client != null) {
                             outputStream.write(bytes);
                             outputStream.flush();
-                            Log.i(TAG1, "发送成功");
+//                            Log.i(TAG1, "发送成功");
                             Message msg = outHandler.obtainMessage();
                             msg.obj = new String(bytes);
                             msg.what = 1;
                             // 结果返回给UI处理
                             outHandler.sendMessage(msg);
                         } else {
-                            Log.i(TAG, "client 不存在");
+//                            Log.i(TAG, "client 不存在");
                             Message msg = outHandler.obtainMessage();
                             msg.obj = new String(bytes);
                             msg.what = 0;
@@ -209,7 +206,7 @@ public class SocThread {
                         isConnected = false;
                         isRun = false;
                         //executeConn();
-                        Log.i(TAG1, "发送 error");
+//                        Log.i(TAG1, "发送 error");
                         e.printStackTrace();
                     }
 
@@ -238,7 +235,7 @@ public class SocThread {
         bean.setMessageType(NumberUtil.byteArrayToInt(messageType));
         bean.setLength(NumberUtil.byteArrayToInt(length));
         bean.setBody(new String(body));
-        Log.e("TAG","parse--> " + JSON.toJSONString(bean));
+//        Log.e("TAG","parse--> " + JSON.toJSONString(bean));
         Message msg = inHandler.obtainMessage();
         msg.obj = bean;
         inHandler.sendMessage(msg);// 结果返回给UI处理
@@ -257,7 +254,7 @@ public class SocThread {
         bean.setMessageType(NumberUtil.byteArrayToInt(messageType));
         bean.setLength(NumberUtil.byteArrayToInt(length));
         bean.setBody(new String(body));
-        Log.e("TAG","parse--> " + JSON.toJSONString(bean));
+//        Log.e("TAG","parse--> " + JSON.toJSONString(bean));
         return bean;
     }
 
@@ -299,7 +296,7 @@ public class SocThread {
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                Log.e("TAG","====== conn");
+//                Log.e("TAG","====== conn");
                 conn();
             }
         };
@@ -333,27 +330,37 @@ public class SocThread {
             if (client != null) {
                 isRun = false;
                 client.close();
-                Log.e(TAG, "close client");
-                outputStream.close();
-                Log.e(TAG, "close out");
-                in.close();
-                Log.e(TAG, "close in");
+//                Log.e(TAG, "close client");
+                if (outputStream != null){
+                    outputStream.close();
+                }
+
+//                Log.e(TAG, "close out");
+                if (in != null){
+                    in.close();
+                }
+
+//                Log.e(TAG, "close in");
             }
         } catch (Exception e) {
-            Log.i(TAG, "close err");
+//            Log.i(TAG, "close err");
             e.printStackTrace();
         }finally {
             try {
                 if (client != null) {
                     client.close();
-                    Log.e(TAG, "close client");
-                    outputStream.close();
-                    Log.e(TAG, "close out");
-                    in.close();
-                    Log.e(TAG, "close in");
+//                    Log.e(TAG, "close client");
+                    if (outputStream != null){
+                        outputStream.close();
+                    }
+//                    Log.e(TAG, "close out");
+                    if (in != null){
+                        in.close();
+                    }
+//                    Log.e(TAG, "close in");
                 }
             } catch (Exception e) {
-                Log.i(TAG, "close err");
+//                Log.i(TAG, "close err");
                 e.printStackTrace();
             }
         }

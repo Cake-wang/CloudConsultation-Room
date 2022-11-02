@@ -16,7 +16,7 @@ public class HeartBeat {
         public void handleMessage(Message msg) {
             if ((System.currentTimeMillis() - lastResTime) > 6 * 1000){
                 //断开
-                Log.e("TAG","断开了，重连中...");
+//                Log.e("TAG","断开了，重连中...");
                 breakHandler.sendEmptyMessage(BREAK_WHAT);
                 refreshTime();
                 if(socThread != null){

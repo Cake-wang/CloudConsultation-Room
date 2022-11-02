@@ -1054,6 +1054,8 @@ public class GetConsultsAndRecipesResultEntity implements Serializable{
             public String patientSex;
             public String organDiseaseName;
             public String signDate;
+            public String createDate;
+            public Integer valueDays;
             public Double totalMoney;
             public String statusText;
             public Integer organId;
@@ -1063,6 +1065,22 @@ public class GetConsultsAndRecipesResultEntity implements Serializable{
             public Integer recipeType;
             public Integer orderId;
             public List<RecipeDetail> recipeDetailBeans;
+
+            public String getCreateDate() {
+                return createDate;
+            }
+
+            public void setCreateDate(String createDate) {
+                this.createDate = createDate;
+            }
+
+            public Integer getValueDays() {
+                return valueDays;
+            }
+
+            public void setValueDays(Integer valueDays) {
+                this.valueDays = valueDays;
+            }
 
             public Integer getRecipeId() {
                 return recipeId;
@@ -1191,10 +1209,19 @@ public class GetConsultsAndRecipesResultEntity implements Serializable{
                 public String usingRate;
                 public String usePathways;
                 public Double useTotalDose;
+                public String usingRateText;
                 public Double sendNumber;
                 public Integer useDays;
                 public String memo;
                 public String organDrugCode;
+
+                public String getUsingRateText() {
+                    return usingRateText;
+                }
+
+                public void setUsingRateText(String usingRateText) {
+                    this.usingRateText = usingRateText;
+                }
 
                 public Double getDrugCost() {
                     return drugCost;

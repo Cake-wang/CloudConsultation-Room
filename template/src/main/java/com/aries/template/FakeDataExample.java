@@ -3,7 +3,6 @@ package com.aries.template;
 import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.template.retrofit.repository.BaseRepository;
 import com.aries.template.thridapp.JTJKSSDCard;
-import com.decard.entitys.SSCard;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,17 +20,17 @@ import okhttp3.RequestBody;
  */
 public class FakeDataExample extends BaseRepository {
 
-    public static final String phoneNumber = "18667115892";
-//    public static final String idCard = "33052219861229693X";
-    public static final String idCard = "330184199401223513";
+    public static  String phoneNumber = "18667115892";
+    public static  String idCard = "33052219861229693X";
+//    public static final String idCard = "330184199401223513";
 //    public static final String idCard = "330522198612296933";
-    public static final String name = "飞飞";
+    public static  String name = "飞飞";
     public static final String consultId = "815423874";
     public static final String departmentId = "18804";//行政科室编码
     public static final String organId = "2000300";//机构Id
     public static final String profession = "444986";//专科编码
 
-    public static final String payway = "111";//支付类型代码
+    public static final String payway = "180";//支付类型代码
     public static final String decoctionFlag = "0";//是否代煎
     public static final String payMode = "1";//支付方式代码
     public static final String recipeId = "2257979";//电子处方ID
@@ -105,7 +104,9 @@ public class FakeDataExample extends BaseRepository {
 
     public static Map<String,Object> getSignExampleMap(){
         Map<String,Object> tempMap = new HashMap<>();
-        tempMap.put("bizContent","{appKey=app_web, tid=tid_2, startPage=0, requestMode=4, tabStatus=ongoing, recipeIndex=0, recipeLimit=10}");
+//        tempMap.put("bizContent","{appKey=app_web, tid=tid_2, startPage=0, requestMode=4, tabStatus=ongoing, recipeIndex=0, recipeLimit=10}");
+        tempMap.put("bizContent","{appKey=zlbJT-pyjdqtfy, tid=tid_2, startPage=0, requestMode=4, tabStatus=ongoing, recipeIndex=0, recipeLimit=10}");
+
         tempMap.put("common", ApiRepository.common.getInstance());
         tempMap.put("logTraceId","1657847389340");
         tempMap.put("merchantId","123456");
@@ -126,10 +127,20 @@ public class FakeDataExample extends BaseRepository {
      * 社保卡假数据
      */
     public static JTJKSSDCard fakeSSCard(){
+//        name = "段先东";
+//        idCard = "411524199409076016";
+//        phoneNumber = "18790628520";
+        name = "王郭亮";
+        idCard = "33052219861229693X";
+        phoneNumber = "18667115892";
+//                name = "张宇舟";
+//        idCard = "330281199108180012";
+//        phoneNumber = "18867135633";
         JTJKSSDCard ssCard = new JTJKSSDCard();
         ssCard.setName(name);
         ssCard.setSSNum(idCard);
         ssCard.setCardNum(phoneNumber);
+
         ssCard.setSex("男");
         return ssCard;
     }
@@ -178,7 +189,7 @@ public class FakeDataExample extends BaseRepository {
         bizContent.put("recipeConsultSourceFlag", String.valueOf(2));//医生类型(1：平台排班，2：无排班，3：his排班，4：医生自主排班)
         bizContent.put("start", String.valueOf(0));//是否快速返回，快速返回没有职业点和扩展信息//todo cc
         bizContent.put("limit", String.valueOf(10));//是否快速返回，快速返回没有职业点和扩展信息//todo cc
-        bizContent.put("packageFlag", String.valueOf(1));//是否快速返回，快速返回没有职业点和扩展信息
+//        bizContent.put("packageFlag", String.valueOf(1));//是否快速返回，快速返回没有职业点和扩展信息
         bizContent.put("search", "");//是否快速返回，快速返回没有职业点和扩展信息
         // 请求的类型 searchDoctorListByBusTypeV2
         RequestBody body = BodyCreate(bizContent, "searchDoctorListByBusTypeV2");
@@ -222,7 +233,8 @@ public class FakeDataExample extends BaseRepository {
 
         Map<String, Object> bizContent = new HashMap<>();
         bizContent.put("mpiid", "2c95818f80b0ab390180b0db16ea0000");
-        bizContent.put("appClientType", "APP_WEB");
+//        bizContent.put("appClientType", "APP_WEB");
+        bizContent.put("appClientType", "zlbJT-pyjdqtfy");
         bizContent.put("appType", "ngari-health");
         bizContent.put("requestMode", String.valueOf(4));
         bizContent.put("consultOrgan", String.valueOf(2000300));

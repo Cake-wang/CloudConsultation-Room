@@ -5,12 +5,9 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
+import android.os.Handler;
 import android.util.Log;
 import android.view.ViewGroup;
-import android.widget.Toast;
-
-import androidx.annotation.IntDef;
-import androidx.fragment.app.FragmentActivity;
 
 import com.ainemo.sdk.otf.ConnectNemoCallback;
 import com.ainemo.sdk.otf.LayoutElement;
@@ -42,6 +39,7 @@ import com.aries.template.xiaoyu.xinlin.XLSend;
 import com.hyphenate.EMCallBack;
 import com.hyphenate.EMMessageListener;
 import com.hyphenate.chat.EMClient;
+import com.hyphenate.chat.EMCmdMessageBody;
 import com.hyphenate.chat.EMMessage;
 import com.hyphenate.chat.EMOptions;
 import com.tbruyelle.rxpermissions2.RxPermissions;
@@ -53,6 +51,9 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import androidx.annotation.IntDef;
+import androidx.fragment.app.FragmentActivity;
 
 /******
  * 环信 + 信令 + 小鱼
@@ -97,7 +98,8 @@ public class EaseModeProxy {
     // 信令的配置
     private String xlPatientUserId = "627dd085cc2f202b1d2146f3"; //用户userId getConfigurationToThirdForPatient
 //    private final String XL_URL = "ws://172.21.1.95:9090/";
-    private final String XL_URL = "wss://app-DEV.ngarihealth.com/";
+//    private final String XL_URL = "wss://app-DEV.ngarihealth.com/";
+    private final String XL_URL = "wss://www.zjjgpt.com:9091/";
 
     //------------小鱼的配置
     private static final String xyAppId = "5886885697deb9f4760b3a5e1ab912b9a3b7dfd3"; //小鱼appid 固定
@@ -112,6 +114,8 @@ public class EaseModeProxy {
     private boolean isEasemodStarted = false;
     // 医生是否进入过
     private boolean isDoctorEnterRoom=false;
+
+    Handler handler;
 
     //单例
     private static volatile EaseModeProxy sInstance;
@@ -211,6 +215,14 @@ public class EaseModeProxy {
      * 专门登录环信
      */
     public void loginEmClient(){
+//        videoCell = new MeetingVideoCell(activity.get());
+//        contentLayout.addView(videoCell);
+//                                            //渲染local画面
+//                                    VideoInfo videoInfo = new VideoInfo();
+//                                    videoInfo.setDataSourceID(NemoSDK.getLocalVideoStreamID());
+//                                    videoInfo.setAudioMute(muteMic);
+//                                    videoInfo.setVideoMute(muteVideo);
+//                                    videoCell.setVideoInfo(videoInfo);// 启动本地视频窗口
         //注册监听消息的回调地址 参看：https://docs-im.easemob.com/im/android/basics/message#%E6%8E%A5%E6%94%B6%E6%B6%88%E6%81%AF
         EMClient.getInstance().chatManager().addMessageListener(new EMMessageListener() {
             @Override
@@ -218,7 +230,7 @@ public class EaseModeProxy {
                 activity.get().runOnUiThread(() -> {
                     //接收消息
                     for (EMMessage message : messages) {
-                        Log.d("main", "onMessageReceived " + message.toString());
+//                        Log.d("main", "onMessageReceived " + message.toString());
                         Map<String, Object> ext = message.ext();
                         if (ext == null) {
                             continue;
@@ -228,6 +240,7 @@ public class EaseModeProxy {
                             continue;
                         }
                         String msgType = (String) msgTypeObj;
+//                        Log.i("onMessageReceived", msgType);
                         if (msgType == null || !msgType.equals("26")) {
                             continue;
                         }
@@ -244,6 +257,42 @@ public class EaseModeProxy {
 
             @Override
             public void onCmdMessageReceived(List<EMMessage> messages) {
+
+                activity.get().runOnUiThread(() -> {
+                    //接收消息
+                    for (EMMessage message : messages) {
+//                        Log.d("main", "onMessageReceived " + message.toString());
+//                        Map<String, Object> ext = message.ext();
+//                        if (ext == null) {
+//                            continue;
+//                        }
+//                        Object msgTypeObj = ext.get("msgType");
+//                        if (msgTypeObj == null) {
+//                            continue;
+//                        }
+//                        String msgType = (String) msgTypeObj;
+//                        Log.i("onMessageReceived", msgType);
+//                        if (msgType == null || !msgType.equals("26")) {
+//                            continue;
+//                        }
+                        // 信令请求 socket 没有心跳，返回医生请求状态
+//                        setDoctorMessaged(true);
+                        EMCmdMessageBody body = (EMCmdMessageBody) message.getBody();
+                        if (body == null) {
+                            continue;
+                        }
+//                        Log.d("main", "onMessageReceived " + body.action());
+                        if(body.action().equals("kiosk_initiation_video")){
+                            // 提示患者，医生挂断视频
+                            XLMessage.with().init(xlPatientUserId,XL_URL,activity.get()).send(new XLSend().getLoginMsg(xlPatientUserId),
+                                    msg -> onRegSuccess(msg));
+                        }
+
+//                        xlMessage = new XLMessage(xlPatientUserId,XL_URL,activity.get());
+//                        xlMessage.login(msg -> onRegSuccess(msg));
+                    }
+                });
+
             }
 
             @Override
@@ -308,7 +357,9 @@ public class EaseModeProxy {
         };
         // 防止用户由于特殊原因登出，然后再进来的时候，被提示已经登录
         EMClient.getInstance().logout(true);
-        EMClient.getInstance().login(easemobUserName, easemobPassword,emcallback);
+        EMClient.getInstance().login("zj_test_"+easemobUserName, easemobPassword,emcallback);
+//        Log.e("easemob",easemobUserName);
+//        Log.e("easemob",easemobPassword);
     }
 
     /**
@@ -343,7 +394,14 @@ public class EaseModeProxy {
         setActivity(inputAc);
 
         // 开始登录
-        loginEmClient();
+        handler = new Handler();
+        handler.postDelayed(() -> {
+            //
+            loginEmClient();
+//            loginEmClient(entity.getData().getJsonResponseBean().getBody().getUsername(),entity.getData().getJsonResponseBean().getBody().getUserpwd());
+
+        }, 1000);//3秒后执行Runnable中的run方法
+      ;
     }
 
     /**
@@ -360,7 +418,7 @@ public class EaseModeProxy {
             xyInit();
         }catch (Exception e){
             e.printStackTrace();
-            Log.d("JTJK", "onRegSuccess: "+e.getMessage());
+//            Log.d("JTJK", "onRegSuccess: "+e.getMessage());
         }
     }
     //{"topic":"TX_RTC_SHUTDOWN_RES","payload":{"role":"patient","doctorUserId":"627dcfd9cc2f204b0217f3a7","thirdAppVideoConsult":"xyLink","patientUserId":"62aa8f36cc2f205c7eaa4536"}}
@@ -487,16 +545,42 @@ public class EaseModeProxy {
                 //1.监听会议状态
                 if (state == CallState.CONNECTED) {
 //                        ToastWithLogin("入会成功: ");
+//                    Log.e("TAG", NemoSDK.getInstance().getCurrentCameraId()+"");
+                    // 打开默认摄像头需要这个代码
+//                    Log.e("TAG", !uvcCameraPresenter.hasUvcCamera()+"");
+//                    if (!uvcCameraPresenter.hasUvcCamera()){
+//                        Log.e("TAG", NemoSDK.getInstance().getCurrentCameraId()+"");
+//                        NemoSDK.getInstance().requestCamera();
+//                    }
+
+//                    int numberOfCameras = Camera.getNumberOfCameras();
+//                    for (int i = 0; i < numberOfCameras; i++) {
+//                        Camera.CameraInfo info = new Camera.CameraInfo();
+//                        Camera.getCameraInfo(i, info);
+//                        if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+//                            NemoSDK.getInstance().requestCamera();
+//                            break;
+//                        }
+//                    }
+
+                    if (GlobalConfig.thirdFactory.equals("1")||GlobalConfig.thirdFactory.equals("3")){
+                        if (NemoSDK.getInstance().getCurrentCameraId()==0){
+                            Log.e("TAG", NemoSDK.getInstance().getCurrentCameraId()+"");
+                            NemoSDK.getInstance().requestCamera();
+                        }
+                    }
+//
                     // 入会成功
-                    Log.e("TAG", "onCallStateChange: 入会成功");
+//                    Log.e("TAG", "onCallStateChange: 入会成功");
                     // 可能会造成多次入会成功
                     if (listener!=null)
                         listener.onVideoSuccessLinked();
                 } else if (state == CallState.DISCONNECTED) {
+//                    Log.e("TAG", "onCallStateChange: 退出成功");
 //                        ToastWithLogin("退出会议: " + reason);
                     // 告诉医生，你已经离开
                     sendNotifyPaintLiveMsg();
-                    // 释放资源一定要写在退出会议的后面
+//                    // 释放资源一定要写在退出会议的后面
                     releaseProxy();
                 }
             }
@@ -588,10 +672,17 @@ public class EaseModeProxy {
         // 向大屏幕socket传递离开信息
         // 如果医生没有进入房间
         if (!NemoSDK.getInstance().inCalling()){
+//            Log.e("JTJKkkkk", "releaseProxy" );
+
             releaseProxy();
         }else {
             // 如果医生已经进入房间
             NemoSDK.getInstance().hangup();// 挂断通话
+//            Log.e("JTJKkkkk", "hangup" );
+//            sendNotifyPaintLiveMsg();
+            // 释放资源一定要写在退出会议的后面
+//            releaseProxy();
+//            releaseProxy();
         }
     }
 
@@ -601,16 +692,16 @@ public class EaseModeProxy {
     public void releaseProxy(){
         // 重置全局数据
         isDoctorEnterRoom = false;
-        Log.e("JTJK", "releaseProxy: start" );
+//        Log.e("JTJK", "releaseProxy: start" );
         // 释放对象资源
         if (uvcCameraPresenter!=null){
             uvcCameraPresenter.onDestroy();
             uvcCameraPresenter = null;
-            Log.e("JTJK", "uvcCameraPresenter: done" );
+//            Log.e("JTJK", "uvcCameraPresenter: done" );
         }
         // 释放在这里为保证这个对象被释放了，如果在监听里面，可能没有被释放该怎么办？
         XLMessage.with().delayDestroy();
-        Log.e("JTJK", "XLMessage: done" );
+//        Log.e("JTJK", "XLMessage: done" );
         if (activity!=null)
             activity.clear();
         if (contentLayout !=null)
@@ -619,28 +710,33 @@ public class EaseModeProxy {
             videoCell.removeVideoInfo();
             videoCell = null;
         }
-        Log.e("JTJK", "failed: done" );
+//        Log.e("JTJK", "failed: done" );
         // 释放 环信
         if (emcallback!=null)
             EMClient.getInstance().logout(true,emcallback);
 
-        Log.e("JTJK", "EMClient: done" );
+//        Log.e("JTJK", "EMClient: done" );
         // 释放小鱼
-        NemoSDK.getInstance().setNemoSDKListener(null);
-        NemoSDK.getInstance().releaseLayout();
-        NemoSDK.getInstance().releaseCamera();
-        NemoSDK.getInstance().releaseAudioMic();
-        Log.e("JTJK", "NemoSDK: done" );
+//        NemoSDK.getInstance().setNemoSDKListener(null);
+//        NemoSDK.getInstance().releaseLayout();
+//        NemoSDK.getInstance().releaseCamera();
+//        NemoSDK.getInstance().releaseAudioMic();
+        NemoSDK.getInstance().shutdown();
+//        Log.e("JTJK", "NemoSDK: done" );
+        if (handler!=null){
+            handler.removeCallbacksAndMessages(null);
+            handler = null;
+        }
     }
 
     /**
      * 打印并提示用户
      */
     private void ToastWithLogin(String msg){
-        if (activity!=null && activity.get()!=null){
-            Log.d("EaseModeProxy",msg);
-            activity.get().runOnUiThread(() -> Toast.makeText(activity.get(), msg, Toast.LENGTH_SHORT).show());
-        }
+//        if (activity!=null && activity.get()!=null){
+//            Log.d("EaseModeProxy",msg);
+//            activity.get().runOnUiThread(() -> Toast.makeText(activity.get(), msg, Toast.LENGTH_SHORT).show());
+//        }
     }
 
     /**

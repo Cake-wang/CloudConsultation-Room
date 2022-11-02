@@ -28,7 +28,7 @@ buildscript {
         //SharedPreferences 优化
         classpath "com.didiglobal.booster:booster-transform-shared-preferences:$booster_version"
         //采用 cwebp 对资源进行压缩
-        classpath "com.didiglobal.booster:booster-task-compression-cwebp:$booster_version"//android.precompileDependenciesResources=false
+//        classpath "com.didiglobal.booster:booster-task-compression-cwebp:$booster_version"//android.precompileDependenciesResources=false
         //采用 pngquant 对资源进行压缩
 //        classpath "com.didiglobal.booster:booster-task-compression-pngquant:$booster_version"//android.precompileDependenciesResources=false
         //去冗余资源

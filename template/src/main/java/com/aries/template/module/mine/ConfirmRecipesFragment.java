@@ -6,23 +6,12 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.RecyclerView;
-
-import com.alibaba.fastjson.JSON;
 import com.aries.library.fast.retrofit.FastLoadingObserver;
-import com.aries.library.fast.util.SPUtil;
 import com.aries.library.fast.util.ToastUtil;
-import com.aries.template.FakeDataExample;
 import com.aries.template.GlobalConfig;
 import com.aries.template.R;
-import com.aries.template.entity.CanRequestOnlineConsultResultEntity;
-import com.aries.template.entity.CreateOrderResultEntity;
 import com.aries.template.entity.FindMedicineStockEntity;
-import com.aries.template.entity.GetConsultsAndRecipesResultEntity;
 import com.aries.template.entity.GetRecipeListByConsultIdEntity;
-import com.aries.template.entity.GetStockInfoEntity;
-import com.aries.template.entity.PrescriptionPushEntity;
 import com.aries.template.module.base.BaseEventFragment;
 import com.aries.template.module.main.HomeFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
@@ -40,6 +29,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.OnClick;
 import me.yokeyword.fragmentation.SupportFragment;
@@ -162,7 +153,7 @@ public class ConfirmRecipesFragment extends BaseEventFragment {
         tv_name.setText(GlobalConfig.ssCard.getName().trim()+"("+sex+")");
         tv_card.setText(GlobalConfig.ssCard.getCardNum());
         tv_age_l.setText(String.valueOf(GlobalConfig.age));
-        tv_dept.setText(currentRecipes.get(0).appointDepartName);
+        tv_dept.setText(currentRecipes.get(0).departText);
         tv_result.setText(currentRecipes.get(0).organDiseaseName);
         tv_date.setText(currentRecipes.get(0).createDate);
 
@@ -170,7 +161,7 @@ public class ConfirmRecipesFragment extends BaseEventFragment {
         final List<GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO> no9Recipes = new ArrayList<>();
         for (GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO currentRecipe : currentRecipes) {
             // 去除 9 的 取消单
-            if (currentRecipe.status!=9)
+            if (currentRecipe.status!=9&&currentRecipe.status!=15)
                 no9Recipes.add(currentRecipe);
         }
 
@@ -252,11 +243,11 @@ public class ConfirmRecipesFragment extends BaseEventFragment {
      * @param skus 药品编码 列表
      */
     public void requestGetStockInfo(String clinicSn, ArrayList<Map<String,Object>> skus){
-        skus = new ArrayList<Map<String,Object>>(){{
-            Map<String,Object> map =new HashMap<>();
-            map.put("6901339924484","1");
-            add(map);
-        }};//todo cc
+//        skus = new ArrayList<Map<String,Object>>(){{
+//            Map<String,Object> map =new HashMap<>();
+//            map.put("6901339924484","1");
+//            add(map);
+//        }};//todo cc
 //        skus = new ArrayList<String>(){{add("4895013208569");}};//todo cc
         ApiRepository.getInstance().findMedicineStock(clinicSn,skus)
                 .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
@@ -309,7 +300,8 @@ public class ConfirmRecipesFragment extends BaseEventFragment {
                                     if ((Double) vo.useDose!=null)
                                         perDayUse = String.valueOf(((Double) vo.useDose).intValue()) + "片";
 
-                                    String howToUse = "(1天"+vo.useTotalDose/vo.useDays+"次，每次"+perDayUse+")";
+//                                    String howToUse = "(1天"+vo.useTotalDose/vo.useDays+"次，每次"+perDayUse+")";
+                                    String howToUse = "("+vo.usingRateText+"，每次"+perDayUse+")";
                                     PayRecipeFragment.DrugObject drug= new PayRecipeFragment.DrugObject();
                                     //            drugs.put("direction","口服");
                                     drug.dosageUnit = vo.drugUnit;
@@ -459,7 +451,8 @@ public class ConfirmRecipesFragment extends BaseEventFragment {
                         perDayUse = String.valueOf(((Double) vo.useDose).intValue()) + "片";
 
                     String drugName = (position+1)+"、"+vo.drugName;
-                    String wayToUse = "(1天"+vo.useTotalDose/vo.useDays+"次，每次"+perDayUse+")";
+//                    String wayToUse = "(1天"+vo.useTotalDose/vo.useDays+"次，每次"+perDayUse+")";
+                    String wayToUse = "("+vo.usingRateText+",每次"+perDayUse+")";
                     String[] orders = {"#333333",drugName,"#38ABA0",wayToUse};
                     ((TextView)holder.itemView.findViewById(R.id.tv_useDose)).setText(ActivityUtils.formatTextView(orders));//使用方法
                 } });

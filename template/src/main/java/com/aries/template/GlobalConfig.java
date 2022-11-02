@@ -1,9 +1,7 @@
 package com.aries.template;
 
 import com.aries.template.entity.SearchDoctorListByBusTypeV2ResultEntity;
-import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.template.thridapp.JTJKSSDCard;
-import com.decard.entitys.SSCard;
 
 /******
  * 全世界存储对象
@@ -28,8 +26,11 @@ public class GlobalConfig {
      * 由纳里平台分配的公司标识，
      * 固定写死
      * */
-    public static final String NALI_APPKEY = "app_web";
-
+//    public static final String NALI_APPKEY = "app_web";
+            //滨江
+    public static final String NALI_APPKEY = "zlbJT-pyjdqtfy";
+            //西溪
+//            public static final String NALI_APPKEY = "zlbJT-xxjd";
     /**
      * 由纳里平台分配 第三方平台用户唯一主键，
      * 在findUser里面取的 在findUser 这个请求中获取, 这个值就是 userId
@@ -54,8 +55,11 @@ public class GlobalConfig {
     /**
      * 第三方厂家 ID
      * 1 盖瑞
+     * 2 立创
      */
     public static String thirdFactory ="1";
+//    public static String thirdFactory ="2";
+//    public static String thirdFactory ="3";
 
     /**
      * 商户ID
@@ -66,7 +70,7 @@ public class GlobalConfig {
     /**
      * 大屏幕链接的 socket的地址
      */
-    public static String machineIp;
+    public static String machineIp = "";
 
     /**
      * 大屏幕链接的 socket的地址 端口
@@ -105,6 +109,8 @@ public class GlobalConfig {
      */
     public static int organId = 0;
 
+    public static String mpiId = "";
+
     /**
      * 药柜号
      * 在其他地方也叫 诊亭编号clinicSn
@@ -140,6 +146,8 @@ public class GlobalConfig {
      * 这个数据在用户选择好复诊医生后被存储
      */
     public static SearchDoctorListByBusTypeV2ResultEntity.QueryArrearsSummary.JsonResponseBean.OrganProfessionDTO.DocList.Doctor doc;
+
+    public static SearchDoctorListByBusTypeV2ResultEntity.QueryArrearsSummary.JsonResponseBean.OrganProfessionDTO.DocList.ConsultSet consultSet;
 
     /**
      * 用户医保卡信息，全局数据

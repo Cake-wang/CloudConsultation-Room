@@ -1,8 +1,8 @@
 package com.aries.template.widget.updownbtn;
 
-import androidx.annotation.IntRange;
-
 import java.util.ArrayList;
+
+import androidx.annotation.IntRange;
 
 /******
  * 上一页，下一页，刷新 的代理工具
@@ -87,6 +87,9 @@ public class UpDownProxy<T> {
                 setBtnEnable(CASE_RV_DOWN,false);
                 break; // out of boundary
             }
+            if(totalDatas.size()==0){
+                return;
+            }
             newDatas.add(totalDatas.get(startIndex+i));
         }
         if (listener!=null)
@@ -123,6 +126,9 @@ public class UpDownProxy<T> {
 //                setBtnEnable(CASE_RV_DOWN,false);
 //                break; // out of boundary
 //            }
+            if(totalDatas.size()==0){
+                return;
+            }
             newDatas.add(totalDatas.get(startIndex+i));
 
             // 检测你下一个是不是可以

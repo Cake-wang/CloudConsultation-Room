@@ -1,5 +1,8 @@
 package com.aries.template.thridapp;
 
+import com.aries.template.entity.SbkcardResultEntity;
+import com.decard.entitys.IDCard;
+
 /**
  * 金投健康 SSDCard 数据
  */
@@ -46,6 +49,52 @@ public class JTJKSSDCard {
             // 性别
             card.sex = Integer.valueOf(splits[1].substring(16,17))%2==0?"女":"男";
         }
+        return card;
+    }
+
+    public static JTJKSSDCard buildiD(IDCard idCard){
+//        String[] splits = data.split("\\|");
+//        if (splits.length<=0)
+//            return null;
+
+        // 创建对象
+        JTJKSSDCard card = new JTJKSSDCard();
+//        if (splits.length>=11){
+            // 卡号
+            card.cardNum = "未读卡";
+            // 姓名
+            card.name = idCard.getName();
+            // 社会保障号码 身份证
+            card.SSNum = idCard.getId();
+            // 卡片识别码
+            card.cardIdentificationCode = "";
+            // 性别
+            card.sex = idCard.getSex();
+//        }
+        return card;
+    }
+
+    public static JTJKSSDCard buildsbkcard(SbkcardResultEntity.SbkcardResult idCard){
+//        String[] splits = data.split("\\|");
+//        if (splits.length<=0)
+//            return null;
+
+        // 创建对象
+        JTJKSSDCard card = new JTJKSSDCard();
+//        if (splits.length>=11){
+        // 卡号
+        card.cardNum = "未读卡";
+        // 姓名
+        card.name = idCard.getName();
+        // 社会保障号码 身份证
+        card.SSNum = idCard.getIdno();
+        // 卡片识别码
+        card.cardIdentificationCode = "";
+        // 性别
+        card.sex = idCard.getSex().equals("2")?"女":"男";
+
+        card.birthday = idCard.getBirthday();
+//        }
         return card;
     }
 

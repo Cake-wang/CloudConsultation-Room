@@ -86,10 +86,24 @@
                     android:visibility="visible">
 
                     <ImageView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
                         android:scaleType="center"
+
+                        android:id="@+id/iv_doctor"
                         android:src="@mipmap/video_doctor_img" />
+
+                    <com.aries.template.utils.ScaleTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                       android:layout_centerHorizontal="true"
+                        android:layout_marginTop="10dp"
+                        android:text="等待医生接诊中，请稍候"
+                        android:textSize="14dp"
+                        android:layout_below="@id/iv_doctor"
+                        android:textColor="#38ABA0" />
+
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/videoContent"
@@ -128,13 +142,19 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="16dp"
                             android:text="加载中..."
-                            android:autoSizeMaxTextSize="22dp"
-                            android:autoSizeMinTextSize="14dp"
-                            android:autoSizeStepGranularity="1dp"
-                            android:autoSizeTextType="uniform"
+                            android:textSize="14dp"
+
                             android:textColor="#38ABA0" />
                     </LinearLayout>
-
+                    <com.aries.template.utils.ScaleTextView
+                        android:id="@+id/tv_video_wait"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="等待医生开具处方信息，请稍候"
+                        android:textSize="14dp"
+                        android:visibility="gone"
+                        android:textColor="#38ABA0" />
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/rv_video_tip"
                         android:layout_width="match_parent"

@@ -1,43 +1,34 @@
 package com.aries.template.module.mine;
 
-import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.RecyclerView;
-
 import com.aries.library.fast.retrofit.FastLoadingObserver;
 import com.aries.library.fast.util.ToastUtil;
-import com.aries.template.FakeDataExample;
 import com.aries.template.GlobalConfig;
 import com.aries.template.R;
 import com.aries.template.entity.CanRequestOnlineConsultResultEntity;
-import com.aries.template.entity.FindValidDepartmentForRevisitResultEntity;
 import com.aries.template.entity.SearchDoctorListByBusTypeV2ResultEntity;
 import com.aries.template.module.base.BaseEventFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
-import com.aries.template.widget.autoadopter.AutoAdaptor;
 import com.aries.template.widget.autoadopter.AutoAdaptorProxy;
 import com.aries.template.widget.autoadopter.AutoObjectAdaptor;
 import com.aries.template.widget.autoadopter.DefenceAutoAdaptorProxy;
-import com.aries.template.widget.updownbtn.DefenceUpDownProxy;
 import com.aries.template.widget.updownbtn.UpDownProxy;
 import com.aries.ui.view.title.TitleBarView;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.trello.rxlifecycle3.android.FragmentEvent;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 
 /**
@@ -53,6 +44,7 @@ public class DoctorListFragment extends BaseEventFragment {
     public static final String KEY_ITEM_VALUE = "key_item_value";
     /** 网格数据 医生信息 全数据 */
     public static final String KEY_ITEM_CURRENT_DOC = "key_item_current_doc";
+    public static final String KEY_ITEM_CURRENT_ConsultSet = "key_item_current_consultSet";
     /** 获取传参 专科编码*/
     public static final String KEK_BUNDLE_PROFESSION = "key_item_organprofessionid";
     /** 获取传参 科室ID*/
@@ -126,13 +118,19 @@ public class DoctorListFragment extends BaseEventFragment {
                         //进入复诊单
                         // todo 存储当前最终选择的医生信息，可以重复刷新，结束后清空
                         SearchDoctorListByBusTypeV2ResultEntity.QueryArrearsSummary.JsonResponseBean.OrganProfessionDTO.DocList.Doctor doc = ((SearchDoctorListByBusTypeV2ResultEntity.QueryArrearsSummary.JsonResponseBean.OrganProfessionDTO.DocList.Doctor) itemData.get(KEY_ITEM_CURRENT_DOC));
+                        SearchDoctorListByBusTypeV2ResultEntity.QueryArrearsSummary.JsonResponseBean.OrganProfessionDTO.DocList.ConsultSet consultSet = ((SearchDoctorListByBusTypeV2ResultEntity.QueryArrearsSummary.JsonResponseBean.OrganProfessionDTO.DocList.ConsultSet) itemData.get(KEY_ITEM_CURRENT_ConsultSet));
+
+                        GlobalConfig.consultSet = consultSet;
                         requestCanRequestOnlineConsult(doc.getDoctorId(),doc);
                     }
                     @Override
                     public void onItemViewDraw(AutoObjectAdaptor.ViewHolder holder, int position, Map itemData) {
                         SearchDoctorListByBusTypeV2ResultEntity.QueryArrearsSummary.JsonResponseBean.OrganProfessionDTO.DocList.Doctor doc = ((SearchDoctorListByBusTypeV2ResultEntity.QueryArrearsSummary.JsonResponseBean.OrganProfessionDTO.DocList.Doctor) itemData.get(KEY_ITEM_CURRENT_DOC));
                         ((TextView)holder.itemView.findViewById(R.id.jtjk_doc_item_name_tv)).setText(doc.getName());
+//                        ((TextView)holder.itemView.findViewById(R.id.jtjk_doc_item_introduce_tv)).setMovementMethod(new ScrollingMovementMethod());
+//                        ((TextView)holder.itemView.findViewById(R.id.jtjk_doc_item_introduce_tv)).setFocusable(false);
                         ((TextView)holder.itemView.findViewById(R.id.jtjk_doc_item_introduce_tv)).setText(doc.getIntroduce());
+//                        Log.d("getIntroduce",doc.getIntroduce());
                     }
                 });
                 proxy.notifyDataSetChanged();
@@ -195,6 +193,7 @@ public class DoctorListFragment extends BaseEventFragment {
                                 doc.getDoctor().getName();
                                 Map<String,Object> data = new HashMap<>();
                                 data.put(KEY_ITEM_CURRENT_DOC,doc.getDoctor());
+                                data.put(KEY_ITEM_CURRENT_ConsultSet,doc.getConsultSet());
                                 totalDatas.add(data);
                             }
                             if (totalDatas.size()>0){

@@ -153,11 +153,20 @@ public class PayOrderEntity {
                 private int needPay;
                 private boolean isStepOverMerchant;
                 public String qr_code;
+                public String formData;
                 private String payWay;
                 private String accessToken;
                 private String prepayId;
                 public String prepay_id;
                 private int saFlag;
+
+                public String getFormData() {
+                    return formData;
+                }
+
+                public void setFormData(String formData) {
+                    this.formData = formData;
+                }
 
                 public int getBusId() {
                     return busId;

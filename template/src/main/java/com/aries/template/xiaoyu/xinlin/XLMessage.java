@@ -32,7 +32,8 @@ public class XLMessage {
     // 用户 userId getConfigurationToThirdForPatient
     private String xlPatientUserId = "627dd085cc2f202b1d2146f3";
     // 地址
-    private String XL_URL = "wss://app-DEV.ngarihealth.com/";
+//    private String XL_URL = "wss://app-DEV.ngarihealth.com/";
+    private  String XL_URL = "wss://www.zjjgpt.com:9091/";
     // 信令 Socket 对象, 这个 socket 不需要设置心跳包
     private WebSocketClient webSocketClient;
     // 弱应用 activity
@@ -86,8 +87,11 @@ public class XLMessage {
      * @param inputlistener 如果消息发送，则返回这个监听
      */
     public void send(String msg, XLEventListener inputlistener){
+//        Log.i("onMessageReceived", "WebSocket");
+
         try {
             final URI uri = new URI(XL_URL);
+//            Log.i("onMessageReceived", XL_URL);
             listener = inputlistener;
             // 如果已经关闭了socket，则进行重建
             if (webSocketClient==null){
@@ -96,6 +100,7 @@ public class XLMessage {
                     public void onOpen() {
                         // 握手成功
 //                        Log.i("WebSocket", "Session is starting");
+//                        Log.i("onMessageReceived", "Session");
                         //连接成功服务器后必须要注册
                         webSocketClient.send(new XLSend().getLoginMsg(xlPatientUserId));
                     }
@@ -103,15 +108,24 @@ public class XLMessage {
                     @Override
                     public void onTextReceived(String s) {
                         final String message = s;
-                        ToastWithLogin(message);
+//                        Log.e("messagetttttk", message);
+//                        ToastWithLogin(message);
                         activity.runOnUiThread(() -> {
                             //这里改成用json来解析?
+//                            Log.e("messagetttttk", message);
                             if (message.contains("REG_SUCCESS")) {
                                 // 登录成功
                                 if (!msg.equals(new XLSend().getLoginMsg(xlPatientUserId))){
+//                                    Log.e("messagetttttq", message);
                                     // 如果不只是登录，则登录成功后，继续发送消息
-                                    webSocketClient.send(msg);
+                                    try{
+                                        webSocketClient.send(msg);
+                                    }catch (Exception e){
+
+                                    }
+
                                 }else{
+//                                    Log.e("messagetttttw", message);
                                     // 如果只是登录，则直接返回结果
                                     if (listener!=null)
                                         listener.sended(message);
@@ -123,7 +137,8 @@ public class XLMessage {
                                 // 如果返回的不是登录
                                 if (message.contains("TX_RTC_SHUTDOWN_RES")) {
                                     // 医生已经离开
-                                    ToastWithLogin("医生已经离开");
+                                    ToastUtil.show("医生已经离开");
+//                                    ToastWithLogin("医生已经离开");
                                     if (listener != null)
                                         listener.sended(message);
                                 }else if (message.contains("SUCCESS")){
@@ -157,7 +172,8 @@ public class XLMessage {
 
                     @Override
                     public void onException(Exception e) {
-                        System.out.println(e.getMessage());
+//                        Log.i("onMessageReceived", e.getMessage());
+//                        System.out.println(e.getMessage());
                         destroy();
                     }
 
@@ -166,7 +182,8 @@ public class XLMessage {
                         // socket 关闭
                         // 关闭后，webSocketClient 会被置空
 //                        Log.i("WebSocket", "Closed ");
-                        System.out.println("onCloseReceived");
+//                        Log.i("onMessageReceived", "onCloseReceived");
+//                        System.out.println("onCloseReceived");
                         if (isDelayDestroy)
                             destroy();
                     }

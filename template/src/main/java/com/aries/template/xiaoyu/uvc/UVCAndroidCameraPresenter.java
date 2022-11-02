@@ -8,12 +8,10 @@ import android.opengl.GLES20;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.ainemo.sdk.otf.NemoSDK;
 import com.ainemo.sdk.otf.Orientation;
 import com.aries.template.R;
-import com.aries.template.utils.JTJKLogUtils;
 import com.serenegiant.usb.DeviceFilter;
 import com.serenegiant.usb.IFrameCallback;
 import com.serenegiant.usb.Size;
@@ -184,7 +182,7 @@ public class UVCAndroidCameraPresenter {
      * 小鱼的监听返回
      */
     private final IFrameCallback mIFrameCallback = frame -> {
-        Log.d(TAG, "mIFrameCallback: work");
+//        Log.d(TAG, "mIFrameCallback: work");
         frame.clear();
         int len = frame.capacity();
         int captureWidth =size.width; //视频宽
@@ -193,9 +191,11 @@ public class UVCAndroidCameraPresenter {
         frame.get(yuv);
         String localSourceId = NemoSDK.getInstance().getDataSourceId();
         if (!TextUtils.isEmpty(localSourceId)) {
+//            Log.d(TAG, "mIFrameCallbackkkkkk: work1");
             NativeDataSourceManager.putVideoData(localSourceId, yuv, yuv.length,
                     captureWidth, captureHeight, 0, false);
         }else {
+//            Log.d(TAG, "mIFrameCallbackkkkkk: work2");
             NativeDataSourceManager.putVideoData("LocalPreviewID", yuv, yuv.length,
                     captureWidth, captureHeight, 0, false);
         }
@@ -219,7 +219,7 @@ public class UVCAndroidCameraPresenter {
                 }
             }
         }catch (Exception e){
-            Log.e(TAG, "onDialogResult: 崩溃了，请重新尝试");
+//            Log.e(TAG, "onDialogResult: 崩溃了，请重新尝试");
         }
     }
 
@@ -269,7 +269,7 @@ public class UVCAndroidCameraPresenter {
             NemoSDK.getInstance().switchCamera(0);
         }catch (Exception e){
             e.printStackTrace();
-            JTJKLogUtils.message(e.toString());
+//            JTJKLogUtils.message(e.toString());
         }
     }
 
@@ -336,6 +336,10 @@ public class UVCAndroidCameraPresenter {
 //                }catch (Exception e){
 //                    e.printStackTrace();
 //                }
+                if (!mUSBMonitor.isRegistered()){
+                    mUSBMonitor.destroy();
+
+                }
                 mUSBMonitor = null;
 
                 mListenerHandlerThread.quitSafely();
@@ -375,11 +379,11 @@ public class UVCAndroidCameraPresenter {
     public void USBUnregister(){
         synchronized (mSync) {
             try {
-                Log.d("JTJK","releaseUsbMonitor b");
+//                Log.d("JTJK","releaseUsbMonitor b");
                 // 由于 hasPermission 有崩溃，所以必须要在 destroy 之前，先判断
                 mUSBMonitor.hasPermission(null);
                 mUSBMonitor.unregister();
-                Log.d("JTJK","releaseUsbMonitor e");
+//                Log.d("JTJK","releaseUsbMonitor e");
             }catch (Exception e){
                 e.printStackTrace();
             }

@@ -5,32 +5,22 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import androidx.annotation.Nullable;
 
 import com.aries.library.fast.retrofit.FastLoadingObserver;
 import com.aries.library.fast.retrofit.FastObserver;
 import com.aries.library.fast.util.ToastUtil;
 import com.aries.template.GlobalConfig;
 import com.aries.template.R;
-import com.aries.template.entity.BatchCreateOrderEntity;
 import com.aries.template.entity.GetConsultAndPatientAndDoctorByIdEntity;
-import com.aries.template.entity.GetConsultsAndRecipesResultEntity;
-import com.aries.template.entity.GetPatientRecipeByIdEntity;
 import com.aries.template.entity.PayOrderEntity;
-import com.aries.template.entity.PrescriptionPushEntity;
 import com.aries.template.entity.VisitMedicalPreSettleEntity;
 import com.aries.template.module.base.BaseEventFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.template.utils.ActivityUtils;
-import com.aries.template.utils.JTJKLogUtils;
 import com.aries.ui.view.title.TitleBarView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -41,11 +31,9 @@ import com.xuexiang.xaop.annotation.MainThread;
 import com.xuexiang.xaop.enums.ThreadType;
 import com.xuexiang.xqrcode.XQRCode;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import androidx.annotation.Nullable;
 import butterknife.BindView;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -98,6 +86,8 @@ public class PayConsultFragment extends BaseEventFragment {
     TextView jtjk_pay_text;
     @BindView(R.id.jtjk_pay_reflash_tip)
     TextView jtjk_pay_reflash_tip;
+
+    boolean flagone = true;
 
     /**
      * 跳转科室，需要带的数据
@@ -227,20 +217,26 @@ public class PayConsultFragment extends BaseEventFragment {
                                 tv_fee_yb.setText(String.valueOf(entity.getData().getJsonResponseBean().getBody().getConsult().getFundAmount())+"元");
                                 // 自费
                                 tv_fee_zf.setText(String.valueOf(entity.getData().getJsonResponseBean().getBody().getConsult().getCashAmount())+"元");
+//                                Log.e("getPayflag",entity.getData().getJsonResponseBean().getBody().getConsult().getPayflag()+"");
                                 if (entity.getData().getJsonResponseBean().getBody().getConsult().getPayflag()==1){
-                                    // 跳转到视频
-                                    start(VideoConsultFragment.newInstance(consultId,
-                                            patientName,
-                                            doctorId,
-                                            doctorName,
-                                            false));
-                                    // 释放对象资源
-                                    onDismiss();
+                                    if (flagone){
+                                        flagone = false;
+                                        // 释放对象资源
+                                        onDismiss();
+                                        // 跳转到视频
+                                        start(VideoConsultFragment.newInstance(consultId,
+                                                patientName,
+                                                doctorId,
+                                                doctorName,
+                                                false));
+                                    }
+
+
                                 }
                             }
                         }catch (Exception e){
                             e.printStackTrace();
-                            JTJKLogUtils.message(e.toString());
+//                            JTJKLogUtils.message(e.toString());
                         }
                     }
                 });
@@ -268,11 +264,12 @@ public class PayConsultFragment extends BaseEventFragment {
                                 //通过 4.9 刷新价格
                                 requestPayOrder(consultId);
                             }else {
+                                ToastUtil.show(entity.data.errorMessage+"");
                                 // 失败则让用户可以重新尝试
                             }
                         }catch (Exception e){
                             e.printStackTrace();
-                            JTJKLogUtils.message(e.toString());
+//                            JTJKLogUtils.message(e.toString());
                         }
                     }
                 });
@@ -295,18 +292,18 @@ public class PayConsultFragment extends BaseEventFragment {
                         try {
                             if (entity.getData().isSuccess()){
                                 // 显示二维码
-                                String qrStr = entity.getData().getJsonResponseBean().getBody().qr_code;
+                                String qrStr = entity.getData().getJsonResponseBean().getBody().getFormData();
                                 Resources res = getActivity().getResources();
                                 logoBmp = BitmapFactory.decodeResource(res, R.mipmap.pay_alilogo);
                                 payBmp = XQRCode.createQRCodeWithLogo(qrStr, 400, 400, logoBmp);
-                                Drawable drawable = new BitmapDrawable(payBmp);
+                                BitmapDrawable drawable = new BitmapDrawable(payBmp);
                                 RequestOptions requestOptions =new RequestOptions().centerCrop()
                                         .diskCacheStrategy(DiskCacheStrategy.ALL)
                                         .error(drawable)//放在出错位置
                                          .placeholder(drawable);//放在占位符位置
                                 Glide.with(getContext())
                                         .setDefaultRequestOptions(requestOptions)
-                                        .load("https://${System.currentTimeMillis()}")//随便给个不可用的url
+                                        .load("https://")//随便给个不可用的url
                                          .into(mIvQrcode);
 
 //                                Log.i("JTJK", "压缩前图片的大小" + (payBmp.getByteCount() / 1024 / 1024) + "M宽度为" + payBmp.getWidth() + "高度为" + payBmp.getHeight());
@@ -317,7 +314,7 @@ public class PayConsultFragment extends BaseEventFragment {
                             }
                         }catch (Exception e){
                             e.printStackTrace();
-                            JTJKLogUtils.message(e.toString());
+//                            JTJKLogUtils.message(e.toString());
                         }
                     }
                 });
@@ -355,29 +352,29 @@ public class PayConsultFragment extends BaseEventFragment {
             }
         }catch (Exception e){
             e.printStackTrace();
-            JTJKLogUtils.message(e.toString());
+//            JTJKLogUtils.message(e.toString());
         }
 
-        // 清理 logo 图片
-        try {
-            if (logoBmp!=null){
-//                logoBmp.recycle();
-                logoBmp = null;
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-            JTJKLogUtils.message(e.toString());
-        }
-
-        // 清理支付图片
-        try {
-            if (payBmp!=null){
-//                payBmp.recycle();
-                payBmp = null;
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-            JTJKLogUtils.message(e.toString());
-        }
+//        // 清理 logo 图片
+//        try {
+//            if (logoBmp!=null){
+////                logoBmp.recycle();
+//                logoBmp = null;
+//            }
+//        }catch (Exception e){
+//            e.printStackTrace();
+//            JTJKLogUtils.message(e.toString());
+//        }
+//
+//        // 清理支付图片
+//        try {
+//            if (payBmp!=null){
+////                payBmp.recycle();
+//                payBmp = null;
+//            }
+//        }catch (Exception e){
+//            e.printStackTrace();
+//            JTJKLogUtils.message(e.toString());
+//        }
     }
 }

@@ -10,25 +10,18 @@ import android.net.wifi.WifiManager;
 import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
-import android.util.Log;
 import android.widget.Toast;
 
-import com.aries.library.fast.util.SPUtil;
-import com.aries.library.fast.util.ToastUtil;
 import com.aries.template.GlobalConfig;
 
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-
-import io.reactivex.Maybe;
 
 /**
  * 大屏socket 代理类
@@ -190,7 +183,7 @@ public class DapinSocketProxy {
 
                 @Override
                 public void onReceiveData(String receiveData) {
-                    Log.e("JTJK","receiveData="+receiveData);
+//                    Log.e("JTJK","receiveData="+receiveData);
                     try {
                         //接收dlna发送的JSON string
                         // 有可能获取到正确数据后 mhandler 会空对象
@@ -232,7 +225,7 @@ public class DapinSocketProxy {
 //            if(TextUtils.isEmpty(socketThread.flag))
 //                return;
             if (msg.what == HeartBeat.BREAK_WHAT){
-                Log.d("JTJK", "DapinSocketProxy: 断开了");
+//                Log.d("JTJK", "DapinSocketProxy: 断开了");
                 //断开了
                 return;
             }
@@ -256,12 +249,17 @@ public class DapinSocketProxy {
                         } catch (UnsupportedEncodingException e) {
                             e.printStackTrace();
                         }
-                        Log.d("JTJK", "DapinSocketProxy: 发送成功 "+send);
-                        ToastUtil.show("发送成功："+send);
+//                        Log.d("JTJK", "DapinSocketProxy: 发送成功 "+send);
+//                        ToastUtil.show("发送成功："+send);
                         // 成功后释放资源
                         if (isDelayDestroy){
                             isDelayDestroy = false;
-                            destroy();
+                            try{
+                                destroy();
+                                return;
+                            }catch (Exception e){
+
+                            }
                         }
                     }
                 }
@@ -269,18 +267,29 @@ public class DapinSocketProxy {
             }
             if (msg.what == SocThread.CONNECT_FAIL){
                 isSendEnable = false;
-                Log.d("JTJK", "DapinSocketProxy: 连接失败");
+//                Log.d("JTJK", "DapinSocketProxy: 连接失败");
                 // 连接失败
                 // 链接失败后，不释放资源，让他继续向大屏请求
                 // 如果延迟释放，则立即释放该内容
                 if (isDelayDestroy){
                     isDelayDestroy = false;
-                    destroy();
+                    try{
+                        destroy();
+                        return;
+                    }catch (Exception e){
+
+                    }
                     return;
                 }
                 if (isFailDestroy){
                     isFailDestroy = false;
-                    destroy();
+                    try{
+                        destroy();
+                        return;
+                    }catch (Exception e){
+
+                    }
+
                     return;
                 }
                 return;
@@ -289,7 +298,7 @@ public class DapinSocketProxy {
             try {
                 if (msg.obj != null) {
                     DataBean bean = (DataBean) msg.obj;
-                    Log.d("JTJK", "handleMessage: "+bean.body);
+//                    Log.d("JTJK", "handleMessage: "+bean.body);
                     if (bean.getDataType() == 3){
                         //心跳
 //                        heartBeat.refreshTime();
@@ -488,7 +497,12 @@ public class DapinSocketProxy {
                 // 释放监听，由于socketThreads已经全部出栈，监听已经不重要了。
                 clearListener();
                 // 释放资源
-                destroy();
+                try{
+                    destroy();
+                    return;
+                }catch (Exception e){
+
+                }
             }
         }
     }
@@ -571,7 +585,7 @@ public class DapinSocketProxy {
                 }
             }
         } catch (SocketException ex) {
-            Log.e("localip", ex.toString());
+//            Log.e("localip", ex.toString());
         }
         return null;
     }

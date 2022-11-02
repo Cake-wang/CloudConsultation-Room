@@ -42,7 +42,8 @@ public class GetRecipeListByConsultIdEntity {
                 public String recipeMode;
                 public int depart;
                 public String appointDepart;
-                public String appointDepartName;
+//                public String appointDepartName;
+                public String departText;
                 public int doctor;
                 public String createDate;
                 public int copyNum;
@@ -112,6 +113,7 @@ public class GetRecipeListByConsultIdEntity {
                     public String usingRateTextFromHis;
                     public String usePathwaysTextFromHis;
                     public double useTotalDose;
+                    public String usingRateText;
                     public double sendNumber;
                     public int useDays;
                     public double drugCost;

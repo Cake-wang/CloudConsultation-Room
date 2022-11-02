@@ -5,17 +5,11 @@ import android.accounts.NetworkErrorException;
 import com.aries.library.fast.retrofit.FastNullException;
 import com.aries.library.fast.retrofit.FastRetryWhen;
 import com.aries.library.fast.retrofit.FastTransformer;
-import com.aries.template.FakeDataExample;
 import com.aries.template.GlobalConfig;
 import com.aries.template.utility.ConvertJavaBean;
 import com.aries.template.utility.JTJSONUtils;
-import com.aries.template.utility.RSASignature;
 import com.aries.template.utility.RSAUtil;
 
-import java.io.UnsupportedEncodingException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SignatureException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -131,7 +125,7 @@ public abstract class BaseRepository {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
+        params.put("logTraceID", ApiRepository.getUUID());
 //        //签名
 //        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
 //            //将最外层参数中除sign字段外的所有字段按照按字母序排序，键和值用=号连接，键值对之间用&符号分隔

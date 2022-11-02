@@ -1,6 +1,10 @@
 package com.aries.template.module.main;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -11,6 +15,7 @@ import com.aries.template.GlobalConfig;
 import com.aries.template.MainActivity;
 import com.aries.template.R;
 import com.aries.template.entity.ConfigurationToThirdForPatientEntity;
+import com.aries.template.entity.FindUserResultEntity;
 import com.aries.template.entity.MachineEntity;
 import com.aries.template.module.base.BaseEventFragment;
 import com.aries.template.module.mine.MineCardFragment;
@@ -26,10 +31,9 @@ import com.hyphenate.chat.EMClient;
 import com.trello.rxlifecycle3.android.ActivityEvent;
 import com.trello.rxlifecycle3.android.FragmentEvent;
 
-import androidx.annotation.Nullable;
-
 import java.util.concurrent.TimeUnit;
 
+import androidx.annotation.Nullable;
 import butterknife.BindView;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -57,6 +61,8 @@ public class HomeFragment extends BaseEventFragment{
     TextView jtjk_machine;//机器编号
     @BindView(R.id.jtjk_hospital_name)
     TextView jtjk_hospital;//医院名称
+    @BindView(R.id.tv_setting)
+    TextView tv_setting;//医院名称
 
     private static final int PERIOD = 999* 1000;
     private static final int DELAY = 15*1000;
@@ -109,6 +115,20 @@ public class HomeFragment extends BaseEventFragment{
 //            mDisposable.dispose();
 //            mDisposable = null;
 //        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+//        Log.e("onDestroy","onDestroy");
+        if (mDisposable!=null){
+            mDisposable.dispose();
+            mDisposable = null;
+        }
+        if (dialog!=null){
+            dialog.onDismiss();
+
+        }
     }
 
     public static HomeFragment newInstance() {
@@ -173,10 +193,42 @@ public class HomeFragment extends BaseEventFragment{
         // 启动时，需要立刻请求，机器相关的数据，并保存在全局
         requestMachineInfo();
         // 启动环信视频
-        requestConfigurationToThirdForPatient();
+//        requestConfigurationToThirdForPatient();
         // 启动时间循环，显示广告
         timeLoop();
+
+
+        tv_setting.setOnClickListener(new DoubleClickListener() {
+            @Override
+            public void onDoubleClick(View v) {
+
+                Intent intent= new Intent(Settings.ACTION_HOME_SETTINGS);
+                startActivity(intent);
+
+//                start(ResultFragment.newInstance(""));
+
+            }
+        });
+
+
     }
+
+
+    public  abstract class DoubleClickListener implements View.OnClickListener {
+        private static final long DOUBLE_TIME = 1000;
+        private  long lastClickTime = 0;
+
+        @Override
+        public void onClick(View v) {
+            long currentTimeMillis = System.currentTimeMillis();
+            if (currentTimeMillis - lastClickTime < DOUBLE_TIME) {
+                onDoubleClick(v);
+            }
+            lastClickTime = currentTimeMillis;
+        }
+        public abstract void onDoubleClick(View v);
+    }
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -219,7 +271,7 @@ public class HomeFragment extends BaseEventFragment{
             public void onSuccess() {
                 EMClient.getInstance().groupManager().loadAllGroups();
                 EMClient.getInstance().chatManager().loadAllConversations();
-                ToastUtil.show("环信登录成功");
+//                ToastUtil.show("环信登录成功");
             }
 
             @Override
@@ -232,7 +284,9 @@ public class HomeFragment extends BaseEventFragment{
         };
         // 防止用户由于特殊原因登出，然后再进来的时候，被提示已经登录
         EMClient.getInstance().logout(true);
-        EMClient.getInstance().login(easemobUserName, easemobPassword,emcallback );
+        EMClient.getInstance().login("zj_test_"+easemobUserName, easemobPassword,emcallback );
+//        Log.e("easemob",easemobUserName);
+//        Log.e("easemob",easemobPassword);
     }
 
     /**
@@ -245,6 +299,7 @@ public class HomeFragment extends BaseEventFragment{
             return;
         }
         String deviceId = ApiRepository.getDeviceId();
+        Log.e("deviceId",deviceId);
         GlobalConfig.machineId = deviceId;
         ApiRepository.getInstance().findByMachineId(deviceId)
             .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
@@ -258,7 +313,7 @@ public class HomeFragment extends BaseEventFragment{
                    try {
                        if (entity.success){
                            if (entity.data==null){
-                               ToastUtil.show("机器号没有配置");
+                               ToastUtil.show("机器号没有配置，请联系工作人员");
                                return;
                            }
                            GlobalConfig.machineId = entity.data.machineId;
@@ -270,12 +325,15 @@ public class HomeFragment extends BaseEventFragment{
 //                        GlobalConfig.thirdMachineId = entity.data.thirdMachineId;// 暂定不赋予
                            GlobalConfig.factoryResource = entity.data.factoryResource;
                            GlobalConfig.factoryMainPage = entity.data.factoryMainPage;
-
+//                           Log.e("machineId",GlobalConfig.machineId);
+//                           Log.e("thirdFactory",GlobalConfig.thirdFactory);
                            // 设置显示对象数据
                            // 医院
                            ((TextView) getActivity().findViewById(R.id.jtjk_hospital_name)).setText(GlobalConfig.hospitalName);
                            // 机器编号
                            ((TextView) getActivity().findViewById(R.id.jtjk_machine_id)).setText("机器编号: "+GlobalConfig.machineId);
+
+//                           findPatIdByPatientQuery(entity.data.hospitalNo);
 
                            // 必须跟在获取全局信息之后
                            // 启动大屏显示
@@ -289,6 +347,46 @@ public class HomeFragment extends BaseEventFragment{
                 }
             });
     }
+
+
+    private void findPatIdByPatientQuery(String organId) {
+
+
+        ApiRepository.getInstance().findPatIdByPatientQuery(organId)
+                .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
+                .subscribe(new FastLoadingObserver<FindUserResultEntity>("请稍后...") {
+                    @Override
+                    public void _onNext(@io.reactivex.annotations.NonNull FindUserResultEntity entity) {
+                        if (entity == null) {
+                            ToastUtil.show("请检查网络");
+                            return;
+                        }
+                        try {
+                            if (entity.isSuccess()){
+                                String tag = (String) SPUtil.get(mContext,"tag","fzpy");
+                                if (entity.getData()!=null){
+
+                                }else {
+
+                                }
+                            }else {
+
+                            }
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void _onError(Throwable e) {
+                        super._onError(e);
+
+                    }
+                });
+
+
+    }
+
 
     @Override
     public void onHiddenChanged(boolean hidden) {
@@ -320,6 +418,10 @@ public class HomeFragment extends BaseEventFragment{
             if (mDisposable!=null){
                 mDisposable.dispose();
                 mDisposable = null;
+            }
+            if (dialog!=null){
+                dialog.onDismiss();
+
             }
         }
     }

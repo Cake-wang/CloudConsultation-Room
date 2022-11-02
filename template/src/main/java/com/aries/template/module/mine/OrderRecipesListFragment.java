@@ -3,24 +3,19 @@ package com.aries.template.module.mine;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.RecyclerView;
-
-import com.alibaba.fastjson.JSON;
 import com.aries.library.fast.retrofit.FastLoadingObserver;
 import com.aries.library.fast.util.ToastUtil;
 import com.aries.template.GlobalConfig;
 import com.aries.template.R;
 import com.aries.template.entity.GetConsultsAndRecipesResultEntity;
 import com.aries.template.entity.GetTakeCodeEntity;
-import com.aries.template.entity.SearchDoctorListByBusTypeV2ResultEntity;
 import com.aries.template.module.base.BaseEventFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.template.utils.ActivityUtils;
-import com.aries.template.utils.DateUtils;
 import com.aries.template.utils.DefenceUtil;
 import com.aries.template.widget.autoadopter.AutoAdaptorProxy;
 import com.aries.template.widget.autoadopter.AutoObjectAdaptor;
@@ -29,10 +24,16 @@ import com.aries.template.widget.updownbtn.UpDownProxy;
 import com.aries.ui.view.title.TitleBarView;
 import com.trello.rxlifecycle3.android.FragmentEvent;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 
 /**
@@ -139,7 +140,22 @@ public class OrderRecipesListFragment extends BaseEventFragment {
 //                            minute = ((Float)(Float.valueOf(itemData.recipeSurplusHours)*60)).intValue();
 //                        }
                         String openTime = itemData.signDate.split(" ")[0];
-                        String endTime = itemData.recipeSurplusHours.split(" ")[0];
+                        String endTime = "";
+                        if (!TextUtils.isEmpty(itemData.recipeSurplusHours)){
+                            endTime = itemData.recipeSurplusHours.split(" ")[0];
+
+                        }else {
+                            ((TextView)holder.itemView.findViewById(R.id.jtjk_recipe_closetime)).setVisibility(View.GONE);
+                        }
+//                        String openTime = itemData.createDate.split(" ")[0];
+//                        String endTime = "";
+////                        if (!TextUtils.isEmpty(itemData.recipeSurplusHours)){
+//                        try {
+//                            endTime = addDate(openTime,itemData.getValueDays());
+//                        } catch (ParseException e) {
+//                            e.printStackTrace();
+//                        }
+
                         ((TextView)holder.itemView.findViewById(R.id.jtjk_recipe_disastname)).setText(itemData.organDiseaseName);
                         ((TextView)holder.itemView.findViewById(R.id.jtjk_recipe_optime)).setText("开方时间:  "+openTime);
                         ((TextView)holder.itemView.findViewById(R.id.jtjk_recipe_closetime)).setText("失效时间:  "+endTime);
@@ -178,6 +194,30 @@ public class OrderRecipesListFragment extends BaseEventFragment {
             }
         });
     }
+
+    /**
+     *  计算多少天后的日期
+     * @param date   手动输入日期
+     * @param days   多少天后
+     * @return
+     * @throws
+     */
+    public static String addDate(String date,int days) throws ParseException {
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        Date parse = format.parse(date);
+        calendar.setTime(parse);
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        // days  多少天后的日期
+        int newDay = day+days;
+        calendar.set(Calendar.YEAR,year);
+        calendar.set(Calendar.MONTH,month);
+        calendar.set(Calendar.DAY_OF_MONTH,newDay);
+        return format.format(calendar.getTime());
+    }
+
 
     /**
      * 页面的动作，包括数据传输和界面改变
@@ -236,7 +276,8 @@ public class OrderRecipesListFragment extends BaseEventFragment {
                                     String perDayUse = "适量";
                                     if (item.getUseDose()!=null)
                                         perDayUse = String.valueOf(item.getUseDose().intValue()) + "片";
-                                    String howToUse = "(1天"+item.getUseTotalDose()/item.getUseDays()+"次，每次"+ perDayUse+")";
+//                                    String howToUse = "(1天"+item.getUseTotalDose()/item.getUseDays()+"次，每次"+ perDayUse+")";
+                                    String howToUse = "(每次"+ perDayUse+")";
                                     drug+= item.drugName +" "+howToUse+"&&";
                                 }
                                 // 释放资源。只要进入到这里，就结束请求支付轮训

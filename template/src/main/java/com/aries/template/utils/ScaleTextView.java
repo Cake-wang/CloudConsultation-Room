@@ -4,13 +4,12 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.WindowManager;
 
-import androidx.appcompat.widget.AppCompatTextView;
-
 import com.aries.template.R;
+
+import androidx.appcompat.widget.AppCompatTextView;
 
 public class ScaleTextView extends AppCompatTextView {
     private int designedHeight = 768;
@@ -24,9 +23,9 @@ public class ScaleTextView extends AppCompatTextView {
         Float textSize = getTextSize();
         int i = textSize.intValue();
         // recompute the size
-        Log.d("LOGCAT","i:"+i);
+//        Log.d("LOGCAT","i:"+i);
         baseScreenHeight = type.getInteger(R.styleable.ScaleTextView_baseScreenHeight, designedHeight);
-        Log.d("LOGCAT","baseScreenHeight:"+baseScreenHeight);
+//        Log.d("LOGCAT","baseScreenHeight:"+baseScreenHeight);
         // re set
         setTextSize(TypedValue.COMPLEX_UNIT_PX, getFontSize(i));
         boolean _isBold=type.getBoolean(R.styleable.ScaleTextView_textBold, false);

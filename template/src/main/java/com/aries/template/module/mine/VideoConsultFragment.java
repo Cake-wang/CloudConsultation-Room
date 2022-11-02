@@ -1,11 +1,9 @@
 package com.aries.template.module.mine;
 
 import android.Manifest;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -17,6 +15,7 @@ import com.aries.library.fast.retrofit.FastLoadingObserver;
 import com.aries.library.fast.retrofit.FastObserver;
 import com.aries.library.fast.util.ToastUtil;
 import com.aries.template.GlobalConfig;
+import com.aries.template.MainActivity;
 import com.aries.template.R;
 import com.aries.template.entity.CancelregisterResultEntity;
 import com.aries.template.entity.ConfigurationToThirdForPatientEntity;
@@ -28,7 +27,7 @@ import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.template.thridapp.JTJKThirdAppUtil;
 import com.aries.template.utils.ActivityUtils;
 import com.aries.template.utils.DefenceUtil;
-import com.aries.template.utils.JTJKLogUtils;
+import com.aries.template.utils.ScaleTextView;
 import com.aries.template.view.ShineButtonDialog;
 import com.aries.template.widget.autoadopter.AutoAdaptorProxy;
 import com.aries.template.widget.autoadopter.AutoObjectAdaptor;
@@ -40,22 +39,17 @@ import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.trello.rxlifecycle3.android.FragmentEvent;
 import com.xuexiang.xaop.annotation.SingleClick;
 
-import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.FragmentActivity;
-import androidx.recyclerview.widget.RecyclerView;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.OnClick;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import me.yokeyword.fragmentation.SupportFragment;
 
@@ -127,6 +121,9 @@ public class VideoConsultFragment extends BaseEventFragment {
     LinearLayout rv_video_wait;
     @BindView(R.id.jtjk_video_doctorname)
     TextView jtjk_video_doctorname;
+    @BindView(R.id.tv_video_wait)
+    ScaleTextView tv_video_wait;
+
 
     /**
      * 跳转科室，需要带的数据
@@ -266,26 +263,34 @@ public class VideoConsultFragment extends BaseEventFragment {
         DefenceUtil.checkReSubmit("VideoConsultFragment.onViewClicked");
         switch (view.getId()) {
             case R.id.btn_stjc:
-                // 跳向身体检测，则更新flag准备回来
-                isBodyTestingFlag = true;
-                // 跳向身体检测
-                // 启动第三方跳转
-                // 并告知大屏，启动身体检测，大屏的通信代理 在里面
-                if (!TextUtils.isEmpty(GlobalConfig.factoryResource)){
-                    new JTJKThirdAppUtil().gotoBodyTestingFromVideo(getActivity(),
-                            GlobalConfig.factoryResource,
-                            GlobalConfig.factoryMainPage,
-                            GlobalConfig.ssCard.getName(),
-                            GlobalConfig.ssCard.getSSNum(),
-                            GlobalConfig.mobile);
 
-                    // 关闭视频问诊投屏
+                if (GlobalConfig.thirdFactory.equals("3")){
+
+                    ((MainActivity)getActivity()).gotoYYPJ();
+
+                }else {
+                    // 跳向身体检测，则更新flag准备回来
+                    isBodyTestingFlag = true;
+                    // 跳向身体检测
+                    // 启动第三方跳转
+                    // 并告知大屏，启动身体检测，大屏的通信代理 在里面
+                    if (!TextUtils.isEmpty(GlobalConfig.factoryResource)){
+                        new JTJKThirdAppUtil().gotoBodyTestingFromVideo(getActivity(),
+                                GlobalConfig.factoryResource,
+                                GlobalConfig.factoryMainPage,
+                                GlobalConfig.ssCard.getName(),
+                                GlobalConfig.ssCard.getSSNum(),
+                                GlobalConfig.mobile);
+
+                        // 关闭视频问诊投屏
 //                    DapinSocketProxy.with()
 //                            .initWithOld(getActivity(),GlobalConfig.machineIp)
 //                            .startSocket(DapinSocketProxy.FLAG_SCREENFLAG_CLOSESCREEN);
-                }else {
-                    ToastUtil.show("没有第三方应用信息，无法跳转");
+                    }else {
+                        ToastUtil.show("请您移步到旁边的健康管理设备进行检测");
+                    }
                 }
+
 
 //                Intent intent = new Intent(Intent.ACTION_MAIN);
 //                /**知道要跳转应用的包命与目标Activity*/
@@ -418,24 +423,26 @@ public class VideoConsultFragment extends BaseEventFragment {
                         try {
                             if (entity.data.jsonResponseBean.body){
                                 if (entity.getData().isSuccess()){
-                                    Log.d("JTJK","患者取消复诊服务");
+//                                    Log.d("JTJK","患者取消复诊服务");
+                                    // 清理
+                                    onDismiss();
                                     // 医生不曾进入到视频中
                                     start(HomeFragment.newInstance(), SupportFragment.SINGLETASK);
                                     isHomeBack = true;
-                                    // 清理
-                                    onDismiss();
+
                                 }else{
                                     // 可能出现医生已经主动回复，无法取消的情况
                                     ToastUtil.show(entity.getData().errorMessage);
-                                    start(HomeFragment.newInstance(), SupportFragment.SINGLETASK);
-                                    isHomeBack = true;
                                     // 清理
                                     onDismiss();
+                                    start(HomeFragment.newInstance(), SupportFragment.SINGLETASK);
+                                    isHomeBack = true;
+
                                 }
                             }
                         }catch (Exception e){
                             e.printStackTrace();
-                            JTJKLogUtils.message(e.toString());
+//                            JTJKLogUtils.message(e.toString());
                         }
                     }
                 });
@@ -469,7 +476,7 @@ public class VideoConsultFragment extends BaseEventFragment {
                             }
                         }catch (Exception e){
                             e.printStackTrace();
-                            JTJKLogUtils.message(e.toString());
+//                            JTJKLogUtils.message(e.toString());
                         }
                     }
                 });
@@ -495,18 +502,24 @@ public class VideoConsultFragment extends BaseEventFragment {
                                 // 隐藏显示提示，等待旋转
                                 if (rv_video_wait.getVisibility()==View.VISIBLE)
                                     rv_video_wait.setVisibility(View.GONE);
-                                if (rv_video_tip.getVisibility()==View.GONE)
-                                    rv_video_tip.setVisibility(View.VISIBLE);
+
+                                if (tv_video_wait.getVisibility()==View.GONE)
+                                    tv_video_wait.setVisibility(View.VISIBLE);
 
                                 if (entity.data.jsonResponseBean.body.size()<1)
                                     return;
 
+                                if (tv_video_wait.getVisibility()==View.VISIBLE)
+                                    tv_video_wait.setVisibility(View.GONE);
+
+                                if (rv_video_tip.getVisibility()==View.GONE)
+                                    rv_video_tip.setVisibility(View.VISIBLE);
                                 // 筛选处方
                                 // 去掉被取消的处方
                                 ArrayList<GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO> newData = new ArrayList<>();
                                 for (GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO item : entity.data.jsonResponseBean.body) {
                                     // 9 是取消处方
-                                    if (item.status != 9)
+                                    if (item.status != 9&&item.status != 15)
                                         newData.add(item);
                                 }
                                 //刷新 RV 处方单界面
@@ -518,14 +531,14 @@ public class VideoConsultFragment extends BaseEventFragment {
                                 // 9 是取消处方
                                 isRecipeCheckedFlag = true;
                                 for (GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO currentRecipe : currentRecipes) {
-                                    if (currentRecipe.status!=1 && currentRecipe.status!=2 && currentRecipe.status!=9){
+                                    if (currentRecipe.status!=1 && currentRecipe.status!=2 && currentRecipe.status!=9&& currentRecipe.status!=15){
                                         isRecipeCheckedFlag = false;
                                     }
                                 }
                             }
                         }catch (Exception e){
                             e.printStackTrace();
-                            JTJKLogUtils.message(e.toString());
+//                            JTJKLogUtils.message(e.toString());
                         }
                     }
                 });
@@ -549,26 +562,29 @@ public class VideoConsultFragment extends BaseEventFragment {
                         }
                         try {
                             if (entity.data.jsonResponseBean.body){
-                                Log.d("JTJK","结束问诊");
+//                                Log.d("JTJK","结束问诊");
                                 // 跳转
                                 if (isHaveRecipe){
-                                    // 启动确定处方单
-                                    start(ConfirmRecipesFragment.newInstance(recipeId,currentRecipes));
+
                                     // 清理
                                     onDismiss();
+                                    // 启动确定处方单
+                                    start(ConfirmRecipesFragment.newInstance(recipeId,currentRecipes));
+
                                 }else {
+                                    // 清理
+                                    onDismiss();
                                     // 启动返回首页
                                     start(HomeFragment.newInstance(), SupportFragment.SINGLETASK);
                                     isHomeBack = true;
-                                    // 清理
-                                    onDismiss();
+
                                 }
                             }else{
                                 ToastUtil.show(entity.message);
                             }
                         }catch (Exception e){
                             e.printStackTrace();
-                            JTJKLogUtils.message(e.toString());
+//                            JTJKLogUtils.message(e.toString());
                         }
                     }
                 });
@@ -605,7 +621,8 @@ public class VideoConsultFragment extends BaseEventFragment {
 
 
                     String drugName = (position+1)+"、"+vo.drugName;
-                    String wayToUse = "(1天"+vo.useTotalDose/vo.useDays+"次，每次"+perDayUse+")";
+//                    String wayToUse = "(1天"+vo.useTotalDose/vo.useDays+"次，每次"+perDayUse+")";
+                    String wayToUse = "("+vo.usingRateText+"，每次"+perDayUse+")";
                     String[] orders = {"#333333",drugName,"#38ABA0",wayToUse};
                     ((TextView)holder.itemView.findViewById(R.id.tv_useDose)).setText(ActivityUtils.formatTextView(orders));//使用方法
                 }
@@ -634,7 +651,7 @@ public class VideoConsultFragment extends BaseEventFragment {
         DapinSocketProxy.with().failDestroy();
         // 释放自己，让 onCreate 下次进来的时候有效
         // 让 fragment 出栈
-        Log.d("JTJK", "pop: start");
+//        Log.d("JTJK", "pop: start");
 //        if (!isHomeBack)
 //            pop();
     }
