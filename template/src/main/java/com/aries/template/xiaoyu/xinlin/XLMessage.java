@@ -113,7 +113,7 @@ public class XLMessage {
                         activity.runOnUiThread(() -> {
                             //这里改成用json来解析?
 //                            Log.e("messagetttttk", message);
-                            if (message.contains("REG_SUCCESS")) {
+                            if (message.equals("REG_SUCCESS")) {
                                 // 登录成功
                                 if (!msg.equals(new XLSend().getLoginMsg(xlPatientUserId))){
 //                                    Log.e("messagetttttq", message);
@@ -135,13 +135,13 @@ public class XLMessage {
 //                                ToastWithLogin("xl登录成功");
                             }else{
                                 // 如果返回的不是登录
-                                if (message.contains("TX_RTC_SHUTDOWN_RES")) {
+                                if (message.equals("TX_RTC_SHUTDOWN_RES")) {
                                     // 医生已经离开
                                     ToastUtil.show("医生已经离开");
 //                                    ToastWithLogin("医生已经离开");
                                     if (listener != null)
                                         listener.sended(message);
-                                }else if (message.contains("SUCCESS")){
+                                }else if (message.equals("SUCCESS")){
                                     // 其他各种返回成功了
                                     if (listener!=null)
                                         listener.sended(message);
@@ -244,13 +244,30 @@ public class XLMessage {
      * 释放所有资源
      */
     public void destroy(){
-        if (webSocketClient!=null)
-            webSocketClient = null;
-        if (listener!=null)
-            listener = null;
-        if (activity!=null)
-            activity=null;
-        if (sInstance!=null)
-            sInstance = null;
+
+            try {
+                if (webSocketClient!=null)
+                webSocketClient.close();
+                webSocketClient = null;
+                if (listener!=null)
+                    listener = null;
+                if (activity!=null)
+                    activity=null;
+                if (sInstance!=null)
+                    sInstance = null;
+            }catch (Exception e){
+                if (webSocketClient!=null)
+                    webSocketClient = null;
+                if (listener!=null)
+                    listener = null;
+                if (activity!=null)
+                    activity=null;
+                if (sInstance!=null)
+                    sInstance = null;
+            }
+
+
+
+
     }
 }

@@ -303,13 +303,18 @@ public class OrderRecipesFragment extends BaseEventFragment {
                                     String howToUse = "(每次"+ perDayUse+")";
                                     PayRecipeFragment.DrugObject drug= new PayRecipeFragment.DrugObject();
                                     //            drugs.put("direction","口服");
+                                    int quantityInt = (Double.valueOf(item.sendNumber)).intValue();
+                                    // 药品发放数量不小于1
+                                    if (quantityInt<=0)quantityInt=1;
+                                    // 价格必须是整型，单位是分
+                                    int priceInt = ((Double)(Double.valueOf(item.drugCost)*100)).intValue();
                                     drug.dosageUnit = item.drugUnit;
                                     drug.drugCommonName = item.drugName;
                                     drug.drugTradeName = item.drugName;
                                     drug.eachDosage = String.valueOf(item.defaultUseDose);
                                     drug.itemDays = String.valueOf(item.useDays);
-                                    drug.price = String.valueOf(item.drugCost);
-                                    drug.quantity =String.valueOf( item.sendNumber);
+                                    drug.price = String.valueOf(priceInt);
+                                    drug.quantity =String.valueOf(quantityInt);
                                     drug.quantityUnit = item.drugUnit;
                                     drug.sku = item.organDrugCode;
                                     drug.spec =String.valueOf( item.drugSpec);
@@ -322,11 +327,11 @@ public class OrderRecipesFragment extends BaseEventFragment {
                                 String orderId = obj.orderId==null?"":String.valueOf(obj.orderId);
                                 start(PayRecipeFragment.newInstance(recipeids,recipeCodes,drugs,orderId));
                             }else {
-                                ToastUtil.show("药品查询失败");
+                                ToastUtil.show(entity.message);
                             }
                         }catch (Exception e){
                             e.printStackTrace();
-                            ToastUtil.show("药品查询失败");
+                            ToastUtil.show("查询药品库存失败");
                         }
                     }
                 });

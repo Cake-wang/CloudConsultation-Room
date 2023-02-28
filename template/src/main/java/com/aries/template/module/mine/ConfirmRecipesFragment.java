@@ -304,13 +304,19 @@ public class ConfirmRecipesFragment extends BaseEventFragment {
                                     String howToUse = "("+vo.usingRateText+"，每次"+perDayUse+")";
                                     PayRecipeFragment.DrugObject drug= new PayRecipeFragment.DrugObject();
                                     //            drugs.put("direction","口服");
+
+                                    int quantityInt = (Double.valueOf(vo.sendNumber)).intValue();
+                                    // 药品发放数量不小于1
+                                    if (quantityInt<=0)quantityInt=1;
+                                    // 价格必须是整型，单位是分
+                                    int priceInt = ((Double)(Double.valueOf(vo.drugCost)*100)).intValue();
                                     drug.dosageUnit = vo.drugUnit;
                                     drug.drugCommonName = vo.drugName;
                                     drug.drugTradeName = vo.drugName;
                                     drug.eachDosage = String.valueOf(vo.defaultUseDose);
                                     drug.itemDays = String.valueOf(vo.useDays);
-                                    drug.price = String.valueOf(vo.drugCost);
-                                    drug.quantity =String.valueOf( vo.sendNumber);
+                                    drug.price = String.valueOf(priceInt);
+                                    drug.quantity =String.valueOf(quantityInt);
                                     drug.quantityUnit = vo.drugUnit;
                                     drug.sku = vo.organDrugCode;
                                     drug.spec =String.valueOf( vo.drugSpec);
@@ -323,6 +329,8 @@ public class ConfirmRecipesFragment extends BaseEventFragment {
                                 // 然后取支付页面请求支付，合并处方单
                                 //当处方单产生订单，并且订单有效时取的是订单的真实金额，其他时候取的处方的总金额保留两位小数
                                 start(PayRecipeFragment.newInstance(recipeids,recipeCodes,drugs,null));
+                            }else{
+                                ToastUtil.show(entity.message);
                             }
                         }catch (Exception e){
                             e.printStackTrace();

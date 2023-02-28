@@ -56,10 +56,12 @@ public class GlobalConfig {
      * 第三方厂家 ID
      * 1 盖瑞
      * 2 立创
+     * 3 医云
      */
-    public static String thirdFactory ="1";
-//    public static String thirdFactory ="2";
+//    public static String thirdFactory ="1";
+    public static String thirdFactory ="2";
 //    public static String thirdFactory ="3";
+
 
     /**
      * 商户ID

@@ -345,7 +345,7 @@ public class PhoneRegisterFragment extends BaseEventFragment implements ISupport
                                     if(tag.contains("stjc")){
 
                                         if (GlobalConfig.thirdFactory.equals("3")){
-
+//                                            if (GlobalConfig.thirdFactory.equals("1")){
                                             ((MainActivity)getActivity()).gotoYYPJ();
 
                                         }else {

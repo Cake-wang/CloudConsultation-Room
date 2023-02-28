@@ -1,7 +1,7 @@
 ---- AspectJ Properties ---
 AspectJ Compiler 1.8.9 built on Monday Mar 14, 2016 at 21:18:16 GMT
 ---- Dump Properties ---
-Dump file: ajcore.20221101.100334.668.txt
+Dump file: ajcore.20230217.110557.520.txt
 Dump reason: org.aspectj.apache.bcel.classfile.ClassFormatException
 Dump on exception: true
 Dump at exit condition: abort
@@ -148,9 +148,9 @@ file.separator=\
 java.vm.compressedOopsMode=Zero based
 line.separator=
 
-jdk.attach.allowAttachSelf=true
-java.vm.specification.vendor=Oracle Corporation
 java.specification.name=Java Platform API Specification
+java.vm.specification.vendor=Oracle Corporation
+jdk.attach.allowAttachSelf=true
 pty4j.tmpdir=C:\Users\wgl\AppData\Local\Google\AndroidStudio4.1/tmp
 user.script=
 sun.management.compiler=HotSpot 64-Bit Tiered Compilers
@@ -159,14 +159,14 @@ user.name=wgl
 javax.swing.rebaseCssSizeMap=true
 idea.paths.selector=AndroidStudio4.1
 file.encoding=GBK
-jnidispatch.path=C:\Users\wgl\AppData\Local\Google\AndroidStudio4.1\tmp\jna6449642576558203462.dll
+jnidispatch.path=C:\Users\wgl\AppData\Local\Google\AndroidStudio4.1\tmp\jna20729309063013411.dll
 idea.popup.weight=heavy
 java.vendor.version=18.9
 jna.loaded=true
 java.io.tmpdir=C:\Users\wgl\AppData\Local\Temp\
 idea.version=4.1
-ide.new.welcome.screen.force=true
 java.version=11
+ide.new.welcome.screen.force=true
 idea.xdebug.key=-Xdebug
 java.vm.specification.name=Java Virtual Machine Specification
 idea.jre.check=true
@@ -174,15 +174,15 @@ java.awt.printerjob=sun.awt.windows.WPrinterJob
 sun.os.patch.level=
 java.library.path=C:\Program Files\Java\jdk-11\bin;C:\WINDOWS\Sun\Java\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\ProgramData\Oracle\Java\javapath;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;E:\TortoiseSVN\bin;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;D:\develporDir\thrift;E:\Git\cmd;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\Intel\WiFi\bin\;C:\Program Files\Common Files\Intel\WirelessCommon\;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\Program Files\OpenSSL-Win64\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;E:\flutter\flutter\bin;E:\nodejs\;C:\Program Files\TortoiseGit\bin;E:\微信web开发者工具\dll;C:\Program Files (x86)\NetSarang\Xftp 7\;C:\Program Files (x86)\NetSarang\Xshell 7\;c:\Program Files (x86)\Intel\Intel(R) Management Engine Components\DAL;c:\Program Files\Intel\Intel(R) Management Engine Components\DAL;C:\Users\wgl\AppData\Local\Microsoft\WindowsApps;C:\Users\wgl\AppData\Local\GitHubDesktop\bin;D:\develporDir\thrift;C:\Users\wgl\AppData\Local\Microsoft\WindowsApps;E:\flutter\flutter\bin;C:\Users\wgl\AppData\Roaming\npm;.
 java.vendor=Oracle Corporation
-io.netty.processId=28537
+io.netty.processId=30938
 sun.io.unicode.encoding=UnicodeLittle
 java.rmi.server.disableHttp=true
-library.jansi.path=C:\Users\wgl\.gradle\native\jansi\1.18\windows64
+library.jansi.path=C:\Users\wgl\.gradle\native\jansi\null\windows64
 io.netty.machineId=28:f0:76:ff:fe:16:65:0e
 idea.platform.prefix=AndroidStudio
 sun.desktop=windows
 idea.active=true
-studio.record.file=C:\Users\wgl\AppData\Local\Google\AndroidStudio4.1\tmp\AndroidStudio.91d151a5-9898-4947-9af8-7b7ae2e39cd5
+studio.record.file=C:\Users\wgl\AppData\Local\Google\AndroidStudio4.1\tmp\AndroidStudio.eed5cc1a-bec9-40d0-ba95-c678cb80ca26
 file.encoding.pkg=sun.io
 java.class.path=C:\Users\wgl\.gradle\wrapper\dists\gradle-6.5-bin\6nifqtx7604sqp1q6g8wikw7p\gradle-6.5\lib\gradle-launcher-6.5.jar
 java.vm.vendor=Oracle Corporation

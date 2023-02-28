@@ -83,7 +83,7 @@ public class JTJKSSDCard {
         JTJKSSDCard card = new JTJKSSDCard();
 //        if (splits.length>=11){
         // 卡号
-        card.cardNum = "未读卡";
+        card.cardNum = idCard.getCardno();
         // 姓名
         card.name = idCard.getName();
         // 社会保障号码 身份证

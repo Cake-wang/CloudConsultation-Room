@@ -20,6 +20,7 @@ import okhttp3.RequestBody;
  */
 public class FakeDataExample extends BaseRepository {
 
+    public static  String cardNumber = "W30103722";
     public static  String phoneNumber = "18667115892";
     public static  String idCard = "33052219861229693X";
 //    public static final String idCard = "330184199401223513";
@@ -133,15 +134,25 @@ public class FakeDataExample extends BaseRepository {
         name = "王郭亮";
         idCard = "33052219861229693X";
         phoneNumber = "18667115892";
+        cardNumber = "W30103722";
+//        name = "来杰";
+//        idCard = "330103198805230418";
+//        phoneNumber = "13706515416";
+//        cardNumber = "A29379846";
 //                name = "张宇舟";
 //        idCard = "330281199108180012";
 //        phoneNumber = "18867135633";
+//        name = "吴淑芬";
+//        idCard = "332525197810087529";
+//        phoneNumber = "13600510959";
+//        cardNumber = "AA4391232";
         JTJKSSDCard ssCard = new JTJKSSDCard();
         ssCard.setName(name);
         ssCard.setSSNum(idCard);
-        ssCard.setCardNum(phoneNumber);
+        ssCard.setCardNum(cardNumber);
 
-        ssCard.setSex("男");
+//        ssCard.setSex("男");
+        ssCard.setSex("女");
         return ssCard;
     }
 

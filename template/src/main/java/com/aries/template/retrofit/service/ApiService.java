@@ -275,6 +275,10 @@ public interface ApiService {
     @POST(ApiConstant.doBaseNgariRequest)
     Observable<FindPatIdByPatientQueryEntity> getfindPatIdByPatientQuery(@Body RequestBody body);
 
+    @Headers("Content-Type: application/json")
+    @POST(ApiConstant.doBaseNgariRequest)
+    Observable<FindPatIdByPatientQueryEntity> getfindPatIdByPatientQueryWithCard(@Body RequestBody body);
+
 
     /**
      * 获取处方列表

@@ -52,6 +52,7 @@ import com.aries.template.entity.SearchDoctorListByBusTypeV2ResultEntity;
 import com.aries.template.entity.TopexampageResultEntity;
 import com.aries.template.entity.UpdateEntity;
 import com.aries.template.entity.VisitMedicalPreSettleEntity;
+import com.aries.template.module.mine.PayRecipeFragment;
 import com.aries.template.retrofit.service.ApiService;
 import com.aries.template.utility.ConvertJavaBean;
 import com.aries.template.utility.JTJSONUtils;
@@ -294,13 +295,17 @@ public class ApiRepository extends BaseRepository {
 
 
         Map<String, Object> params = new HashMap<>(4);
+
         params.put("idno", GlobalConfig.ssCard.getSSNum());
-//        params.put("methodCode","");
-//        params.put("mchntId", SPUtil.get(mContext,"mchntId",""));
-//        params.put("hosiptalNo", SPUtil.get(mContext,"hosiptalNo",""));
-//        params.put("terminal", SPUtil.get(mContext,"termial","")+"_5");
+
         params.put("name", GlobalConfig.ssCard.getName());
         params.put("deviceId", GlobalConfig.machineId);
+
+//        params.put("idno", "33052219861229693X");
+//
+//        params.put("name", "王郭亮");
+//        params.put("deviceId","xdjdooifoif");
+
         params.put("takeCode",takeCode);
         params.put("drugs",stuckUse);
 
@@ -777,14 +782,14 @@ public class ApiRepository extends BaseRepository {
                                                                String  outerOrderNo,
                                                                String takeCode,
                                                                String  totalAmount,
-                                                               ArrayList<Map> drugs
+                                                               ArrayList<PayRecipeFragment.DrugObject> drugs
                                                                ) {
         // 外部引入的 arrayList 必须在这里再重新组装一遍，
         // 有可能会出现数组不能被Gson格式话的问题
-        ArrayList<Map> maps = new ArrayList<>();
-        for (Map item : drugs) {
-            maps.add(item);
-        }
+//        ArrayList<PayRecipeFragment.DrugObject> maps = new ArrayList<>();
+//        for (PayRecipeFragment.DrugObject item : drugs) {
+//            maps.add(item);
+//        }
 
         // 除了公共的数据之外，还有其他的数据请求
         Map<String,Object> bizContent = new HashMap<>();
@@ -807,7 +812,7 @@ public class ApiRepository extends BaseRepository {
         bizContent.put("paymentType","SELF");//
         bizContent.put("timeout","1440");//
         bizContent.put("takeCode",takeCode);//
-        bizContent.put("drugs",maps);//
+        bizContent.put("drugs",drugs);//
         // 请求的类型
         RequestBody body = BodyCreate(bizContent,"prescriptionPush",false);
         return FastTransformer.switchSchedulers(getApiService().prescriptionPush(body).retryWhen(new FastRetryWhen()));
@@ -963,6 +968,20 @@ public class ApiRepository extends BaseRepository {
         return FastTransformer.switchSchedulers(getApiService().getfindPatIdByPatientQuery(body).retryWhen(new FastRetryWhen()));
     }
 
+    public Observable<FindPatIdByPatientQueryEntity> getfindPatIdByPatientQueryWithCard(String mpiId) {
+        // 除了公共的数据之外，还有其他的数据请求
+        Map<String,Object> bizContent = new HashMap<>();
+        bizContent.put("organId", GlobalConfig.organId);//复诊单 ID
+        bizContent.put("mpiId", mpiId);//复诊单 ID
+        bizContent.put("healthCardOrganId", 1);//复诊单 ID
+        bizContent.put("cardType", "2");
+        bizContent.put("cardId",GlobalConfig.ssCard.getCardNum());
+
+        // 请求的类型
+        RequestBody body = BodyCreate(bizContent,"findPatIdByPatientQueryWithCard");
+        return FastTransformer.switchSchedulers(getApiService().getfindPatIdByPatientQueryWithCard(body).retryWhen(new FastRetryWhen()));
+    }
+
     /**
      * 获取处方列表，根据复诊单
      * 支付中，通过复诊单id来查询处方单id
@@ -989,7 +1008,8 @@ public class ApiRepository extends BaseRepository {
         bizContent.put("consultId", consultId);//复诊单 ID
 
         // 请求的类型
-        RequestBody body = BodyCreate(bizContent,"patientFinishGraphicTextConsult");
+//        RequestBody body = BodyCreate(bizContent,"patientFinishGraphicTextConsult");
+        RequestBody body = BodyCreate(bizContent,"patientFinishGraphicTextConsultZJS");
         return FastTransformer.switchSchedulers(getApiService().patientFinishGraphicTextConsult(body).retryWhen(new FastRetryWhen()));
     }
 

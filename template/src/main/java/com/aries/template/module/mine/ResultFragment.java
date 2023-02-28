@@ -331,8 +331,13 @@ public class ResultFragment extends BaseEventFragment implements ISupportFragmen
     @Override
     public void loadData() {
         if (GlobalConfig.thirdFactory.equals("3")){
+//            if (GlobalConfig.thirdFactory.equals("1")){
             // 处方用量
+//            String takeCode  = "123685";
+//            String[] split = {"铝碳酸镁咀嚼片（1天1.0次，每次10片）","阿司匹林（1天1.0次，每次10片）","氯雷他定（1天1.0次，每次10片）"};
+
             String[] split = stuckUse.split("&&");
+
             ApiRepository.getInstance().printcode(takeCode,split)
                     .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
                     .subscribe(new FastLoadingObserver<TopexampageResultEntity>() {

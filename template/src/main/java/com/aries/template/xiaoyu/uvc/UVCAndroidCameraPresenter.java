@@ -3,7 +3,6 @@ package com.aries.template.xiaoyu.uvc;
 import android.app.Activity;
 import android.graphics.SurfaceTexture;
 import android.hardware.usb.UsbDevice;
-import android.log.L;
 import android.opengl.GLES20;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -87,6 +86,8 @@ public class UVCAndroidCameraPresenter {
         mSurfaceTexture = new SurfaceTexture(texture[0]);
     }
 
+    UVCCamera camera ;
+
     /**
      * USB 监听器
      */
@@ -95,7 +96,7 @@ public class UVCAndroidCameraPresenter {
         public void onAttach(final UsbDevice device) {
             // 插入 USB
             // 这个方法会多次被调用
-            L.i(TAG, "onAttach:");
+//            L.i(TAG, "onAttach:");
             synchronized (mSync) {
                 onDialogResult(true);
             }
@@ -104,20 +105,20 @@ public class UVCAndroidCameraPresenter {
         @Override
         public void onDeviceOpen(UsbDevice device, USBMonitor.UsbControlBlock ctrlBlock, boolean createNew) {
             // USB 摄像头打开
-            L.i(TAG, "onConnect:");
+//            L.i(TAG, "onConnect:");
             NemoSDK.getInstance().releaseCamera();
             releaseCamera();
             handler.postDelayed(() -> {
-                final UVCCamera camera = new UVCCamera(new UVCParam());
+               camera = new UVCCamera(new UVCParam());
 //                final UVCCamera camera = new UVCCamera(new UVCParam(size,0));
                 try {
                     camera.open(ctrlBlock);
-                    L.i(TAG, "supportedSize:" + camera.getSupportedSize() + ",ctrlBlock=" + ctrlBlock);
+//                    L.i(TAG, "supportedSize:" + camera.getSupportedSize() + ",ctrlBlock=" + ctrlBlock);
                     camera.setPreviewSize(size);
                 } catch (final IllegalArgumentException e) {
                     // fallback to YUV mode
-                    L.i(TAG, e.getMessage());
-                    L.i(TAG, "IllegalArgumentException setPreviewSize:" + camera.getSupportedSize());
+//                    L.i(TAG, e.getMessage());
+//                    L.i(TAG, "IllegalArgumentException setPreviewSize:" + camera.getSupportedSize());
                     try {
                         camera.setPreviewSize(size);
                     } catch (final IllegalArgumentException e1) {
@@ -126,12 +127,12 @@ public class UVCAndroidCameraPresenter {
                     }
                 }
                 if (mSurfaceTexture != null) {
-                    L.i(TAG, "setPreviewTexture success");
+//                    L.i(TAG, "setPreviewTexture success");
                     camera.setPreviewTexture(mSurfaceTexture);
                     camera.setFrameCallback(mIFrameCallback, DefaultMode);
                     camera.startPreview();
                 } else {
-                    L.i(TAG, "mSurfaceTexture == null, cancel setPreviewTexture");
+//                    L.i(TAG, "mSurfaceTexture == null, cancel setPreviewTexture");
                 }
                 synchronized (mSync) {
                     mUVCCamera = camera;
@@ -143,6 +144,15 @@ public class UVCAndroidCameraPresenter {
         public void onDeviceClose(UsbDevice usbDevice, USBMonitor.UsbControlBlock usbControlBlock) {
             // 关闭 UVC
             // 如果USB 被拔掉了，则启动 前置摄像头
+//            try{
+//                // maybe throw java.lang.IllegalStateException: already released
+//                camera.setFrameCallback(null,DefaultMode);
+//            }
+//            catch(Exception e) {
+//                e.printStackTrace();
+//            }
+
+
             useFrontCamera();
         }
 
@@ -277,8 +287,11 @@ public class UVCAndroidCameraPresenter {
      * 释放摄像头
      */
     public synchronized void releaseCamera() {
+        NemoSDK.getInstance().releaseCamera();
         if (mUVCCamera != null) {
             try {
+                // maybe throw java.lang.IllegalStateException: already released
+                mUVCCamera.setFrameCallback(null,DefaultMode);
                 mUVCCamera.close();
                 mUVCCamera.destroy();
             } catch (final Exception e) {
@@ -325,7 +338,7 @@ public class UVCAndroidCameraPresenter {
      * 释放 mUSBMonitor
      */
     private synchronized void releaseUsbMonitor() {
-        try{
+
             if (mUSBMonitor != null) {
 //                try {
 //                    Log.d("JTJK","releaseUsbMonitor b");
@@ -337,14 +350,18 @@ public class UVCAndroidCameraPresenter {
 //                    e.printStackTrace();
 //                }
                 if (!mUSBMonitor.isRegistered()){
-                    mUSBMonitor.destroy();
+                    try{
+
+                        mUSBMonitor.destroy();
+
+                    }catch (Exception e){e.printStackTrace();};
 
                 }
                 mUSBMonitor = null;
 
                 mListenerHandlerThread.quitSafely();
             }
-        }catch (Exception e){e.printStackTrace();};
+
     }
 
     /**

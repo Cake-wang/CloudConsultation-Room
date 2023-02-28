@@ -3,6 +3,7 @@ package com.aries.template.module.mine;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.TextUtils;
 
 import com.aries.library.fast.retrofit.FastLoadingObserver;
 import com.aries.library.fast.util.ToastUtil;
@@ -16,7 +17,13 @@ import com.aries.template.thridapp.JTJKSSDCard;
 import com.aries.ui.view.title.TitleBarView;
 import com.trello.rxlifecycle3.android.FragmentEvent;
 
+import java.util.concurrent.TimeUnit;
+
 import androidx.annotation.Nullable;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 
 /**
@@ -56,6 +63,77 @@ public class MineCardFragment extends BaseEventFragment{
         callIDMachine();
     }
 
+    private static final int PERIOD = 6* 1000;
+    private static final int DELAY = 100;
+    private Disposable mDisposable;
+
+    /**
+     * 定时循环任务
+     */
+    private void timeLoop() {
+        mDisposable = Observable.interval(DELAY, PERIOD, TimeUnit.MILLISECONDS)
+                .map((aLong -> aLong + 1))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(aLong -> sbkcard());//getUnreadCount()执行的任务
+    }
+
+    private void sbkcard() {
+
+        ApiRepository.getInstance().sbkcard()
+                .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
+                .subscribe(new FastLoadingObserver<SbkcardResultEntity>() {
+                    @Override
+                    public void _onNext(SbkcardResultEntity entity) {
+                        if (entity == null) {
+                            ToastUtil.show("请检查网络");
+                            return;
+                        }
+                        try {
+                            if (entity.success){
+
+                                JTJKSSDCard ssCard = null;
+                                try {
+                                    ssCard = JTJKSSDCard.buildsbkcard(entity.data);
+                                    //                SSCard ssCard = EGovernment.EgAPP_SI_ReadSSCardInfo();
+                                } catch (Exception e) {
+                                    ToastUtil.show("未查询到卡信息");
+                                    e.printStackTrace();
+                                }
+
+                                // 注入数据
+                                if(!TextUtils.isEmpty(ssCard.getSSNum())) {
+//                                    Log.d("111111MODEL", ssCard+"");
+                                    //清除mDisposable不再进行验证
+                                    try {
+                                        if (mDisposable != null) {
+                                            mDisposable.dispose();
+                                            mDisposable = null;
+                                        }
+                                    }catch (Exception e){
+                                        e.printStackTrace();
+                                    }
+
+                                    // 输入社保数据
+                                    ((MainActivity)getActivity()).setSSDCardData(ssCard);
+
+
+                                }else {
+                                    ToastUtil.show("未查询到卡信息");
+                                }
+
+                            }else {
+                                ToastUtil.show(entity.getMessage());
+                            }
+                        }catch (Exception e){
+                            ToastUtil.show("未查询到卡信息");
+                            e.printStackTrace();
+                        }
+                    }
+                });
+
+    }
+
     /**
      * 启动社保卡
      */
@@ -68,48 +146,8 @@ public class MineCardFragment extends BaseEventFragment{
 
 
         if (GlobalConfig.thirdFactory.equals("3")){
-
-            ApiRepository.getInstance().sbkcard()
-                    .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
-                    .subscribe(new FastLoadingObserver<SbkcardResultEntity>() {
-                        @Override
-                        public void _onNext(SbkcardResultEntity entity) {
-                            if (entity == null) {
-                                ToastUtil.show("请检查网络");
-                                return;
-                            }
-                            try {
-                                if (entity.success){
-
-                                    JTJKSSDCard ssCard = null;
-                                    try {
-                                        ssCard = JTJKSSDCard.buildsbkcard(entity.data);
-                                        //                SSCard ssCard = EGovernment.EgAPP_SI_ReadSSCardInfo();
-                                    } catch (Exception e) {
-                                        ToastUtil.show("未查询到卡信息");
-                                        e.printStackTrace();
-                                    }
-
-                                    // 注入数据
-                                    if(ssCard!=null) {
-
-                                        // 输入社保数据
-                                        ((MainActivity)getActivity()).setSSDCardData(ssCard);
-
-
-                                    }else {
-                                        ToastUtil.show("未查询到卡信息");
-                                    }
-
-                                }else {
-                                    ToastUtil.show(entity.getMessage());
-                                }
-                            }catch (Exception e){
-                                ToastUtil.show("卡信息异常");
-                                e.printStackTrace();
-                            }
-                        }
-                    });
+//        if (GlobalConfig.thirdFactory.equals("1")){
+            timeLoop();
 
         }else {
             handler = new Handler();
@@ -125,6 +163,9 @@ public class MineCardFragment extends BaseEventFragment{
     @Override
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
+
+//        Log.d("111111MODEL", hidden+"");
+
         if (!hidden){
             if ((MainActivity)getActivity()!=null){
                 if (((MainActivity)getActivity()).getTopFragment() instanceof MineCardFragment){
@@ -135,6 +176,17 @@ public class MineCardFragment extends BaseEventFragment{
 
 
         }else{
+
+            //清除mDisposable不再进行验证
+            try {
+                if (mDisposable != null) {
+                    mDisposable.dispose();
+                    mDisposable = null;
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+
             if (handler!=null){
                 handler.removeCallbacksAndMessages(null);
                 handler = null;
@@ -168,5 +220,21 @@ public class MineCardFragment extends BaseEventFragment{
     @Override
     public void onDestroy() {
         super.onDestroy();
+    }
+
+    @Override
+    public void onDismiss() {
+        super.onDismiss();
+        //清除mDisposable不再进行验证
+        try {
+            if (mDisposable != null) {
+                mDisposable.dispose();
+                mDisposable = null;
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+
     }
 }

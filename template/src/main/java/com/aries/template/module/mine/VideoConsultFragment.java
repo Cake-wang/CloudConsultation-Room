@@ -193,6 +193,10 @@ public class VideoConsultFragment extends BaseEventFragment {
                     // 医生进入的TAG
                     isDoctorInRoomFlag = true;
                     // 如果医生进入了，则直接释放XL的socket
+                    if (mDisposableNew != null) {
+                        mDisposableNew.dispose();
+                        mDisposableNew = null;
+                    }
                     XLMessage.with().destroy();
                     // 大屏接口，启动大屏
                     DapinSocketProxy.with()
@@ -265,6 +269,7 @@ public class VideoConsultFragment extends BaseEventFragment {
             case R.id.btn_stjc:
 
                 if (GlobalConfig.thirdFactory.equals("3")){
+//                    if (GlobalConfig.thirdFactory.equals("1")){
 
                     ((MainActivity)getActivity()).gotoYYPJ();
 
@@ -386,6 +391,10 @@ public class VideoConsultFragment extends BaseEventFragment {
     private static final int PERIOD = 6* 1000;
     private static final int DELAY = 100;
     private Disposable mDisposable;
+
+    private static final int PERIODNEW = 60* 1000;
+    private static final int DELAYNEW = 100;
+    public Disposable mDisposableNew;
     /**
      * 定时循环任务
      * 入会成功后执行
@@ -398,6 +407,14 @@ public class VideoConsultFragment extends BaseEventFragment {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(aLong -> {requestGetRecipeListByConsultId();
+
+                });//getUnreadCount()执行的任务
+
+        mDisposableNew = Observable.interval(DELAYNEW, PERIODNEW, TimeUnit.MILLISECONDS)
+                .map((aLong -> aLong + 1))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(aLong -> {
                     if (!isDoctorInRoomFlag)
                         // 启动向医生发送消息
                         // 如果医生没有进入房间，则不停的继续call
@@ -647,6 +664,10 @@ public class VideoConsultFragment extends BaseEventFragment {
             mDisposable.dispose();
             mDisposable = null;
         }
+        if (mDisposableNew != null) {
+            mDisposableNew.dispose();
+            mDisposableNew = null;
+        }
         // 清理大屏socket
         DapinSocketProxy.with().failDestroy();
         // 释放自己，让 onCreate 下次进来的时候有效
@@ -683,6 +704,10 @@ public class VideoConsultFragment extends BaseEventFragment {
             if (mDisposable != null) {
                 mDisposable.dispose();
                 mDisposable = null;
+            }
+            if (mDisposableNew != null) {
+                mDisposableNew.dispose();
+                mDisposableNew = null;
             }
         } else {
             // 启动请求

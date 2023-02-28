@@ -61,6 +61,8 @@ public class SbkcardResultEntity {
 
         public String birthday;
 
+        public String cardno;
+
         public String getIdno() {
             return idno;
         }
@@ -91,6 +93,14 @@ public class SbkcardResultEntity {
 
         public void setBirthday(String birthday) {
             this.birthday = birthday;
+        }
+
+        public String getCardno() {
+            return cardno;
+        }
+
+        public void setCardno(String cardno) {
+            this.cardno = cardno;
         }
     }
 

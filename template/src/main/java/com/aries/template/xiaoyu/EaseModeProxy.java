@@ -564,6 +564,7 @@ public class EaseModeProxy {
 //                    }
 
                     if (GlobalConfig.thirdFactory.equals("1")||GlobalConfig.thirdFactory.equals("3")){
+//                        if (GlobalConfig.thirdFactory.equals("3")){
                         if (NemoSDK.getInstance().getCurrentCameraId()==0){
                             Log.e("TAG", NemoSDK.getInstance().getCurrentCameraId()+"");
                             NemoSDK.getInstance().requestCamera();
@@ -578,8 +579,8 @@ public class EaseModeProxy {
                 } else if (state == CallState.DISCONNECTED) {
 //                    Log.e("TAG", "onCallStateChange: 退出成功");
 //                        ToastWithLogin("退出会议: " + reason);
-                    // 告诉医生，你已经离开
-                    sendNotifyPaintLiveMsg();
+                    // 告诉医生，你已经离开，先注释有问题
+//                    sendNotifyPaintLiveMsg();
 //                    // 释放资源一定要写在退出会议的后面
                     releaseProxy();
                 }
@@ -717,10 +718,10 @@ public class EaseModeProxy {
 
 //        Log.e("JTJK", "EMClient: done" );
         // 释放小鱼
-//        NemoSDK.getInstance().setNemoSDKListener(null);
-//        NemoSDK.getInstance().releaseLayout();
-//        NemoSDK.getInstance().releaseCamera();
-//        NemoSDK.getInstance().releaseAudioMic();
+        NemoSDK.getInstance().setNemoSDKListener(null);
+        NemoSDK.getInstance().releaseLayout();
+        NemoSDK.getInstance().releaseCamera();
+        NemoSDK.getInstance().releaseAudioMic();
         NemoSDK.getInstance().shutdown();
 //        Log.e("JTJK", "NemoSDK: done" );
         if (handler!=null){

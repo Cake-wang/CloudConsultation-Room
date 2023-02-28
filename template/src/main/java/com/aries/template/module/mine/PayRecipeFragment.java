@@ -281,8 +281,12 @@ public class PayRecipeFragment extends BaseEventFragment {
         }
 
         try {
+
+            HashMap<String, DrugObject> tempMap = new HashMap<String, DrugObject>();
+
+
             // 生成处方单药物集，遍历生成数据，准备输入
-            ArrayList<Map> drugs = new ArrayList<>(); // 存储所有处方药品信息的容器
+            DrugObject drugs = new DrugObject(); // 存储所有处方药品信息的容器
             int current = 0;
             for (DrugObject item : obj) {
                 // 药品发放数量必须是整型
@@ -292,26 +296,55 @@ public class PayRecipeFragment extends BaseEventFragment {
 //                    item.sku = "4895013208569";//todo cc 6901339924484 4895013208569
 //                }
                 current++;
-                int quantityInt = (Double.valueOf(item.quantity)).intValue();
-                // 药品发放数量不小于1
-                if (quantityInt<=0)quantityInt=1;
-                // 价格必须是整型，单位是分
-                int priceInt = ((Double)(Double.valueOf(item.price)*100)).intValue();
-                // 组织药品数据
-                Map<String, Object> drug= new HashMap<>();
-                //            drugs.put("direction","口服");
-                drug.put("dosageUnit",item.dosageUnit);
-                drug.put("drugCommonName",item.drugCommonName);
-                drug.put("drugTradeName",item.drugTradeName);
-                drug.put("eachDosage",item.eachDosage);
-                drug.put("itemDays",item.itemDays);
-                drug.put("price",String.valueOf(priceInt));
-                drug.put("quantity",String.valueOf(quantityInt));
-                drug.put("quantityUnit",item.quantityUnit);
-                drug.put("sku",item.sku);
-                drug.put("spec",item.spec);
-                drugs.add(drug);
+
+                String temp = item.sku;
+
+                if (tempMap.containsKey(temp)){
+//                    int quantityInt = (Double.valueOf(item.quantity)).intValue();
+//                    // 药品发放数量不小于1
+//                    if (quantityInt<=0)quantityInt=1;
+//                    // 价格必须是整型，单位是分
+//                    int priceInt = ((Double)(Double.valueOf(item.price)*100)).intValue();
+                    // 组织药品数据
+//                    Map<String, Object> drug= new HashMap<>();
+                    //            drugs.put("direction","口服");
+//                    drug.put("dosageUnit",item.dosageUnit);
+//                    drug.put("drugCommonName",item.drugCommonName);
+//                    drug.put("drugTradeName",item.drugTradeName);
+//                    drug.put("eachDosage",item.eachDosage);
+//                    drug.put("itemDays",item.itemDays);
+//                    drug.put("price",String.valueOf(priceInt));
+//                    drug.put("quantity",String.valueOf(quantityInt));
+//                    drug.put("quantityUnit",item.quantityUnit);
+//                    drug.put("sku",item.sku);
+//                    drug.put("spec",item.spec);
+//                    drugs.add(drug);
+                    drugs.setDosageUnit(item.dosageUnit);
+                    drugs.setDrugCommonName(item.drugCommonName);
+                    drugs.setDrugTradeName(item.drugTradeName);
+                    drugs.setEachDosage(item.eachDosage);
+                    drugs.setItemDays(item.itemDays);
+                    drugs.setPrice(item.price);
+                    drugs.setQuantity(String.valueOf(Integer.valueOf(tempMap.get(temp).getQuantity()) + Integer.valueOf(item.quantity)));
+                    drugs.setQuantityUnit(item.quantityUnit);
+                    drugs.setSku(item.sku);
+                    drugs.setSpec(item.spec);
+                    // HashMap不允许key重复，当有key重复时，前面key对应的value值会覆盖
+                    tempMap.put(temp,drugs);
+                }else {
+                    tempMap.put(temp,item);
+                }
+
+
+
             }
+
+            ArrayList<DrugObject> newList = new ArrayList<DrugObject>();
+            for(String temp:tempMap.keySet()){
+                newList.add(tempMap.get(temp));
+            }
+
+
             String takeCode = String.valueOf((int) ((Math.random() * 9 + 1) * Math.pow(10,5)));
             int recipeFeeTrans = (((Float) (Float.valueOf(recipeFee) * 100)).intValue());
             ApiRepository.getInstance().prescriptionPush(clinicSn,
@@ -323,7 +356,7 @@ public class PayRecipeFragment extends BaseEventFragment {
                             orderid,
                             takeCode,
                             String.valueOf(recipeFeeTrans),
-                            drugs)
+                    newList)
                     .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
                     .subscribe(new FastLoadingObserver<PrescriptionPushEntity>("请稍后...") {
                         @Override
@@ -668,5 +701,94 @@ public class PayRecipeFragment extends BaseEventFragment {
         public String sku;
         public String spec;
         public String howToUse;
+
+
+        public String getDosageUnit() {
+            return dosageUnit;
+        }
+
+        public void setDosageUnit(String dosageUnit) {
+            this.dosageUnit = dosageUnit;
+        }
+
+        public String getDrugCommonName() {
+            return drugCommonName;
+        }
+
+        public void setDrugCommonName(String drugCommonName) {
+            this.drugCommonName = drugCommonName;
+        }
+
+        public String getDrugTradeName() {
+            return drugTradeName;
+        }
+
+        public void setDrugTradeName(String drugTradeName) {
+            this.drugTradeName = drugTradeName;
+        }
+
+        public String getEachDosage() {
+            return eachDosage;
+        }
+
+        public void setEachDosage(String eachDosage) {
+            this.eachDosage = eachDosage;
+        }
+
+        public String getItemDays() {
+            return itemDays;
+        }
+
+        public void setItemDays(String itemDays) {
+            this.itemDays = itemDays;
+        }
+
+        public String getPrice() {
+            return price;
+        }
+
+        public void setPrice(String price) {
+            this.price = price;
+        }
+
+        public String getQuantity() {
+            return quantity;
+        }
+
+        public void setQuantity(String quantity) {
+            this.quantity = quantity;
+        }
+
+        public String getQuantityUnit() {
+            return quantityUnit;
+        }
+
+        public void setQuantityUnit(String quantityUnit) {
+            this.quantityUnit = quantityUnit;
+        }
+
+        public String getSku() {
+            return sku;
+        }
+
+        public void setSku(String sku) {
+            this.sku = sku;
+        }
+
+        public String getSpec() {
+            return spec;
+        }
+
+        public void setSpec(String spec) {
+            this.spec = spec;
+        }
+
+        public String getHowToUse() {
+            return howToUse;
+        }
+
+        public void setHowToUse(String howToUse) {
+            this.howToUse = howToUse;
+        }
     }
 }

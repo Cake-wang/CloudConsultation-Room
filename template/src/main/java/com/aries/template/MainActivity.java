@@ -185,6 +185,7 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
     public void openSerialport() {
 //        Log.d("111111MODEL", Build.MODEL);
 //        Log.d("111111MODEL", getTopFragment()+"");
+//        BasicOper.dc_exit();
         //打开端口，usb模式，打开之前必须确保已经获取到USB权限，返回值为设备句柄号。
         int devHandle = BasicOper.dc_open("AUSB",this,"",0);
 //        int devHandle = BasicOper.dc_open("AUSB",this,"/dev/ttyHSL1",115200);
@@ -195,8 +196,9 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
             timeLoop();
         }else{
             ToastUtil.show("读卡失败，请重新插卡，并重试");
-            start(HomeFragment.newInstance(), SupportFragment.SINGLETASK);
             BasicOper.dc_exit();
+            start(HomeFragment.newInstance(), SupportFragment.SINGLETASK);
+
         }
     }
 
@@ -215,9 +217,12 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                 .map((aLong -> aLong + 1))
 //                    .delay(PERIOD, TimeUnit.MILLISECONDS, true)       // 设置delayError为true，表示出现错误的时候也需要延迟5s进行通知，达到无论是请求正常还是请求失败，都是5s后重新订阅，即重新请求。
                 .subscribeOn(Schedulers.io())
+//                .subscribeOn(Schedulers.newThread())
                 .repeat()   // repeat保证请求成功后能够重新订阅。
                 .retry()    // retry保证请求失败后能重新订阅
                 .observeOn(Schedulers.newThread())
+//                .observeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(aLong ->readCardNew());//getUnreadCount()执行的任务
 
 //        if (mDisposable == null){
@@ -330,18 +335,40 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                         e.printStackTrace();
                     }
                     JTJKSSDCard ssCard = null;
+                    String cardinfo = null;
                     try {
-                        ssCard = JTJKSSDCard.build2D(new String(info, "gbk").trim());
+//                        ToastUtil.show(new String(info, "gbk").trim());
+//                        Log.d("EgAPP_SI_CardPowerOn",new String(info, "gbk").trim());
+                        cardinfo =   new String(info, "gbk").trim();
+                        ssCard = JTJKSSDCard.build2D(cardinfo);
                         //                SSCard ssCard = EGovernment.EgAPP_SI_ReadSSCardInfo();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-
+//                    String cardinfo = String.valueOf(info);
+//                    ssCard = JTJKSSDCard.build2D(cardinfo);
                     // 注入数据
                     if(ssCard!=null){
 
-                        // 输入社保数据
-                        setSSDCardData(ssCard);
+                        try {
+                            // 输入社保数据
+                            setSSDCardData(ssCard);
+                            if (mDisposable != null) {
+                                mDisposable.dispose();
+                                mDisposable=null;
+                            }
+                            BasicOper.dc_exit();
+                        }catch (Exception e){
+                            if (mDisposable != null) {
+                                mDisposable.dispose();
+                                mDisposable=null;
+                            }
+                            BasicOper.dc_exit();
+                            ToastUtil.show(cardinfo);
+                            start(HomeFragment.newInstance(), SupportFragment.SINGLETASK);
+
+                        }
+
 
 //                    Log.d("EgAPP_SI_ReadSSCardInfo",ssCard.toString());
 //                    // 向全局填写当前社保卡信息
@@ -360,20 +387,29 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
 //                    runOnUiThread(() -> requestFindUser(GlobalConfig.ssCard.getSSNum(),GlobalConfig.ssCard.getName(),GlobalConfig.ssCard.getCardNum()));
 
                         // 读取成功后，清除mDisposable不再进行验证
+
+                    }else{
                         if (mDisposable != null) {
                             mDisposable.dispose();
                             mDisposable=null;
                         }
                         BasicOper.dc_exit();
-                    }else{
-                        if (mDisposable != null) {mDisposable.dispose();}
-                        BasicOper.dc_exit();
-                        ToastUtil.show("读取社保卡失败，请返回首页重试");
+                        ToastUtil.show("读卡失败，请重新插卡，并重试");
+                        start(HomeFragment.newInstance(), SupportFragment.SINGLETASK);
 //                    Log.d("EgAPP_SI_ReadSSCardInfo","读取社保卡信息失败");
                     }
+
                 }else {
 //                    ToastUtil.show("读取社保卡失败，请重新插拔社保卡,您也可以刷身份证复诊配药");
-                    ToastUtil.show("读取社保卡失败，请重新插拔社保卡");
+//                    if (mDisposable != null) {
+//                        mDisposable.dispose();
+//                        mDisposable=null;
+//                    }
+//                    BasicOper.dc_exit();
+                    ToastUtil.show("读卡失败，请重新插卡，并重试");
+//                    start(HomeFragment.newInstance(), SupportFragment.SINGLETASK);
+
+//                    ToastUtil.show("读取社保卡失败，请重新插拔社保卡");
                 }
                 //社保卡下电
                 if(bCardPowerOn){
@@ -511,7 +547,7 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
 
 
                                                if (GlobalConfig.thirdFactory.equals("3")){
-
+//                                                   if (GlobalConfig.thirdFactory.equals("1")){
                                                     gotoYYPJ();
 
                                                }else {
@@ -521,12 +557,19 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                                                        handler = new Handler();
                                                        handler.postDelayed(() -> {
                                                            //
-                                                           new JTJKThirdAppUtil().gotoBodyTesting(MainActivity.this,
-                                                                   GlobalConfig.factoryResource,
-                                                                   GlobalConfig.factoryMainPage,
-                                                                   entity.getData().getName().trim(),
-                                                                   entity.getData().getIdcard(),
-                                                                   entity.getData().getMobile());
+                                                           try {
+
+                                                               new JTJKThirdAppUtil().gotoBodyTesting(MainActivity.this,
+                                                                       GlobalConfig.factoryResource,
+                                                                       GlobalConfig.factoryMainPage,
+                                                                       entity.getData().getName().trim(),
+                                                                       entity.getData().getIdcard(),
+                                                                       entity.getData().getMobile());
+
+                                                           }catch (Exception e){
+                                                               ToastUtil.show("请您移步到旁边的健康管理设备进行检测");
+                                                           }
+
                                                        }, 500);//3秒后执行Runnable中的run方法
 
 
@@ -592,7 +635,11 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                         try {
                             if (entity.success){
 
+                                if (getTopFragment() instanceof MineCardFragment||getTopFragment() instanceof PhoneRegisterFragment){
 
+                                    start(HomeFragment.newInstance(), SupportFragment.SINGLETASK);
+
+                                }
 
                             }else {
                                 ToastUtil.show(entity.getMessage());
@@ -636,7 +683,8 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
     }
 
     public  void requestfindPatIdByPatientQuery(String mpiId){
-        ApiRepository.getInstance().getfindPatIdByPatientQuery(mpiId)
+//        ApiRepository.getInstance().getfindPatIdByPatientQuery(mpiId)
+        ApiRepository.getInstance().getfindPatIdByPatientQueryWithCard(mpiId)
                 .compose(this.bindUntilEvent(ActivityEvent.DESTROY))
                 .subscribe(new FastLoadingObserver<FindPatIdByPatientQueryEntity>() {
                     @Override

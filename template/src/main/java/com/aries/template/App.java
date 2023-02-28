@@ -148,6 +148,10 @@ public class App extends MultiDexApplication {
 //                .addHeader(" Content-Type","application/json")
                 .putBaseUrl(ApiConstant.topexampage, ApiConstant.BASEURLYY);
 
+        MFastRetrofit.getInstance()
+//                .addHeader(" Content-Type","application/json")
+                .putBaseUrl(ApiConstant.printcode, ApiConstant.BASEURLYY);
+
         //方式二 通过 Service 里添加特定header设置
         //step1
 //        FastRetrofit.getInstance()

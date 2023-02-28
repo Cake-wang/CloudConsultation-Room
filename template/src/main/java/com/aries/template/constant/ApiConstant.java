@@ -29,7 +29,9 @@ public class ApiConstant {
 //    public static  String BASEURLTest = "https://jsbceshi.hfi-health.com:18188/app/hzAppMS/api/";
     public static  String BASEURLTest = "https://api.hfi-health.com:18181/app/hzAppMS/api/";
 
-    public static  String BASEURLYY = "http://172.16.3.101:7810/api/";
+//    public static  String BASEURLYY = "http://172.16.3.101:7810/api/";
+
+    public static  String BASEURLYY = "http://10.0.2.2:7810/api/";
 
     public static  String DownURL = "http://10.100.10.45:18033/";
 
