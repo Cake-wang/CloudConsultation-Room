@@ -18,14 +18,13 @@
 package com.aries.template.view;
 
 import android.content.Context;
-import android.text.Layout;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.aries.template.GlobalConfig;
 import com.aries.template.R;
 import com.xuexiang.xui.widget.alpha.XUIAlphaImageView;
 import com.xuexiang.xui.widget.dialog.materialdialog.CustomMaterialDialog;
@@ -57,8 +56,16 @@ public class ShineButtonDialog extends CustomMaterialDialog {
 
     @Override
     protected MaterialDialog.Builder getDialogBuilder(Context context) {
-        return new MaterialDialog.Builder(context)
-                .customView(R.layout.dialog_custom, true);
+
+
+        if(GlobalConfig.thirdFactory.equals("3")||GlobalConfig.thirdFactory.equals("2")){
+            return new MaterialDialog.Builder(context)
+                    .customView(R.layout.dialog_custom_l, true);
+        }else {
+            return new MaterialDialog.Builder(context)
+                    .customView(R.layout.dialog_custom, true);
+        }
+
     }
 
     @Override
@@ -70,7 +77,17 @@ public class ShineButtonDialog extends CustomMaterialDialog {
         tv_content_tip = findViewById(R.id.tv_content_tip);
 
         //设置 对话的宽高
-        this.getDialog().getWindow().setLayout(-2,-2);
+        if(GlobalConfig.thirdFactory.equals("3")||GlobalConfig.thirdFactory.equals("2")){
+
+            btn_inquiry.setTextSize(30);
+            btn_cancel.setTextSize(30);
+
+            this.getDialog().getWindow().setLayout(650,-2);
+
+        }else {
+            this.getDialog().getWindow().setLayout(-2,-2);
+        }
+
 
         // 隐藏导航栏
         // 如果打开这个选项，会直接进入非沉浸式

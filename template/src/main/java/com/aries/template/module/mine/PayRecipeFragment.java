@@ -6,9 +6,11 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
+import android.text.Html;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.alibaba.fastjson.JSON;
@@ -25,6 +27,7 @@ import com.aries.template.entity.PrescriptionPushEntity;
 import com.aries.template.module.base.BaseEventFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.template.utils.ActivityUtils;
+import com.aries.template.utils.RegUtils;
 import com.aries.ui.view.title.TitleBarView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -74,7 +77,11 @@ public class PayRecipeFragment extends BaseEventFragment {
      */
     @Override
     public int getContentLayout() {
-        return R.layout.fragment_pay;
+        if(GlobalConfig.thirdFactory.equals("3")||GlobalConfig.thirdFactory.equals("2")){
+            return R.layout.fragment_pay_l;
+        }else {
+            return R.layout.fragment_pay;
+        }
     }
 
     /** 从外部传入的数据  */
@@ -108,6 +115,12 @@ public class PayRecipeFragment extends BaseEventFragment {
     @BindView(R.id.jtjk_pay_reflash_tip)
     TextView jtjk_pay_reflash_tip;
     boolean flagone = true;
+
+    @BindView(R.id.ll_process)
+    LinearLayout ll_process;
+
+    @BindView(R.id.jtjk_recipe_name)
+    TextView jtjk_recipe_name;
     /**
      * 跳转科室，需要带的数据
 //     * @param recipeId 处方单ID
@@ -163,10 +176,16 @@ public class PayRecipeFragment extends BaseEventFragment {
     @Override
     public void initView(Bundle savedInstanceState) {
         //数据展示
+
+        ll_process.setVisibility(View.VISIBLE);
+
+        // 显示名称
+        jtjk_recipe_name.setText(RegUtils.nameDesensitization(GlobalConfig.ssCard.getName())+"，您好");
+
         if (GlobalConfig.ssCard!=null)
             tv_name.setText(GlobalConfig.ssCard.getName());
         // 支付提示
-        String[] orders = {"#38ABA0","支付宝·","#333333","扫一扫"};
+        String[] orders = {"#333333","扫一扫"};
         jtjk_pay_text.setText(ActivityUtils.formatTextView(orders));
         // 支付类型
         tv_fee_type.setText("处方费");
@@ -551,7 +570,7 @@ public class PayRecipeFragment extends BaseEventFragment {
                                     Resources res = getActivity().getResources();
 //                                    Bitmap bmp= BitmapFactory.decodeResource(res, R.drawable.pay_alilogo);
 //                                    showQRCode(XQRCode.createQRCodeWithLogo(qrStr, 400, 400, bmp));
-                                    logoBmp = BitmapFactory.decodeResource(res, R.mipmap.pay_alilogo);
+                                    logoBmp = BitmapFactory.decodeResource(res, R.mipmap.pay_hfi);
                                     payBmp = XQRCode.createQRCodeWithLogo(qrStr, 400, 400, logoBmp);
                                     BitmapDrawable drawable = new BitmapDrawable(payBmp);
                                     RequestOptions requestOptions =new RequestOptions().centerCrop()
@@ -599,12 +618,27 @@ public class PayRecipeFragment extends BaseEventFragment {
                         try {
                             if (entity.data.success){
                                 // 刷新价格
+//                                // 总费用
+//                                tv_fee_all.setText(entity.data.jsonResponseBean.body.preSettleTotalAmount+"元");
+//                                // 医保
+//                                tv_fee_yb.setText(entity.data.jsonResponseBean.body.fundAmount+"元");
+//                                // 自费
+//                                tv_fee_zf.setText(entity.data.jsonResponseBean.body.cashAmount+"元");
+
                                 // 总费用
-                                tv_fee_all.setText(entity.data.jsonResponseBean.body.preSettleTotalAmount+"元");
+                                String textStr =entity.data.jsonResponseBean.body.preSettleTotalAmount+"<font color=\"#333333\">元</font>";
+
+
+                                tv_fee_all.setText(Html.fromHtml(textStr));
                                 // 医保
-                                tv_fee_yb.setText(entity.data.jsonResponseBean.body.fundAmount+"元");
+                                textStr =entity.data.jsonResponseBean.body.fundAmount+"<font color=\"#333333\">元</font>";
+
+                                tv_fee_yb.setText(Html.fromHtml(textStr));
                                 // 自费
-                                tv_fee_zf.setText(entity.data.jsonResponseBean.body.cashAmount+"元");
+                                textStr =entity.data.jsonResponseBean.body.cashAmount+"<font color=\"#333333\">元</font>";
+
+                                tv_fee_zf.setText(Html.fromHtml(textStr));
+
                                 // 启动支付二维码
                                 // 获得总费用后，请求二维码，这里的价格需要和上面的总费用对齐
                                 recipeFee = entity.data.jsonResponseBean.body.preSettleTotalAmount;

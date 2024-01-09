@@ -6,10 +6,6 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
 
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
-import androidx.recyclerview.widget.RecyclerView;
-
 import com.aries.library.fast.retrofit.FastLoadingObserver;
 import com.aries.library.fast.util.ToastUtil;
 import com.aries.template.GlobalConfig;
@@ -17,10 +13,10 @@ import com.aries.template.R;
 import com.aries.template.entity.FindValidDepartmentForRevisitResultEntity;
 import com.aries.template.module.base.BaseEventFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
+import com.aries.template.utils.RegUtils;
 import com.aries.template.widget.autoadopter.AutoAdaptorProxy;
 import com.aries.template.widget.autoadopter.AutoObjectAdaptor;
 import com.aries.template.widget.autoadopter.DefenceAutoAdaptorProxy;
-import com.aries.template.widget.updownbtn.DefenceUpDownProxy;
 import com.aries.template.widget.updownbtn.UpDownProxy;
 import com.aries.ui.view.title.TitleBarView;
 import com.trello.rxlifecycle3.android.FragmentEvent;
@@ -29,6 +25,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 
 /**
@@ -50,7 +49,12 @@ public class DepartmentTwoFragment extends BaseEventFragment {
      */
     @Override
     public int getContentLayout() {
-        return R.layout.fragment_dept;
+        if(GlobalConfig.thirdFactory.equals("3")||GlobalConfig.thirdFactory.equals("2")){
+            return R.layout.fragment_dept_l;
+        }else {
+            return R.layout.fragment_dept;
+        }
+
     }
 
     /** 从外部传入的数据  */
@@ -108,6 +112,7 @@ public class DepartmentTwoFragment extends BaseEventFragment {
                         if (itemData.get(KEY_ITEM_OBJECT)!=null){
                             FindValidDepartmentForRevisitResultEntity.QueryArrearsSummary.JsonResponseBean.OrganProfessionDTO data
                                     = ((FindValidDepartmentForRevisitResultEntity.QueryArrearsSummary.JsonResponseBean.OrganProfessionDTO) itemData.get(KEY_ITEM_OBJECT));
+//                            Log.e("deptid", String.valueOf(data.getDeptId())+" and "+data.getProfessionCode());
                             start(DoctorListFragment.newInstance(String.valueOf(data.getDeptId()),data.getProfessionCode()));
                         }
                     }
@@ -166,7 +171,7 @@ public class DepartmentTwoFragment extends BaseEventFragment {
         btn_cancel.setOnClickListener(v -> {upDownProxy.doProReFlash();});
         title.setText("请选择二级科室");
         // 显示名称
-        jtjk_recipe_name.setText(GlobalConfig.ssCard.getName()+"，您好");
+        jtjk_recipe_name.setText(RegUtils.nameDesensitization(GlobalConfig.ssCard.getName())+"，您好");
         // 请求一级科室
         if (inputObj!=null)
             requestLevelTwo(inputObj);

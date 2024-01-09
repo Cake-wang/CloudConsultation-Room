@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.View;
 import android.widget.TextView;
 
+import com.aries.template.GlobalConfig;
 import com.aries.template.R;
 import com.xuexiang.xui.widget.flowlayout.BaseTagAdapter;
 
@@ -25,7 +26,12 @@ public class FlowTagAdapter extends BaseTagAdapter<String, TextView> {
 
     @Override
     protected int getLayoutId() {
-        return R.layout.adapter_item_tag;
+        if(GlobalConfig.thirdFactory.equals("3")||GlobalConfig.thirdFactory.equals("2")){
+            return R.layout.adapter_item_tag_l;
+        }else {
+            return R.layout.adapter_item_tag;
+        }
+//        return R.layout.adapter_item_tag;
     }
 
     @Override

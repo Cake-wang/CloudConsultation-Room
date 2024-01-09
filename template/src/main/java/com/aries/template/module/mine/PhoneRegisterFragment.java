@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.aries.library.fast.retrofit.FastLoadingObserver;
 import com.aries.library.fast.util.SPUtil;
@@ -114,7 +115,12 @@ public class PhoneRegisterFragment extends BaseEventFragment implements ISupport
 
     @Override
     public int getContentLayout() {
-        return R.layout.fragment_putrc;
+        if(GlobalConfig.thirdFactory.equals("3")||GlobalConfig.thirdFactory.equals("2")){
+            return R.layout.fragment_putrc_l;
+        }else {
+            return R.layout.fragment_putrc;
+        }
+
     }
 
     /**
@@ -312,6 +318,8 @@ public class PhoneRegisterFragment extends BaseEventFragment implements ISupport
      * @param verifyCode  验证码
      */
     private void loginByVerifyCode(String phoneNumber, String verifyCode) {
+        // 缩回软键盘
+        hideSoftInput();
         if (!TextUtils.isEmpty(authCodeId)){
             requestRegister(idCard,name,phoneNumber,verifyCode,authCodeId);
         }else{
@@ -365,6 +373,7 @@ public class PhoneRegisterFragment extends BaseEventFragment implements ISupport
 
                                             }else {
                                                 ToastUtil.show("请您移步到旁边的健康管理设备进行检测");
+                                                start(HomeFragment.newInstance(), SupportFragment.SINGLETASK);
                                             }
                                         }
 
@@ -382,7 +391,8 @@ public class PhoneRegisterFragment extends BaseEventFragment implements ISupport
                                         start(MineCardFragment.newInstance("fzpy"));
                                     }
                                 }else {
-                                    ToastUtil.show(entity.message);
+                                    Toast.makeText(getActivity(), entity.message, Toast.LENGTH_LONG).show();
+//                                    ToastUtil.show(entity.message);
                                 }
                             }
                         });

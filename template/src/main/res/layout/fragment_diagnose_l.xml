@@ -1,0 +1,641 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@mipmap/bg_main_yzs_new"
+    android:orientation="vertical">
+
+    <com.aries.template.utils.ScaleTextView
+        android:id="@+id/jtjk_hospital_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="16dp"
+        android:gravity="center"
+        android:layout_weight="2"
+        android:textSize="26dp"
+        android:layout_marginLeft="50dp"
+        android:layout_marginTop="40dp"
+        android:text="杭州市第一人民医院"
+        android:textColor="#fff" />
+
+    <com.aries.template.utils.ScaleTextView
+        android:id="@+id/jtjk_recipe_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="620dp"
+        android:layout_marginTop="42dp"
+        android:gravity="center"
+        android:text="王**：您好！"
+        android:textColor="#fff"
+        android:textSize="24dp"
+         />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="180dp"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:layout_marginBottom="110dp"
+        android:background="@drawable/bg_readcard_gray"
+        android:paddingTop="10dp"
+        android:paddingRight="40dp"
+        android:paddingLeft="40dp"
+        android:orientation="vertical"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            >
+
+            <View
+                android:layout_width="5dp"
+                android:layout_height="25dp"
+                android:background="#24A6A0"
+                />
+
+            <com.aries.template.utils.ScaleTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#333"
+                android:layout_weight="1"
+                android:layout_marginLeft="10dp"
+                android:textSize="24dp"
+                android:gravity="left"
+                android:text="请确认您的订单" />
+
+            <TextView
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:background="@mipmap/icon_countdown_yzs">
+
+            </TextView>
+
+            <com.aries.template.utils.ScaleTextView
+                android:id="@+id/jtjk_fz_fragment_timer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#333"
+                android:textSize="24dp"
+                android:layout_marginLeft="10dp"
+                android:gravity="center"
+                android:text="119秒" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="576dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+
+            android:background="@drawable/bg_readcard_white"
+            android:gravity="center"
+            android:orientation="vertical"
+            >
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:scrollbars="none"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@mipmap/bg_pay_yzs"
+                android:gravity="top"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:orientation="horizontal"
+                >
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:layout_marginLeft="80dp"
+                    android:paddingTop="40dp"
+                    android:paddingBottom="10dp"
+                    android:orientation="vertical"
+                    >
+
+                    <com.aries.template.utils.ScaleTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#666666"
+                        android:layout_marginTop="20dp"
+                        android:textSize="22dp"
+                        android:gravity="left"
+                        android:layout_marginBottom="35dp"
+                        android:text="就诊人：" />
+
+                    <com.aries.template.utils.ScaleTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#666666"
+                        android:layout_marginLeft="10dp"
+                        android:textSize="22dp"
+                        android:gravity="left"
+                        android:layout_marginBottom="28dp"
+                        android:text="首诊时间：" />
+
+                    <com.aries.template.utils.ScaleTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#666666"
+                        android:layout_marginLeft="10dp"
+                        android:textSize="22dp"
+                        android:layout_marginTop="20dp"
+                        android:gravity="left"
+                        android:text="用药情况：" />
+
+                    <com.aries.template.utils.ScaleTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#666666"
+                        android:layout_weight="1"
+                        android:layout_marginLeft="10dp"
+                        android:textSize="22dp"
+                        android:gravity="left"
+                        android:visibility="gone"
+                        android:layout_marginBottom="15dp"
+                        android:text="科室：" />
+
+                    <com.aries.template.utils.ScaleTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#666666"
+                        android:layout_weight="1"
+                        android:layout_marginLeft="10dp"
+                        android:textSize="22dp"
+                        android:gravity="left"
+                        android:visibility="gone"
+                        android:layout_marginBottom="15dp"
+                        android:text="诊断结果：" />
+
+                    <com.aries.template.utils.ScaleTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#666666"
+                        android:layout_weight="1"
+                        android:layout_marginLeft="10dp"
+                        android:textSize="22dp"
+                        android:gravity="left"
+                        android:visibility="gone"
+                        android:layout_marginBottom="15dp"
+                        android:text="开方时间：" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical|top"
+                    android:paddingTop="40dp"
+                    android:paddingBottom="10dp"
+                    android:layout_marginLeft="10dp"
+                    android:orientation="vertical"
+                    >
+
+                    <com.aries.template.utils.ScaleTextView
+                        android:layout_marginTop="20dp"
+                        android:id="@+id/tv_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#333333"
+                        android:layout_marginLeft="10dp"
+                        android:textSize="22dp"
+                        android:gravity="left"
+                        android:layout_marginBottom="15dp"
+                        android:text="王二二（男）" />
+
+                    <com.aries.template.utils.ScaleTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="80dp"
+                        android:textColor="#333333"
+                        android:id="@+id/tv_date"
+                        android:layout_marginLeft="10dp"
+                        android:textSize="22dp"
+                        android:paddingLeft="15dp"
+                        android:paddingRight="15dp"
+                        android:drawableRight="@mipmap/bg_data_yzs"
+                        android:gravity="center_vertical"
+                        android:background="@mipmap/bg_text_yzs"
+                        android:layout_marginBottom="16dp"
+                        android:text="2022-05-08" />
+
+                    <com.aries.template.utils.ScaleTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#333333"
+                        android:layout_marginLeft="10dp"
+                        android:textSize="22dp"
+                        android:layout_marginTop="12dp"
+                        android:gravity="left"
+
+                        android:text="是否有过敏史 \u3000 \u3000是否有不良反应" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:layout_marginLeft="2dp"
+                        android:orientation="horizontal"
+                        >
+
+                        <com.xuexiang.xui.widget.flowlayout.FlowTagLayout
+                            android:id="@+id/flowlayout_single_select_o"
+                            android:layout_width="150dp"
+
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content" />
+
+                        <com.xuexiang.xui.widget.flowlayout.FlowTagLayout
+                            android:id="@+id/flowlayout_single_select_t"
+                            android:layout_width="150dp"
+                            android:layout_weight="1"
+
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
+
+
+
+                    <com.aries.template.utils.ScaleTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#333333"
+                        android:layout_weight="1"
+                        android:layout_marginLeft="10dp"
+                        android:textSize="22dp"
+                        android:gravity="left"
+                        android:visibility="gone"
+                        android:layout_marginBottom="15dp"
+                        android:text="心胸外科" />
+
+                    <com.aries.template.utils.ScaleTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#333333"
+                        android:layout_weight="1"
+                        android:layout_marginLeft="10dp"
+                        android:textSize="22dp"
+                        android:gravity="left"
+                        android:visibility="gone"
+                        android:layout_marginBottom="15dp"
+                        android:text="过度熬夜" />
+
+                    <com.aries.template.utils.ScaleTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#333333"
+                        android:layout_weight="1"
+                        android:layout_marginLeft="10dp"
+                        android:textSize="22dp"
+                        android:gravity="left"
+                        android:visibility="gone"
+                        android:layout_marginBottom="15dp"
+                        android:text="2022-04-06" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:layout_marginLeft="140dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_gravity="top"
+                    android:visibility="gone"
+                    android:layout_marginRight="10dp"
+                    android:orientation="vertical"
+                    >
+
+                    <com.aries.template.utils.ScaleTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#666666"
+                        android:layout_weight="1"
+                        android:layout_marginLeft="10dp"
+                        android:textSize="22dp"
+                        android:gravity="left"
+                        android:layout_marginBottom="15dp"
+                        android:text="处方信息：" />
+
+                    <com.aries.template.utils.ScaleTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#333333"
+                        android:layout_weight="1"
+                        android:layout_marginLeft="10dp"
+                        android:textSize="22dp"
+                        android:gravity="left"
+                        android:layout_marginBottom="15dp"
+                        android:text="1、阿莫西林（1天3次，每次2片）" />
+
+                    <com.aries.template.utils.ScaleTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#333333"
+                        android:layout_weight="1"
+                        android:layout_marginLeft="10dp"
+                        android:textSize="22dp"
+                        android:gravity="left"
+                        android:layout_marginBottom="15dp"
+                        android:text="2、止咳糖浆（1天3次，每次20毫升）" />
+
+                    <com.aries.template.utils.ScaleTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#333333"
+                        android:layout_weight="1"
+                        android:layout_marginLeft="10dp"
+                        android:textSize="22dp"
+                        android:gravity="left"
+
+                        android:text="3、口服液（1天2次，每次1支）" />
+
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical|top"
+                    android:layout_marginLeft="40dp"
+                    android:visibility="visible"
+                    android:orientation="vertical"
+                    >
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical|top"
+                    android:visibility="visible"
+                    android:layout_marginTop="60dp"
+                    android:layout_marginLeft="150dp"
+                    android:orientation="vertical"
+                    >
+                    <com.aries.template.utils.ScaleTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingLeft="40dp"
+                        android:textColor="#666"
+                        android:textSize="22dp"
+                        android:gravity="left"
+
+                        android:layout_marginBottom="25dp"
+                        android:text="本次复诊情况：" />
+
+                    <LinearLayout
+                        android:id="@+id/cb_protocol_tx_o"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingLeft="40dp"
+                        android:paddingVertical="8dp"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        >
+                        <androidx.appcompat.widget.AppCompatCheckBox
+                            android:id="@+id/cb_protocol_o"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:button="@drawable/checkbox_theme"
+                            android:paddingVertical="8dp"
+                            android:clickable="false"
+                            android:enabled="false"
+                         />
+
+                        <com.aries.template.utils.ScaleTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#333333"
+                            android:layout_weight="1"
+                            android:layout_marginLeft="10dp"
+                            android:textSize="22dp"
+                            android:gravity="left"
+                            android:text="本院同医生复诊" />
+                    </LinearLayout>
+
+
+                    <LinearLayout
+                        android:id="@+id/cb_protocol_tx_tw"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginTop="20dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingVertical="8dp"
+                        android:paddingLeft="40dp"
+                        >
+                        <androidx.appcompat.widget.AppCompatCheckBox
+                            android:id="@+id/cb_protocol_tw"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:button="@drawable/checkbox_theme"
+                            android:paddingVertical="8dp"
+                            android:clickable="false"
+                            android:enabled="false"
+                           />
+                        <com.aries.template.utils.ScaleTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#333333"
+                            android:layout_weight="1"
+                            android:layout_marginLeft="10dp"
+                            android:textSize="22dp"
+                            android:gravity="left"
+                            android:text="本院非同医生复诊" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/cb_protocol_tx_tr"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="horizontal"
+                        android:paddingLeft="40dp"
+                        android:layout_marginTop="20dp"
+                        android:gravity="center_vertical"
+                        android:paddingVertical="8dp"
+                        >
+                        <androidx.appcompat.widget.AppCompatCheckBox
+                            android:id="@+id/cb_protocol_tr"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:button="@drawable/checkbox_theme"
+                            android:paddingVertical="8dp"
+                            android:clickable="false"
+                            android:enabled="false"
+                         />
+                        <com.aries.template.utils.ScaleTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#333333"
+                            android:layout_weight="1"
+                            android:layout_marginLeft="10dp"
+                            android:textSize="22dp"
+                            android:gravity="left"
+                            android:text="非本院复诊" />
+                    </LinearLayout>
+                </LinearLayout>
+
+            </LinearLayout>
+            </ScrollView>
+
+            <com.aries.template.utils.ScaleTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#DCA63C"
+
+                android:layout_marginLeft="10dp"
+                android:textSize="22dp"
+
+                android:gravity="left"
+                android:text="温馨提示：请按照个人实际情况填写本页内容，以便医生诊断" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+
+                android:gravity="center"
+                android:orientation="horizontal"
+                >
+
+                <Button
+                    android:id="@+id/btn_cancel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="取消挂号"
+                    android:textColor="#999999"
+                    android:textSize="29dp"
+                    android:visibility="gone"
+                    android:gravity="center"
+                    android:layout_marginBottom="10dp"
+
+                    android:layout_marginLeft="30dp"
+                    android:layout_marginRight="60dp"
+                    android:background="@mipmap/btn_ago_yzs"
+                    />
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="确认复诊"
+                    android:textSize="29dp"
+
+                    android:textColor="#fff"
+                    android:gravity="center"
+                    android:id="@+id/btn_inquiry"
+
+                    android:background="@mipmap/btn_next_yzs"
+                    />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:paddingTop="10dp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            >
+
+            <Button
+                android:layout_width="160dp"
+                android:layout_height="60dp"
+                android:text="返回"
+                android:id="@+id/btn_back"
+                android:textSize="24dp"
+
+                android:textColor="#38ABA0"
+                android:gravity="center"
+                android:background="@mipmap/btn_back_yzs"
+                />
+
+            <Button
+                android:layout_width="160dp"
+                android:layout_height="60dp"
+                android:text="首页"
+
+                android:textSize="24dp"
+                android:id="@+id/btn_main"
+                android:textColor="#fff"
+                android:gravity="center"
+                android:layout_marginLeft="15dp"
+                android:background="@mipmap/btn_main_yzs"
+                />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_main"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:background="#00000000"
+        android:gravity="center_vertical"
+        android:paddingBottom="15dp"
+        android:orientation="horizontal">
+
+        <com.aries.template.utils.ScaleTextView
+            android:id="@+id/jtjk_machine_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="16dp"
+            android:layout_weight="1"
+            android:layout_marginLeft="80dp"
+            android:gravity="center_vertical"
+            android:textSize="16dp"
+            android:text="机器编号：583958794759"
+            android:textColor="#fff" />
+
+
+        <com.aries.template.utils.ScaleTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="10dp"
+            android:text="服务电话：96225"
+            android:textColor="#333"
+            android:visibility="gone" />
+
+        <com.aries.template.utils.ScaleTextView
+            android:id="@+id/tv_clock"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:paddingLeft="16dp"
+
+            android:fontFamily="sans-serif-light"
+            android:gravity="left"
+            android:textColor="#fff"
+            android:textSize="16dp"
+            android:textStyle="normal" />
+
+        <com.aries.template.utils.ScaleTextView
+            android:id="@+id/tv_version"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:paddingLeft="16dp"
+
+            android:fontFamily="sans-serif-light"
+            android:gravity="left"
+            android:textColor="#fff"
+            android:layout_marginRight="80dp"
+            android:textSize="16dp"
+            android:textStyle="normal"
+            />
+
+    </LinearLayout>
+</RelativeLayout>

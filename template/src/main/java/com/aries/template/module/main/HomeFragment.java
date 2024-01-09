@@ -3,9 +3,7 @@ package com.aries.template.module.main;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.util.Log;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.aries.library.fast.retrofit.FastLoadingObserver;
@@ -54,9 +52,9 @@ import io.reactivex.schedulers.Schedulers;
 public class HomeFragment extends BaseEventFragment{
 
     @BindView(R.id.iv_stjc)
-    ImageView iv_stjc;//身体检查
+    TextView iv_stjc;//身体检查
     @BindView(R.id.iv_fzpy)
-    ImageView iv_fzpy;//复诊配药
+    TextView iv_fzpy;//复诊配药
     @BindView(R.id.jtjk_machine_id)
     TextView jtjk_machine;//机器编号
     @BindView(R.id.jtjk_hospital_name)
@@ -144,7 +142,12 @@ public class HomeFragment extends BaseEventFragment{
 
     @Override
     public int getContentLayout() {
-        return R.layout.fragment_home;
+        if(GlobalConfig.thirdFactory.equals("3")||GlobalConfig.thirdFactory.equals("2")){
+            return R.layout.fragment_home_l;
+        }else {
+            return R.layout.fragment_home;
+        }
+//        return R.layout.fragment_home;
     }
 
     @Override
@@ -205,7 +208,11 @@ public class HomeFragment extends BaseEventFragment{
                 Intent intent= new Intent(Settings.ACTION_HOME_SETTINGS);
                 startActivity(intent);
 
-//                start(ResultFragment.newInstance(""));
+//                start(PhoneRegisterFragment.newInstance( "33052219861229693X", "王郭亮", "AR6114503"));
+
+//                start(ResultFragment.newInstance("paySuc"));
+
+//                start(ResultFragment.newInstance("fail"));
 
             }
         });
@@ -298,10 +305,51 @@ public class HomeFragment extends BaseEventFragment{
         if (!DefenceUtil.checkReSubmit("HomeFragment.requestMachineInfo")){
             return;
         }
-        String deviceId = ApiRepository.getDeviceId();
-        Log.e("deviceId",deviceId);
-        GlobalConfig.machineId = deviceId;
-        ApiRepository.getInstance().findByMachineId(deviceId)
+        String deviceId ;
+        if(GlobalConfig.thirdFactory.equals("3")){
+            // 湘湖
+                    GlobalConfig.machineId = "ZX1G42CPJD";
+                    GlobalConfig.thirdMachineId = "ZX1G42CPJD";
+            // 盈丰
+//            GlobalConfig.machineId = "ZX1G42CPJE";
+//            GlobalConfig.thirdMachineId = "ZX1G42CPJE";
+
+            // 湖山
+//            GlobalConfig.machineId = "ZX1G42CPJF";
+//            GlobalConfig.thirdMachineId = "ZX1G42CPJF";
+
+            // 南阳潮都
+//              GlobalConfig.machineId = "ZX1G42CPJG";
+//              GlobalConfig.thirdMachineId = "ZX1G42CPJG";
+
+            // 利丰
+//            GlobalConfig.machineId = "ZX1G42CPJH";
+//            GlobalConfig.thirdMachineId = "ZX1G42CPJH";
+
+            // 北干塘湾
+//            GlobalConfig.machineId = "ZX1G42CPJI";
+//            GlobalConfig.thirdMachineId = "ZX1G42CPJI";
+
+            // 戴村云石
+//            GlobalConfig.machineId = "ZX1G42CPJJ";
+//            GlobalConfig.thirdMachineId = "ZX1G42CPJJ";
+
+            // 义桥
+//            GlobalConfig.machineId = "ZX1G42CPJK";
+//            GlobalConfig.thirdMachineId = "ZX1G42CPJK";
+
+        }
+//        if(GlobalConfig.thirdFactory.equals("2")){
+//            GlobalConfig.machineId = "N73MAX3CZQ";
+//            GlobalConfig.thirdMachineId = "N73MAX3CZQ";
+//        }
+        else {
+            GlobalConfig.machineId = ApiRepository.getDeviceId();
+        }
+//         deviceId = ApiRepository.getDeviceId();
+//        Log.e("deviceId",deviceId);
+//        GlobalConfig.machineId = deviceId;
+        ApiRepository.getInstance().findByMachineId(GlobalConfig.machineId)
             .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
             .subscribe(new FastLoadingObserver<MachineEntity>("请稍后...") {
                 @Override
@@ -325,6 +373,12 @@ public class HomeFragment extends BaseEventFragment{
 //                        GlobalConfig.thirdMachineId = entity.data.thirdMachineId;// 暂定不赋予
                            GlobalConfig.factoryResource = entity.data.factoryResource;
                            GlobalConfig.factoryMainPage = entity.data.factoryMainPage;
+
+                           GlobalConfig.departmentID_1 = entity.data.firstDepartment;
+                           GlobalConfig.departmentID_2 = entity.data.secondDepartment;
+
+//                           GlobalConfig.departmentID_1 = "";
+//                           GlobalConfig.departmentID_2 = "";
 //                           Log.e("machineId",GlobalConfig.machineId);
 //                           Log.e("thirdFactory",GlobalConfig.thirdFactory);
                            // 设置显示对象数据

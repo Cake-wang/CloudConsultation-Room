@@ -19,12 +19,14 @@ import com.aries.library.fast.util.ToastUtil;
 import com.aries.template.GlobalConfig;
 import com.aries.template.R;
 import com.aries.template.adapter.FlowTagAdapter;
+import com.aries.template.entity.GetPhysicalReportInfoEntity;
 import com.aries.template.entity.PatientListEntity;
 import com.aries.template.entity.ReportListDataEntity;
 import com.aries.template.entity.RequestConsultAndCdrOtherdocResultEntity;
 import com.aries.template.module.base.BaseEventFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.template.utils.DateUtils;
+import com.aries.template.utils.RegUtils;
 import com.aries.ui.view.title.TitleBarView;
 import com.trello.rxlifecycle3.android.FragmentEvent;
 import com.xuexiang.xaop.annotation.SingleClick;
@@ -56,7 +58,12 @@ public class ConfirmConsultFragment extends BaseEventFragment implements Compoun
      */
     @Override
     public int getContentLayout() {
-        return R.layout.fragment_diagnose;
+        if(GlobalConfig.thirdFactory.equals("3")||GlobalConfig.thirdFactory.equals("2")){
+            return R.layout.fragment_diagnose_l;
+        }else {
+            return R.layout.fragment_diagnose;
+        }
+
     }
 
     /** 从外部传入的数据  */
@@ -88,6 +95,8 @@ public class ConfirmConsultFragment extends BaseEventFragment implements Compoun
     View cb_protocol_tx_tw;
     @BindView(R.id.cb_protocol_tx_tr)
     View cb_protocol_tx_tr;
+    @BindView(R.id.jtjk_recipe_name)
+    TextView jtjk_recipe_name;// 病人名称
 
     Integer returnVisitStatus = 0,alleric =  0,haveReaction =0;
     // 用于确认复诊单，输入扶正单 leavemessage
@@ -131,6 +140,9 @@ public class ConfirmConsultFragment extends BaseEventFragment implements Compoun
         cb_protocol_o.setEnabled(false);
         cb_protocol_tw.setEnabled(false);
         cb_protocol_tr.setEnabled(false);
+
+        // 显示名称
+        jtjk_recipe_name.setText(RegUtils.nameDesensitization(GlobalConfig.ssCard.getName())+"，您好");
     }
 
     private void initSingleFlowTagLayouto() {
@@ -197,7 +209,16 @@ public class ConfirmConsultFragment extends BaseEventFragment implements Compoun
                 // 确认，发起复诊请求
                 // 审查输入完整性
                 if (inputCheck())
-                    requestReportList();
+                    if (GlobalConfig.thirdFactory .equals("3")){
+
+//                        requestReportList();
+
+                        getPhysicalReportInfo();
+
+                    }else {
+                        requestReportList();
+                    }
+
                 break;
             case R.id.cb_protocol_tx_o:
                 cb_protocol_o.setChecked(true);
@@ -211,6 +232,72 @@ public class ConfirmConsultFragment extends BaseEventFragment implements Compoun
             default:
                 break;
         }
+    }
+
+    private void getPhysicalReportInfo() {
+
+
+        ApiRepository.getInstance().getPhysicalReportInfo(GlobalConfig.ssCard.getSSNum())
+                .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
+                .subscribe(new FastLoadingObserver<GetPhysicalReportInfoEntity>() {
+                    @Override
+                    public void _onNext(GetPhysicalReportInfoEntity entity) {
+                        if (entity == null) {
+                            ToastUtil.show("请检查网络");
+                            return;
+                        }
+                        try {
+                            if (entity.success){
+                                //  获取HTML 做为确认报告的输入
+
+                                if (entity.data!=null&&entity.data.size()>0){
+//                                    ToastUtil.show(entity.data.size()+"");
+//                                    JSONArray array = JSON.parseArray(entity.data);
+//                                    com.alibaba.fastjson.JSONObject jsonObject = (com.alibaba.fastjson.JSONObject) array.get(0);
+//                                    String time = jsonObject.get("reportTime").toString();
+                                    // 把第一个数据扔进去
+                                    // 判断是不是今天的
+//                                    if (DateUtils.ifToday(time)){
+                                        // 如果是今天的，则给予结果
+                                        reportHTML = (TextUtils.isEmpty(entity.data.get(0).getHeight()+"")?"":"身高："+entity.data.get(0).getHeight())+
+                                                    (TextUtils.isEmpty(entity.data.get(0).getWeight()+"")?"":" 体重："+entity.data.get(0).getWeight())+
+                                                    (TextUtils.isEmpty(entity.data.get(0).getTemperature()+"")?"":" 体温："+entity.data.get(0).getTemperature())+
+                                                    (TextUtils.isEmpty(entity.data.get(0).getSys()+"")?"":" 收缩压："+entity.data.get(0).getSys())+
+                                                    (TextUtils.isEmpty(entity.data.get(0).getDia()+"")?"":" 舒张压："+entity.data.get(0).getDia())+
+                                                    (TextUtils.isEmpty(entity.data.get(0).getPr()+"")?"":" 脉率："+entity.data.get(0).getPr())+
+                                                    (TextUtils.isEmpty(entity.data.get(0).getMea()+"")?"":" 平均压："+entity.data.get(0).getMea())+
+                                                    (TextUtils.isEmpty(entity.data.get(0).getConclusion()+"")?"":" 心电结论："+entity.data.get(0).getConclusion());
+//                                    }
+                                }else{
+//                                    ToastUtil.show("无数据");
+                                    // 如果不是今天的，则不给予结果
+                                    reportHTML = "";
+                                }
+                            }
+//                            else{
+//                                requestGetPatientList();
+//                            }
+                        }catch (Exception e){
+//                            requestGetPatientList();
+//                            ToastUtil.show("出错了");
+//                            e.printStackTrace();
+                            if(TextUtils.isEmpty(GlobalConfig.mpiId)){
+                                requestGetPatientList();
+                            }else {
+                                requestConsultAndCdrOtherdoc(GlobalConfig.mpiId);
+                            }
+                        }finally {
+                            if(TextUtils.isEmpty(GlobalConfig.mpiId)){
+                                requestGetPatientList();
+                            }else {
+                                requestConsultAndCdrOtherdoc(GlobalConfig.mpiId);
+                            }
+
+                        }
+                    }
+                });
+
+
     }
 
     /**
@@ -236,7 +323,7 @@ public class ConfirmConsultFragment extends BaseEventFragment implements Compoun
      * 为了能够获得Mpiid
      */
     public  void requestGetPatientList(){
-        ApiRepository.getInstance().getPatientList()
+        ApiRepository.getInstance().getPatientList(GlobalConfig.ssCard.getSSNum())
                 .compose(this.bindUntilEvent(FragmentEvent.DESTROY))
                 .subscribe(new FastLoadingObserver<PatientListEntity>() {
                     @Override

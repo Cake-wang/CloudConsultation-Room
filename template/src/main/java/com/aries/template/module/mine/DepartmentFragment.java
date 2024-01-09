@@ -13,6 +13,7 @@ import com.aries.template.R;
 import com.aries.template.entity.FindValidOrganProfessionForRevisitResultEntity;
 import com.aries.template.module.base.BaseEventFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
+import com.aries.template.utils.RegUtils;
 import com.aries.template.widget.autoadopter.AutoAdaptorProxy;
 import com.aries.template.widget.autoadopter.AutoObjectAdaptor;
 import com.aries.template.widget.autoadopter.DefenceAutoAdaptorProxy;
@@ -20,14 +21,13 @@ import com.aries.template.widget.updownbtn.UpDownProxy;
 import com.aries.ui.view.title.TitleBarView;
 import com.trello.rxlifecycle3.android.FragmentEvent;
 
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
-import androidx.recyclerview.widget.RecyclerView;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 
 /**
@@ -49,7 +49,12 @@ public class DepartmentFragment extends BaseEventFragment {
      */
     @Override
     public int getContentLayout() {
-        return R.layout.fragment_dept;
+        if(GlobalConfig.thirdFactory.equals("3")||GlobalConfig.thirdFactory.equals("2")){
+            return R.layout.fragment_dept_l;
+        }else {
+            return R.layout.fragment_dept;
+        }
+
     }
 
     /** 从外部传入的数据  */
@@ -155,7 +160,7 @@ public class DepartmentFragment extends BaseEventFragment {
         // 点击下一页
         btn_cancel.setOnClickListener(v -> {upDownProxy.doProReFlash();});
         // 显示名称
-        jtjk_recipe_name.setText(GlobalConfig.ssCard.getName()+"，您好");
+        jtjk_recipe_name.setText(RegUtils.nameDesensitization(GlobalConfig.ssCard.getName())+"，您好");
         // 设置标题
         title.setText("请选择一级科室");
     }

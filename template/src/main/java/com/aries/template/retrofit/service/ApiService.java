@@ -21,6 +21,7 @@ import com.aries.template.entity.GetConsultsAndRecipesResultEntity;
 import com.aries.template.entity.GetExamDataEntity;
 import com.aries.template.entity.GetMedicalInfoEntity;
 import com.aries.template.entity.GetPatientRecipeByIdEntity;
+import com.aries.template.entity.GetPhysicalReportInfoEntity;
 import com.aries.template.entity.GetRecipeListByConsultIdEntity;
 import com.aries.template.entity.GetStockInfoEntity;
 import com.aries.template.entity.GetTakeCodeEntity;
@@ -107,6 +108,12 @@ public interface ApiService {
     @Headers("Content-Type: application/json")
     @POST(ApiConstant.findUser)
     Observable<FindUserResultEntity> findUser(@Body RequestBody body);
+
+
+    @Headers("Content-Type: application/json")
+    @POST(ApiConstant.getPhysicalReportInfo)
+    Observable<GetPhysicalReportInfoEntity> getPhysicalReportInfo(@Body RequestBody body);
+
 
     @Headers("Content-Type: application/json")
     @POST(ApiConstant.register)

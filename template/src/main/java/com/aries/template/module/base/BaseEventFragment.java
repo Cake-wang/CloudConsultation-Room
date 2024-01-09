@@ -2,20 +2,23 @@ package com.aries.template.module.base;
 
 import android.annotation.SuppressLint;
 import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.text.Html;
 import android.widget.Button;
 import android.widget.TextView;
 
-import androidx.annotation.Nullable;
-
+import com.aries.library.fast.util.SizeUtil;
 import com.aries.template.GlobalConfig;
+import com.aries.template.MainActivity;
 import com.aries.template.R;
 import com.aries.template.module.main.HomeFragment;
+import com.aries.template.module.mine.ResultFragment;
 import com.aries.template.utils.ActivityUtils;
 import com.aries.template.utils.DateUtils;
 import com.aries.template.utils.DefenceUtil;
+import com.aries.template.view.ShineButtonDialog;
 
+import androidx.annotation.Nullable;
 import me.yokeyword.fragmentation.SupportFragment;
 
 /******
@@ -48,6 +51,8 @@ public abstract class BaseEventFragment extends BaseTimerFragment{
     /** 120  秒倒计时间 */
     protected int timeCount = 120;
 
+    ShineButtonDialog dialog;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,8 +80,59 @@ public abstract class BaseEventFragment extends BaseTimerFragment{
         if (btnMain !=null)
             btnMain.setOnClickListener(v ->{
                 if (DefenceUtil.checkReSubmit("btn_main")) {
-                    onDismiss();
-                    gotoMain();
+
+                    if(((MainActivity)getActivity()).getTopFragment()  instanceof ResultFragment  && ResultFragment.result.contains("paySuc")){
+
+
+
+
+
+
+
+                                dialog = new ShineButtonDialog(this.mContext);
+//                                dialog.tv_title_tip.setText("请根据凭条或取药码至药柜取药\n请您惠存取药码："+ResultFragment.takeCode);
+                                dialog.tv_title_tip.setText("请根据凭条或取药码至药柜取药");
+                                dialog.tv_title_tip.setTextSize(SizeUtil.dp2px(20));
+
+
+//                                String[] param = {"#38ABA0",ResultFragment.takeCode,"#00000000","0"};
+
+
+
+//                                dialog.tv_content_tip.setText("请您惠存取药码："+ActivityUtils.formatTextView(param));
+                        String str = "请您惠存取药码："+ "<font color=\"#38ABA0\">"+ResultFragment.takeCode+"</font>";
+                        dialog.tv_content_tip.setText(Html.fromHtml(str));
+                        dialog.tv_content_tip.setTextSize(SizeUtil.dp2px(24));
+
+                        dialog.btn_inquiry.setText("确定");
+
+                                dialog.btn_inquiry.setOnClickListener(vv -> {
+                                    // 防御代码
+                                    if (!DefenceUtil.checkReSubmit("BaseEventFragment.showSimpleConfirmDialog"))
+                                        return;
+
+                                    // 关闭对话框
+                                    dialog.dismiss();
+                                    onDismiss();
+                                    gotoMain();
+
+
+                                });
+                        dialog.btn_cancel.setText("取消");
+                                dialog.btn_cancel.setOnClickListener(vv ->  {dialog.dismiss();});
+                                dialog.iv_close.setOnClickListener(vv -> {dialog.dismiss();});
+                                dialog.show();
+
+
+
+
+
+
+                    }else {
+                        onDismiss();
+                        gotoMain();
+                    }
+
                 }
             });
         if (versionCode!=null && mContext!=null){
@@ -140,9 +196,29 @@ public abstract class BaseEventFragment extends BaseTimerFragment{
             if ( tvShowTimer !=null){
                 String[] param = {"#38ABA0",--timeCount+"","#333333","秒"};
                 tvShowTimer.setText(ActivityUtils.formatTextView(param));
+
+                if(((MainActivity)getActivity()).getTopFragment()  instanceof ResultFragment &&timeCount>90 && ResultFragment.result.contains("paySuc")){
+
+                    int timeCountx = timeCount-90;
+                    String[] paramx = {"#fff",timeCountx+"","#fff","秒"};
+//                    String[] paramx = {"#fff",--timeCountx+"","#fff","秒可返回首页"};
+//                    btnMain.setText(ActivityUtils.formatTextView(paramx));
+                    btnMain.setText("首页("+ActivityUtils.formatTextView(paramx)+")");
+                    btnMain.setEnabled(false);
+
+                }else {
+                    btnMain.setText("首页");
+                    btnMain.setEnabled(true);
+
+                }
+
             }
+
             // 显示对象 到时后跳转到主页
             if (timeCount==0){
+                if(dialog!=null){
+                    dialog.dismiss();
+                }
                 onDismiss();
                 gotoMain();
             }

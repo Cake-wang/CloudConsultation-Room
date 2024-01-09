@@ -7,13 +7,8 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.RecyclerView;
-
 import com.aries.library.fast.retrofit.FastLoadingObserver;
-import com.aries.library.fast.util.SPUtil;
 import com.aries.library.fast.util.ToastUtil;
-import com.aries.template.FakeDataExample;
 import com.aries.template.GlobalConfig;
 import com.aries.template.R;
 import com.aries.template.entity.CancelregisterResultEntity;
@@ -23,6 +18,7 @@ import com.aries.template.entity.ReceiveMessageFromPatientWithRequestModeEntity;
 import com.aries.template.module.base.BaseEventFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.template.utils.DateUtils;
+import com.aries.template.utils.RegUtils;
 import com.aries.template.view.ShineButtonDialog;
 import com.aries.ui.view.title.TitleBarView;
 import com.trello.rxlifecycle3.android.FragmentEvent;
@@ -30,6 +26,8 @@ import com.xuexiang.xaop.annotation.SingleClick;
 
 import java.io.Serializable;
 
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.OnClick;
 
@@ -95,10 +93,18 @@ public class OrderConsultFragment extends BaseEventFragment {
     @BindView(R.id.rv_contentFastLib)
     RecyclerView rv_contentFastLib;
 
+    @BindView(R.id.jtjk_recipe_name)
+    TextView jtjk_recipe_name;
+
 
     @Override
     public int getContentLayout() {
-        return R.layout.fragment_order;
+        if(GlobalConfig.thirdFactory.equals("3")||GlobalConfig.thirdFactory.equals("2")){
+            return R.layout.fragment_order_l;
+        }else {
+            return R.layout.fragment_order;
+        }
+
     }
 
     /**
@@ -146,8 +152,12 @@ public class OrderConsultFragment extends BaseEventFragment {
         btn_cancel.setText("取消挂号");
         btn_inquiry.setText("去问诊");
 
+        // 显示名称
+        jtjk_recipe_name.setText(RegUtils.nameDesensitization(GlobalConfig.ssCard.getName())+"，您好");
+
         String sex = GlobalConfig.ssCard.getSex().equals("0")?"女":"男";
-        tv_name.setText(obj.getConsults().getMpiName()+"("+sex+")");
+//        tv_name.setText(obj.getConsults().getMpiName()+"("+sex+")");
+        tv_name.setText(obj.getConsults().getMpiName());
         tv_card.setText(GlobalConfig.ssCard.getCardNum());
         tv_age.setText(String.valueOf(GlobalConfig.age));
         tv_doc.setText(obj.getConsults().getConsultDoctorText());

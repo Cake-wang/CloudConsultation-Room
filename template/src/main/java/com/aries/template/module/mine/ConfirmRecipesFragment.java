@@ -16,6 +16,7 @@ import com.aries.template.module.base.BaseEventFragment;
 import com.aries.template.module.main.HomeFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.template.utils.ActivityUtils;
+import com.aries.template.utils.RegUtils;
 import com.aries.template.view.ShineButtonDialog;
 import com.aries.template.widget.autoadopter.AutoAdaptorProxy;
 import com.aries.template.widget.autoadopter.AutoObjectAdaptor;
@@ -99,11 +100,21 @@ public class ConfirmRecipesFragment extends BaseEventFragment {
     @BindView(R.id.rv_contentFastLib)
     RecyclerView rv_contentFastLib; // 藏的很深的RV对象，显示处方信息
 
+    @BindView(R.id.jtjk_recipe_name)
+    TextView jtjk_recipe_name;// 病人名称
+
     private AutoAdaptorProxy<GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO> proxy; //处方显示对象
 
     @Override
     public int getContentLayout() {
-        return R.layout.fragment_recipe_order;
+
+        if(GlobalConfig.thirdFactory.equals("3")||GlobalConfig.thirdFactory.equals("2")){
+            return R.layout.fragment_recipe_order_l;
+        }else {
+            return R.layout.fragment_recipe_order;
+        }
+
+
     }
 
     /**
@@ -150,12 +161,16 @@ public class ConfirmRecipesFragment extends BaseEventFragment {
         btn_inquiry.setText("确认结算");
 //        String sex = GlobalConfig.ssCard.getSex().equals("0")?"女":"男";
         String sex = GlobalConfig.ssCard.getSex();
-        tv_name.setText(GlobalConfig.ssCard.getName().trim()+"("+sex+")");
+//        tv_name.setText(GlobalConfig.ssCard.getName().trim()+"("+sex+")");
+        tv_name.setText(GlobalConfig.ssCard.getName().trim());
         tv_card.setText(GlobalConfig.ssCard.getCardNum());
         tv_age_l.setText(String.valueOf(GlobalConfig.age));
         tv_dept.setText(currentRecipes.get(0).departText);
         tv_result.setText(currentRecipes.get(0).organDiseaseName);
         tv_date.setText(currentRecipes.get(0).createDate);
+
+        // 显示名称
+        jtjk_recipe_name.setText(RegUtils.nameDesensitization(GlobalConfig.ssCard.getName())+"，您好");
 
         // 将数据里面的 9 去除掉，是取消的处方单
         final List<GetRecipeListByConsultIdEntity.DataDTO.JsonResponseBeanDTO.BodyDTO> no9Recipes = new ArrayList<>();
@@ -298,7 +313,8 @@ public class ConfirmRecipesFragment extends BaseEventFragment {
                                     // 用量
                                     String perDayUse = "适量";
                                     if ((Double) vo.useDose!=null)
-                                        perDayUse = String.valueOf(((Double) vo.useDose).intValue()) + "片";
+//                                        perDayUse = String.valueOf(((Double) vo.useDose).intValue()) +vo.useDoseUnit;
+                                    perDayUse = Double.toString(vo.useDose) +vo.useDoseUnit;
 
 //                                    String howToUse = "(1天"+vo.useTotalDose/vo.useDays+"次，每次"+perDayUse+")";
                                     String howToUse = "("+vo.usingRateText+"，每次"+perDayUse+")";
@@ -456,7 +472,10 @@ public class ConfirmRecipesFragment extends BaseEventFragment {
 //                    int perDayUse = ((Double) vo.useDose).intValue();
                     String perDayUse = "适量";
                     if ((Double) vo.useDose!=null)
-                        perDayUse = String.valueOf(((Double) vo.useDose).intValue()) + "片";
+
+                        perDayUse = Double.toString(vo.useDose) + vo.useDoseUnit;
+
+//                        perDayUse = String.valueOf(((Double) vo.useDose).intValue()) + vo.useDoseUnit;
 
                     String drugName = (position+1)+"、"+vo.drugName;
 //                    String wayToUse = "(1天"+vo.useTotalDose/vo.useDays+"次，每次"+perDayUse+")";

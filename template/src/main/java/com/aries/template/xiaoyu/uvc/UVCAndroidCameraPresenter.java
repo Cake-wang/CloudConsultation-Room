@@ -287,7 +287,7 @@ public class UVCAndroidCameraPresenter {
      * 释放摄像头
      */
     public synchronized void releaseCamera() {
-        NemoSDK.getInstance().releaseCamera();
+//        NemoSDK.getInstance().releaseCamera();
         if (mUVCCamera != null) {
             try {
                 // maybe throw java.lang.IllegalStateException: already released

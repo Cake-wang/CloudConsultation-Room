@@ -90,7 +90,7 @@
                         android:layout_height="wrap_content"
                         android:layout_centerInParent="true"
                         android:scaleType="center"
-
+                        android:visibility="gone"
                         android:id="@+id/iv_doctor"
                         android:src="@mipmap/video_doctor_img" />
 
@@ -101,6 +101,7 @@
                         android:layout_marginTop="10dp"
                         android:text="等待医生接诊中，请稍候"
                         android:textSize="14dp"
+                        android:visibility="gone"
                         android:layout_below="@id/iv_doctor"
                         android:textColor="#38ABA0" />
 
@@ -110,7 +111,17 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:padding="12dp"
+                        android:layout_margin="20dp"
                         app:layout_constraintDimensionRatio="16:9" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_margin="20dp"
+                        android:id="@+id/ll_webview"
+                        android:orientation="vertical" >
+
+                    </LinearLayout>
                 </RelativeLayout>
 
                 <RelativeLayout
@@ -130,6 +141,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:gravity="center"
+
                         android:orientation="vertical">
 
                         <ProgressBar
@@ -148,15 +160,28 @@
                     </LinearLayout>
                     <com.aries.template.utils.ScaleTextView
                         android:id="@+id/tv_video_wait"
+                        android:layout_width="230dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:layout_marginTop="16dp"
+                        android:text="等待医生开具处方信息，请稍候\n\n如医生长时间未响应，可点击｜结束问诊｜按钮，取消本次问诊服务(费用会自动退回)"
+                        android:textSize="14dp"
+                        android:visibility="gone"
+                        android:textColor="#38ABA0" />
+                    <com.aries.template.utils.ScaleTextView
+                        android:id="@+id/tv_video_tip"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:gravity="center"
                         android:layout_marginTop="16dp"
-                        android:text="等待医生开具处方信息，请稍候"
-                        android:textSize="14dp"
+                        android:text="处方信息："
+
+                        android:textSize="18dp"
                         android:visibility="gone"
                         android:textColor="#38ABA0" />
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/rv_video_tip"
+                        android:layout_marginTop="20dp"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:padding="26dp"
@@ -204,7 +229,7 @@
                     android:background="@mipmap/btn_next_yzs"
                     android:gravity="center"
                     android:text="身体检测"
-                    android:enabled="false"
+
                     android:textColor="#fff" />
 
                 <Button

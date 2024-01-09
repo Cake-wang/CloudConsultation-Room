@@ -31,6 +31,7 @@ import com.aries.template.entity.GetConsultsAndRecipesResultEntity;
 import com.aries.template.entity.GetExamDataEntity;
 import com.aries.template.entity.GetMedicalInfoEntity;
 import com.aries.template.entity.GetPatientRecipeByIdEntity;
+import com.aries.template.entity.GetPhysicalReportInfoEntity;
 import com.aries.template.entity.GetRecipeListByConsultIdEntity;
 import com.aries.template.entity.GetStockInfoEntity;
 import com.aries.template.entity.GetTakeCodeEntity;
@@ -946,10 +947,10 @@ public class ApiRepository extends BaseRepository {
      * 获取病人详细数据 根据 TID
      * 唯一获得 mpiId 的地方
      */
-    public Observable<PatientListEntity> getPatientList() {
+    public Observable<PatientListEntity> getPatientList(String idcard) {
         // 除了公共的数据之外，还有其他的数据请求
         Map<String,Object> bizContent = new HashMap<>();
-
+        bizContent.put("idcard", idcard);//处方单 ID
         // 请求的类型
         RequestBody body = BodyCreate(bizContent,"patientList");
         return FastTransformer.switchSchedulers(getApiService().getPatientList(body).retryWhen(new FastRetryWhen()));
@@ -1063,6 +1064,19 @@ public class ApiRepository extends BaseRepository {
         RequestBody body = BodyCreate(bizContent,"reportList");
         return FastTransformer.switchSchedulers(getApiService().reportList(body).retryWhen(new FastRetryWhen()));
     }
+
+    public Observable<GetPhysicalReportInfoEntity> getPhysicalReportInfo(String idNo) {
+        // 除了公共的数据之外，还有其他的数据请求
+        // 除了公共的数据之外，还有其他的数据请求
+        Map<String,String> bizContent = new HashMap<>();
+        bizContent.put("idNo",idNo);
+        // 请求的类型 findValidOrganProfessionForRevisit
+        RequestBody body = BodyCreate(bizContent,"",false);
+        return FastTransformer.switchSchedulers(getApiService().getPhysicalReportInfo(body).retryWhen(new FastRetryWhen()));
+    }
+
+
+
 
     /**
      * 4.32.	复诊预结算

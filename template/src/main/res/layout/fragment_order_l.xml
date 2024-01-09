@@ -1,0 +1,645 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@mipmap/bg_main_yzs_new"
+    android:orientation="vertical">
+
+    <com.aries.template.utils.ScaleTextView
+        android:id="@+id/jtjk_hospital_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="16dp"
+        android:gravity="center"
+        android:layout_weight="2"
+        android:textSize="26dp"
+        android:layout_marginLeft="50dp"
+        android:layout_marginTop="40dp"
+        android:text="杭州市第一人民医院"
+        android:textColor="#fff" />
+
+    <com.aries.template.utils.ScaleTextView
+        android:id="@+id/jtjk_recipe_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="620dp"
+        android:layout_marginTop="42dp"
+        android:gravity="center"
+        android:text="王**：您好！"
+        android:textColor="#fff"
+        android:textSize="24dp"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="180dp"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:layout_marginBottom="110dp"
+        android:background="@drawable/bg_readcard_gray"
+        android:paddingTop="10dp"
+        android:paddingRight="40dp"
+        android:paddingLeft="40dp"
+        android:orientation="vertical"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            >
+
+            <View
+                android:layout_width="5dp"
+                android:layout_height="25dp"
+                android:background="#24A6A0"
+                />
+
+            <com.aries.template.utils.ScaleTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#333"
+                android:layout_weight="1"
+                android:layout_marginLeft="10dp"
+                android:textSize="24dp"
+                android:gravity="left"
+
+                android:text="请确认您的订单" />
+
+            <TextView
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:background="@mipmap/icon_countdown_yzs">
+
+            </TextView>
+
+            <com.aries.template.utils.ScaleTextView
+                android:id="@+id/jtjk_fz_fragment_timer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#333"
+                android:textSize="24dp"
+                android:layout_marginLeft="10dp"
+                android:gravity="center"
+                android:text="119秒" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="576dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:padding="20dp"
+            android:background="@drawable/bg_readcard_white"
+            android:gravity="center"
+            android:orientation="vertical"
+            >
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:scrollbars="none"
+                android:layout_height="400dp"
+                android:background="@mipmap/bg_pay_yzs"
+
+                >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:gravity="top"
+                android:paddingTop="80dp"
+                android:layout_marginVertical="16dp"
+                android:orientation="horizontal"
+                >
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:layout_marginLeft="80dp"
+
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
+                    android:orientation="vertical"
+                    >
+
+                    <com.aries.template.utils.ScaleTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#666666"
+                        android:layout_weight="1"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginLeft="10dp"
+                        android:textSize="22dp"
+                        android:gravity="left"
+                        android:id="@+id/tv_name_tv"
+                        android:layout_marginBottom="15dp"
+                        android:text="姓名：" />
+
+                    <com.aries.template.utils.ScaleTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#666666"
+                        android:layout_weight="1"
+                        android:layout_marginLeft="10dp"
+                        android:textSize="22dp"
+                        android:gravity="left"
+                        android:visibility="gone"
+                        android:id="@+id/tv_age_tv"
+                        android:layout_marginBottom="15dp"
+                        android:text="年龄：" />
+
+                    <com.aries.template.utils.ScaleTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#666666"
+                        android:layout_weight="1"
+                        android:layout_marginLeft="10dp"
+                        android:textSize="22dp"
+                        android:gravity="left"
+                        android:id="@+id/tv_card_tv"
+                        android:layout_marginBottom="15dp"
+                        android:text="医保卡号：" />
+
+                    <com.aries.template.utils.ScaleTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#666666"
+                        android:layout_weight="1"
+                        android:layout_marginLeft="10dp"
+                        android:textSize="22dp"
+                        android:gravity="left"
+                        android:layout_marginBottom="15dp"
+                        android:id="@+id/tv_doc_tv"
+                        android:text="医生：" />
+
+                    <com.aries.template.utils.ScaleTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#666666"
+                        android:layout_weight="1"
+                        android:layout_marginLeft="10dp"
+                        android:textSize="22dp"
+                        android:gravity="left"
+                        android:visibility="gone"
+                        android:id="@+id/tv_dept_tv"
+                        android:layout_marginBottom="15dp"
+                        android:text="科室：" />
+
+                    <com.aries.template.utils.ScaleTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#666666"
+                        android:layout_weight="1"
+                        android:layout_marginLeft="10dp"
+                        android:textSize="22dp"
+                        android:gravity="left"
+                        android:visibility="gone"
+                        android:id="@+id/tv_result_tv"
+                        android:layout_marginBottom="15dp"
+                        android:text="诊断结果：" />
+
+                    <com.aries.template.utils.ScaleTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#666666"
+                        android:layout_weight="1"
+                        android:layout_marginLeft="10dp"
+                        android:textSize="22dp"
+                        android:gravity="left"
+                        android:visibility="gone"
+                        android:id="@+id/tv_date_tv"
+                        android:layout_marginBottom="15dp"
+                        android:text="开方时间：" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
+
+                    android:layout_marginRight="10dp"
+                    android:orientation="vertical"
+                    >
+
+                    <com.aries.template.utils.ScaleTextView
+                        android:layout_marginTop="10dp"
+
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#333333"
+                        android:layout_weight="1"
+                        android:layout_marginLeft="10dp"
+                        android:textSize="22dp"
+                        android:gravity="left"
+                        android:id="@+id/tv_name"
+                        android:layout_marginBottom="15dp"
+                        android:text="王二二（男）" />
+
+                    <com.aries.template.utils.ScaleTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#333333"
+                        android:layout_weight="1"
+                        android:layout_marginLeft="10dp"
+                        android:textSize="22dp"
+                        android:gravity="left"
+                        android:visibility="gone"
+                        android:id="@+id/tv_age_l"
+                        android:layout_marginBottom="15dp"
+                        android:text="01" />
+
+                    <com.aries.template.utils.ScaleTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#333333"
+                        android:layout_weight="1"
+                        android:layout_marginLeft="10dp"
+                        android:textSize="22dp"
+                        android:gravity="left"
+                        android:id="@+id/tv_card"
+                        android:layout_marginBottom="15dp"
+                        android:text="A12345678" />
+
+                    <com.aries.template.utils.ScaleTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#333333"
+                        android:layout_weight="1"
+                        android:layout_marginLeft="10dp"
+                        android:textSize="22dp"
+                        android:gravity="left"
+                        android:layout_marginBottom="15dp"
+                        android:id="@+id/tv_doc"
+                        android:text="张三三" />
+
+                    <com.aries.template.utils.ScaleTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#333333"
+                        android:layout_weight="1"
+                        android:layout_marginLeft="10dp"
+                        android:textSize="22dp"
+                        android:gravity="left"
+                        android:visibility="gone"
+                        android:id="@+id/tv_dept"
+                        android:layout_marginBottom="15dp"
+                        android:text="心胸外科" />
+
+                    <com.aries.template.utils.ScaleTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#333333"
+                        android:layout_weight="1"
+                        android:layout_marginLeft="10dp"
+                        android:textSize="22dp"
+                        android:gravity="left"
+                        android:visibility="gone"
+                        android:id="@+id/tv_result"
+                        android:layout_marginBottom="15dp"
+                        android:text="过度熬夜" />
+
+                    <com.aries.template.utils.ScaleTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#333333"
+                        android:layout_weight="1"
+                        android:layout_marginLeft="10dp"
+                        android:textSize="22dp"
+                        android:gravity="left"
+                        android:visibility="gone"
+                        android:id="@+id/tv_date"
+                        android:layout_marginBottom="15dp"
+                        android:text="2022-04-06" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:layout_marginLeft="130dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_gravity="top"
+                    android:visibility="gone"
+                    android:id="@+id/ll_prescription"
+                    android:orientation="vertical"
+                    >
+
+                    <com.aries.template.utils.ScaleTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#666666"
+                        android:layout_weight="1"
+                        android:layout_marginLeft="10dp"
+                        android:textSize="22dp"
+                        android:gravity="left"
+                        android:layout_marginBottom="15dp"
+                        android:text="处方信息：" />
+
+
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rv_contentFastLib"
+                        android:layout_marginLeft="10dp"
+                        android:layout_width="340dp"
+                        android:layout_height="match_parent"/>
+
+
+<!--                    <include-->
+<!--                        layout="@layout/fast_layout_refresh_recycler"-->
+<!--                        android:layout_width="340dp"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_marginLeft="10dp"-->
+<!--                        />-->
+
+                    <com.aries.template.utils.ScaleTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#333333"
+                        android:layout_weight="1"
+                        android:layout_marginLeft="10dp"
+                        android:textSize="22dp"
+                        android:gravity="left"
+                        android:visibility="gone"
+                        android:layout_marginBottom="15dp"
+                        android:text="1、阿莫西林（1天3次，每次2片）" />
+
+                    <com.aries.template.utils.ScaleTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#333333"
+                        android:layout_weight="1"
+                        android:layout_marginLeft="10dp"
+                        android:textSize="22dp"
+                        android:gravity="left"
+                        android:visibility="gone"
+                        android:layout_marginBottom="15dp"
+                        android:text="2、止咳糖浆（1天3次，每次20毫升）" />
+
+                    <com.aries.template.utils.ScaleTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#333333"
+                        android:layout_weight="1"
+                        android:layout_marginLeft="10dp"
+                        android:textSize="22dp"
+                        android:gravity="left"
+                        android:visibility="gone"
+                        android:text="3、口服液（1天2次，每次1支）" />
+
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:layout_marginLeft="600dp"
+                    android:id="@+id/ll_order_text_r"
+                    android:visibility="visible"
+                    android:paddingTop="10dp"
+                    android:orientation="vertical"
+                    >
+
+                    <com.aries.template.utils.ScaleTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#666666"
+                        android:layout_weight="1"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginLeft="10dp"
+                        android:textSize="22dp"
+                        android:gravity="left"
+                        android:layout_marginBottom="15dp"
+                        android:text="年龄：" />
+
+                    <com.aries.template.utils.ScaleTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#666666"
+                        android:layout_weight="1"
+                        android:layout_marginLeft="10dp"
+                        android:textSize="22dp"
+                        android:gravity="left"
+                        android:layout_marginBottom="15dp"
+                        android:text="科室：" />
+
+                    <com.aries.template.utils.ScaleTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#666666"
+                        android:layout_weight="1"
+                        android:layout_marginLeft="10dp"
+                        android:textSize="22dp"
+                        android:gravity="left"
+
+                        android:text="挂号时间：" />
+
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:id="@+id/ll_order_r"
+                    android:visibility="visible"
+                    android:paddingTop="10dp"
+                    android:layout_marginRight="10dp"
+                    android:orientation="vertical"
+                    >
+
+                    <com.aries.template.utils.ScaleTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#333333"
+                        android:layout_weight="1"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginLeft="10dp"
+                        android:textSize="22dp"
+                        android:gravity="left"
+                        android:id="@+id/tv_age"
+                        android:layout_marginBottom="15dp"
+                        android:text="01" />
+
+                    <com.aries.template.utils.ScaleTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#333333"
+                        android:layout_weight="1"
+                        android:layout_marginLeft="10dp"
+                        android:textSize="22dp"
+                        android:gravity="left"
+                        android:id="@+id/tv_dept_r"
+                        android:layout_marginBottom="15dp"
+                        android:text="心胸外科" />
+
+                    <com.aries.template.utils.ScaleTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#333333"
+                        android:layout_weight="1"
+                        android:layout_marginLeft="10dp"
+                        android:textSize="22dp"
+                        android:gravity="left"
+                        android:id="@+id/tv_date_r"
+                        android:text="2022-04-06" />
+
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            </ScrollView>
+
+            <com.aries.template.utils.ScaleTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#FE6E63"
+                android:id="@+id/tv_tip_message"
+                android:layout_marginLeft="10dp"
+                android:textSize="20dp"
+                android:layout_marginTop="15dp"
+                android:gravity="left"
+                android:text="您已有挂号记录，是否发起问诊" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:paddingTop="10dp"
+                android:gravity="center"
+                android:orientation="horizontal"
+                >
+
+                <Button
+                    android:id="@+id/btn_cancel"
+                    android:layout_width="210dp"
+                    android:layout_height="72dp"
+                    android:text="取消挂号"
+                    android:textColor="#999999"
+                    android:gravity="center"
+                    android:textSize="24dp"
+                    android:layout_marginLeft="30dp"
+                    android:layout_marginRight="60dp"
+                    android:background="@mipmap/btn_ago_yzs"
+                    android:visibility="gone"
+                    />
+
+                <Button
+                    android:layout_width="210dp"
+                    android:layout_height="72dp"
+                    android:text="去问诊"
+                    android:textColor="#fff"
+                    android:gravity="center"
+                    android:textSize="24dp"
+                    android:id="@+id/btn_inquiry"
+                    android:layout_marginLeft="50dp"
+                    android:background="@mipmap/btn_next_yzs"
+                    />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:paddingTop="10dp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            >
+
+            <Button
+                android:layout_width="160dp"
+                android:layout_height="60dp"
+                android:text="返回"
+                android:textSize="24dp"
+                android:id="@+id/btn_back"
+                android:textColor="#38ABA0"
+                android:gravity="center"
+                android:background="@mipmap/btn_back_yzs"
+                />
+
+            <Button
+                android:layout_width="160dp"
+                android:layout_height="60dp"
+                android:text="首页"
+                android:textSize="24dp"
+                android:id="@+id/btn_main"
+                android:textColor="#fff"
+                android:gravity="center"
+                android:layout_marginLeft="15dp"
+                android:background="@mipmap/btn_main_yzs"
+                />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_main"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:background="#00000000"
+        android:gravity="center_vertical"
+        android:paddingBottom="15dp"
+        android:orientation="horizontal">
+
+        <com.aries.template.utils.ScaleTextView
+            android:id="@+id/jtjk_machine_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="16dp"
+            android:layout_weight="1"
+            android:layout_marginLeft="80dp"
+            android:gravity="center_vertical"
+            android:textSize="16dp"
+            android:text="机器编号：583958794759"
+            android:textColor="#fff" />
+
+
+        <com.aries.template.utils.ScaleTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="10dp"
+            android:text="服务电话：96225"
+            android:textColor="#333"
+            android:visibility="gone" />
+
+        <com.aries.template.utils.ScaleTextView
+            android:id="@+id/tv_clock"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:paddingLeft="16dp"
+
+            android:fontFamily="sans-serif-light"
+            android:gravity="left"
+            android:textColor="#fff"
+            android:textSize="16dp"
+            android:textStyle="normal" />
+
+        <com.aries.template.utils.ScaleTextView
+            android:id="@+id/tv_version"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:paddingLeft="16dp"
+
+            android:fontFamily="sans-serif-light"
+            android:gravity="left"
+            android:textColor="#fff"
+            android:layout_marginRight="80dp"
+            android:textSize="16dp"
+            android:textStyle="normal"
+            />
+
+    </LinearLayout>
+</RelativeLayout>

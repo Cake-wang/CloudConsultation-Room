@@ -137,7 +137,7 @@ public class XLMessage {
                                 // 如果返回的不是登录
                                 if (message.equals("TX_RTC_SHUTDOWN_RES")) {
                                     // 医生已经离开
-                                    ToastUtil.show("医生已经离开");
+//                                    ToastUtil.show("医生已经离开");
 //                                    ToastWithLogin("医生已经离开");
                                     if (listener != null)
                                         listener.sended(message);

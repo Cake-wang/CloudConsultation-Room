@@ -26,6 +26,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
+import com.aries.template.GlobalConfig;
 import com.aries.template.R;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -65,7 +66,12 @@ public class SplashDialog{
         // 获取最底层的显示对象
         screenLayout = new RelativeLayout(context);
         RelativeLayout.LayoutParams screenParams = new RelativeLayout.LayoutParams(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
-        screenLayout.setPadding(46,116,46,116);
+        if(GlobalConfig.thirdFactory.equals("3")||GlobalConfig.thirdFactory.equals("2")){
+            screenLayout.setPadding(46,130,46,100);
+        }else {
+            screenLayout.setPadding(46,116,46,116);
+        }
+
         screenLayout.setLayoutParams(screenParams);
         screenLayout.setVerticalGravity(RelativeLayout.CENTER_IN_PARENT);
         screenLayout.setHorizontalGravity(RelativeLayout.CENTER_IN_PARENT);

@@ -5,9 +5,6 @@ import android.app.Application;
 import android.os.Bundle;
 import android.util.Log;
 
-import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
-
 import com.aries.library.fast.delegate.FastRefreshDelegate;
 import com.aries.library.fast.delegate.FastRefreshLoadDelegate;
 import com.aries.library.fast.i.ActivityDispatchEventControl;
@@ -27,11 +24,14 @@ import com.aries.library.fast.manager.GlideManager;
 import com.aries.library.fast.retrofit.FastLoadingObserver;
 import com.aries.library.fast.retrofit.FastObserver;
 import com.aries.library.fast.util.FastUtil;
+import com.aries.library.fast.util.SizeUtil;
 import com.aries.library.fast.util.ToastUtil;
 import com.aries.library.fast.widget.FastLoadDialog;
 import com.aries.ui.widget.progress.UIProgressDialog;
 import com.scwang.smart.refresh.layout.listener.DefaultRefreshHeaderCreator;
 
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import cn.bingoogolapple.swipebacklayout.BGASwipeBackHelper;
 
 /**
@@ -150,6 +150,8 @@ public class FastManager {
                     return new FastLoadDialog(activity,
                             new UIProgressDialog.WeBoBuilder(activity)
                                     .setMessage(R.string.fast_loading)
+                                    .setLoadingSize(SizeUtil.dp2px(30))
+                                    .setTextSize(SizeUtil.dp2px(30f))
                                     .create());
                 }
             });

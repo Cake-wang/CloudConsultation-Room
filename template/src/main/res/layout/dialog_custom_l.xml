@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_readcard_white"
+    android:orientation="vertical"
+    android:layout_gravity="center"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:gravity="center_horizontal">
+
+    <LinearLayout
+        android:layout_width="600dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_gravity="center"
+        android:gravity="center_horizontal"
+        android:padding="16dp"
+        android:background="@drawable/bg_readcard_white"
+        >
+
+        <com.xuexiang.xui.widget.alpha.XUIAlphaImageView
+            android:id="@+id/iv_close"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:layout_marginTop="16dp"
+            app:srcCompat="@mipmap/btn_close_yzs" />
+
+        <com.aries.template.utils.ScaleTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#333"
+            android:id="@+id/tv_title_tip"
+            android:textSize="24dp"
+            android:gravity="left"
+            android:textStyle="bold"
+            android:text="取消支付订单" />
+
+        <com.aries.template.utils.ScaleTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#666"
+            android:layout_marginTop="10dp"
+            android:textSize="20dp"
+            android:gravity="left"
+            android:id="@+id/tv_content_tip"
+            android:text="取消后将无法再次支付，是否确认取消" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:paddingTop="10dp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            >
+
+            <Button
+                android:id="@+id/btn_inquiry"
+                android:layout_width="250dp"
+                android:layout_height="wrap_content"
+                android:text="是"
+                android:textColor="#fff"
+                android:gravity="center"
+                android:background="@mipmap/btn_next_yzs"
+                />
+
+            <Button
+                android:id="@+id/btn_cancel"
+                android:layout_width="250dp"
+                android:layout_height="wrap_content"
+                android:text="否"
+                android:textColor="#999999"
+                android:gravity="center"
+                android:layout_marginLeft="30dp"
+                android:background="@mipmap/btn_ago_yzs"
+                />
+
+
+    </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

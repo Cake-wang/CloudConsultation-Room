@@ -2,6 +2,8 @@ package com.aries.template.module.mine;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -14,6 +16,7 @@ import com.aries.template.entity.CanRequestOnlineConsultResultEntity;
 import com.aries.template.entity.SearchDoctorListByBusTypeV2ResultEntity;
 import com.aries.template.module.base.BaseEventFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
+import com.aries.template.utils.RegUtils;
 import com.aries.template.widget.autoadopter.AutoAdaptorProxy;
 import com.aries.template.widget.autoadopter.AutoObjectAdaptor;
 import com.aries.template.widget.autoadopter.DefenceAutoAdaptorProxy;
@@ -55,7 +58,12 @@ public class DoctorListFragment extends BaseEventFragment {
      */
     @Override
     public int getContentLayout() {
-        return R.layout.fragment_doctor;
+        if(GlobalConfig.thirdFactory.equals("3")||GlobalConfig.thirdFactory.equals("2")){
+            return R.layout.fragment_doctor_l;
+        }else {
+            return R.layout.fragment_doctor;
+        }
+
     }
 
     /** 从外部传入的数据  */
@@ -127,6 +135,23 @@ public class DoctorListFragment extends BaseEventFragment {
                     public void onItemViewDraw(AutoObjectAdaptor.ViewHolder holder, int position, Map itemData) {
                         SearchDoctorListByBusTypeV2ResultEntity.QueryArrearsSummary.JsonResponseBean.OrganProfessionDTO.DocList.Doctor doc = ((SearchDoctorListByBusTypeV2ResultEntity.QueryArrearsSummary.JsonResponseBean.OrganProfessionDTO.DocList.Doctor) itemData.get(KEY_ITEM_CURRENT_DOC));
                         ((TextView)holder.itemView.findViewById(R.id.jtjk_doc_item_name_tv)).setText(doc.getName());
+
+                        if (!TextUtils.isEmpty(doc.getProTitleText())){
+                            ((TextView)holder.itemView.findViewById(R.id.jtjk_doc_item_title_tv)).setVisibility(View.VISIBLE);
+                            ((TextView)holder.itemView.findViewById(R.id.jtjk_doc_item_title_tv)).setText(doc.getProTitleText());
+                            if (doc.getProTitleText().startsWith("主")){
+                                ((TextView)holder.itemView.findViewById(R.id.jtjk_doc_item_title_tv)).setBackgroundResource(R.drawable.color_gradient);
+                            }else if(doc.getProTitleText().startsWith("副")){
+                                ((TextView)holder.itemView.findViewById(R.id.jtjk_doc_item_title_tv)).setBackgroundResource(R.drawable.color_gradient_x);
+                            }else {
+                                ((TextView)holder.itemView.findViewById(R.id.jtjk_doc_item_title_tv)).setBackgroundResource(R.drawable.color_gradient_xx);
+
+                            }
+                        }else {
+                            ((TextView)holder.itemView.findViewById(R.id.jtjk_doc_item_title_tv)).setVisibility(View.GONE);
+                        }
+
+
 //                        ((TextView)holder.itemView.findViewById(R.id.jtjk_doc_item_introduce_tv)).setMovementMethod(new ScrollingMovementMethod());
 //                        ((TextView)holder.itemView.findViewById(R.id.jtjk_doc_item_introduce_tv)).setFocusable(false);
                         ((TextView)holder.itemView.findViewById(R.id.jtjk_doc_item_introduce_tv)).setText(doc.getIntroduce());
@@ -164,7 +189,7 @@ public class DoctorListFragment extends BaseEventFragment {
         btn_inquiry.setOnClickListener(v -> {upDownProxy.doNextReFlash();});
         btn_cancel.setOnClickListener(v -> {upDownProxy.doProReFlash();});
         // 显示名称
-        jtjk_recipe_name.setText(GlobalConfig.ssCard.getName()+"，您好");
+        jtjk_recipe_name.setText(RegUtils.nameDesensitization(GlobalConfig.ssCard.getName())+"，您好");
         title.setText("请选择就诊医生");
         // 请求一级科室
         requestDoctorInfo();

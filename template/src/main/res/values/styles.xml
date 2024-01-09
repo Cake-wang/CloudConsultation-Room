@@ -35,4 +35,13 @@
 
     </style>
 
+    <style name="Dialog" parent="android:style/Theme.Dialog">
+
+        <item name="android:background">@drawable/bg_readcard_white</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">true</item>
+    </style>
+
+
 </resources>

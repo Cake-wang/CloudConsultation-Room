@@ -386,6 +386,9 @@ public class DapinSocketProxy {
      * @param _currentTime 当前请求的次数
      */
     public void startSocket(String _flag, int _currentTime){
+        if (!GlobalConfig.thirdFactory.equals("1")){
+            return;
+        }
         GlobalConfig.lastDapinSocketStr = _flag;
 
         // 如果IP 是空的，则不请求

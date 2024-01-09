@@ -1,0 +1,809 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@mipmap/bg_other_yzs_new">
+
+    <com.aries.template.utils.ScaleTextView
+        android:id="@+id/jtjk_hospital_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="16dp"
+        android:gravity="center"
+        android:layout_weight="2"
+        android:textSize="26dp"
+        android:layout_marginLeft="50dp"
+        android:layout_marginTop="40dp"
+        android:text="杭州市第一人民医院"
+        android:textColor="#fff" />
+
+    <com.aries.template.utils.ScaleTextView
+        android:id="@+id/jtjk_recipe_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="620dp"
+        android:layout_marginTop="42dp"
+        android:gravity="center"
+        android:text="王**：您好！"
+        android:textColor="#fff"
+        android:textSize="24dp"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="40dp"
+        android:layout_marginTop="180dp"
+        android:layout_marginRight="40dp"
+        android:layout_marginBottom="110dp"
+        android:background="@drawable/bg_readcard_gray"
+        android:orientation="vertical"
+        android:paddingLeft="40dp"
+        android:paddingTop="10dp"
+        android:paddingRight="40dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <View
+                android:layout_width="5dp"
+                android:layout_height="25dp"
+                android:background="#24A6A0" />
+
+            <com.aries.template.utils.ScaleTextView
+                android:id="@+id/jtjk_video_doctorname"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+
+                android:gravity="left"
+                android:text="复诊医生: "
+                android:textColor="#333"
+                android:textSize="24dp"
+                />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="260dp"
+                android:layout_marginBottom="10dp"
+                android:gravity="center"
+                >
+
+
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    >
+                    <ImageView
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:src="@mipmap/process_f"
+
+
+                        />
+
+                    <com.aries.template.utils.ScaleTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#777"
+                        android:layout_marginTop="4dp"
+
+                        android:textSize="12dp"
+                        android:gravity="left"
+
+                        android:text="等待医生接诊" />
+                </LinearLayout>
+
+                <ImageView
+                    android:layout_width="90dp"
+                    android:layout_height="wrap_content"
+                    android:src="@mipmap/process_l_x"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginLeft="-20dp"
+                    android:id="@+id/iv_process_l_x"
+
+                    />
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="-5dp"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    >
+                    <ImageView
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:src="@mipmap/process_2_x"
+                        android:id="@+id/iv_process_2_x"
+
+                        />
+                    <com.aries.template.utils.ScaleTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#999"
+                        android:id="@+id/tv_process_2_x"
+                        android:layout_marginTop="4dp"
+                        android:textSize="12dp"
+                        android:gravity="left"
+
+                        android:text="问诊开方" />
+                </LinearLayout>
+
+                <ImageView
+                    android:layout_width="90dp"
+                    android:layout_height="wrap_content"
+                    android:src="@mipmap/process_l_x"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginLeft="-5dp"
+                    android:id="@+id/iv_process_l_x_x"
+                    />
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="-5dp"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    >
+                    <ImageView
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:src="@mipmap/process_3_x"
+                        android:id="@+id/iv_process_3_x"
+
+                        />
+                    <com.aries.template.utils.ScaleTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#999"
+                        android:id="@+id/tv_process_3_x"
+                        android:layout_marginTop="4dp"
+                        android:textSize="12dp"
+                        android:gravity="left"
+
+                        android:text="药师审方" />
+                </LinearLayout>
+
+                <ImageView
+                    android:layout_width="90dp"
+                    android:layout_height="wrap_content"
+                    android:src="@mipmap/process_l_x"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginLeft="-5dp"
+                    android:id="@+id/iv_process_l_x_x_x"
+                    />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="-5dp"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    >
+                    <ImageView
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:id="@+id/iv_process_4_x"
+                        android:src="@mipmap/process_4_x"
+
+                        />
+                    <com.aries.template.utils.ScaleTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#999"
+                        android:id="@+id/tv_process_4_x"
+                        android:layout_marginTop="4dp"
+                        android:textSize="12dp"
+                        android:gravity="left"
+
+                        android:text="结束问诊" />
+                </LinearLayout>
+
+
+                <ImageView
+                    android:layout_width="90dp"
+                    android:layout_height="wrap_content"
+                    android:src="@mipmap/process_l_x"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginLeft="-5dp"
+                    />
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="-5dp"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    >
+                    <ImageView
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:src="@mipmap/process_5_x"
+
+
+                        />
+                    <com.aries.template.utils.ScaleTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#999"
+
+                        android:layout_marginTop="4dp"
+                        android:textSize="12dp"
+                        android:gravity="left"
+
+                        android:text="费用结算" />
+                </LinearLayout>
+
+                <ImageView
+                    android:layout_width="90dp"
+                    android:layout_height="wrap_content"
+                    android:src="@mipmap/process_l_x"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginLeft="-5dp"
+                    />
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    >
+                    <ImageView
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:src="@mipmap/process_6_x"
+
+
+                        />
+                    <com.aries.template.utils.ScaleTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#999"
+                        android:layout_marginTop="4dp"
+
+                        android:textSize="12dp"
+                        android:gravity="left"
+
+                        android:text="取药" />
+                </LinearLayout>
+
+
+
+            </LinearLayout>
+
+            <com.aries.template.utils.ScaleTextView
+                android:id="@+id/jtjk_fz_fragment_timer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableLeft="@mipmap/icon_countdown_yzs"
+                android:drawablePadding="10dp"
+                android:gravity="center"
+                android:text=""
+                android:textColor="#333"
+                android:textSize="24dp"
+                android:visibility="gone" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:visibility="gone"
+            android:id="@+id/ll_older"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/bg_readcard_white"
+            android:gravity="center"
+            android:orientation="vertical">
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:layout_marginHorizontal="10dp"
+                android:layout_marginVertical="16dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <RelativeLayout
+                    android:layout_width="0dp"
+                    android:minHeight="300dp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="top"
+                    android:layout_marginTop="20dp"
+
+                    android:layout_weight="1"
+                    android:background="@mipmap/bg_redio_yzs"
+                    android:gravity="top"
+                    android:visibility="visible">
+
+                    <ImageView
+                        android:layout_width="230dp"
+                        android:layout_height="180dp"
+                        android:layout_centerInParent="true"
+                        android:scaleType="center"
+
+                        android:id="@+id/iv_doctor"
+                        android:src="@mipmap/video_doctor_img" />
+
+                    <com.aries.template.utils.ScaleTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginTop="10dp"
+                        android:text="等待医生接诊中，请稍候"
+                        android:textSize="24dp"
+
+                        android:layout_below="@id/iv_doctor"
+                        android:textColor="#38ABA0" />
+
+                    <!--                    <LinearLayout-->
+                    <!--                        android:layout_width="match_parent"-->
+                    <!--                        android:layout_height="match_parent"-->
+                    <!--                        android:layout_margin="30dp"-->
+                    <!--                        android:id="@+id/ll_webview"-->
+                    <!--                        android:orientation="vertical" >-->
+
+                    <!--                    </LinearLayout>-->
+
+                    <VideoView
+                        android:id="@+id/videoview"
+                        android:layout_width="match_parent"
+                        android:layout_margin="30dp"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center_horizontal" />
+
+
+<!--                    <androidx.constraintlayout.widget.ConstraintLayout-->
+<!--                        android:id="@+id/videoContent"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="match_parent"-->
+<!--                        android:padding="12dp"-->
+<!--                        android:visibility="gone"-->
+<!--                        android:layout_margin="20dp"-->
+<!--                        app:layout_constraintDimensionRatio="16:9" />-->
+
+
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="top"
+                    android:layout_marginLeft="30dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_weight="1"
+                    android:background="@mipmap/bg_redio_yzs"
+                    android:gravity="center"
+                    android:padding="20dp"
+                    android:visibility="visible">
+
+                    <LinearLayout
+                        android:id="@+id/rv_video_wait"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+
+                        android:orientation="vertical">
+
+                        <ProgressBar
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
+                            android:indeterminateTint="#38ABA0" />
+
+                        <com.aries.template.utils.ScaleTextView
+                            android:layout_width="280dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:text="如医生长时间未响应，可点击｜结束问诊｜按钮，取消本次问诊服务(费用会自动退回)"
+                            android:textSize="18dp"
+
+                            android:textColor="#38ABA0" />
+                    </LinearLayout>
+                    <com.aries.template.utils.ScaleTextView
+                        android:id="@+id/tv_video_wait"
+                        android:layout_width="280dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:layout_marginTop="16dp"
+                        android:text="等待医生开具处方信息，请稍候"
+                        android:textSize="18dp"
+                        android:visibility="gone"
+                        android:textColor="#38ABA0" />
+                    <com.aries.template.utils.ScaleTextView
+                        android:id="@+id/tv_video_tip"
+                        android:layout_width="230dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:layout_marginTop="16dp"
+                        android:text="处方信息："
+                        android:visibility="gone"
+                        android:textSize="22dp"
+
+                        android:textColor="#666" />
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rv_video_tip"
+                        android:layout_marginTop="20dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:padding="56dp"
+                        android:visibility="gone"
+                        />
+                    <com.aries.template.utils.ScaleTextView
+                        android:id="@+id/tv_process_tip"
+                        android:layout_width="280dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:layout_alignParentBottom="true"
+                        android:layout_marginBottom="20dp"
+                        android:text="等待医生接诊..."
+                        android:visibility="gone"
+                        android:textSize="24dp"
+
+                        android:textColor="#DCA63C" />
+                </RelativeLayout>
+
+            </LinearLayout>
+
+
+            <com.aries.template.utils.ScaleTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="15dp"
+                android:gravity="left"
+                android:text="您已有挂号记录，是否发起问诊"
+                android:textColor="#FE6E63"
+                android:textSize="22dp"
+                android:visibility="gone" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_marginBottom="20dp"
+                android:orientation="horizontal"
+                android:paddingTop="5dp">
+
+                <Button
+                    android:id="@+id/btn_full_screen"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="30dp"
+                    android:textSize="29dp"
+                    android:layout_marginRight="10dp"
+                    android:background="@mipmap/btn_next_yzs"
+                    android:gravity="center"
+                    android:visibility="gone"
+                    android:text="全屏播放"
+                    android:textColor="#fff" />
+
+                <Button
+                    android:id="@+id/btn_stjc"
+                    android:layout_width="200dp"
+                    android:layout_height="80dp"
+
+                    android:background="@mipmap/btn_next_yzs"
+                    android:gravity="center"
+                    android:textSize="29dp"
+                    android:text="身体检测"
+
+                    android:textColor="#fff" />
+
+                <Button
+                    android:id="@+id/btn_finish"
+                    android:layout_width="200dp"
+                    android:layout_height="80dp"
+                    android:layout_marginLeft="50dp"
+                    android:background="@mipmap/bg_end_yzs"
+                    android:gravity="center"
+                    android:textSize="29dp"
+                    android:text="结束问诊"
+                    android:textColor="#fff" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/bg_readcard_white"
+            android:gravity="center"
+            android:id="@+id/fl_new"
+            android:orientation="horizontal">
+
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+
+
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <!--                <RelativeLayout-->
+                <!--                    android:layout_width="510dp"-->
+                <!--                    android:minHeight="300dp"-->
+                <!--                    android:layout_height="match_parent"-->
+                <!--                    android:layout_gravity="center"-->
+                <!--                    android:layout_marginTop="20dp"-->
+
+                <!--                    android:layout_weight="1"-->
+                <!--                    android:gravity="top"-->
+                <!--                    android:visibility="visible">-->
+
+                <!--                    <ImageView-->
+                <!--                        android:layout_width="230dp"-->
+                <!--                        android:layout_height="180dp"-->
+                <!--                        android:layout_centerInParent="true"-->
+                <!--                        android:scaleType="center"-->
+                <!--                        android:visibility="gone"-->
+                <!--                        android:id="@+id/iv_doctor"-->
+                <!--                        android:src="@mipmap/video_doctor_img" />-->
+
+                <!--                    <com.aries.template.utils.ScaleTextView-->
+                <!--                        android:layout_width="wrap_content"-->
+                <!--                        android:layout_height="wrap_content"-->
+                <!--                       android:layout_centerHorizontal="true"-->
+                <!--                        android:layout_marginTop="10dp"-->
+                <!--                        android:text="等待医生接诊中，请稍候"-->
+                <!--                        android:textSize="24dp"-->
+                <!--                        android:visibility="gone"-->
+                <!--                        android:layout_below="@id/iv_doctor"-->
+                <!--                        android:textColor="#38ABA0" />-->
+
+                <!--                    <LinearLayout-->
+                <!--                        android:layout_width="match_parent"-->
+                <!--                        android:layout_height="match_parent"-->
+                <!--                        android:layout_margin="30dp"-->
+                <!--                        android:id="@+id/ll_webview"-->
+                <!--                        android:orientation="vertical" >-->
+
+                <!--                    </LinearLayout>-->
+
+                <VideoView
+                    android:id="@+id/videoview_x"
+                    android:layout_width="1020dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center" />
+
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/videoContent"
+                    android:layout_width="1020dp"
+                    android:layout_height="match_parent"
+                    android:padding="2dp"
+                    android:visibility="gone"
+
+                    app:layout_constraintDimensionRatio="16:9" />
+
+
+
+                <!--                </RelativeLayout>-->
+
+
+
+            </LinearLayout>
+
+
+            <com.aries.template.utils.ScaleTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="15dp"
+                android:gravity="left"
+                android:text="您已有挂号记录，是否发起问诊"
+                android:textColor="#FE6E63"
+                android:textSize="22dp"
+                android:visibility="gone" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:layout_gravity="right"
+                android:layout_marginRight="70dp"
+                android:orientation="vertical"
+                android:paddingTop="5dp">
+
+                <Button
+                    android:id="@+id/btn_full_screen_x"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="30dp"
+                    android:textSize="29dp"
+                    android:layout_marginRight="10dp"
+                    android:background="@mipmap/btn_next_yzs"
+                    android:gravity="center"
+                    android:visibility="gone"
+                    android:text="全屏播放"
+                    android:textColor="#fff" />
+
+
+
+                <com.aries.template.utils.ScaleTextView
+                    android:id="@+id/tv_process_tip_x"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:layout_weight="1"
+                    android:layout_alignParentBottom="true"
+                    android:text="等待医生接诊..."
+                    android:visibility="visible"
+                    android:textSize="24dp"
+
+                    android:textColor="#37A19C" />
+
+
+                <Button
+                    android:id="@+id/btn_finish_x"
+                    android:layout_width="200dp"
+                    android:layout_height="80dp"
+                    android:background="@mipmap/bg_end_yzs"
+                    android:gravity="center"
+                    android:textSize="29dp"
+                    android:text="结束问诊"
+                    android:textColor="#fff" />
+
+                <Button
+                    android:id="@+id/btn_stjc_x"
+                    android:layout_width="200dp"
+                    android:layout_height="80dp"
+                    android:layout_marginTop="20dp"
+                    android:background="@mipmap/btn_next_yzs"
+                    android:gravity="center"
+                    android:textSize="29dp"
+                    android:layout_marginBottom="20dp"
+                    android:text="身体检测"
+
+                    android:textColor="#fff" />
+
+
+            </LinearLayout>
+
+        </FrameLayout>
+
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingTop="10dp">
+
+            <Button
+                android:id="@+id/btn_back"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@mipmap/btn_back_yzs"
+                android:gravity="center"
+                android:text="返回"
+                android:textColor="#38ABA0"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/btn_main"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="15dp"
+                android:background="@mipmap/btn_main_yzs"
+                android:gravity="center"
+                android:text="首页"
+                android:textColor="#fff"
+                android:visibility="gone" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_main"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:background="#00000000"
+        android:gravity="center_vertical"
+        android:paddingBottom="15dp"
+        android:orientation="horizontal">
+
+        <com.aries.template.utils.ScaleTextView
+            android:id="@+id/jtjk_machine_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="16dp"
+            android:layout_weight="1"
+            android:layout_marginLeft="80dp"
+            android:gravity="center_vertical"
+            android:textSize="16dp"
+            android:text="机器编号：583958794759"
+            android:textColor="#fff" />
+
+
+        <com.aries.template.utils.ScaleTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="10dp"
+            android:text="服务电话：96225"
+            android:textColor="#333"
+            android:visibility="gone" />
+
+        <com.aries.template.utils.ScaleTextView
+            android:id="@+id/tv_clock"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:paddingLeft="16dp"
+
+            android:fontFamily="sans-serif-light"
+            android:gravity="left"
+            android:textColor="#fff"
+            android:textSize="16dp"
+            android:textStyle="normal" />
+
+        <com.aries.template.utils.ScaleTextView
+            android:id="@+id/tv_version"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:paddingLeft="16dp"
+
+            android:fontFamily="sans-serif-light"
+            android:gravity="left"
+            android:textColor="#fff"
+            android:layout_marginRight="80dp"
+            android:textSize="16dp"
+            android:textStyle="normal"
+            />
+
+    </LinearLayout>
+
+    <!-- 全屏时使用的容器 -->
+    <RelativeLayout
+        android:id="@+id/jtjk_video_content_parent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/black"
+        android:visibility="gone"
+        >
+        <RelativeLayout
+            android:id="@+id/jtjk_video_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="82dp"
+            android:orientation="horizontal"
+            android:gravity="right"
+            >
+            <com.aries.template.utils.ScaleTextView
+                android:id="@+id/jtjk_video_close_full"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:background="@mipmap/btn_next_yzs"
+                android:text="关闭全屏"
+                android:textSize="24dp"
+                android:gravity="center"
+                android:textColor="@color/white"
+                />
+        </LinearLayout>
+    </RelativeLayout>
+</RelativeLayout>

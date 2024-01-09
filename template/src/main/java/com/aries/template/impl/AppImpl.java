@@ -7,11 +7,6 @@ import android.os.Build;
 import android.view.View;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.RecyclerView;
-
 import com.aries.library.fast.i.FastObserverControl;
 import com.aries.library.fast.i.FastRecyclerViewControl;
 import com.aries.library.fast.i.IFastRefreshLoadView;
@@ -43,6 +38,10 @@ import com.scwang.smart.refresh.layout.api.RefreshHeader;
 import com.scwang.smart.refresh.layout.api.RefreshLayout;
 import com.scwang.smart.refresh.layout.listener.DefaultRefreshHeaderCreator;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.RecyclerView;
 import me.bakumon.statuslayoutmanager.library.StatusLayoutManager;
 
 /**
@@ -155,6 +154,8 @@ public class AppImpl implements DefaultRefreshHeaderCreator, LoadMoreFoot,
         return new FastLoadDialog(activity,
                 new UIProgressDialog.WeBoBuilder(activity)
                         .setMessage("加载中")
+                        .setLoadingSize(SizeUtil.dp2px(30))
+                        .setTextSize(SizeUtil.dp2px(30f))
                         .create())
                 .setCanceledOnTouchOutside(false)
                 .setMessage("请求数据中,请稍候...");

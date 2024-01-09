@@ -7,6 +7,7 @@ import android.text.TextUtils;
 
 import com.aries.library.fast.retrofit.FastLoadingObserver;
 import com.aries.library.fast.util.ToastUtil;
+import com.aries.template.FakeDataExample;
 import com.aries.template.GlobalConfig;
 import com.aries.template.MainActivity;
 import com.aries.template.R;
@@ -138,25 +139,25 @@ public class MineCardFragment extends BaseEventFragment{
      * 启动社保卡
      */
     private void callIDMachine() {
-//        if (getActivity() !=null)
-//        ((MainActivity)getActivity()).setSSDCardData(FakeDataExample.fakeSSCard()); //todo cc
+        if (getActivity() !=null)
+        ((MainActivity)getActivity()).setSSDCardData(FakeDataExample.fakeSSCard()); //todo cc
 
 //       Log.d("111111MODEL", "111111MODEL");
 
 
 
-        if (GlobalConfig.thirdFactory.equals("3")){
-//        if (GlobalConfig.thirdFactory.equals("1")){
-            timeLoop();
-
-        }else {
-            handler = new Handler();
-            handler.postDelayed(() -> {
-                // 要执行的操作 启动卡片读取操作。
-                if (getActivity() !=null)
-                    ((MainActivity)getActivity()).openSerialport();
-            }, 500);//3秒后执行Runnable中的run方法
-        }
+//        if (GlobalConfig.thirdFactory.equals("3")){
+////        if (GlobalConfig.thirdFactory.equals("1")){
+//            timeLoop();
+//
+//        }else {
+//            handler = new Handler();
+//            handler.postDelayed(() -> {
+//                // 要执行的操作 启动卡片读取操作。
+//                if (getActivity() !=null)
+//                    ((MainActivity)getActivity()).openSerialport();
+//            }, 500);//3秒后执行Runnable中的run方法
+//        }
 
     }
 
@@ -204,7 +205,12 @@ public class MineCardFragment extends BaseEventFragment{
 
     @Override
     public int getContentLayout() {
-        return R.layout.fragment_mine;
+        if(GlobalConfig.thirdFactory.equals("3")||GlobalConfig.thirdFactory.equals("2")){
+            return R.layout.fragment_mine_l;
+        }else {
+            return R.layout.fragment_mine;
+        }
+
     }
 
     @Override

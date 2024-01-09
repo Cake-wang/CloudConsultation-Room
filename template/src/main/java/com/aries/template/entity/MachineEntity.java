@@ -26,5 +26,9 @@ public class MachineEntity {
         public String factoryMainPage;
         public String createTime;
         public String updateTime;
+
+        public String firstDepartment;
+        public String secondDepartment;
+
     }
 }

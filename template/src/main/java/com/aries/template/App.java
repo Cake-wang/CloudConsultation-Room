@@ -10,6 +10,7 @@ import android.util.Log;
 
 import com.aries.library.fast.FastManager;
 import com.aries.library.fast.manager.LoggerManager;
+import com.aries.library.fast.util.SizeUtil;
 import com.aries.library.fast.widget.FastLoadDialog;
 import com.aries.template.constant.ApiConstant;
 import com.aries.template.impl.ActivityControlImpl;
@@ -81,6 +82,7 @@ public class App extends MultiDexApplication {
                 .setLoadingDialog(activity -> new FastLoadDialog(activity,
                         new FullScreenJTJKDialog.JTJKBuilder(activity)
                                 .setMessage(R.string.fast_loading)
+                                .setTextSize(SizeUtil.dp2px(14f))
                                 .create()))
                 //设置全局TitleBarView相关配置
                 .setTitleBarViewControl(impl)
@@ -233,6 +235,75 @@ public class App extends MultiDexApplication {
         //blockcanary 初始化 卡顿
         // 不需要用只需要这里不让他们初始化
 //        BlockCanary.install(this, new AppBlockCanaryContext()).start();
+
+//        /* 设置允许移动网络下进行内核下载。默认不下载，会导致部分一直用移动网络的用户无法使用x5内核 */
+//        QbSdk.setDownloadWithoutWifi(true);
+//
+//        QbSdk.setCoreMinVersion(QbSdk.CORE_VER_ENABLE_202112);
+//        /* SDK内核初始化周期回调，包括 下载、安装、加载 */
+//
+//        QbSdk.setTbsListener(new TbsListener() {
+//
+//            /**
+//             * @param stateCode 用户可处理错误码请参考{@link com.tencent.smtt.sdk.TbsCommonCode}
+//             */
+//            @Override
+//            public void onDownloadFinish(int stateCode) {
+//                Log.i("TAG", "onDownloadFinished: " + stateCode);
+//            }
+//
+//            /**
+//             * @param stateCode 用户可处理错误码请参考{@link com.tencent.smtt.sdk.TbsCommonCode}
+//             */
+//            @Override
+//            public void onInstallFinish(int stateCode) {
+//                Log.i("TAG", "onInstallFinished: " + stateCode);
+////                if(stateCode==200){
+////                    ToastUtils.showToast("初始化X5内核成功。。。。",mContext);
+////                }
+//            }
+//
+//            /**
+//             * 首次安装应用，会触发内核下载，此时会有内核下载的进度回调。
+//             * @param progress 0 - 100
+//             */
+//            @Override
+//            public void onDownloadProgress(int progress) {
+//                Log.i("TAG", "Core Downloading: " + progress);
+//            }
+//        });
+//
+//        /* 此过程包括X5内核的下载、预初始化，接入方不需要接管处理x5的初始化流程，希望无感接入 */
+//        QbSdk.initX5Environment(this, new QbSdk.PreInitCallback() {
+//            @Override
+//            public void onCoreInitFinished() {
+//                // 内核初始化完成，可能为系统内核，也可能为系统内核
+//            }
+//
+//            /**
+//             * 预初始化结束
+//             * 由于X5内核体积较大，需要依赖wifi网络下发，所以当内核不存在的时候，默认会回调false，此时将会使用系统内核代替
+//             * 内核下发请求发起有24小时间隔，卸载重装、调整系统时间24小时后都可重置
+//             * 调试阶段建议通过 WebView 访问 debugtbs.qq.com -> 安装线上内核 解决
+//             * @param isX5 是否使用X5内核
+//             */
+//            @Override
+//            public void onViewInitFinished(boolean isX5) {
+//                Log.i("TAG", "onViewInitFinished: " + isX5);
+//                // hint: you can use QbSdk.getX5CoreLoadHelp(context) anytime to get help.
+//                if(isX5){
+////                    ToastUtils.showToast("X5内核安装成功。。。。",mContext);
+//                }else{
+////                    ToastUtils.showToast("X5内核安装失败。。。。",mContext);
+////                    initX5WebView();
+//                }
+//            }
+//        });
+//        // 在调用TBS初始化、创建WebView之前进行如下配置
+//        HashMap map = new HashMap();
+//        map.put(TbsCoreSettings.TBS_SETTINGS_USE_SPEEDY_CLASSLOADER, true);
+//        map.put(TbsCoreSettings.TBS_SETTINGS_USE_DEXLOADER_SERVICE, true);
+//        QbSdk.initTbsSettings(map);
     }
 
 

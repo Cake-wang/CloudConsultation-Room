@@ -6,8 +6,10 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
+import android.text.Html;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.aries.library.fast.retrofit.FastLoadingObserver;
@@ -21,6 +23,7 @@ import com.aries.template.entity.VisitMedicalPreSettleEntity;
 import com.aries.template.module.base.BaseEventFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.template.utils.ActivityUtils;
+import com.aries.template.utils.RegUtils;
 import com.aries.ui.view.title.TitleBarView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -61,7 +64,13 @@ public class PayConsultFragment extends BaseEventFragment {
      */
     @Override
     public int getContentLayout() {
-        return R.layout.fragment_pay;
+        if(GlobalConfig.thirdFactory.equals("3")||GlobalConfig.thirdFactory.equals("2")){
+            return R.layout.fragment_pay_l;
+        }else {
+            return R.layout.fragment_pay;
+        }
+
+
     }
 
     /** 从外部传入的数据  */
@@ -86,6 +95,12 @@ public class PayConsultFragment extends BaseEventFragment {
     TextView jtjk_pay_text;
     @BindView(R.id.jtjk_pay_reflash_tip)
     TextView jtjk_pay_reflash_tip;
+
+    @BindView(R.id.ll_process)
+    LinearLayout ll_process;
+
+    @BindView(R.id.jtjk_recipe_name)
+    TextView jtjk_recipe_name;
 
     boolean flagone = true;
 
@@ -131,10 +146,16 @@ public class PayConsultFragment extends BaseEventFragment {
     @Override
     public void initView(Bundle savedInstanceState) {
         //数据展示
+
+        ll_process.setVisibility(View.INVISIBLE);
+
+        // 显示名称
+        jtjk_recipe_name.setText(RegUtils.nameDesensitization(GlobalConfig.ssCard.getName())+"，您好");
+
         if (GlobalConfig.ssCard!=null)
             tv_name.setText(GlobalConfig.ssCard.getName());
 
-        String[] orders = {"#38ABA0","支付宝·","#333333","扫一扫"};
+        String[] orders = {"#333333","扫一扫"};
         jtjk_pay_text.setText(ActivityUtils.formatTextView(orders));
 
         jtjk_pay_reflash_tip.setOnClickListener(v -> {
@@ -211,12 +232,26 @@ public class PayConsultFragment extends BaseEventFragment {
                             // 检查 payFlag 如果是 1 就是支付成功
                             if (entity.isSuccess()){
                                 // 刷新复诊单价格
-                                // 总价，自费和医保
-                                tv_fee_all.setText(String.valueOf(entity.getData().getJsonResponseBean().getBody().getConsult().getConsultPrice())+"元");
-                               // 医保
-                                tv_fee_yb.setText(String.valueOf(entity.getData().getJsonResponseBean().getBody().getConsult().getFundAmount())+"元");
+//                                // 总价，自费和医保
+//                                tv_fee_all.setText(String.valueOf(entity.getData().getJsonResponseBean().getBody().getConsult().getConsultPrice())+"元");
+//                               // 医保
+//                                tv_fee_yb.setText(String.valueOf(entity.getData().getJsonResponseBean().getBody().getConsult().getFundAmount())+"元");
+//                                // 自费
+//                                tv_fee_zf.setText(String.valueOf(entity.getData().getJsonResponseBean().getBody().getConsult().getCashAmount())+"元");
+
+                                String textStr = String.valueOf(entity.getData().getJsonResponseBean().getBody().getConsult().getConsultPrice())+"<font color=\"#333333\">元</font>";
+
+                                tv_fee_all.setText(Html.fromHtml(textStr));
+                                // 医保
+                                textStr = String.valueOf(entity.getData().getJsonResponseBean().getBody().getConsult().getFundAmount())+"<font color=\"#333333\">元</font>";
+
+                                tv_fee_yb.setText(Html.fromHtml(textStr));
                                 // 自费
-                                tv_fee_zf.setText(String.valueOf(entity.getData().getJsonResponseBean().getBody().getConsult().getCashAmount())+"元");
+
+                                textStr = String.valueOf(entity.getData().getJsonResponseBean().getBody().getConsult().getCashAmount())+"<font color=\"#333333\">元</font>";
+
+                                tv_fee_zf.setText(Html.fromHtml(textStr));
+
 //                                Log.e("getPayflag",entity.getData().getJsonResponseBean().getBody().getConsult().getPayflag()+"");
                                 if (entity.getData().getJsonResponseBean().getBody().getConsult().getPayflag()==1){
                                     if (flagone){
@@ -294,7 +329,7 @@ public class PayConsultFragment extends BaseEventFragment {
                                 // 显示二维码
                                 String qrStr = entity.getData().getJsonResponseBean().getBody().getFormData();
                                 Resources res = getActivity().getResources();
-                                logoBmp = BitmapFactory.decodeResource(res, R.mipmap.pay_alilogo);
+                                logoBmp = BitmapFactory.decodeResource(res, R.mipmap.pay_hfi);
                                 payBmp = XQRCode.createQRCodeWithLogo(qrStr, 400, 400, logoBmp);
                                 BitmapDrawable drawable = new BitmapDrawable(payBmp);
                                 RequestOptions requestOptions =new RequestOptions().centerCrop()

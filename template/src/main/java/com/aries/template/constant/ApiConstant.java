@@ -49,6 +49,8 @@ public class ApiConstant {
 //    public static final String findUser  =  "ngariUserRelation/findUser";
     public static final String findUser  =  "cloudHospitalCore/findUser";
 
+    public static final String getPhysicalReportInfo  =  "cloudHospitalCore/getPhysicalReportInfo";
+
     /** 用户注册 */
 //    public static final String register  =  "ngariUserRelation/register";
     public static final String register  =  "cloudHospitalCore/register";

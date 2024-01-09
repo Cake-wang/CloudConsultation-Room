@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.aries.library.fast.retrofit.FastLoadingObserver;
@@ -14,6 +15,7 @@ import com.aries.template.R;
 import com.aries.template.entity.TopexampageResultEntity;
 import com.aries.template.module.base.BaseEventFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
+import com.aries.template.utils.RegUtils;
 import com.aries.ui.view.title.TitleBarView;
 import com.decard.NDKMethod.BasicOper;
 import com.trello.rxlifecycle3.android.FragmentEvent;
@@ -41,8 +43,8 @@ import me.yokeyword.fragmentation.ISupportFragment;
  * @Description:
  */
 public class ResultFragment extends BaseEventFragment implements ISupportFragment {
-    private  String result= "";
-    private  String takeCode= ""; // 取药码
+    public static String result= "";
+    public static String takeCode= ""; // 取药码
     private  String stuckUse= ""; // 药物用量
     private  boolean isFirstTimePrint=true; // 第一次打印判定，如果不是，则释放资源. true 为第一次
 
@@ -50,12 +52,28 @@ public class ResultFragment extends BaseEventFragment implements ISupportFragmen
     TextView tv_result_title;
     @BindView(R.id.tv_result_bg)
     ImageView tv_result_bg;
+    @BindView(R.id.ll_qy)
+    LinearLayout ll_qy;
+
+//    @BindView(R.id.iv_smqy)
+//    ImageView iv_smqy;
+//    @BindView(R.id.iv_qymqy)
+//    ImageView iv_qymqy;
+    @BindView(R.id.iv_process_f)
+    ImageView iv_process_f;
+
     @BindView(R.id.tv_result_tip)
     TextView tv_result_tip;
     @BindView(R.id.tv_result_contet)
     TextView tv_result_contet;
     @BindView(R.id.tv_result_code)
     TextView tv_result_code;
+
+    @BindView(R.id.ll_process)
+    LinearLayout ll_process;
+
+    @BindView(R.id.jtjk_recipe_name)
+    TextView jtjk_recipe_name;
 
     public static ResultFragment newInstance(String result) {
         Bundle args = new Bundle();
@@ -88,7 +106,12 @@ public class ResultFragment extends BaseEventFragment implements ISupportFragmen
 
     @Override
     public int getContentLayout() {
-        return R.layout.fragment_result;
+        if(GlobalConfig.thirdFactory.equals("3")||GlobalConfig.thirdFactory.equals("2")){
+            return R.layout.fragment_result_l;
+        }else {
+            return R.layout.fragment_result;
+        }
+//        return R.layout.fragment_result;
     }
 
     @Override
@@ -99,25 +122,59 @@ public class ResultFragment extends BaseEventFragment implements ISupportFragmen
 
     @Override
     public void initView(Bundle savedInstanceState) {
+
+        // 显示名称
+        jtjk_recipe_name.setText(RegUtils.nameDesensitization(GlobalConfig.ssCard.getName())+"，您好");
+
         if (result.contains("cancelConsult")){
              tv_result_title.setText("取消成功");
-            tv_result_bg.setBackgroundResource(R.mipmap.bg_suc_yzs);
+            if(GlobalConfig.thirdFactory.equals("3")||GlobalConfig.thirdFactory.equals("2")){
+                ll_qy.setVisibility(View.GONE);
+
+                iv_process_f.setVisibility(View.GONE);
+                tv_result_bg.setVisibility(View.VISIBLE);
+                tv_result_bg.setImageResource(R.mipmap.bg_suc_yzs_new);
+            }else {
+                tv_result_bg.setImageResource(R.mipmap.bg_suc_yzs);
+            }
+
              tv_result_tip.setText("取消成功");
              tv_result_contet.setText("您的结算单已取消，如需开药请再次发起问诊");
             tv_result_code.setVisibility(View.GONE);
+            ll_process.setVisibility(View.INVISIBLE);
         }else  if (result.contains("paySuc")){
             tv_result_title.setText("支付成功");
-            tv_result_bg.setBackgroundResource(R.mipmap.bg_pay_suc_yzs);
+            if(GlobalConfig.thirdFactory.equals("3")||GlobalConfig.thirdFactory.equals("2")){
+                ll_qy.setVisibility(View.VISIBLE);
+
+                iv_process_f.setVisibility(View.VISIBLE);
+                tv_result_bg.setVisibility(View.GONE);
+                tv_result_bg.setImageResource(R.mipmap.bg_pay_suc_yzs_new);
+            }else {
+                tv_result_bg.setImageResource(R.mipmap.bg_pay_suc_yzs);
+            }
+
             tv_result_tip.setText("支付成功");
-            tv_result_contet.setText("请取走凭条，凭取药码至药柜取药");
+            tv_result_contet.setText("请取走凭条至药柜取药");
             tv_result_code.setVisibility(View.VISIBLE);
-            tv_result_code.setText("取号码"+takeCode);
+            tv_result_code.setText("取药码："+takeCode);
+            ll_process.setVisibility(View.VISIBLE);
         }else {
             tv_result_title.setText("支付失败");
-            tv_result_bg.setBackgroundResource(R.mipmap.bg_fail_yzs);
+            if(GlobalConfig.thirdFactory.equals("3")||GlobalConfig.thirdFactory.equals("2")){
+                ll_qy.setVisibility(View.GONE);
+
+                iv_process_f.setVisibility(View.GONE);
+                tv_result_bg.setVisibility(View.VISIBLE);
+                tv_result_bg.setImageResource(R.mipmap.bg_fail_yzs_new);
+            }else {
+                tv_result_bg.setImageResource(R.mipmap.bg_fail_yzs);
+            }
+
             tv_result_tip.setText("支付失败");
             tv_result_contet.setText("当前药品库存不足");
             tv_result_code.setVisibility(View.GONE);
+            ll_process.setVisibility(View.INVISIBLE);
         }
 
 //        Handler handler = new Handler();
@@ -164,7 +221,7 @@ public class ResultFragment extends BaseEventFragment implements ISupportFragmen
                 // 机器编号
                 try {
                     String name = "姓名：王郭亮";
-                    String cardNum= "卡号：W30103722";
+                    String cardNum= "卡号：AR6114503";
                     String machineId= "设备号：widdnidvjvfkv";
 //                    byte[] strByte = printString.getBytes("GBK");
                     //打印字符
@@ -201,7 +258,7 @@ public class ResultFragment extends BaseEventFragment implements ISupportFragmen
                 // 处方用量
                 String[] split = {"铝碳酸镁咀嚼片（1天1.0次，每次10片）","阿司匹林（1天1.0次，每次10片）","氯雷他定（1天1.0次，每次10片）"};
                 try {
-                    BasicOper.dc_printcharacter("处方信息：".getBytes("GBK"));
+                    BasicOper.dc_printcharacter("用药指引：".getBytes("GBK"));
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }
@@ -296,7 +353,7 @@ public class ResultFragment extends BaseEventFragment implements ISupportFragmen
                 // 处方用量
                 String[] split = stuckUse.split("&&");
                 try {
-                    BasicOper.dc_printcharacter("处方信息：".getBytes("GBK"));
+                    BasicOper.dc_printcharacter("用药指引：".getBytes("GBK"));
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }
@@ -335,6 +392,10 @@ public class ResultFragment extends BaseEventFragment implements ISupportFragmen
             // 处方用量
 //            String takeCode  = "123685";
 //            String[] split = {"铝碳酸镁咀嚼片（1天1.0次，每次10片）","阿司匹林（1天1.0次，每次10片）","氯雷他定（1天1.0次，每次10片）"};
+
+            if(TextUtils.isEmpty(takeCode)){
+               return;
+            }
 
             String[] split = stuckUse.split("&&");
 

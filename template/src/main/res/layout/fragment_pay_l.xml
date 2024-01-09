@@ -1,0 +1,849 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@mipmap/bg_other_yzs_new"
+    android:orientation="vertical">
+
+    <com.aries.template.utils.ScaleTextView
+        android:id="@+id/jtjk_hospital_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="16dp"
+        android:gravity="center"
+        android:layout_weight="2"
+        android:textSize="26dp"
+        android:layout_marginLeft="50dp"
+        android:layout_marginTop="40dp"
+        android:text="杭州市第一人民医院"
+        android:textColor="#fff" />
+
+    <com.aries.template.utils.ScaleTextView
+        android:id="@+id/jtjk_recipe_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="620dp"
+        android:layout_marginTop="42dp"
+        android:gravity="center"
+        android:text="王**：您好！"
+        android:textColor="#fff"
+        android:textSize="24dp"
+         />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="180dp"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:layout_marginBottom="110dp"
+        android:background="@drawable/bg_readcard_gray"
+        android:paddingTop="10dp"
+        android:paddingRight="40dp"
+        android:paddingLeft="40dp"
+        android:orientation="vertical"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            >
+
+            <View
+                android:layout_width="5dp"
+                android:layout_height="25dp"
+                android:background="#24A6A0"
+                />
+
+            <com.aries.template.utils.ScaleTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#333"
+
+                android:layout_marginLeft="10dp"
+                android:textSize="24dp"
+                android:gravity="left"
+
+                android:text="请完成费用支付" />
+
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="260dp"
+                android:layout_marginBottom="10dp"
+                android:gravity="center"
+                android:id="@+id/ll_process"
+                android:orientation="horizontal"
+                >
+
+
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        >
+                        <ImageView
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:src="@mipmap/process_f"
+
+
+                            />
+
+                        <com.aries.template.utils.ScaleTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#777"
+                          android:layout_marginTop="4dp"
+
+                            android:textSize="12dp"
+                            android:gravity="left"
+
+                            android:text="等待医生接诊" />
+                    </LinearLayout>
+
+                    <ImageView
+                        android:layout_width="90dp"
+                        android:layout_height="wrap_content"
+                        android:src="@mipmap/process_l"
+android:layout_marginBottom="10dp"
+                        android:layout_marginLeft="-20dp"
+
+
+                        />
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:layout_marginLeft="-5dp"
+                        android:orientation="vertical"
+                        >
+                        <ImageView
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:src="@mipmap/process_f"
+
+
+                            />
+                        <com.aries.template.utils.ScaleTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#777"
+
+                            android:layout_marginTop="4dp"
+                            android:textSize="12dp"
+                            android:gravity="left"
+
+                            android:text="问诊开方" />
+                    </LinearLayout>
+
+                    <ImageView
+                        android:layout_width="90dp"
+                        android:layout_height="wrap_content"
+                        android:src="@mipmap/process_l"
+                        android:layout_marginLeft="-5dp"
+                        android:layout_marginBottom="10dp"
+                        />
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="-5dp"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        >
+                        <ImageView
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:src="@mipmap/process_f"
+
+
+                            />
+                        <com.aries.template.utils.ScaleTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#777"
+
+                            android:layout_marginTop="4dp"
+                            android:textSize="12dp"
+                            android:gravity="left"
+
+                            android:text="药师审方" />
+                    </LinearLayout>
+
+                    <ImageView
+                        android:layout_width="90dp"
+                        android:layout_height="wrap_content"
+                        android:src="@mipmap/process_l"
+                        android:layout_marginLeft="-5dp"
+                        android:layout_marginBottom="10dp"
+                        />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:layout_marginLeft="-5dp"
+                        android:orientation="vertical"
+                        >
+                        <ImageView
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+
+                            android:src="@mipmap/process_f"
+
+                            />
+                        <com.aries.template.utils.ScaleTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#777"
+
+                            android:layout_marginTop="4dp"
+                            android:textSize="12dp"
+                            android:gravity="left"
+
+                            android:text="结束问诊" />
+                    </LinearLayout>
+
+
+                    <ImageView
+                        android:layout_width="90dp"
+                        android:layout_height="wrap_content"
+                        android:src="@mipmap/process_x"
+                        android:layout_marginBottom="10dp"
+                        android:layout_marginLeft="-5dp"
+                        />
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:layout_marginLeft="-5dp"
+                        android:orientation="vertical"
+                        >
+                        <ImageView
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:src="@mipmap/process_5"
+
+
+                            />
+                        <com.aries.template.utils.ScaleTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#333"
+
+                            android:layout_marginTop="4dp"
+                            android:textSize="12dp"
+                            android:gravity="left"
+
+                            android:text="费用结算" />
+                    </LinearLayout>
+
+                    <ImageView
+                        android:layout_width="90dp"
+                        android:layout_height="wrap_content"
+                        android:src="@mipmap/process_l_x"
+                        android:layout_marginLeft="-5dp"
+                        android:layout_marginBottom="10dp"
+                        />
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        >
+                        <ImageView
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:src="@mipmap/process_6_x"
+
+
+                            />
+                        <com.aries.template.utils.ScaleTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#999"
+                            android:layout_marginTop="4dp"
+
+                            android:textSize="12dp"
+                            android:gravity="left"
+
+                            android:text="取药" />
+                    </LinearLayout>
+
+
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:layout_marginLeft="310dp"
+                android:background="@mipmap/icon_countdown_yzs">
+
+            </TextView>
+
+            <com.aries.template.utils.ScaleTextView
+                android:id="@+id/jtjk_fz_fragment_timer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#333"
+                android:textSize="24dp"
+                android:layout_marginLeft="10dp"
+                android:gravity="center"
+                android:text="119秒" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="576dp"
+
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/bg_readcard_white"
+            android:orientation="vertical"
+            >
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="200dp"
+                android:orientation="horizontal"
+                android:gravity="center"
+                >
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+
+                    android:layout_marginLeft="50dp"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    >
+
+                    <LinearLayout
+                        android:layout_width="260dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:paddingTop="10dp"
+                        android:paddingBottom="10dp"
+                        android:orientation="vertical"
+                        >
+
+                        <com.aries.template.utils.ScaleTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#666666"
+                            android:layout_weight="1"
+                            android:layout_marginRight="20dp"
+                            android:layout_marginTop="10dp"
+                            android:textSize="26dp"
+                            android:gravity="left"
+                            android:layout_marginBottom="20dp"
+                            android:text="姓名：" />
+
+                        <com.aries.template.utils.ScaleTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#666666"
+                            android:layout_weight="1"
+                            android:layout_marginLeft="10dp"
+                            android:textSize="26dp"
+                            android:gravity="left"
+                            android:layout_marginBottom="20dp"
+                            android:text="费用类型：" />
+
+                        <com.aries.template.utils.ScaleTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#666666"
+                            android:layout_weight="1"
+                            android:layout_marginLeft="10dp"
+                            android:textSize="26dp"
+                            android:gravity="left"
+                            android:layout_marginBottom="20dp"
+                            android:text="费用总额：" />
+
+                        <com.aries.template.utils.ScaleTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#666666"
+                            android:layout_weight="1"
+                            android:layout_marginLeft="10dp"
+                            android:textSize="26dp"
+                            android:gravity="left"
+                            android:layout_marginBottom="20dp"
+                            android:text="医保支付：" />
+
+                        <com.aries.template.utils.ScaleTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#666666"
+                            android:layout_weight="1"
+                            android:layout_marginLeft="10dp"
+                            android:textSize="26dp"
+                            android:gravity="left"
+                            android:text="自费支付：" />
+
+                        <com.aries.template.utils.ScaleTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#666666"
+                            android:layout_weight="1"
+                            android:layout_marginLeft="10dp"
+                            android:textSize="26dp"
+                            android:gravity="left"
+                            android:visibility="gone"
+                            android:layout_marginBottom="15dp"
+                            android:text="开方时间：" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="200dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:paddingTop="10dp"
+                        android:paddingBottom="10dp"
+                        android:layout_marginRight="10dp"
+                        android:orientation="vertical"
+                        android:minWidth="350dp"
+                        >
+
+                        <com.aries.template.utils.ScaleTextView
+                            android:layout_marginTop="10dp"
+                            android:id="@+id/tv_name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#333333"
+                            android:layout_weight="1"
+                            android:layout_marginLeft="10dp"
+                            android:textSize="26dp"
+                            android:gravity="left"
+                            android:layout_marginBottom="20dp"
+                            android:text="王二" />
+
+                        <com.aries.template.utils.ScaleTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#333333"
+                            android:layout_weight="1"
+                            android:layout_marginLeft="10dp"
+                            android:textSize="26dp"
+                            android:gravity="left"
+                            android:id="@+id/tv_fee_type"
+                            android:layout_marginBottom="20dp"
+                            android:text="挂号费" />
+
+                        <com.aries.template.utils.ScaleTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#698FCB"
+                            android:layout_weight="1"
+                            android:layout_marginLeft="10dp"
+                            android:textSize="26dp"
+                            android:gravity="left"
+                            android:layout_marginBottom="20dp"
+                            android:id="@+id/tv_fee_all"
+                            android:text="" />
+
+                        <com.aries.template.utils.ScaleTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#698FCB"
+                            android:layout_weight="1"
+                            android:layout_marginLeft="10dp"
+                            android:textSize="26dp"
+                            android:gravity="left"
+                            android:id="@+id/tv_fee_yb"
+                            android:layout_marginBottom="20dp"
+                            android:text="" />
+
+                        <com.aries.template.utils.ScaleTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#698FCB"
+                            android:layout_weight="1"
+                            android:layout_marginLeft="10dp"
+                            android:textSize="26dp"
+                            android:gravity="left"
+                            android:id="@+id/tv_fee_zf"
+                            android:text="" />
+
+                        <com.aries.template.utils.ScaleTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#333333"
+                            android:layout_weight="1"
+                            android:layout_marginLeft="10dp"
+                            android:textSize="26dp"
+                            android:gravity="left"
+                            android:visibility="gone"
+                            android:layout_marginBottom="15dp"
+                            android:text="2022-04-06" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:layout_marginLeft="140dp"
+                        android:layout_marginTop="20dp"
+                        android:layout_gravity="top"
+                        android:visibility="gone"
+                        android:layout_marginRight="10dp"
+                        android:orientation="vertical"
+                        >
+
+                        <com.aries.template.utils.ScaleTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#666666"
+                            android:layout_weight="1"
+                            android:layout_marginLeft="10dp"
+                            android:textSize="29dp"
+                            android:gravity="left"
+                            android:layout_marginBottom="15dp"
+                            android:text="处方信息：" />
+
+                        <com.aries.template.utils.ScaleTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#333333"
+                            android:layout_weight="1"
+                            android:layout_marginLeft="10dp"
+                            android:textSize="29dp"
+                            android:gravity="left"
+                            android:layout_marginBottom="15dp"
+                            android:text="1、阿莫西林（1天3次，每次2片）" />
+
+                        <com.aries.template.utils.ScaleTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#333333"
+                            android:layout_weight="1"
+                            android:layout_marginLeft="10dp"
+                            android:textSize="29dp"
+                            android:gravity="left"
+                            android:layout_marginBottom="15dp"
+                            android:text="2、止咳糖浆（1天3次，每次20毫升）" />
+
+                        <com.aries.template.utils.ScaleTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#333333"
+                            android:layout_weight="1"
+                            android:layout_marginLeft="10dp"
+                            android:textSize="29dp"
+                            android:gravity="left"
+                            android:text="3、口服液（1天2次，每次1支）" />
+
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:layout_marginLeft="140dp"
+                        android:visibility="gone"
+                        android:orientation="vertical"
+                        >
+
+                        <com.aries.template.utils.ScaleTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#666666"
+                            android:layout_weight="1"
+                            android:layout_marginLeft="10dp"
+                            android:textSize="29dp"
+                            android:gravity="left"
+                            android:layout_marginBottom="15dp"
+                            android:text="年龄：" />
+
+                        <com.aries.template.utils.ScaleTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#666666"
+                            android:layout_weight="1"
+                            android:layout_marginLeft="10dp"
+                            android:textSize="29dp"
+                            android:gravity="left"
+                            android:layout_marginBottom="15dp"
+                            android:text="科室：" />
+
+                        <com.aries.template.utils.ScaleTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#666666"
+                            android:layout_weight="1"
+                            android:layout_marginLeft="10dp"
+                            android:textSize="29dp"
+                            android:gravity="left"
+                            android:text="挂号时间：" />
+
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:visibility="gone"
+                        android:layout_marginRight="10dp"
+                        android:orientation="vertical"
+                        >
+
+                        <com.aries.template.utils.ScaleTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#333333"
+                            android:layout_weight="1"
+                            android:layout_marginLeft="10dp"
+                            android:textSize="29dp"
+                            android:gravity="left"
+                            android:layout_marginBottom="15dp"
+                            android:text="22" />
+
+                        <com.aries.template.utils.ScaleTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#333333"
+                            android:layout_weight="1"
+                            android:layout_marginLeft="10dp"
+                            android:textSize="29dp"
+                            android:gravity="left"
+                            android:layout_marginBottom="15dp"
+                            android:text="心胸外科" />
+
+                        <com.aries.template.utils.ScaleTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#333333"
+                            android:layout_weight="1"
+                            android:layout_marginLeft="10dp"
+                            android:textSize="29dp"
+                            android:gravity="left"
+                            android:text="2022-04-06" />
+                    </LinearLayout>
+
+
+                </LinearLayout>
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:visibility="visible"
+                    android:paddingVertical="20dp"
+                    >
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:visibility="visible"
+                        android:orientation="vertical"
+                        >
+
+                        <com.aries.template.utils.ScaleTextView
+                            android:id="@+id/jtjk_pay_text"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#333333"
+                            android:layout_marginTop="16dp"
+                            android:textSize="28dp"
+                            android:gravity="left"
+                            android:text="扫一扫" />
+
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@mipmap/bg_pay_w_yzs"
+                            android:visibility="gone"
+                            />
+
+                    <LinearLayout
+                        android:layout_width="360dp"
+                        android:layout_height="360dp"
+                        android:gravity="center"
+                        android:visibility="visible"
+                        android:background="@mipmap/bg_pay_w_yzs"
+                        android:layout_marginTop="10dp"
+                        android:orientation="horizontal"
+                        >
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/iv_qrcode"
+                            android:layout_width="340dp"
+                            android:layout_height="340dp"
+
+                            android:minWidth="120dp"
+                            android:minHeight="120dp"
+                            android:scaleType="fitXY" />
+                    </LinearLayout>
+
+
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:visibility="visible"
+                        android:layout_marginTop="5dp"
+                        android:orientation="horizontal"
+                        >
+                        <com.aries.template.utils.ScaleTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#333333"
+
+                            android:textSize="22dp"
+                            android:gravity="left"
+
+                            android:text="支持" />
+
+                        <ImageView
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:src="@mipmap/pay_zfb"
+                            android:layout_marginLeft="30dp"
+
+                            />
+                        <ImageView
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:src="@mipmap/pay_wechat"
+                            android:layout_marginLeft="15dp"
+
+                            />
+
+                    </LinearLayout>
+
+
+
+                    </LinearLayout>
+
+                    <com.aries.template.utils.ScaleTextView
+                        android:id="@+id/jtjk_pay_reflash_tip"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:text="请点击刷新"
+                        android:textColor="#38ABA0"
+                        android:textSize="26dp" />
+
+                </RelativeLayout>
+
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:paddingTop="10dp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            >
+
+            <Button
+                android:layout_width="160dp"
+                android:layout_height="60dp"
+                android:text="返回"
+
+
+                android:textSize="24dp"
+                android:id="@+id/btn_back"
+                android:textColor="#38ABA0"
+                android:gravity="center"
+                android:background="@mipmap/btn_back_yzs"
+                />
+
+            <Button
+                android:layout_width="160dp"
+                android:layout_height="60dp"
+                android:text="首页"
+
+
+                android:textSize="24dp"
+                android:id="@+id/btn_main"
+                android:textColor="#fff"
+                android:gravity="center"
+                android:layout_marginLeft="15dp"
+                android:background="@mipmap/btn_main_yzs"
+                />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_main"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:background="#00000000"
+        android:gravity="center_vertical"
+        android:paddingBottom="15dp"
+        android:orientation="horizontal">
+
+        <com.aries.template.utils.ScaleTextView
+            android:id="@+id/jtjk_machine_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="16dp"
+            android:layout_weight="1"
+            android:layout_marginLeft="80dp"
+            android:gravity="center_vertical"
+            android:textSize="16dp"
+            android:text="机器编号：583958794759"
+            android:textColor="#fff" />
+
+
+        <com.aries.template.utils.ScaleTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="10dp"
+            android:text="服务电话：96225"
+            android:textColor="#333"
+            android:visibility="gone" />
+
+        <com.aries.template.utils.ScaleTextView
+            android:id="@+id/tv_clock"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:paddingLeft="16dp"
+
+            android:fontFamily="sans-serif-light"
+            android:gravity="left"
+            android:textColor="#fff"
+            android:textSize="16dp"
+            android:textStyle="normal" />
+
+        <com.aries.template.utils.ScaleTextView
+            android:id="@+id/tv_version"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:paddingLeft="16dp"
+
+            android:fontFamily="sans-serif-light"
+            android:gravity="left"
+            android:textColor="#fff"
+            android:layout_marginRight="80dp"
+            android:textSize="16dp"
+            android:textStyle="normal"
+            />
+
+    </LinearLayout>
+</RelativeLayout>

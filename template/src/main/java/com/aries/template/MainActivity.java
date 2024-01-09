@@ -25,10 +25,12 @@ import com.aries.template.entity.TopexampageResultEntity;
 import com.aries.template.module.base.BaseEventFragment;
 import com.aries.template.module.main.HomeFragment;
 import com.aries.template.module.mine.DepartmentFragment;
+import com.aries.template.module.mine.DoctorListFragment;
 import com.aries.template.module.mine.MineCardFragment;
 import com.aries.template.module.mine.OrderConsultFragment;
 import com.aries.template.module.mine.OrderRecipesListFragment;
 import com.aries.template.module.mine.PhoneRegisterFragment;
+import com.aries.template.module.mine.TestBackFragment;
 import com.aries.template.module.mine.VideoConsultFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.template.thridapp.JTJKSSDCard;
@@ -637,8 +639,8 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
 
                                 if (getTopFragment() instanceof MineCardFragment||getTopFragment() instanceof PhoneRegisterFragment){
 
-                                    start(HomeFragment.newInstance(), SupportFragment.SINGLETASK);
-
+//                                    start(HomeFragment.newInstance(), SupportFragment.SINGLETASK);
+                                    start(TestBackFragment.newInstance(), SupportFragment.SINGLETASK);
                                 }
 
                             }else {
@@ -658,7 +660,7 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
      * 为了能够获得Mpiid
      */
     public  void requestGetPatientList(){
-        ApiRepository.getInstance().getPatientList()
+        ApiRepository.getInstance().getPatientList(GlobalConfig.ssCard.getSSNum())
                 .compose(this.bindUntilEvent(ActivityEvent.DESTROY))
                 .subscribe(new FastLoadingObserver<PatientListEntity>() {
                     @Override
@@ -686,7 +688,7 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
 //        ApiRepository.getInstance().getfindPatIdByPatientQuery(mpiId)
         ApiRepository.getInstance().getfindPatIdByPatientQueryWithCard(mpiId)
                 .compose(this.bindUntilEvent(ActivityEvent.DESTROY))
-                .subscribe(new FastLoadingObserver<FindPatIdByPatientQueryEntity>() {
+                .subscribe(new FastLoadingObserver<FindPatIdByPatientQueryEntity>("正在查询建档信息，请稍候") {
                     @Override
                     public void _onNext(FindPatIdByPatientQueryEntity entity) {
                         if (entity == null) {
@@ -789,7 +791,7 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
 
         ApiRepository.getInstance().getConsultsAndRecipes("ongoing")
                 .compose(this.bindUntilEvent(ActivityEvent.DESTROY))
-                .subscribe(new FastLoadingObserver<GetConsultsAndRecipesResultEntity>("请稍后...") {
+                .subscribe(new FastLoadingObserver<GetConsultsAndRecipesResultEntity>("正在查询就诊/处方记录，请稍候") {
                     @Override
                     public void _onNext(@io.reactivex.annotations.NonNull GetConsultsAndRecipesResultEntity entity) {
                         if (entity == null) {
@@ -805,7 +807,7 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                                 // 请求 onready
                                 ApiRepository.getInstance().getConsultsAndRecipes("onready")
                                         .compose(MainActivity.this.bindUntilEvent(ActivityEvent.DESTROY))
-                                        .subscribe(new FastLoadingObserver<GetConsultsAndRecipesResultEntity>("请稍后...") {
+                                        .subscribe(new FastLoadingObserver<GetConsultsAndRecipesResultEntity>("正在查询就诊/处方记录，请稍候") {
                                             @Override
                                             public void _onNext(@io.reactivex.annotations.NonNull GetConsultsAndRecipesResultEntity entity) {
                                                 if (entity == null) {
@@ -909,7 +911,16 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
                                                         // 如果即没有未支付处方单，也没有未支付复诊单
                                                         if (isDepartTag){
                                                             // 如果2个都不满足则跳转科室
-                                                            start(DepartmentFragment.newInstance());
+
+                                                            if (!TextUtils.isEmpty(GlobalConfig.departmentID_1)&&!TextUtils.isEmpty(GlobalConfig.departmentID_2)){
+
+                                                                start(DoctorListFragment.newInstance(GlobalConfig.departmentID_1,GlobalConfig.departmentID_2));
+
+                                                            }else {
+                                                                start(DepartmentFragment.newInstance());
+                                                            }
+
+
                                                         }
                                                     }else {
                                                         ToastUtil.show("获取未支付失败，请稍后重试");
@@ -976,8 +987,61 @@ public class MainActivity extends FastMainActivity implements ISupportActivity {
         // 保持设备界面常亮
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         // 优先将设备号输入进来
-        GlobalConfig.machineId = ApiRepository.getDeviceId();
-        GlobalConfig.thirdMachineId = ApiRepository.getDeviceId();
+        if(GlobalConfig.thirdFactory.equals("3")){
+//            String deviceId = Settings.Secure.getString(this.getContentResolver(),Settings.Secure.ANDROID_ID);
+
+//            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+//                String deviceId = Build.getSerial();
+//                if (TextUtils.isEmpty(deviceId)){
+//                    GlobalConfig.machineId = "ZX1G42CPJD";
+//                    GlobalConfig.thirdMachineId = "ZX1G42CPJD";
+//                }else {
+//                    GlobalConfig.machineId = deviceId;
+//                    GlobalConfig.thirdMachineId = deviceId;
+//                }
+//            }else {
+            // 湘湖
+                    GlobalConfig.machineId = "ZX1G42CPJD";
+                    GlobalConfig.thirdMachineId = "ZX1G42CPJD";
+            // 盈丰
+//                GlobalConfig.machineId = "ZX1G42CPJE";
+//                GlobalConfig.thirdMachineId = "ZX1G42CPJE";
+
+            // 湖山
+//            GlobalConfig.machineId = "ZX1G42CPJF";
+//            GlobalConfig.thirdMachineId = "ZX1G42CPJF";
+//            }
+
+            // 南阳潮都
+//              GlobalConfig.machineId = "ZX1G42CPJG";
+//              GlobalConfig.thirdMachineId = "ZX1G42CPJG";
+
+            // 利丰
+//            GlobalConfig.machineId = "ZX1G42CPJH";
+//            GlobalConfig.thirdMachineId = "ZX1G42CPJH";
+
+            // 北干塘湾
+//            GlobalConfig.machineId = "ZX1G42CPJI";
+//            GlobalConfig.thirdMachineId = "ZX1G42CPJI";
+
+            // 戴村云石
+//            GlobalConfig.machineId = "ZX1G42CPJJ";
+//            GlobalConfig.thirdMachineId = "ZX1G42CPJJ";
+
+            // 义桥
+//            GlobalConfig.machineId = "ZX1G42CPJK";
+//            GlobalConfig.thirdMachineId = "ZX1G42CPJK";
+
+        }
+//        if(GlobalConfig.thirdFactory.equals("2")){
+//            GlobalConfig.machineId = "N73MAX3CZQ";
+//            GlobalConfig.thirdMachineId = "N73MAX3CZQ";
+//        }
+        else {
+            GlobalConfig.machineId = ApiRepository.getDeviceId();
+            GlobalConfig.thirdMachineId = ApiRepository.getDeviceId();
+        }
+
         mDelegate.onCreate(savedInstanceState);
         if (findFragment(HomeFragment.class) == null) {
             loadRootFragment(R.id.fLayout_containerFastMain, HomeFragment.newInstance());  // 加载根Fragment

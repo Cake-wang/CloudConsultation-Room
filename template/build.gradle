@@ -207,6 +207,12 @@ dependencies {
     api(name: 'debug', ext: 'aar') {
         transitive = false
     }
+//        api(name: 'android_xysdk_3.3.4_20230724', ext: 'aar') {
+//        transitive = false
+//    }
+//    api(name: 'android_xysdk_3.3.3_20230427', ext: 'aar') {
+//        transitive = false
+//    }
 //        api(name: 'android_xysdk_3.3.1_20220920', ext: 'aar') {
 //        transitive = false
 //    }
@@ -222,7 +228,7 @@ dependencies {
     implementation 'com.alibaba:fastjson:1.1.72.android'
 
     // uvc
-    implementation 'com.herohan:UVCAndroid:1.0.4'
+    implementation 'com.herohan:UVCAndroid:1.0.5'
 
     // okone 网络框架
     implementation 'com.github.chidehang.OkOne:okone:2.3.0'
@@ -232,4 +238,6 @@ dependencies {
 
     // blockcanary example AndroidPerformanceMonitor
     implementation 'com.github.markzhai:blockcanary-android:1.5.0'
+
+    api 'com.tencent.tbs:tbssdk:44216'
 }

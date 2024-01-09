@@ -30,33 +30,31 @@
             android:gravity="center"
             android:orientation="horizontal">
 
-            <ImageView
+            <TextView
                 android:id="@+id/iv_stjc"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="5"
+                android:layout_width="300dp"
+                android:layout_height="500dp"
+
                 android:layout_centerVertical="true"
                 android:layout_marginTop="60dp"
                 android:layout_marginHorizontal="26dp"
                 android:scaleType="fitEnd"
-                android:src="@mipmap/btn_stjc_yzs" />
+                android:background="@mipmap/btn_stjc_yzs" />
 
-            <RelativeLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                />
+            <LinearLayout
+                android:layout_width="50dp"
+                android:layout_height="600dp"></LinearLayout>
 
-            <ImageView
+            <TextView
                 android:id="@+id/iv_fzpy"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="5"
+                android:layout_width="300dp"
+                android:layout_height="500dp"
+
                 android:layout_centerVertical="true"
                 android:layout_marginTop="61dp"
                 android:layout_marginHorizontal="26dp"
                 android:scaleType="fitStart"
-                android:src="@mipmap/btn_ffpy_yzs" />
+                android:background="@mipmap/btn_ffpy_yzs" />
 
         </LinearLayout>
 

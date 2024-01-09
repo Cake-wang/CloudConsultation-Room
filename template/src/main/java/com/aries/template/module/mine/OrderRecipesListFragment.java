@@ -17,6 +17,7 @@ import com.aries.template.module.base.BaseEventFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.template.utils.ActivityUtils;
 import com.aries.template.utils.DefenceUtil;
+import com.aries.template.utils.RegUtils;
 import com.aries.template.widget.autoadopter.AutoAdaptorProxy;
 import com.aries.template.widget.autoadopter.AutoObjectAdaptor;
 import com.aries.template.widget.autoadopter.DefenceAutoAdaptorProxy;
@@ -61,7 +62,13 @@ public class OrderRecipesListFragment extends BaseEventFragment {
      */
     @Override
     public int getContentLayout() {
-        return R.layout.fragment_order_recipe_list;
+
+        if(GlobalConfig.thirdFactory.equals("3")||GlobalConfig.thirdFactory.equals("2")){
+            return R.layout.fragment_order_recipe_list_l;
+        }else {
+            return R.layout.fragment_order_recipe_list;
+        }
+
     }
 
     /** 上一页，下一页管理器 */
@@ -115,7 +122,14 @@ public class OrderRecipesListFragment extends BaseEventFragment {
             public void reFlashRV(ArrayList<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes> newDatas) {
                 // 刷新时间
                 timeCount = 120;
-                DefenceAutoAdaptorProxy<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes> proxy = new DefenceAutoAdaptorProxy(recyclerView,R.layout.item_recipe,1,newDatas,getContext());
+                DefenceAutoAdaptorProxy<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes> proxy;
+                if(GlobalConfig.thirdFactory.equals("3")||GlobalConfig.thirdFactory.equals("2")){
+                     proxy = new DefenceAutoAdaptorProxy(recyclerView,R.layout.item_recipe_l,1,newDatas,getContext());
+
+                }else {
+                    proxy = new DefenceAutoAdaptorProxy(recyclerView,R.layout.item_recipe,1,newDatas,getContext());
+
+                }
                 proxy.setListener(new AutoAdaptorProxy.IItemListener<GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes>() {
                     @Override
                     public void onItemClick(AutoObjectAdaptor.ViewHolder holder, int position, GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes itemData) {
@@ -145,7 +159,7 @@ public class OrderRecipesListFragment extends BaseEventFragment {
                             endTime = itemData.recipeSurplusHours.split(" ")[0];
 
                         }else {
-                            ((TextView)holder.itemView.findViewById(R.id.jtjk_recipe_closetime)).setVisibility(View.GONE);
+                            ((TextView)holder.itemView.findViewById(R.id.jtjk_recipe_closetime)).setVisibility(View.INVISIBLE);
                         }
 //                        String openTime = itemData.createDate.split(" ")[0];
 //                        String endTime = "";
@@ -230,9 +244,15 @@ public class OrderRecipesListFragment extends BaseEventFragment {
         // 点击下一页
         btn_cancel.setOnClickListener(v -> {upDownProxy.doProReFlash();});
         // 点击跳过
-        btn_goto_dep.setOnClickListener(v->{start(DepartmentFragment.newInstance());});
+        btn_goto_dep.setOnClickListener(v->{if (!TextUtils.isEmpty(GlobalConfig.departmentID_1)&&!TextUtils.isEmpty(GlobalConfig.departmentID_2)){
+
+            start(DoctorListFragment.newInstance(GlobalConfig.departmentID_1,GlobalConfig.departmentID_2));
+
+        }else {
+            start(DepartmentFragment.newInstance());
+        }});
         // 显示名称
-        jtjk_recipe_name.setText(GlobalConfig.ssCard.getName()+"，您好");
+        jtjk_recipe_name.setText(RegUtils.nameDesensitization(GlobalConfig.ssCard.getName())+"，您好");
 
 
         title.setText("未支付的处方单");
@@ -275,7 +295,9 @@ public class OrderRecipesListFragment extends BaseEventFragment {
                                 for (GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes.RecipeDetail item : recipes.recipeDetailBeans) {
                                     String perDayUse = "适量";
                                     if (item.getUseDose()!=null)
-                                        perDayUse = String.valueOf(item.getUseDose().intValue()) + "片";
+//                                        perDayUse = String.valueOf(item.getUseDose().intValue()) + item.getUseDoseUnit();
+                                    perDayUse =Double.toString(item.getUseDose()) + item.getUseDoseUnit();
+
 //                                    String howToUse = "(1天"+item.getUseTotalDose()/item.getUseDays()+"次，每次"+ perDayUse+")";
                                     String howToUse = "(每次"+ perDayUse+")";
                                     drug+= item.drugName +" "+howToUse+"&&";

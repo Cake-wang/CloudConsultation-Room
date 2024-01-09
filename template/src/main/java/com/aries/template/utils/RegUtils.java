@@ -1,5 +1,7 @@
 package com.aries.template.utils;
 
+import android.text.TextUtils;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,4 +34,28 @@ public class RegUtils {
         Matcher m = p.matcher(verifyCode);
         return m.matches();
     }
+
+    /**
+     * 姓脱敏
+     * @param name
+     * @return
+     */
+    public static String nameDesensitization(String name) {
+        if(TextUtils.isEmpty(name)) {
+            return name;
+        }
+        char[] sArr = name.toCharArray();
+        if (sArr.length == 2) {
+            return sArr[0]+"*";
+        } else if (sArr.length  > 2) {
+            for (int i = 1; i < sArr.length ; i++) {
+                // if ('·' != sArr[i]) {
+                sArr[i] = '*';
+                // }
+            }
+            return new String(sArr);
+        }
+        return name;
+    }
+
 }

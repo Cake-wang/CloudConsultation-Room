@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:autofit="http://schemas.android.com/apk/res-auto"
+    android:background="@mipmap/bg_main_yzs_new"
+    android:orientation="vertical">
+
+
+
+    <com.aries.template.utils.ScaleTextView
+        android:id="@+id/jtjk_hospital_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="16dp"
+        android:gravity="center"
+        android:layout_weight="2"
+        android:textSize="26dp"
+        android:layout_marginLeft="50dp"
+        android:layout_marginTop="40dp"
+        android:text="杭州市第一人民医院"
+        android:textColor="#fff" />
+
+    <TextView
+        android:layout_width="100dp"
+        android:layout_alignParentRight="true"
+        android:id="@+id/tv_setting"
+        android:layout_height="100dp">
+
+    </TextView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        >
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="10"
+            android:layout_marginTop="150dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/iv_stjc"
+                android:layout_width="360dp"
+                android:layout_height="600dp"
+
+                android:layout_centerVertical="true"
+                android:layout_marginTop="60dp"
+                android:layout_marginHorizontal="26dp"
+                android:scaleType="fitEnd"
+                android:background="@mipmap/btn_stjc_yzs" />
+
+            <LinearLayout
+                android:layout_width="200dp"
+                android:layout_height="600dp"></LinearLayout>
+
+            <TextView
+                android:id="@+id/iv_fzpy"
+                android:layout_width="360dp"
+                android:layout_height="600dp"
+
+                android:layout_centerVertical="true"
+                android:layout_marginTop="61dp"
+                android:layout_marginHorizontal="26dp"
+                android:scaleType="fitStart"
+                android:background="@mipmap/btn_ffpy_yzs_new" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_main"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_alignParentBottom="true"
+            android:background="#00000000"
+            android:gravity="center_vertical"
+            android:paddingBottom="15dp"
+            android:orientation="horizontal">
+
+            <com.aries.template.utils.ScaleTextView
+                android:id="@+id/jtjk_machine_id"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="16dp"
+                android:layout_weight="1"
+                android:layout_marginLeft="80dp"
+                android:gravity="center_vertical"
+                android:textSize="16dp"
+                android:text="机器编号：583958794759"
+                android:textColor="#fff" />
+
+
+            <com.aries.template.utils.ScaleTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="10dp"
+                android:text="服务电话：96225"
+                android:textColor="#333"
+                android:visibility="gone" />
+
+            <com.aries.template.utils.ScaleTextView
+                android:id="@+id/tv_clock"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:paddingLeft="16dp"
+
+                android:fontFamily="sans-serif-light"
+                android:gravity="left"
+                android:textColor="#fff"
+                android:textSize="16dp"
+                android:textStyle="normal" />
+
+            <com.aries.template.utils.ScaleTextView
+                android:id="@+id/tv_version"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:paddingLeft="16dp"
+
+                android:fontFamily="sans-serif-light"
+                android:gravity="left"
+                android:textColor="#fff"
+                android:layout_marginRight="80dp"
+                android:textSize="16dp"
+                android:textStyle="normal"
+                />
+
+        </LinearLayout>
+
+    </LinearLayout>
+</RelativeLayout>

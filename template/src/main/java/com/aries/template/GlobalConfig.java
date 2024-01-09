@@ -59,8 +59,8 @@ public class GlobalConfig {
      * 3 医云
      */
 //    public static String thirdFactory ="1";
-    public static String thirdFactory ="2";
-//    public static String thirdFactory ="3";
+//    public static String thirdFactory ="2";
+    public static String thirdFactory ="3";
 
 
     /**
@@ -142,6 +142,13 @@ public class GlobalConfig {
      * 科室ID，当前选择的医生所在的科室
      */
     public static String departmentID="";
+
+    /**
+     * 科室ID，当前选择的医生所在的科室
+     */
+    public static String departmentID_1="";
+
+    public static String departmentID_2="";
 
     /**
      * 复诊医生全信息

@@ -4,10 +4,9 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
-import android.os.Build;
 import android.os.Handler;
-import android.util.Log;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.ainemo.sdk.otf.ConnectNemoCallback;
 import com.ainemo.sdk.otf.LayoutElement;
@@ -15,6 +14,7 @@ import com.ainemo.sdk.otf.LoginResponseData;
 import com.ainemo.sdk.otf.MakeCallResponse;
 import com.ainemo.sdk.otf.NemoSDK;
 import com.ainemo.sdk.otf.NemoSDKInitCallBack;
+import com.ainemo.sdk.otf.Orientation;
 import com.ainemo.sdk.otf.ResolutionRatio;
 import com.ainemo.sdk.otf.Roster;
 import com.ainemo.sdk.otf.RosterWrapper;
@@ -84,7 +84,7 @@ public class EaseModeProxy {
 //    private WebSocketClient webSocketClient;
     // 使用 UCV
     private UVCAndroidCameraPresenter uvcCameraPresenter;
-
+//    private UVCAndroidCameraPresenterNew uvcAndroidCameraPresenterNew;
     // 复诊单
     // 复诊单号，用于请求小鱼房间号和密码
     private Integer consultId = 815423874; //复诊单id 复诊单拿
@@ -153,7 +153,7 @@ public class EaseModeProxy {
         //初始化
         EMClient.getInstance().init(context, options);
         //在做打包混淆时，关闭debug模式，避免消耗不必要的资源
-        EMClient.getInstance().setDebugMode(true);
+        EMClient.getInstance().setDebugMode(false);
 
         //如果没有，则继续初始化
         Settings settings = new Settings(xyAppId);
@@ -178,12 +178,12 @@ public class EaseModeProxy {
         releaseProxy();
 
         // GPUS
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NemoSDK.getInstance().getGpusInfo(gpus -> {
-                //ThirdPart filter logic
-                NemoSDK.getInstance().setEnableGPUs(gpus);
-            });
-        }
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//            NemoSDK.getInstance().getGpusInfo(gpus -> {
+//                //ThirdPart filter logic
+//                NemoSDK.getInstance().setEnableGPUs(gpus);
+//            });
+//        }
     }
 
     /**
@@ -196,10 +196,30 @@ public class EaseModeProxy {
     public void onStart(Activity inputAc, ViewGroup layout){
         setActivity(inputAc);
         contentLayout = layout;
-        if (uvcCameraPresenter==null){
-            uvcCameraPresenter = new UVCAndroidCameraPresenter(activity.get());
-            uvcCameraPresenter.onStart();
+        if (GlobalConfig.thirdFactory.equals("3")||GlobalConfig.thirdFactory.equals("1")){
+            // todo 如果前置摄像头不启动，提示用户，并退回到首页
+            try{
+                NemoSDK.getInstance().releaseCamera();
+//                releaseCamera();
+                // 设置小鱼摄像头方向
+                // 设置摄像头方向
+                NemoSDK.getInstance().setOrientation(Orientation.LANDSCAPE);
+                // 如果没有，则启动前置
+                NemoSDK.getInstance().switchCamera(0);
+            }catch (Exception e){
+                e.printStackTrace();
+//            JTJKLogUtils.message(e.toString());
+            }
+        }else {
+            if (uvcCameraPresenter==null){
+                uvcCameraPresenter = new UVCAndroidCameraPresenter(activity.get());
+                uvcCameraPresenter.onStart();
+            }
+
+//            uvcAndroidCameraPresenterNew = new UVCAndroidCameraPresenterNew(activity.get());
+
         }
+
     }
 
 //    /**
@@ -540,11 +560,20 @@ public class EaseModeProxy {
      */
     public void onJoinMeetingOk() {
         NemoSDK.getInstance().setNemoSDKListener(new SimpleNemoSDkListener() {
+
+//            @Override
+//            public void onCallStateChange(CallState callState, String s, String s1) {
+//                super.onCallStateChange(callState, s, s1);
+//            }
+
             @Override
             public void onCallStateChange(CallState state, String reason) {
+                super.onCallStateChange(state, reason);
+//            public void onCallStateChange(CallState state, String reason, String s1) {
+//                super.onCallStateChange(state, reason, s1);
                 //1.监听会议状态
                 if (state == CallState.CONNECTED) {
-//                        ToastWithLogin("入会成功: ");
+                        ToastWithLogin("入会成功: 1");
 //                    Log.e("TAG", NemoSDK.getInstance().getCurrentCameraId()+"");
                     // 打开默认摄像头需要这个代码
 //                    Log.e("TAG", !uvcCameraPresenter.hasUvcCamera()+"");
@@ -565,12 +594,13 @@ public class EaseModeProxy {
 
                     if (GlobalConfig.thirdFactory.equals("1")||GlobalConfig.thirdFactory.equals("3")){
 //                        if (GlobalConfig.thirdFactory.equals("3")){
-                        if (NemoSDK.getInstance().getCurrentCameraId()==0){
-                            Log.e("TAG", NemoSDK.getInstance().getCurrentCameraId()+"");
+//                        if (NemoSDK.getInstance().getCurrentCameraId()==0){
+//                            Log.e("TAG", NemoSDK.getInstance().getCurrentCameraId()+"");
                             NemoSDK.getInstance().requestCamera();
-                        }
+//                        }
                     }
 //
+                    ToastWithLogin("入会成功: 2");
                     // 入会成功
 //                    Log.e("TAG", "onCallStateChange: 入会成功");
                     // 可能会造成多次入会成功
@@ -582,7 +612,9 @@ public class EaseModeProxy {
                     // 告诉医生，你已经离开，先注释有问题
 //                    sendNotifyPaintLiveMsg();
 //                    // 释放资源一定要写在退出会议的后面
+                    NemoSDK.getInstance().logout();
                     releaseProxy();
+
                 }
             }
 
@@ -616,16 +648,17 @@ public class EaseModeProxy {
 
             @Override
             public void onVideoDataSourceChange(List<VideoInfo> videoInfos, boolean hasVideoContent) {
+                ToastWithLogin("请流: "+ videoInfos.size()+hasVideoContent);
                     if (videoInfos.size()>0){
                         // 如果医生没有进来过，那么就执行
                         // 如果医生已经进来过了，就不再执行
-                        if (!isDoctorEnterRoom){
+//                        if (!isDoctorEnterRoom){
                             isDoctorEnterRoom = true;
                             if (videoCell !=null)
                                 videoCell.setVideoInfo(videoInfos.get(0));
                             if (listener!=null)
                                 listener.onDoctorInRoom();
-                        }
+//                        }
                     }
                     else if (videoInfos.size()==0){
                         // 现在的房间没有其他人了
@@ -636,6 +669,35 @@ public class EaseModeProxy {
                         if (listener!=null)
                             listener.onDoctorOutRoom();
                     }
+            }
+
+            @Override
+            public void onNetworkIndicatorLevel(int level) {
+                super.onNetworkIndicatorLevel(level);
+
+                if (activity==null)
+                    return;
+                activity.get().runOnUiThread(() -> {
+
+
+                    switch (level) {
+                        case 4:
+                            ToastWithLoginNew("网络质量优");
+                            break;
+                        case 3:
+                            ToastWithLoginNew("网络质量良");
+                            break;
+                        case 2:
+                            ToastWithLoginNew("网络质量中");
+                            break;
+                        case 1:
+                            ToastWithLoginNew("网络质量差");
+                            break;
+                    }
+
+
+                });
+
             }
         });
     }
@@ -678,9 +740,10 @@ public class EaseModeProxy {
             releaseProxy();
         }else {
             // 如果医生已经进入房间
+
             NemoSDK.getInstance().hangup();// 挂断通话
 //            Log.e("JTJKkkkk", "hangup" );
-//            sendNotifyPaintLiveMsg();
+            sendNotifyPaintLiveMsg();
             // 释放资源一定要写在退出会议的后面
 //            releaseProxy();
 //            releaseProxy();
@@ -700,6 +763,12 @@ public class EaseModeProxy {
             uvcCameraPresenter = null;
 //            Log.e("JTJK", "uvcCameraPresenter: done" );
         }
+//        if (uvcAndroidCameraPresenterNew!=null){
+//            uvcAndroidCameraPresenterNew.mCameraHelper.release();
+//
+//        }
+
+
         // 释放在这里为保证这个对象被释放了，如果在监听里面，可能没有被释放该怎么办？
         XLMessage.with().delayDestroy();
 //        Log.e("JTJK", "XLMessage: done" );
@@ -735,9 +804,19 @@ public class EaseModeProxy {
      */
     private void ToastWithLogin(String msg){
 //        if (activity!=null && activity.get()!=null){
-//            Log.d("EaseModeProxy",msg);
+////            Log.d("EaseModeProxy",msg);
 //            activity.get().runOnUiThread(() -> Toast.makeText(activity.get(), msg, Toast.LENGTH_SHORT).show());
 //        }
+    }
+
+    /**
+     * 打印并提示用户
+     */
+    private void ToastWithLoginNew(String msg){
+        if (activity!=null && activity.get()!=null){
+//            Log.d("EaseModeProxy",msg);
+            activity.get().runOnUiThread(() -> Toast.makeText(activity.get(), msg, Toast.LENGTH_SHORT).show());
+        }
     }
 
     /**
@@ -793,17 +872,17 @@ public class EaseModeProxy {
             return;
         activity.get().runOnUiThread(() -> {
             if (videoStatus == VideoStatus.VIDEO_STATUS_NORMAL) {
-                ToastWithLogin( activity.get().getString(R.string.video_status_normal));
+                ToastWithLoginNew( activity.get().getString(R.string.video_status_normal));
             } else if (videoStatus == VideoStatus.VIDEO_STATUS_LOW_AS_LOCAL_BW) {
-                ToastWithLogin( activity.get().getString(R.string.video_status_as_low_local_bw));
+                ToastWithLoginNew( activity.get().getString(R.string.video_status_as_low_local_bw));
             } else if (videoStatus == VideoStatus.VIDEO_STATUS_LOW_AS_LOCAL_HARDWARE) {
-                ToastWithLogin( activity.get().getString(R.string.video_status_as_low_local_hardware));
+                ToastWithLoginNew( activity.get().getString(R.string.video_status_as_low_local_hardware));
             } else if (videoStatus == VideoStatus.VIDEO_STATUS_LOW_AS_REMOTE) {
-                ToastWithLogin( activity.get().getString(R.string.video_status_as_low_local_remote));
+                ToastWithLoginNew( activity.get().getString(R.string.video_status_as_low_local_remote));
             } else if (videoStatus == VideoStatus.VIDEO_STATUS_NETWORK_ERROR) {
-                ToastWithLogin( activity.get().getString(R.string.video_status_network_error));
+                ToastWithLoginNew( activity.get().getString(R.string.video_status_network_error));
             } else if (videoStatus == VideoStatus.VIDEO_STATUS_LOCAL_WIFI_ISSUE) {
-                ToastWithLogin( activity.get().getString(R.string.video_status_local_wifi_issue));
+                ToastWithLoginNew( activity.get().getString(R.string.video_status_local_wifi_issue));
             }
         });
     }

@@ -15,6 +15,7 @@ import com.aries.template.entity.GetConsultsAndRecipesResultEntity;
 import com.aries.template.module.base.BaseEventFragment;
 import com.aries.template.retrofit.repository.ApiRepository;
 import com.aries.template.utils.ActivityUtils;
+import com.aries.template.utils.RegUtils;
 import com.aries.template.view.ShineButtonDialog;
 import com.aries.template.widget.autoadopter.AutoAdaptorProxy;
 import com.aries.template.widget.autoadopter.AutoObjectAdaptor;
@@ -89,10 +90,17 @@ public class OrderRecipesFragment extends BaseEventFragment {
     @BindView(R.id.rv_contentFastLib)
     RecyclerView rv_contentFastLib; // 藏的很深的RV对象，显示处方信息
 
+    @BindView(R.id.jtjk_recipe_name)
+    TextView jtjk_recipe_name;
 
     @Override
     public int getContentLayout() {
-        return R.layout.fragment_recipe_order;
+        if(GlobalConfig.thirdFactory.equals("3")||GlobalConfig.thirdFactory.equals("2")){
+            return R.layout.fragment_recipe_order_l;
+        }else {
+            return R.layout.fragment_recipe_order;
+        }
+
     }
 
     /**
@@ -136,9 +144,13 @@ public class OrderRecipesFragment extends BaseEventFragment {
         btn_cancel.setText("取消支付");
         btn_inquiry.setText("去支付");
 
+        // 显示名称
+        jtjk_recipe_name.setText(RegUtils.nameDesensitization(GlobalConfig.ssCard.getName())+"，您好");
+
 //        String sex = GlobalConfig.ssCard.getSex().equals("0")?"女":"男";
         String sex = GlobalConfig.ssCard.getSex();
-        tv_name.setText(GlobalConfig.ssCard.getName().trim()+"("+sex+")");
+//        tv_name.setText(GlobalConfig.ssCard.getName().trim()+"("+sex+")");
+        tv_name.setText(GlobalConfig.ssCard.getName().trim());
         tv_card.setText(GlobalConfig.ssCard.getCardNum());
         tv_age_l.setText(String.valueOf(GlobalConfig.age));
         tv_result.setText(obj.organDiseaseName);
@@ -219,8 +231,9 @@ public class OrderRecipesFragment extends BaseEventFragment {
            public void onItemViewDraw(AutoObjectAdaptor.ViewHolder holder, int position, GetConsultsAndRecipesResultEntity.QueryArrearsSummary.Recipes.RecipeDetail itemData) {
                String perDayUse = "适量";
                if (itemData.getUseDose()!=null)
-                 perDayUse = String.valueOf(itemData.getUseDose().intValue()) + "片";
+//                 perDayUse = String.valueOf(itemData.getUseDose().intValue()) + itemData.getUseDoseUnit();
 
+               perDayUse = Double.toString(itemData.getUseDose()) + itemData.getUseDoseUnit();
 
                String drugName = (position+1)+"、"+itemData.getDrugName();
 //               String wayToUse = "(1天"+itemData.getUseTotalDose()/itemData.getUseDays()+"次，每次"+perDayUse+")";
@@ -297,8 +310,8 @@ public class OrderRecipesFragment extends BaseEventFragment {
 
                                     String perDayUse = "适量";
                                     if (item.getUseDose()!=null)
-                                        perDayUse = String.valueOf(item.getUseDose().intValue()) + "片";
-
+//                                        perDayUse = String.valueOf(item.getUseDose().intValue()) + item.getUseDoseUnit();
+                                        perDayUse = Double.toString(item.getUseDose()) + item.getUseDoseUnit();
 //                                    String howToUse = "(1天"+item.getUseTotalDose()/item.getUseDays()+"次，每次"+ perDayUse+")";
                                     String howToUse = "(每次"+ perDayUse+")";
                                     PayRecipeFragment.DrugObject drug= new PayRecipeFragment.DrugObject();
